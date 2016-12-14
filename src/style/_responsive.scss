@@ -1,0 +1,209 @@
+// Variables
+
+// Default font size
+// Because this is so important in many of your calculations as a context,
+// keep your default font size stored as a variable.
+
+$default-font-size: 16px !default;
+
+// Breakpoints
+
+// Set your desired breakpoints here. Ideally, breakpoints should be set to 
+// where they make sense in the design, not targeted to specific devices.
+
+// Example:
+$breakpoint-xs: "min-width: 0px";
+$breakpoint-sm: "min-width: 576px";
+$breakpoint-md: "min-width: 768px";
+$breakpoint-lg: "min-width: 992px";
+$breakpoint-xl: "min-width: 1200px";
+
+
+// Contexts
+
+// Not necessarily the same as breakpoints, but a point from which to judge
+// relative values.  Put common ones here, such as the maximum width of
+// the content.
+
+// Example:
+$context-sm: 540px;
+$context-md: 720px;
+$context-lg: 960px;
+$context-xl: 1140px;
+
+
+
+// Mixins
+
+// responsive: to use, include the following code in your
+// declarations:
+//
+// .class {
+//     some-property: some-value;
+// 
+//     @include responsive($breakpoint) { some-property: some-new-value; }
+// }
+// 
+// By default, the declared media value is "all", but this can
+// be overridden by calling the mixin as:
+// @include responsive($breakpoint, screen)
+// (using "screen" as an example)
+// 
+// You can define common breakpoints in the variables section above
+// and reuse them.  Else, you can pass it literally when calling the
+// mixin:
+// 
+// .class {
+//     @include responsive('min-width: 640px') { some-property: some-new-value; }
+// }
+
+@mixin responsive($breakpoint, $media: all) {
+	@media only #{$media} and ($breakpoint) {
+		@content;
+	}
+}
+
+// breakpoint: Chris Coyier's method for creating media queries.
+// See: http://css-tricks.com/media-queries-sass-3-2-and-codekit/
+// Make up **meaningful** names for your breakpoints so that you
+// and the members of your team can understand and remember them.
+// Also, adjust this mixin for as many breakpoints as you need.
+// You'll likely need finer control for things like font size
+// adjustments, so the "responsive" mixin above can help fill in
+// the gaps.
+// 
+// This is currently set up as mobile first, expanding upwards.
+// You'll need to change "min-width" to "max-width" if you're
+// working from the desktop down.
+
+@mixin breakpoint($breakpoint, $media: all) {
+
+	// Change these values as required
+	$medium: 640px / 16px * 1em;
+	$large: 1024px / 16px * 1em;
+	$xlarge: 1280px / 16px * 1em;
+
+	@if $breakpoint == medium {
+		@media only #{$media} and (min-width: $medium) {
+			@content;
+		}
+	} @else if $breakpoint == large {
+		@media only #{$media} and (min-width: $large) {
+			@content;
+		}
+	} @else if $breakpoint == xlarge {
+		@media only #{$media} and (min-width: $xlarge) {
+			@content;
+		}
+	}
+}
+
+
+// bp: alias for breakpoint
+
+@mixin bp($breakpoint, $media: all) {
+	@include breakpoint($breakpoint, $media) {
+		@content;
+	}
+}
+
+
+// hidpi: same concept as "responsive", except that this is focusing on
+// HiDPI (a.k.a. retina) displays.
+@mixin hidpi($media: all) {
+	@media 
+		only #{$media} and (min--moz-device-pixel-ratio: 1.5),
+		only #{$media} and (-o-min-device-pixel-ratio: 3/2),
+		only #{$media} and (-webkit-min-device-pixel-ratio: 1.5),
+		only #{$media} and (min-device-pixel-ratio: 1.5),
+		only #{$media} and (min-resolution: 144dpi),
+		only #{$media} and (min-resolution: 1.5dppx) {
+
+		@content;
+	}
+}
+
+
+// and just because the term "retina" is so widely used, we'll create
+// a mixin that uses that as an alias
+@mixin retina($media: all) {
+	@include hidpi($media) { @content; }
+}
+
+
+// rem: Calculate the rem unit, and return both pixels and rems
+// to support older (non-rem supporting) browsers
+@mixin rem($property, $value, $context: $default-font-size) {
+	#{$property}: $value;
+	#{$property}: cr($value, $context);
+}
+
+// Since the most common application of this is likely to be 
+// with font-size, I've created a special mixin just for that
+// which will save you a whopping **5 characters** per time you
+// have to type it. Productivity FTW!
+@mixin font-size($font-size) {
+	@include rem(font-size, $font-size);
+}
+
+
+// Functions
+
+// calc-rem: calculate the rem value based on the desired pixel 
+// value versus a context value, usually the default font size
+$default-font-size: 16px !default;
+
+@function calc-rem( $target, $context: $default-font-size ) {
+	@return $target / $context * 1rem;
+}
+
+// Shorthand redeclaration of the above
+@function cr( $target, $context: $default-font-size ) {
+	@return calc-rem( $target, $context );
+}
+
+
+// calc-percent: calculate the percent using the target ÷ context
+// formula, expressed as a percentage.  See Chapter 2 of "Responsive 
+// Web Design" (Marcotte, A Book Apart, 2011)
+@function calc-percent( $target, $context ) {
+	@return percentage( $target / $context );
+}
+
+// Shorthand redeclaration of the above
+@function cp( $target, $context ) {
+	@return calc-percent( $target, $context );
+}
+
+
+// calc-em: sometimes, you really need to use ems, not rems,
+// esp. when you're dealing with fonts that should be sized
+// relative to other items in a component, such as headers.
+// Remember to define your context!  Your context will be
+// the font-size of the parent element.
+
+@function calc-em( $target, $context ) {
+	@return $target / $context * 1em;
+}
+
+// Shorthand redeclaration of the above
+
+@function ce( $target, $context ) {
+	@return calc-em( $target, $context );
+}
+
+
+// hidpi-sprite-adjustment
+// when using Sass & Compass to generate sprites, there are issues with calculating the
+// position of the HiDPI sprites. See http://blog.teamtreehouse.com/?p=20925 (I'll update
+// this documentation when I get a chance to later.)  this function makes the necessary
+// adjustment for you.
+@function hidpi-sprite-adjustment($sprite-map, $sprite) {
+	@return round(nth(sprite-position($sprite-map, $sprite), 2) / 2);
+}
+
+// retina-sprite-adjustment
+// prefer the term "retina" over "hidpi"? here you go, this aliases the previous function
+@function retina-sprite-adjustment($sprite-map, $sprite) {
+	@return hidpi-sprite-adjustment($sprite-map, $sprite);
+}
