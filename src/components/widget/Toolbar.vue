@@ -3,15 +3,16 @@
 		<img class="flower" src="../../assets/flower.png">
 		<div class="container">
 			<img class="logo" src="../../assets/logo.png">
-			<div class="tab ripple" :class="curSubTab === index ? 'active' : ''" v-for="(item, index) of tabs[curTab].val" @click="select(index)">
-				{{ item }}
+			<div class="tab ripple" :class="curSubTab === index ? 'active' : ''" :style="'width:' + tabWidth + '%'"
+			 v-for="(item, index) of rankList[curRank].sub[curSubRank].list" @click="select(index)">
+				{{ item.name }}
 			</div>
-			<div class="tab ripple" @click="openSelector()">
+			<div class="tab right ripple" @click="openSelector()" :style="'width:' + tabWidth + '%'">
 				<span class="more"></span>
 				<span class="more"></span>
 				<span class="more"></span>
 			</div>
-			<span class="indicator" :style="'left:' + (100/(tabs[curTab].val.length+1)) * curSubTab + '%'"></span>
+			<span class="indicator" :style="'left:' + tabWidth * curSubTab + '%;width:' + tabWidth + '%'"></span>
 		</div>
 	</div>
 </template>
@@ -23,29 +24,37 @@
 
 		data () {
 			return {
-				tabs: [
-				{
-					name: '映像相关',
-					val: ['动画BD', '映像BD', '映像VD', '电影BD']
-				},
-				{
-					name: '音乐相关',
-					val: ['单曲日榜', '专辑日榜', '音乐BD', '音乐VD']
-				}],
-				curTab: 0,
-				curSubTab: 0
+				rankList: [],
+				curRank: 0, // 周榜还是日榜
+				curSubRank: 0, // 那个榜单分类
+				curSubTab: 0 // 榜单最小项
 			};
+		},
+		created() {
+			this.$root.$children[0].$emit('getRankList', rankList => {
+				this.rankList = rankList;
+				// send to Navbar
+				this.$root.$children[0].$emit('getCurRank', curRank => {
+					this.curRank = curRank;
+				});
+			})
+		},
+		computed: {
+			tabWidth() {
+				return 100 / (this.rankList[this.curRank].sub[this.curSubRank].list.length + 1);
+			}
 		},
 		methods: {
 			select(index) {
 				this.curSubTab = index
 			},
 			openSelector() {
-				let nameList = []
-				this.tabs.forEach((item) => {
-					nameList.push(item.name)
+				this.$root.$children[0].$emit('showSelector', this.rankList[this.curRank].sub.map(item => {
+					return item.name;
+				}), index => {
+					this.curSubRank = index;
+					this.curSubTab = 0;
 				})
-				this.$root.$children[0].$emit('showSelector', nameList, index => this.curTab = index)
 			}
 		}
 	};
@@ -96,7 +105,7 @@
 				float: left;
 				color: white;
 				cursor: pointer;
-				width: 1 / 5 * 100%;
+				// width: 1 / 5 * 100%;
 				font-size: cr($target: 14px);
 				text-align: center;
 				vertical-align: middle;
@@ -118,9 +127,12 @@
 				&.active {
 					color: white;
 				}
+				&.right {
+					float: right;
+				}
 			}
 			>.indicator {
-				width: 1/5 * 100%;
+				// width: 1/5 * 100%;
 				background: white;
 				height: cr($target: 3px);
 				position: absolute;

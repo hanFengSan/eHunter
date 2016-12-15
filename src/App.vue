@@ -23,6 +23,7 @@
 </template>
 
 <script>
+  import string from 'assets/value/string-cn.json'
   import Navbar from './components/widget/Navbar.vue'
   import Selector from './components/widget/Selector.vue'
   import PopupMask from './components/widget/PopupMask.vue'
@@ -32,6 +33,67 @@
   export default {
     data() {
       return {
+        // 详细榜单分类数据
+        rankList: [
+        {
+          name: string.oricon_daily_rank,
+          sName: string.daily_rank,
+          sub: [
+          {
+            name: string.general,
+            list: [
+            { name: string.general_bd, id: 0 },
+            { name: string.general_dvd, id: 0 },
+            { name: string.single, id: 0 },
+            { name: string.album, id: 0 }
+            ]
+          },
+          {
+            name: string.bd_detail,
+            list: [
+            { name: string.anime_bd, id: 0 },
+            { name: string.movie_bd, id: 0 },
+            { name: string.music_bd, id: 0 },
+            ]
+          },
+          {
+            name: string.dvd_detail,
+            list: [
+            { name: string.anime_dvd, id: 0 },
+            { name: string.movie_dvd, id: 0 },
+            { name: string.music_dvd, id: 0 },
+            ]
+          }]
+        },
+        {
+          name: string.oricon_weekly_rank,
+          sName: string.weekly_rank,
+          list: [
+          { name: string.general_bd, id: 0 },
+          { name: string.general_dvd, id: 0 },
+          { name: string.single, id: 0 },
+          { name: string.album, id: 0 }
+          ],
+          more: [
+          {
+            name: string.bd_detail,
+            list:[
+            { name: string.anime_bd, id: 0 },
+            { name: string.movie_bd, id: 0 },
+            { name: string.music_bd, id: 0 },
+            { name: string.tv_bd, id: 0 },
+            ]
+          },
+          {
+            name: string.dvd_detail,
+            list:[
+            { name: string.anime_dvd, id: 0 },
+            { name: string.music_dvd, id: 0 },
+            ]
+          }]
+        }
+        ],
+        // 各个组件的状态管理
         selector: {
           show: false,
           data: [],
@@ -54,6 +116,7 @@
       };
     },
     created() {
+      this.$on('getRankList', this.getRankList);
       this.$on('showSelector', this.showSelector);
       this.$on('showTablePicker', this.showTablePicker);
       this.$on('showItemInfo', this.showItemInfo);
@@ -61,6 +124,9 @@
     },
     components: { Navbar, Selector, TablePicker, PopupMask, ItemInfo },
     methods: {
+      getRankList(callback) {
+        callback(this.rankList);
+      },
       setModalMode() {
         document.body.style.overflow = "hidden";
         // 屏蔽IOS的滑动

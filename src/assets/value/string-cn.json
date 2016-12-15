@@ -32,5 +32,25 @@
     "artist": "艺术家",
     "releaseDate": "已售天数",
     "publisher": "发行方",
-    "day": "天"
+    "day": "天",
+
+    "oricon_daily_rank": "Oricon日榜",
+    "oricon_weekly_rank": "Oricon周榜",    
+    "daily_rank": "日榜",
+    "weekly_rank": "周榜",
+    "general_bd": "综合BD",
+    "bd_detail": "BD详情",
+    "dvd_detail": "DVD详情",
+    "general_dvd": "综合DVD",
+    "general_dvd_abbr": "综合VD",
+    "single": "单曲",
+    "album": "专辑",
+    "anime_bd": "动画BD",
+    "movie_bd": "电影BD",
+    "music_bd": "音乐BD",
+    "anime_dvd": "动画DVD",
+    "movie_dvd": "电影DVD",
+    "music_dvd": "音乐DVD",
+    "tv_BD": "电视剧BD",
+    "general": "综合"
 }

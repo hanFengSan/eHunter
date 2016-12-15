@@ -4,7 +4,7 @@
 		<div class="navbar">
 			<div class="container">
 				<div class="selector" @click="select()">
-					<span class="text">{{ sRank[curRank] }}</span>
+					<span class="text">{{ rankList[curRank].sName }}</span>
 				</div>
 			</div>
 		</div>
@@ -12,27 +12,31 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
-
+	import string from 'assets/value/string-cn.json'
 	export default {
 
 		name: 'navbar',
 
 		data () {
 			return {
-				rank: ['Oricon周榜', 'Oricon日榜'],
-				sRank: ['周榜', '日榜'],
-				curRank: 1
+				// 详细榜单分类数据
+				rankList: [],
+				curRank: 0
 			};
 		},
-		computed: {
-			...mapActions({
-				setSelector: 'setSelector'
-			})
+		created() {
+			this.$root.$children[0].$emit('getRankList', rankList => this.rankList = rankList);
+			this.$root.$children[0].$on('getCurRank', this.getCurRank);
 		},
 		methods: {
 			select() {
-				this.$root.$children[0].$emit('showSelector', this.rank, index => this.curRank = index)
+				let list =  this.rankList.map(item => {
+					return item.name
+				})
+				this.$root.$children[0].$emit('showSelector', list, index => this.curRank = index)
+			},
+			getCurRank(callback) {
+				callback(this.curRank);
 			}
 		}
 	};
