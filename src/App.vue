@@ -7,13 +7,16 @@
     transition
     transition-mode="out-in"></router-view>
     <transition name="fade">  
-      <popup-mask v-if="selector.show || tablePicker.show"></popup-mask>
+      <popup-mask v-if="selector.show || tablePicker.show || itemInfo.show"></popup-mask>
     </transition>   
     <transition name="fade">  
       <selector v-if="selector.show" :data="selector"></selector>
     </transition>
     <transition name="fade">  
       <table-picker v-if="tablePicker.show" :data="tablePicker"></table-picker>
+    </transition>
+    <transition name="fade">  
+      <item-info v-if="itemInfo.show" :data="itemInfo"></item-info>
     </transition>
 
   </div>
@@ -24,6 +27,7 @@
   import Selector from './components/widget/Selector.vue'
   import PopupMask from './components/widget/PopupMask.vue'
   import TablePicker from './components/widget/TablePicker.vue'
+  import ItemInfo from './components/widget/ItemInfo.vue'
 
   export default {
     data() {
@@ -40,15 +44,22 @@
           size: 4,
           callback: () => {},
           cancelCallback: () => {}
+        },
+        itemInfo: {
+          show: false,
+          data: [],
+          callback: () => {},
+          cancelCallback: () => {}
         }
       };
     },
     created() {
       this.$on('showSelector', this.showSelector);
       this.$on('showTablePicker', this.showTablePicker);
+      this.$on('showItemInfo', this.showItemInfo);
       this.$on('closePopup', this.closePopup);
     },
-    components: { Navbar, Selector, TablePicker, PopupMask },
+    components: { Navbar, Selector, TablePicker, PopupMask, ItemInfo },
     methods: {
       setModalMode() {
         document.body.style.overflow = "hidden";
@@ -77,10 +88,18 @@
         this.tablePicker.callback = callback;
         this.tablePicker.cancelCallback = cancelCallback;
         this.setModalMode();
+      },  
+      showItemInfo(data, callback, cancelCallback) {
+        this.itemInfo.show = true;
+        this.itemInfo.data = data;
+        this.itemInfo.callback = callback;
+        this.itemInfo.cancelCallback = cancelCallback;
+        this.setModalMode();
       },
       closePopup() {
         this.selector.show = false;
         this.tablePicker.show = false;
+        this.itemInfo.show = false;
         this.cancelModalMode();
       },
 

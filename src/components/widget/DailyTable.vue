@@ -5,10 +5,10 @@
 				<span class="header-item" :style="'width:' + item.width + '%'">{{ item.name }}</span>
 			</template>
 		</div>
-		<div class="body" v-for="row of data">
+		<div class="row" v-for="(row, index) of data" @click="select(index)">
 			<template v-for="item of row" v-if="item.isActived">
-				<span class="body-item" v-if="item.key !== 'title'" :style="'width:' + item.width + '%'">{{ item.data }}</span>
-				<div class="body-item title-wraper" v-if="item.key === 'title'" :style="'width:' + item.width + '%'">
+				<span class="row-item" v-if="item.key !== 'title'" :style="'width:' + item.width + '%'">{{ item.data }}</span>
+				<div class="row-item title-wraper" v-if="item.key === 'title'" :style="'width:' + item.width + '%'">
 					<span class="title">{{ item.data }}</span>
 				</div>
 			</template>
@@ -52,6 +52,9 @@
 				let timeDiff = Math.abs((new Date()).getTime() - dateTime.getTime());
 				let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
 				return diffDays + this.string.day;
+			},
+			select(index) {
+				this.$root.$children[0].$emit('showItemInfo', this.data[index], ()=>{}, ()=>{})
 			},
 			// 装填修饰数据
 			initData(list) {
@@ -157,7 +160,7 @@
 				float: left;
 			}
 		}
-		>.body {
+		>.row {
 			position: relative;
 			height: 3rem;
 			color: black;
@@ -165,7 +168,15 @@
 			&:nth-child(2n+1) {
 				background: rgba($contrast_color, .1);
 			}		
-			>.body-item {
+			&:hover {
+				@include responsive($breakpoint-md) {
+					background: rgba($contrast_color, .3);
+				}
+			}
+			&:active {
+				background: rgba($contrast_color, .3);
+			}
+			>.row-item {
 				display: inline-block;
 				line-height: 3rem;
 				text-align: center;
