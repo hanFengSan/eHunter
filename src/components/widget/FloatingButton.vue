@@ -35,13 +35,22 @@
 			},
 			showTablePicker() {
 				this.$root.$children[0].$emit('showTablePicker', 
-					['排名', '标题', '艺术家', '已售天数'], 
-					index => {
-						this.buttonSize = '3rem'
-					},
-					() => {
-						this.buttonSize = '3rem'
+					[
+					{name: '排名', key: 'rank', isActived: true},
+					{name: '标题', key: 'title', isActived: true},
+					{name: '艺术家', key: 'artist', isActived: true},
+					{name: '已售天数', key: 'releaseDate', isActived: true},
+					{name: '发行方', key: 'pulisher', isActived: false}
+					],
+					4,
+					() => {},
+					data => {
+						this.reloadTable(data);
+						this.buttonSize = '3rem';
 					})
+			},
+			reloadTable(data) {
+				this.$root.$children[0].$emit('reloadTable', data);
 			}
 		}
 	};

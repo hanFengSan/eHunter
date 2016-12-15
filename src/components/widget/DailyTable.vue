@@ -39,6 +39,9 @@
 			Vue.http.get('/sales/daily?flag=104102').then(res => {
 				this.data = res.data.list
 			}, res => {});
+			console.log('lserviceisten');
+			this.$root.$children[0].$on('reloadTable', this.reloadTable);
+			this.$root.$children[0].$on('getTableInfo', this.getTableInfo);
 		},
 		methods: {
 			getDays(date) {
@@ -47,6 +50,17 @@
 				let timeDiff = Math.abs((new Date()).getTime() - dateTime.getTime());
 				let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
 				return diffDays;
+			},
+			initData(list) {
+				return list.map(item => {
+					
+				})
+			},
+			getTableInfo(callback) {
+
+			},
+			reloadTable(data) {
+				console.log(data);
 			}
 		}
 	};
@@ -90,12 +104,6 @@
 			&:nth-child(2n+1) {
 				background: rgba($contrast_color, .1);
 			}		
-			// &:nth-child(2n+1) {
-			// 	background: rgba($primary_color, .1);
-			// }
-			// &:nth-child(2n+1) {
-			// 	background: rgba($background_grey, 1);
-			// }
 			>.body-item {
 				display: inline-block;
 				line-height: 3rem;
@@ -118,7 +126,6 @@
 					padding: 0 1%;
 					>.title {
 						display: inline-block;
-						// color: $primary_color;
 						max-height: 2.2rem;
 						vertical-align: middle;
 						line-height: 1.1rem;

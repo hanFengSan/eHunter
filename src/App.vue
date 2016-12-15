@@ -7,11 +7,14 @@
     transition
     transition-mode="out-in"></router-view>
     <transition name="fade">  
+      <popup-mask v-if="selector.show || tablePicker.show"></popup-mask>
+    </transition>   
+    <transition name="fade">  
       <selector v-if="selector.show" :data="selector"></selector>
     </transition>
-    <!-- <transition name="fade">   -->
+    <transition name="fade">  
       <table-picker v-if="tablePicker.show" :data="tablePicker"></table-picker>
-    <!-- </transition> -->
+    </transition>
 
   </div>
 </template>
@@ -19,6 +22,7 @@
 <script>
   import Navbar from './components/widget/Navbar.vue'
   import Selector from './components/widget/Selector.vue'
+  import PopupMask from './components/widget/PopupMask.vue'
   import TablePicker from './components/widget/TablePicker.vue'
 
   export default {
@@ -33,6 +37,7 @@
         tablePicker: {
           show: false,
           data: [],
+          size: 4,
           callback: () => {},
           cancelCallback: () => {}
         }
@@ -43,7 +48,7 @@
       this.$on('showTablePicker', this.showTablePicker);
       this.$on('closePopup', this.closePopup);
     },
-    components: {Navbar, Selector, TablePicker},
+    components: { Navbar, Selector, TablePicker, PopupMask },
     methods: {
       setModalMode() {
         document.body.style.overflow = "hidden";
@@ -65,9 +70,10 @@
         this.selector.cancelCallback = cancelCallback;
         this.setModalMode();
       },
-      showTablePicker(data, callback, cancelCallback) {
+      showTablePicker(data, size, callback, cancelCallback) {
         this.tablePicker.show = true;
         this.tablePicker.data = data;
+        this.tablePicker.size = size;
         this.tablePicker.callback = callback;
         this.tablePicker.cancelCallback = cancelCallback;
         this.setModalMode();
@@ -154,6 +160,7 @@
       padding-left: 240%;
       margin-top: -120%;
       margin-left: -120%;
+      pointer-events: none;
       opacity: 0;
       transition: all 0.3s;
     }

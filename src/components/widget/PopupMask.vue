@@ -11,7 +11,7 @@
 
 		name: 'Popup',
 
-		props: ['cancelCallback', 'cancelCallbackParam'],
+		props: ['cancelCallback'],
 		
 		data () {
 			return {
@@ -21,7 +21,7 @@
 		methods: {
 			close() {
 				if (this.cancelCallback !== undefined) {
-					this.cancelCallback(this.cancelCallbackParam)
+					this.cancelCallback()
 				}
 				this.$root.$children[0].$emit('closePopup')
 			}
@@ -36,10 +36,10 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		z-index: 40000;
+		z-index: 30000;
 		overflow-y: auto;
 		margin: 0 auto;
-		// background: rgba(black, .5);
+		background: rgba(black, .5);
 		>.content {
 			position: fixed;
 			top: 50%;
