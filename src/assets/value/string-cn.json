@@ -30,5 +30,7 @@
     "rank": "排名",
     "title": "标题",
     "artist": "艺术家",
-    "releaseDate": "已售天数"
+    "releaseDate": "已售天数",
+    "publisher": "发行方",
+    "day": "天"
 }

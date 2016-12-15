@@ -34,20 +34,16 @@
 					}, () => this.buttonSize = '3rem')
 			},
 			showTablePicker() {
-				this.$root.$children[0].$emit('showTablePicker', 
-					[
-					{name: '排名', key: 'rank', isActived: true},
-					{name: '标题', key: 'title', isActived: true},
-					{name: '艺术家', key: 'artist', isActived: true},
-					{name: '已售天数', key: 'releaseDate', isActived: true},
-					{name: '发行方', key: 'pulisher', isActived: false}
-					],
-					4,
-					() => {},
-					data => {
-						this.reloadTable(data);
-						this.buttonSize = '3rem';
-					})
+				this.$root.$children[0].$emit('getTableInfo', info => {
+					this.$root.$children[0].$emit('showTablePicker', 
+						JSON.parse(JSON.stringify(info.tableData[0])), 
+						info.tableSize,
+						() => {},
+						data => {
+							this.reloadTable(data);
+							this.buttonSize = '3rem';
+						})					
+				})
 			},
 			reloadTable(data) {
 				this.$root.$children[0].$emit('reloadTable', data);
