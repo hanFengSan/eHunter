@@ -62,25 +62,50 @@ const state = {
 		}]
 	}
 	],
+	curRank: 0, // 周榜还是日榜
+	curSubRank: 0, // 榜单小分类
+	curTab: 0, // 榜单小分类下的第几个
 }
 
 // getters
 const getters = {
-	getRankList: state => { return state.rankList }
+	getRankList: state => state.rankList,
+	getCurRank: state => state.curRank,
+	getCurSubRank: state => state.curSubRank,
+	getCurTab: state => state.curTab
 }
 
 // actions
 const actions = {
 	setString ({ commit }, rankList) {
-		commit(types.SET_RANK_LIST, rankList)
-	}
+		commit(types.SET_RANK_LIST, rankList);
+	},
+	setCurRank ({ commit, state }, num) {
+		commit(types.SET_CUR_RANK, { num });
+	},
+	setCurSubRank ({ commit }, num) {
+		commit(types.SET_CUR_SUB_RANK, { num });
+	},
+	setCurTab ({ commit }, num) {
+		commit(types.SET_CUR_TAB, { num });
+	},
 }
 
 // mutations
 const mutations = {
-	[types.SET_STRING] (state, { lang }) {
+	[types.SET_STRING] (state, { list }) {
 
-	}
+	},
+	[types.SET_CUR_RANK] (state, { num }) {
+		state.curRank = num;
+	},
+	[types.SET_CUR_SUB_RANK] (state, { num }) {
+		state.curSubRank = num;
+	},
+	[types.SET_CUR_TAB] (state, { num }) {
+		state.curTab = num;
+	},
+
 }
 
 export default {

@@ -12,6 +12,7 @@
 </template>
 
 <script>
+	import { mapGetters, mapActions } from 'vuex'
 	import string from 'assets/value/string-cn.json'
 	export default {
 
@@ -19,25 +20,28 @@
 
 		data () {
 			return {
-				// 详细榜单分类数据
-				rankList: [],
-				curRank: 0
 			};
 		},
 		created() {
-			this.$root.$children[0].$emit('getRankList', rankList => this.rankList = rankList);
-			this.$root.$children[0].$on('getCurRank', this.getCurRank);
+			// this.$root.$children[0].$on('getCurRank', this.getCurRank);
+		},
+		computed: {
+			...mapGetters({
+				string: 'getString',
+				rankList: 'getRankList',
+				curRank: 'getCurRank'
+			})
 		},
 		methods: {
 			select() {
 				let list =  this.rankList.map(item => {
 					return item.name
 				})
-				this.$root.$children[0].$emit('showSelector', list, index => this.curRank = index)
+				this.$root.$children[0].$emit('showSelector', list, index => this.setCurRank(index));
 			},
-			getCurRank(callback) {
-				callback(this.curRank);
-			}
+			...mapActions({
+				setCurRank: 'setCurRank'
+			})
 		}
 	};
 </script>
