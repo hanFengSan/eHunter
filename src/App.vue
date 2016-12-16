@@ -7,7 +7,7 @@
     transition
     transition-mode="out-in"></router-view>
     <transition name="fade">  
-      <popup-mask v-if="selector.show || tablePicker.show || itemInfo.show"></popup-mask>
+      <popup-mask v-if="hasMask"></popup-mask>
     </transition>   
     <transition name="fade">  
       <selector v-if="selector.show" :data="selector"></selector>
@@ -34,46 +34,23 @@
   export default {
     data() {
       return {
-        // 各个组件的状态管理
-        selector: {
-          show: false,
-          data: [],
-          callback: () => {},
-          cancelCallback: () => {}
-        },
-        tablePicker: {
-          show: false,
-          data: [],
-          size: 4,
-          callback: () => {},
-          cancelCallback: () => {}
-        },
-        itemInfo: {
-          show: false,
-          data: [],
-          callback: () => {},
-          cancelCallback: () => {}
-        }
-      };
+      }
     },
     computed: {
       ...mapGetters({
         string: 'getString',
-        rankList: 'getRankList'
+        rankList: 'getRankList',
+        selector: 'getSelector',
+        tablePicker: 'getTablePicker',
+        itemInfo: 'getItemInfo',
+        hasMask: 'hasMask'
       }),
     },
     created() {
-      this.$on('getRankList', this.getRankList);
-      this.$on('showSelector', this.showSelector);
-      this.$on('showTablePicker', this.showTablePicker);
-      this.$on('showItemInfo', this.showItemInfo);
-      this.$on('closePopup', this.closePopup);
+
     },
     components: { Navbar, Selector, TablePicker, PopupMask, ItemInfo },
     methods: {
-      getRankList(callback) {
-        callback(this.rankList);
-      },
       setModalMode() {
         document.body.style.overflow = "hidden";
         // 屏蔽IOS的滑动
@@ -87,35 +64,6 @@
           e.default(); 
         };
       },
-      showSelector(data, callback, cancelCallback) {
-        this.selector.show = true;
-        this.selector.data = data;
-        this.selector.callback = callback;
-        this.selector.cancelCallback = cancelCallback;
-        this.setModalMode();
-      },
-      showTablePicker(data, size, callback, cancelCallback) {
-        this.tablePicker.show = true;
-        this.tablePicker.data = data;
-        this.tablePicker.size = size;
-        this.tablePicker.callback = callback;
-        this.tablePicker.cancelCallback = cancelCallback;
-        this.setModalMode();
-      },  
-      showItemInfo(data, callback, cancelCallback) {
-        this.itemInfo.show = true;
-        this.itemInfo.data = data;
-        this.itemInfo.callback = callback;
-        this.itemInfo.cancelCallback = cancelCallback;
-        this.setModalMode();
-      },
-      closePopup() {
-        this.selector.show = false;
-        this.tablePicker.show = false;
-        this.itemInfo.show = false;
-        this.cancelModalMode();
-      },
-
     }
   }
 </script>

@@ -13,6 +13,7 @@
 
 <script>
 	import Popup from '../base/Popup.vue'
+	import { mapActions } from 'vuex'
 
 	export default {
 
@@ -32,8 +33,11 @@
 		},
 
 		methods: {
+			...mapActions({
+				closePopups: 'closePopups'
+			}),
 			close() {
-				this.$root.$children[0].$emit('closePopup');
+				this.closePopups();
 			}
 		}
 	};

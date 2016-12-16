@@ -33,15 +33,19 @@
 			})
 		},
 		methods: {
+			...mapActions({
+				setCurRank: 'setCurRank',
+				showSelector: 'showSelector'
+			}),
+
 			select() {
 				let list =  this.rankList.map(item => {
 					return item.name
 				})
-				this.$root.$children[0].$emit('showSelector', list, index => this.setCurRank(index));
-			},
-			...mapActions({
-				setCurRank: 'setCurRank'
-			})
+				this.showSelector({ data: list, callback: index => {
+					this.setCurRank(index);} });
+				console.log('navbar')
+			}
 		}
 	};
 </script>

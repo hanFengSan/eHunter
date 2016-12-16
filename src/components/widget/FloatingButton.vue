@@ -11,6 +11,7 @@
 </template>
 
 <script>
+	import { mapActions, mapGetters } from 'vuex'
 	export default {
 
 		name: 'FloatingButton',
@@ -21,6 +22,9 @@
 			};
 		},
 		methods: {
+			...mapActions({
+				showTablePicker: 'showTablePicker'
+			}),
 			select() {
 				this.buttonSize = '0rem';
 				this.$root.$children[0].$emit('showSelector', ['列表显示项调整', '关于'], 
@@ -35,8 +39,7 @@
 			},
 			showTablePicker() {
 				this.$root.$children[0].$emit('getTableInfo', info => {
-					this.$root.$children[0].$emit('showTablePicker', 
-						JSON.parse(JSON.stringify(info.tableData[0])), 
+					this.showTablePicker(JSON.parse(JSON.stringify(info.tableData[0])), 
 						info.tableSize,
 						() => {},
 						data => {

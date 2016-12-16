@@ -12,6 +12,7 @@
 
 <script>
 	import Popup from '../base/Popup.vue'
+	import { mapActions } from 'vuex'
 	export default {
 
 		name: 'selector',
@@ -24,12 +25,15 @@
 			};
 		},
 		methods: {
+			...mapActions({
+				closePopups: 'closePopups'
+			}),
 			select(index) {
 				this.close();
 				this.data.callback(index);
 			},
 			close() {
-				this.$root.$children[0].$emit('closePopup');
+				this.closePopups();
 			}
 		},
 		components: {

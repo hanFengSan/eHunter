@@ -3,58 +3,57 @@
 		<img class="flower" src="../../assets/flower.png">
 		<div class="container">
 			<img class="logo" src="../../assets/logo.png">
-			<div class="tab ripple" :class="curSubTab === index ? 'active' : ''" :style="'width:' + tabWidth + '%'"
-			 v-for="(item, index) of rankList[curRank].sub[curSubRank].list" @click="select(index)">
-				{{ item.name }}
-			</div>
+			<div class="tab ripple" :class="curTab === index ? 'active' : ''" :style="'width:' + tabWidth + '%'"
+			v-for="(item, index) of rankList[curRank].sub[curSubRank].list" @click="select(index)">
+			{{ item.name }}</div>
 			<div class="tab right ripple" @click="openSelector()" :style="'width:' + tabWidth + '%'">
 				<span class="more"></span>
 				<span class="more"></span>
 				<span class="more"></span>
 			</div>
-			<span class="indicator" :style="'left:' + tabWidth * curSubTab + '%;width:' + tabWidth + '%'"></span>
+			<span class="indicator" :style="'left:' + tabWidth * curTab + '%;width:' + tabWidth + '%'"></span>
 		</div>
 	</div>
 </template>
 
 <script>
+	import { mapActions, mapGetters } from 'vuex'
 	export default {
 
 		name: 'Toolbar',
 
 		data () {
 			return {
-				rankList: [],
-				curRank: 0, // 周榜还是日榜
-				curSubRank: 0, // 那个榜单分类
-				curSubTab: 0 // 榜单最小项
 			};
 		},
 		created() {
-			this.$root.$children[0].$emit('getRankList', rankList => {
-				this.rankList = rankList;
-				// send to Navbar
-				this.$root.$children[0].$emit('getCurRank', curRank => {
-					this.curRank = curRank;
-				});
-			})
 		},
 		computed: {
+			...mapGetters({
+				rankList: 'getRankList',
+				curRank: 'getCurRank',
+				curSubRank: 'getCurSubRank',
+				curTab: 'getCurTab'
+			}),
 			tabWidth() {
 				return 100 / (this.rankList[this.curRank].sub[this.curSubRank].list.length + 1);
 			}
 		},
 		methods: {
+			...mapActions({
+				showSelector: 'showSelector',
+				setCurSubRank: 'setCurSubRank',
+				setCurTab: 'setCurTab'
+			}),
 			select(index) {
-				this.curSubTab = index
+				this.setCurTab(index);
 			},
 			openSelector() {
-				this.$root.$children[0].$emit('showSelector', this.rankList[this.curRank].sub.map(item => {
+				this.showSelector({data: this.rankList[this.curRank].sub.map(item => {
 					return item.name;
-				}), index => {
-					this.curSubRank = index;
-					this.curSubTab = 0;
-				})
+				}), callback: index => {
+					this.setCurSubRank(index);
+				}});
 			}
 		}
 	};

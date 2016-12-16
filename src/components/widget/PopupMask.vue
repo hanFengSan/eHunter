@@ -7,6 +7,7 @@
 </template>
 
 <script>
+	import { mapActions } from 'vuex'
 	export default {
 
 		name: 'Popup',
@@ -19,11 +20,14 @@
 			};
 		},
 		methods: {
+			...mapActions({
+				closePopups: 'closePopups'
+			}),
 			close() {
 				if (this.cancelCallback !== undefined) {
-					this.cancelCallback()
+					this.cancelCallback();
 				}
-				this.$root.$children[0].$emit('closePopup')
+				this.closePopups();			
 			}
 		}
 	};

@@ -37,16 +37,19 @@ const state = {
 	{
 		name: string.oricon_weekly_rank,
 		sName: string.weekly_rank,
-		list: [
-		{ name: string.general_bd, id: 0 },
-		{ name: string.general_dvd, id: 0 },
-		{ name: string.single, id: 0 },
-		{ name: string.album, id: 0 }
-		],
-		more: [
+		sub: [
+		{
+			name: string.general,
+			list:[
+			{ name: string.general_bd, id: 0 },
+			{ name: string.general_dvd, id: 0 },
+			{ name: string.single, id: 0 },
+			{ name: string.album, id: 0 }
+			]
+		},
 		{
 			name: string.bd_detail,
-			list:[
+			list: [
 			{ name: string.anime_bd, id: 0 },
 			{ name: string.movie_bd, id: 0 },
 			{ name: string.music_bd, id: 0 },
@@ -59,7 +62,8 @@ const state = {
 			{ name: string.anime_dvd, id: 0 },
 			{ name: string.music_dvd, id: 0 },
 			]
-		}]
+		}
+		]
 	}
 	],
 	curRank: 0, // 周榜还是日榜
@@ -98,9 +102,13 @@ const mutations = {
 	},
 	[types.SET_CUR_RANK] (state, { num }) {
 		state.curRank = num;
+		// 重置子项
+		state.curSubRank = state.curTab = 0;
 	},
 	[types.SET_CUR_SUB_RANK] (state, { num }) {
 		state.curSubRank = num;
+		// 重置子项
+		state.curTab = 0;
 	},
 	[types.SET_CUR_TAB] (state, { num }) {
 		state.curTab = num;
