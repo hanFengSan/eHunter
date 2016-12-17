@@ -71,6 +71,7 @@
 				});
 			},
 			getTableInfo(callback) {
+				console.log('table')
 				let info = {
 					tableData: this.data,
 					tableSize: this.tableSize

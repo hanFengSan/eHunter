@@ -23,29 +23,36 @@
 		},
 		methods: {
 			...mapActions({
+				showSelector: 'showSelector',
 				showTablePicker: 'showTablePicker'
 			}),
 			select() {
 				this.buttonSize = '0rem';
-				this.$root.$children[0].$emit('showSelector', ['列表显示项调整', '关于'], 
-					index => {
+				this.showSelector(
+				{
+					data: ['列表显示项调整', '关于'], 
+					callback: index => {
 						if (index === 0) {
-							this.showTablePicker();
+							this.openTablePicker();
 						} else {
 							this.buttonSize = '3rem'
 						}
 
-					}, () => this.buttonSize = '3rem')
+					}, 
+					cancelCallback: () => this.buttonSize = '3rem'
+				});
 			},
-			showTablePicker() {
+			openTablePicker() {
 				this.$root.$children[0].$emit('getTableInfo', info => {
-					this.showTablePicker(JSON.parse(JSON.stringify(info.tableData[0])), 
-						info.tableSize,
-						() => {},
-						data => {
+					this.showTablePicker(
+					{ 
+						data: JSON.parse(JSON.stringify(info.tableData[0])), 
+						size: info.tableSize,
+						cancelCallback: data => {
 							this.reloadTable(data);
 							this.buttonSize = '3rem';
-						})					
+						}
+					});					
 				})
 			},
 			reloadTable(data) {
