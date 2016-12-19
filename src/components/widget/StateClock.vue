@@ -13,6 +13,7 @@
 		<div class="intro">
 			<div>{{ string.rank_intro }}</div>
 			<div>{{ string.set_intro }}</div>
+			<div class="error">{{ error }}</div>
 		</div>
 	</div>
 </template>
@@ -34,6 +35,7 @@
 		computed: {
 			...mapGetters({
 				string: 'getString',
+				error: 'getError'
 			})
 		}
 	};
@@ -81,6 +83,9 @@
 		>.intro {
 			font-size: cr($target: 12px);
 			opacity: .55;
+			.error {
+				color: red;
+			}
 		}
 	}
 

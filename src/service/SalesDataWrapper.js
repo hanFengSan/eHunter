@@ -17,7 +17,7 @@ function getDays(date) {
 }
 
 // 计算各row的width
-function calcWidth(data) {
+export function calcWidth(data) {
 	data.map(row => {
 		let clonedRow = JSON.parse(JSON.stringify(row));
 		clonedRow.sort((a, b) => {
@@ -33,10 +33,12 @@ function calcWidth(data) {
 		clonedRow.forEach(item => {
 			if(item.isActived) {
 				if(availableWidth >= item.defaultWidth) {
-					row.find(i => i.key === item.key).width = item.defaultWidth;
+					row.filter(i => i.key === item.key)[0].width = item.defaultWidth;
+					// row.find(i => i.key === item.key).width = item.defaultWidth; // need babel-polyfill
 					availableWidth -= item.defaultWidth;;
 				} else {
-					row.find(i => i.key === item.key).width = availableWidth;
+					row.filter(i => i.key === item.key)[0].width = availableWidth;
+					// row.find(i => i.key === item.key).width = availableWidth;
 					availableWidth = 0;
 				}	
 			}
@@ -50,6 +52,22 @@ function calcWidth(data) {
 
 	});
 	return data;
+}
+
+// 重新计算所有宽度 !!效率非常低下
+export function calcRankListWidth(rankList) {
+	// let cloneRankList = JSON.parse(JSON.stringify(rankList));
+	rankList.forEach(rank => {
+		rank.sub.forEach(subRank => {
+			subRank.list.forEach(tab => {
+				tab.data.list = calcWidth(tab.data.list);
+			})
+		})
+	});
+}
+
+export function getTableSize() {
+	return isPC() ? 8 : 4;
 }
 
 // 装填一般向日榜数据

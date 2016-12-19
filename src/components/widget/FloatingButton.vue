@@ -24,7 +24,8 @@
 		methods: {
 			...mapActions({
 				showSelector: 'showSelector',
-				showTablePicker: 'showTablePicker'
+				showTablePicker: 'showTablePicker',
+				tableSize: 'getTableSize'
 			}),
 			select() {
 				this.buttonSize = '0rem';
@@ -43,17 +44,13 @@
 				});
 			},
 			openTablePicker() {
-				this.$root.$children[0].$emit('getTableInfo', info => {
-					this.showTablePicker(
-					{ 
-						data: JSON.parse(JSON.stringify(info.tableData[0])), 
-						size: info.tableSize,
-						cancelCallback: data => {
-							this.reloadTable(data);
-							this.buttonSize = '3rem';
-						}
-					});					
-				})
+				this.showTablePicker(
+				{ 
+					size: this.tableSize,
+					cancelCallback: data => {
+						this.buttonSize = '3rem';
+					}
+				});					
 			},
 			reloadTable(data) {
 				this.$root.$children[0].$emit('reloadTable', data);

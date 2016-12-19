@@ -1,9 +1,10 @@
 import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
 import { getWeeklyRankByFlag, getDailyRankByFlag } from 'src/service/ServerAPI'
-import { initMusicDailyData, initNormalDailyData, initNormalWeeklyData } from 'src/service/SalesDataWrapper'
+import { initMusicDailyData, initNormalDailyData, initNormalWeeklyData, getTableSize, calcWidth, calcRankListWidth } from 'src/service/SalesDataWrapper'
 // initial state
 const state = {
+	error: '',
 	rankList: [
 	{
 		name: string.oricon_daily_rank,
@@ -82,13 +83,19 @@ const getters = {
 		return getCurTabRankData(state);
 	},
 	getCurTabRankDataList: state =>{
-		return getCurTabRankData(state).data.list;
+		return getCurTabRankDataList(state);
 	},
 	getCurRankData: state => {
-		return state.rankList[state.curRank];
+		return getCurRankData(state);
 	},
 	getCurSubRankData: state => {
-		return state.rankList[state.curRank].sub[state.curSubRank];
+		return getCurSubRankData(state);
+	},
+	getTableSize: state => {
+		return getTableSize();
+	},
+	getError: state => {
+		return state.error;
 	}
 }
 
@@ -108,7 +115,24 @@ const actions = {
 	},
 	updateTabRank({ commit, state }) {
 		updateRankByFlag(state, commit, state.rankList[state.curRank].sub[state.curSubRank].list[state.curTab].flag);
+	},
+	switchTableItem({ commit, state }, key) {
+		commit(types.SWITCH_TABLE_ITEM, { key });
+		// switchTableItem(state, commit, {key});
+		resizeTableWidth(state, commit);
 	}
+}
+
+function getCurRankData(state) {
+	return state.rankList[state.curRank];
+}
+
+function getCurSubRankData(state) {
+	return state.rankList[state.curRank].sub[state.curSubRank]; 
+}
+
+function getCurTabRankDataList(state) {
+	return getCurTabRankData(state).data.list;;
 }
 
 function updateRankByFlag(state, commit, flag) {
@@ -119,8 +143,13 @@ function updateRankByFlag(state, commit, flag) {
 			getRankByFlag(flag)
 			.then(res => {
 				let data = res.data;
-				data.list = wrapSalesData(state, data.list);
-				commit(types.UPDATE_RANK, { flag, data });
+				try {
+					data.list = wrapSalesData(state, data.list);
+					commit(types.UPDATE_RANK, { flag, data });					
+				} catch (e) {
+					let error = e + '';
+					commit(types.SET_ERROR, { error })
+				}
 			})
 			.catch(e => {
 				console.log(e)
@@ -169,6 +198,66 @@ function findRankTypeByFlag(state, flag) {
 		}
 	}
 }
+function switchTableItem(state, key) {
+	getCurTabRankDataList(state).forEach(row => {
+		row.forEach(item => {
+			if (item.key === key) {
+				item.isActived = !item.isActived;
+			}
+		})
+	})
+	// let rankName = getCurRankData(state).name;
+	// let tabName = getCurTabRankData(state).name;
+	// let isMusicType = false;
+	// if (tabName === string.single || tabName === string.album) {
+	// 	isMusicType = true;
+	// }
+	// state.rankList.forEach(rank => {
+	// 	if (rank.name === rankName) {
+	// 		rank.sub.forEach(subRank => {
+	// 			subRank.list.forEach(tab => {
+	// 				if (tab.name === string.single || tab.name === string.album) {
+	// 					if (isMusicType) {
+	// 						tab.data.list.forEach(line => {
+	// 							line.forEach(rowItem => {
+	// 								if (rowItem.key === key)
+	// 									rowItem.isActived = !rowItem.isActived;
+	// 							})
+	// 						})
+	// 					}
+	// 				} else {
+	// 					tab.data.list.forEach(line => {
+	// 						line.forEach(rowItem => {
+	// 							if (rowItem.key === key)
+	// 								rowItem.isActived = !rowItem.isActived;
+	// 						})
+	// 					})
+	// 				}
+	// 			})
+	// 		})
+	// 	}
+	// });
+	// calcRankListWidth(state.rankList);
+}
+
+function resizeTableWidth(state, commit) {
+	let promise = new Promise((resolve, reject) => {
+		resolve(calcWidth(JSON.parse(JSON.stringify(getCurTabRankDataList(state)))));
+	});
+	promise.then(list => {
+		// console.log(getCurTabRankData(state));
+		// getCurTabRankData(state).data.list = list;
+		commit(types.RESET_RANK_LIST, { list });
+	});
+
+	// // 重新计算整个rankList的项的宽度
+	// let promise = new Promise((resolve, reject) => {
+	// 	 resolve(calcRankListWidth(state.rankList));
+	// });
+	// promise.then(rankList => {
+	// 	commit(types.RESET_RANK_LIST, {rankList});
+	// });
+}
 
 function getCurTabRankData(state) {
 	return state.rankList[state.curRank].sub[state.curSubRank].list[state.curTab];
@@ -176,9 +265,6 @@ function getCurTabRankData(state) {
 
 // mutations
 const mutations = {
-	[types.SET_STRING] (state, { list }) {
-
-	},
 	[types.SET_CUR_RANK] (state, { num }) {
 		state.curRank = num;
 		// 重置子项
@@ -195,6 +281,16 @@ const mutations = {
 	[types.UPDATE_RANK] (state, { flag, data }) {
 		let tab = findRankByFlag(state, flag);
 		tab.data = data;
+	},
+	[types.SWITCH_TABLE_ITEM] (state, { key }) {
+		switchTableItem(state, key);
+	},
+	[types.RESET_RANK_LIST] (state, { list }) {
+		getCurTabRankData(state).data.list = list;
+	},
+	[types.SET_ERROR] (state, { error }) {
+		// alert(error)
+		state.error = error;
 	}
 }
 

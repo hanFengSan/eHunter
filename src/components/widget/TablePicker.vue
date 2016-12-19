@@ -2,7 +2,7 @@
 	<popup :cancel-callback="data.cancelCallback" :cancel-callback-param="data.data">
 		<div class="container noselect">
 			<div class="selector" @click.stop="">
-				<div class="item item-ripple" v-for="(item, index) of data.data" :class="item.isActived ? 'active' : ''"
+				<div class="item item-ripple" v-for="(item, index) of curTabRankDataList[0]" :class="item.isActived ? 'active' : ''"
 				@click="select(index)">
 				<a>{{ item.name }}</a>
 			</div>
@@ -28,7 +28,8 @@
 
 		computed: {
 			...mapGetters({
-				curTabRankDataList: 'getCurTabRankDataList'
+				curTabRankDataList: 'getCurTabRankDataList',
+				tableSize: 'getTableSize'
 			})
 		},
 
@@ -36,16 +37,16 @@
 
 		methods: {
 			...mapActions({
-
+				switchTableItem: 'switchTableItem'
 			}),
 			select(index) {
-				if (!this.data.data[index].isActived) {				
-					let length = this.data.data.filter(t => t.isActived).length;
-					if (length === this.data.size) {
-						this.data.data.filter(t => t.isActived)[length - 1].isActived = false;
-					}
+				if (!this.curTabRankDataList[0][index].isActived) {				
+					let length = this.curTabRankDataList[0].filter(t => t.isActived).length;
+					if (length === this.tableSize) {
+						this.switchTableItem(this.curTabRankDataList[0].filter(t => t.isActived)[length - 1].key);
+					}	
 				}
-				this.data.data[index].isActived = !this.data.data[index].isActived;
+				this.switchTableItem(this.curTabRankDataList[0][index].key);
 			}
 		}
 
