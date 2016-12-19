@@ -1,7 +1,7 @@
 import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
 import { getWeeklyRankByFlag, getDailyRankByFlag } from 'src/service/ServerAPI'
-
+import { initMusicDailyData, initNormalDailyData, initNormalWeeklyData } from 'src/service/SalesDataWrapper'
 // initial state
 const state = {
 	rankList: [
@@ -78,6 +78,18 @@ const getters = {
 	getCurRank: state => state.curRank,
 	getCurSubRank: state => state.curSubRank,
 	getCurTab: state => state.curTab,
+	getCurTabRankData: state => {
+		return getCurTabRankData(state);
+	},
+	getCurTabRankDataList: state =>{
+		return getCurTabRankData(state).data.list;
+	},
+	getCurRankData: state => {
+		return state.rankList[state.curRank];
+	},
+	getCurSubRankData: state => {
+		return state.rankList[state.curRank].sub[state.curSubRank];
+	}
 }
 
 // actions
@@ -94,21 +106,43 @@ const actions = {
 	setCurTab ({ commit }, num) {
 		commit(types.SET_CUR_TAB, { num });
 	},
-	updateRank({ commit, state }, flag) {
-		let tab = findRankByFlag(state, flag);
-		if (tab !== undefined) {
-			if (tab.data.list.length === 0) {
-				let getRankByFlag = findRankTypeByFlag(state, flag) === string.oricon_daily_rank ? getDailyRankByFlag : getWeeklyRankByFlag
-				getRankByFlag(flag)
-				.then(res => {
-					let data = res.data
-						commit(types.UPDATE_RANK, { flag, data })
-					})
-				.catch(e => {
-					console.log(e)
-				})
-			}
+	updateTabRank({ commit, state }) {
+		updateRankByFlag(state, commit, state.rankList[state.curRank].sub[state.curSubRank].list[state.curTab].flag);
+	}
+}
+
+function updateRankByFlag(state, commit, flag) {
+	let tab = findRankByFlag(state, flag);
+	if (tab !== undefined) {
+		if (tab.data.list.length === 0) {
+			let getRankByFlag = findRankTypeByFlag(state, flag) === string.oricon_daily_rank ? getDailyRankByFlag : getWeeklyRankByFlag
+			getRankByFlag(flag)
+			.then(res => {
+				let data = res.data;
+				data.list = wrapSalesData(state, data.list);
+				commit(types.UPDATE_RANK, { flag, data });
+			})
+			.catch(e => {
+				console.log(e)
+			})
 		}
+	}
+}
+
+// 装填修饰数据, 表格显示相关
+function wrapSalesData(state, list) {
+	switch(state.rankList[state.curRank].name) {
+		case string.oricon_daily_rank:
+		let tabName = getCurTabRankData(state).name;
+		if (tabName === string.single || tabName === string.album) {
+			return initMusicDailyData(list);
+		} else {
+			return initNormalDailyData(list);
+		}
+		break;
+		case string.oricon_weekly_rank:
+		return initNormalWeeklyData(list);
+		break;
 	}
 }
 
@@ -136,6 +170,10 @@ function findRankTypeByFlag(state, flag) {
 	}
 }
 
+function getCurTabRankData(state) {
+	return state.rankList[state.curRank].sub[state.curSubRank].list[state.curTab];
+}
+
 // mutations
 const mutations = {
 	[types.SET_STRING] (state, { list }) {
@@ -157,7 +195,6 @@ const mutations = {
 	[types.UPDATE_RANK] (state, { flag, data }) {
 		let tab = findRankByFlag(state, flag);
 		tab.data = data;
-		console.log(state.rankList)
 	}
 }
 

@@ -29,22 +29,30 @@
 			...mapGetters({
 				string: 'getString',
 				rankList: 'getRankList',
-				curRank: 'getCurRank'
+				curRank: 'getCurRank',
+				curSubRank: 'getCurSubRank',
+				curTab: 'getCurTab'
 			})
 		},
 		methods: {
 			...mapActions({
 				setCurRank: 'setCurRank',
-				showSelector: 'showSelector'
+				showSelector: 'showSelector',
+				updateTabRank: 'updateTabRank'
 			}),
 
 			select() {
 				let list =  this.rankList.map(item => {
 					return item.name
 				})
-				this.showSelector({ data: list, callback: index => {
-					this.setCurRank(index);} });
-				console.log('navbar')
+				this.showSelector(
+				{ 
+					data: list, 
+					callback: index => {
+						this.setCurRank(index);
+						this.updateTabRank();
+					} 
+				});
 			}
 		}
 	};

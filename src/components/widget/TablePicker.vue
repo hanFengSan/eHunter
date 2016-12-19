@@ -12,6 +12,7 @@
 </template>
 
 <script>
+	import { mapGetters, mapActions } from 'vuex'
 	import Popup from '../base/Popup.vue'
 
 	export default {
@@ -25,9 +26,18 @@
 			};
 		},
 
+		computed: {
+			...mapGetters({
+				curTabRankDataList: 'getCurTabRankDataList'
+			})
+		},
+
 		components: { Popup },
 
 		methods: {
+			...mapActions({
+
+			}),
 			select(index) {
 				if (!this.data.data[index].isActived) {				
 					let length = this.data.data.filter(t => t.isActived).length;

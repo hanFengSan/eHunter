@@ -52,5 +52,9 @@
     "movie_dvd": "电影DVD",
     "music_dvd": "音乐DVD",
     "tv_BD": "电视剧BD",
-    "general": "综合"
+    "general": "综合",
+    "sales": "销量",
+    "weekly_sales": "周销量",
+    "rank_prerank": "排名/上周",
+    "top_times": "最高排名/上榜次数"
 }

@@ -2,7 +2,7 @@
 	<div class="page">	
 		<div class="container">
 			<state-clock class="state-clock"></state-clock>
-			<daily-table class="daily-table"></daily-table>
+			<sales-table class="daily-table"></sales-table>
 		</div>
 	</div>
 
@@ -10,7 +10,7 @@
 
 <script>
 	import StateClock from './widget/StateClock.vue'
-	import DailyTable from './widget/DailyTable.vue'
+	import SalesTable from './widget/SalesTable.vue'
 
 	export default {
 
@@ -22,7 +22,7 @@
 			};
 		},
 
-		components: { StateClock, DailyTable }
+		components: { StateClock, SalesTable }
 	};
 </script>
 

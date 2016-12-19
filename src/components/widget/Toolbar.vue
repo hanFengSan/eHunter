@@ -27,17 +27,19 @@
 			};
 		},
 		created() {
-			this.update();
+			this.updateTabRank();
 		},
 		computed: {
 			...mapGetters({
 				rankList: 'getRankList',
 				curRank: 'getCurRank',
 				curSubRank: 'getCurSubRank',
-				curTab: 'getCurTab'
+				curTab: 'getCurTab',
+				curSubRankData: 'getCurSubRankData',
+				curRankData: 'getCurRankData'
 			}),
 			tabWidth() {
-				return 100 / (this.rankList[this.curRank].sub[this.curSubRank].list.length + 1);
+				return 100 / (this.curSubRankData.list.length + 1);
 			}
 		},
 		methods: {
@@ -45,21 +47,19 @@
 				showSelector: 'showSelector',
 				setCurSubRank: 'setCurSubRank',
 				setCurTab: 'setCurTab',
-				updateRank: 'updateRank'
+				updateTabRank: 'updateTabRank'
 			}),
 			select(index) {
 				this.setCurTab(index);
-				this.update();
+				this.updateTabRank();
 			},
-			update() {
-				this.updateRank(this.rankList[this.curRank].sub[this.curSubRank].list[this.curTab].flag);
-			},
+
 			openSelector() {
-				this.showSelector({data: this.rankList[this.curRank].sub.map(item => {
+				this.showSelector({data: this.curRankData.sub.map(item => {
 					return item.name;
 				}), callback: index => {
 					this.setCurSubRank(index);
-					this.update();
+					this.updateTabRank();
 				}});
 			}
 		}
