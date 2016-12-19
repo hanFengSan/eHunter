@@ -25,7 +25,8 @@
 			...mapActions({
 				showSelector: 'showSelector',
 				showTablePicker: 'showTablePicker',
-				tableSize: 'getTableSize'
+				tableSize: 'getTableSize',
+				switchTableItems: 'switchTableItems'
 			}),
 			select() {
 				this.buttonSize = '0rem';
@@ -43,12 +44,21 @@
 					cancelCallback: () => this.buttonSize = '3rem'
 				});
 			},
+			isPC() {
+				if (screen.width <= 1024) {
+					return false;
+				} else {
+					return true;
+				}	
+			},
 			openTablePicker() {
 				this.showTablePicker(
 				{ 
 					size: this.tableSize,
 					cancelCallback: data => {
 						this.buttonSize = '3rem';
+						// 由于响应数据过大, 为此进行一系列性能优化处理
+						setTimeout(() => this.switchTableItems(data), this.isPC() ? 1 : 300);
 					}
 				});					
 			},

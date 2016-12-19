@@ -116,10 +116,9 @@ const actions = {
 	updateTabRank({ commit, state }) {
 		updateRankByFlag(state, commit, state.rankList[state.curRank].sub[state.curSubRank].list[state.curTab].flag);
 	},
-	switchTableItem({ commit, state }, key) {
-		commit(types.SWITCH_TABLE_ITEM, { key });
-		// switchTableItem(state, commit, {key});
-		resizeTableWidth(state, commit);
+	switchTableItems({ commit, state }, list) {
+		commit(types.SWITCH_TABLE_ITEMS, { list })
+		// switchTableItems(state, commit, list);
 	}
 }
 
@@ -132,7 +131,7 @@ function getCurSubRankData(state) {
 }
 
 function getCurTabRankDataList(state) {
-	return getCurTabRankData(state).data.list;;
+	return getCurTabRankData(state).data.list;
 }
 
 function updateRankByFlag(state, commit, flag) {
@@ -198,70 +197,32 @@ function findRankTypeByFlag(state, flag) {
 		}
 	}
 }
-function switchTableItem(state, key) {
-	getCurTabRankDataList(state).forEach(row => {
-		row.forEach(item => {
-			if (item.key === key) {
-				item.isActived = !item.isActived;
-			}
-		})
-	})
-	// let rankName = getCurRankData(state).name;
-	// let tabName = getCurTabRankData(state).name;
-	// let isMusicType = false;
-	// if (tabName === string.single || tabName === string.album) {
-	// 	isMusicType = true;
-	// }
-	// state.rankList.forEach(rank => {
-	// 	if (rank.name === rankName) {
-	// 		rank.sub.forEach(subRank => {
-	// 			subRank.list.forEach(tab => {
-	// 				if (tab.name === string.single || tab.name === string.album) {
-	// 					if (isMusicType) {
-	// 						tab.data.list.forEach(line => {
-	// 							line.forEach(rowItem => {
-	// 								if (rowItem.key === key)
-	// 									rowItem.isActived = !rowItem.isActived;
-	// 							})
-	// 						})
-	// 					}
-	// 				} else {
-	// 					tab.data.list.forEach(line => {
-	// 						line.forEach(rowItem => {
-	// 							if (rowItem.key === key)
-	// 								rowItem.isActived = !rowItem.isActived;
-	// 						})
-	// 					})
-	// 				}
-	// 			})
-	// 		})
-	// 	}
-	// });
-	// calcRankListWidth(state.rankList);
-}
-
-function resizeTableWidth(state, commit) {
-	let promise = new Promise((resolve, reject) => {
-		resolve(calcWidth(JSON.parse(JSON.stringify(getCurTabRankDataList(state)))));
-	});
-	promise.then(list => {
-		// console.log(getCurTabRankData(state));
-		// getCurTabRankData(state).data.list = list;
-		commit(types.RESET_RANK_LIST, { list });
-	});
-
-	// // 重新计算整个rankList的项的宽度
-	// let promise = new Promise((resolve, reject) => {
-	// 	 resolve(calcRankListWidth(state.rankList));
-	// });
-	// promise.then(rankList => {
-	// 	commit(types.RESET_RANK_LIST, {rankList});
-	// });
-}
 
 function getCurTabRankData(state) {
 	return state.rankList[state.curRank].sub[state.curSubRank].list[state.curTab];
 }
+
+function switchTableItems(state, list) {
+	let changedList = [];
+	// get changed items
+	list.forEach(i => {
+		let curList = getCurTabRankDataList(state)[0];
+		for (let t = 0; t < curList.length; t++) {
+			if (i.key === curList[t].key && curList[t].isActived != i.isActived) {
+				console.log(`${curList[t].key}, ${i.key}`)
+				changedList.push(t);
+			}
+		}
+	});
+	// aync changes
+	getCurTabRankDataList(state).forEach(row => {
+		changedList.forEach(i => {
+			row[i].isActived = list[i].isActived;
+		}) 
+	});
+	// for performance, if update directly, will very slow
+	getCurTabRankData(state).data.list = calcWidth(JSON.parse(JSON.stringify(getCurTabRankDataList(state))));
+} 
 
 // mutations
 const mutations = {
@@ -282,15 +243,12 @@ const mutations = {
 		let tab = findRankByFlag(state, flag);
 		tab.data = data;
 	},
-	[types.SWITCH_TABLE_ITEM] (state, { key }) {
-		switchTableItem(state, key);
-	},
-	[types.RESET_RANK_LIST] (state, { list }) {
-		getCurTabRankData(state).data.list = list;
-	},
 	[types.SET_ERROR] (state, { error }) {
 		// alert(error)
 		state.error = error;
+	},
+	[types.SWITCH_TABLE_ITEMS] (state, { list }) {
+		switchTableItems(state, list);
 	}
 }
 

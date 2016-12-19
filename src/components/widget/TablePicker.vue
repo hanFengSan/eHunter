@@ -1,8 +1,8 @@
 <template>
-	<popup :cancel-callback="data.cancelCallback" :cancel-callback-param="data.data">
+	<popup :cancel-callback="data.cancelCallback" :cancel-callback-param="dataList">
 		<div class="container noselect">
 			<div class="selector" @click.stop="">
-				<div class="item item-ripple" v-for="(item, index) of curTabRankDataList[0]" :class="item.isActived ? 'active' : ''"
+				<div class="item item-ripple" v-for="(item, index) of dataList" :class="item.isActived ? 'active' : ''"
 				@click="select(index)">
 				<a>{{ item.name }}</a>
 			</div>
@@ -23,6 +23,7 @@
 
 		data () {
 			return {
+				dataList: []
 			};
 		},
 
@@ -30,9 +31,12 @@
 			...mapGetters({
 				curTabRankDataList: 'getCurTabRankDataList',
 				tableSize: 'getTableSize'
-			})
+			}),
 		},
 
+		created() {
+			this.dataList = JSON.parse(JSON.stringify(this.curTabRankDataList[0]));
+		},
 		components: { Popup },
 
 		methods: {
@@ -40,13 +44,13 @@
 				switchTableItem: 'switchTableItem'
 			}),
 			select(index) {
-				if (!this.curTabRankDataList[0][index].isActived) {				
-					let length = this.curTabRankDataList[0].filter(t => t.isActived).length;
+				if (!this.dataList.isActived) {				
+					let length = this.dataList.filter(t => t.isActived).length;
 					if (length === this.tableSize) {
-						this.switchTableItem(this.curTabRankDataList[0].filter(t => t.isActived)[length - 1].key);
+						this.dataList.filter(t => t.isActived)[length - 1].isActived = false;
 					}	
 				}
-				this.switchTableItem(this.curTabRankDataList[0][index].key);
+				this.dataList[index].isActived = !this.dataList[index].isActived;
 			}
 		}
 
