@@ -32,9 +32,11 @@
 
 	.page {
 		background: $background_grey;
+		min-height: cr($target: 1100px);
 		padding-bottom: cr($target: 10px);
 		>.container {
 			background: white;
+			min-height: cr($target: 800px);
 			@include responsive($breakpoint-xs) {
 				padding: 0;
 			} 

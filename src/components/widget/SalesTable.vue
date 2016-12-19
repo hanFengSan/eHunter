@@ -45,8 +45,15 @@
 		created() {
 		},
 		methods: {
+			...mapActions({
+				showItemInfo: 'showItemInfo'
+			}),
 			select(index) {
-				this.$root.$children[0].$emit('showItemInfo', this.data[index], ()=>{}, ()=>{})
+				this.showItemInfo({
+					data: this.curTabRankDataList[index], 
+					callback: ()=>{}, 
+					cancelCallback: ()=>{}
+				});
 			},
 			getTableInfo(callback) {
 				console.log('table')

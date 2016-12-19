@@ -51,6 +51,7 @@
 		width: 80%;
 		margin: 0 auto;
 		background: white;
+		padding: 0.45rem;
 		@include responsive($breakpoint-md) {
 			width: 50%;
 		}
@@ -59,9 +60,12 @@
 			overflow: hidden;
 			display : flex;
 			align-items : center;
-			border-bottom: 1px rgba($split_grey, .3) solid;
+			border-bottom: 1px rgba($split_grey, .5) solid;
 			padding: cr($target: 8px) cr($target: 5px);
 			font-size: cr($target: 12px);
+			&:last-child {
+				border-bottom: 0px;
+			}
 			>.name {
 				display: inline-block;
 				align-self: baseline;
