@@ -19,12 +19,10 @@
 
 		data () {
 			return {
-				data:''
 			};
 		},
 
 		created() {
-			this.setSelector([1,2,3], () => {});
 		},
 
 		components: { Toolbar, PageFragment, FloatingButton },
@@ -38,15 +36,9 @@
 			})
 		},
 		events: {
-			showSelector(data, callback) {
-				console.log('received')
-			}
 		},
 
 		created() {
-			Vue.http.get('/sales/daily?flag=104102').then(res => {
-				this.data = res.data.list[0].title
-			}, res => {});
 		}
 	};
 </script>

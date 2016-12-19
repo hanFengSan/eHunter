@@ -26,24 +26,33 @@
 
 		data () {
 			return {
-				data: [],
+				// data: [],
 				tableSize: 4
 			};
 		},
 		computed: {
 			...mapGetters({
 				string: 'getString',
+				rankList: 'getRankList',
+				curRank: 'getCurRank',
+				curSubRank: 'getCurSubRank',
+				curTab: 'getCurTab'
 			}),
+			data() {
+				let result = this.initData(this.rankList[this.curRank].sub[this.curSubRank].list[this.curTab].data.list);
+				this.calcWidth(result);
+				return result;
+			}
 		},
 		created() {
 			this.tableSize = this.getTableSize();
-			Vue.http.get('/sales/daily?flag=104102').then(res => {
-				let data = this.initData(res.data.list)
-				this.calcWidth(data);
-				this.data = data;
-			}, res => {});
-			this.$root.$children[0].$on('reloadTable', this.reloadTable);
-			this.$root.$children[0].$on('getTableInfo', this.getTableInfo);
+			// Vue.http.get('/sales/daily?flag=104102').then(res => {
+			// 	let data = this.initData(res.data.list)
+			// 	this.calcWidth(data);
+			// 	this.data = data;
+			// }, res => {});
+			// this.$root.$children[0].$on('reloadTable', this.reloadTable);
+			// this.$root.$children[0].$on('getTableInfo', this.getTableInfo);
 		},
 		methods: {
 			getDays(date) {

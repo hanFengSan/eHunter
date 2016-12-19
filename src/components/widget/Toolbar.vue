@@ -27,6 +27,7 @@
 			};
 		},
 		created() {
+			this.update();
 		},
 		computed: {
 			...mapGetters({
@@ -43,16 +44,22 @@
 			...mapActions({
 				showSelector: 'showSelector',
 				setCurSubRank: 'setCurSubRank',
-				setCurTab: 'setCurTab'
+				setCurTab: 'setCurTab',
+				updateRank: 'updateRank'
 			}),
 			select(index) {
 				this.setCurTab(index);
+				this.update();
+			},
+			update() {
+				this.updateRank(this.rankList[this.curRank].sub[this.curSubRank].list[this.curTab].flag);
 			},
 			openSelector() {
 				this.showSelector({data: this.rankList[this.curRank].sub.map(item => {
 					return item.name;
 				}), callback: index => {
 					this.setCurSubRank(index);
+					this.update();
 				}});
 			}
 		}
