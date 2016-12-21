@@ -2,8 +2,8 @@
 网站[anime-sales](http://anime-sales.com)的前端部分, 后台project地址: [后台地址](https://github.com/hanFengSan/anime-sales-server),网站提供oricon销量榜的中文化&集成服务. 项目采用了响应式布局, 秉着`mobile first`的理念, 在PC端移动端中都有着不错的可视化&操作体验.
 
 ## 效果预览
-<img src="/hanFengSan/anime-sales/blob/master/github_image/anime-sales-preview1.png"/>
-<img src="/hanFengSan/anime-sales/blob/master/github_image/anime-sales-preview2.png"/>
+<img src="https://github.com/hanFengSan/anime-sales/blob/master/github_image/anime-sales-preview1.png"/>
+<img src="https://github.com/hanFengSan/anime-sales/blob/master/github_image/anime-sales-preview2.png"/>
 
 
 ## Usage
