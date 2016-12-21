@@ -3,10 +3,10 @@
 
 ## 效果预览
 <div>
-	<img src="https://github.com/hanFengSan/anime-sales/github_image/anime-sales-preview1.png">
+	<img src="/hanFengSan/anime-sales/blob/master/github_image/anime-sales-preview1.png">
 </div>
 <div>
-	<img src="https://github.com/hanFengSan/anime-sales/github_image/anime-sales-preview2.png">
+	<img src="/hanFengSan/anime-sales/blob/master/github_image/anime-sales-preview2.png">
 </div>
 
 
