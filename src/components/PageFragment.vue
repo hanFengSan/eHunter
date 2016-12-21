@@ -2,7 +2,7 @@
 	<div class="page">	
 		<div class="container">
 			<state-clock class="state-clock"></state-clock>
-			<sales-table class="daily-table"></sales-table>
+			<sales-table class="sales-table"></sales-table>
 		</div>
 	</div>
 
@@ -31,6 +31,7 @@
 	@import "~style/_variables";
 
 	.page {
+
 		background: $background_grey;
 		min-height: cr($target: 1100px);
 		padding-bottom: cr($target: 10px);
@@ -45,7 +46,8 @@
 				margin: 0 cr($target: 9px);
 				padding-top: cr($target: 20px);
 			}
-			.daily-table {
+			.sales-table {
+				background: white;
 				margin: cr($target: 20px) 0;
 			}
 		}

@@ -5,15 +5,15 @@
 			<span class="label">{{ string.next_update }}</span>
 			<span class="clock">{{ time }}</span>
 		</div>
-		<div class="date">
+		<h1 class="date">
 			<img src="../../assets/date.png" class="date-img">
 			<span class="label">{{ curTabRankData.name +' ' + curRankData.sName }}</span>
 			<span class="date-set">{{ date + string.set }}</span>
-		</div>
+		</h1>
 		<div class="intro">
 			<div>{{ string.rank_intro }}</div>
 			<div>{{ string.set_intro }}</div>
-			<div class="error">{{ error }}</div>
+			<div class="error" v-show="false">{{ error }}</div>
 		</div>
 	</div>
 </template>
@@ -94,6 +94,7 @@
 		>.date {
 			color: $primary-color;
 			font-weight: bolder;
+			margin: 0;
 			padding: cr($target: 5px) 0;
 			>.date-img {
 				height: cr($target: 16px);

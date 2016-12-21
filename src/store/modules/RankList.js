@@ -30,8 +30,8 @@ const state = {
 		{
 			name: string.dvd_detail,
 			list: [
-			{ name: string.anime_dvd, flag: '106103', data: { list: [], updateTime: 0, nextUpdateTime: 0 }}, //lack
-			{ name: string.movie_dvd, flag: '106101', data: { list: [], updateTime: 0, nextUpdateTime: 0 }}, //lack
+			{ name: string.anime_dvd, flag: 'da', data: { list: [], updateTime: 0, nextUpdateTime: 0 }}, 
+			{ name: string.movie_dvd, flag: 'mv', data: { list: [], updateTime: 0, nextUpdateTime: 0 }}, 
 			{ name: string.music_dvd, flag: '104102', data: { list: [], updateTime: 0, nextUpdateTime: 0 }},
 			]
 		}]
@@ -62,7 +62,7 @@ const state = {
 			name: string.dvd_detail,
 			list:[
 			{ name: string.anime_dvd, flag: '114103', data: { list: [], updateTime: 0, nextUpdateTime: 0 }}, 
-			{ name: string.music_dvd, flag: '114103', data: { list: [], updateTime: 0, nextUpdateTime: 0 }},
+			{ name: string.music_dvd, flag: '114102', data: { list: [], updateTime: 0, nextUpdateTime: 0 }},
 			]
 		}
 		]

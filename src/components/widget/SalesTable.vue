@@ -13,6 +13,9 @@
 				</div>
 			</template>
 		</div>
+		<div class="loader-wrapper" v-if="curTabRankDataList.length==0">
+			<div class="loader"></div>
+		</div>
 	</div>
 </template>
 
@@ -95,6 +98,7 @@
 	@import "~style/_responsive";
 	@import "~style/_variables";
 	.table {
+		position: relative;
 		>.header {
 			position: relative;
 			height: 3rem;
@@ -157,6 +161,67 @@
 				}
 			}
 
-		}	
+		}
+		.loader-wrapper {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			top: cr($target: 100px);
+			z-index: 1000;
+
+			animation: spin 1.5s linear infinite;
+
+			@keyframes spin {
+				0%   {
+					transform: rotate(0deg); 
+				}
+				100% {
+					transform: rotate(360deg); 
+				}
+			}
+
+			>.loader {
+				display: block;
+				position: relative;
+				left: 50%;
+				top: 50%;
+				width: 60px;
+				height: 60px;
+				margin: -30px 0 0 -30px;
+				border: 3px solid transparent;
+				border-radius: 50%;
+				border-top-color: $primary_color;
+				animation: spin 2s linear infinite;
+				// border: 3px solid #3498db;
+				z-index: 1500;
+
+				&:before {
+					content: "";
+					position: absolute;
+					top: 5px;
+					left: 5px;
+					animation: spin 3s linear infinite;
+					right: 5px;
+					border-radius: 50%;
+					bottom: 5px;
+					// border: 3px solid #e74c3c;
+					border: 3px solid transparent;
+					border-top-color: $contrast_color;
+				}
+				&:after {
+					content: "";
+					position: absolute;
+					border-radius: 50%;
+					top: 15px;
+					left: 15px;
+					border: 3px solid transparent;
+					border-top-color: red;
+					right: 15px;
+					bottom: 15px;
+				}
+			}	
+		}
 	}
 </style>

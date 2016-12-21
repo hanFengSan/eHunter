@@ -25,6 +25,7 @@
 			...mapActions({
 				showSelector: 'showSelector',
 				showTablePicker: 'showTablePicker',
+				showItemInfo: 'showItemInfo',
 				tableSize: 'getTableSize',
 				switchTableItems: 'switchTableItems'
 			}),
@@ -36,8 +37,8 @@
 					callback: index => {
 						if (index === 0) {
 							this.openTablePicker();
-						} else {
-							this.buttonSize = '3rem'
+						} else if (index === 1) {
+							this.openAbout();
 						}
 
 					}, 
@@ -61,6 +62,19 @@
 						setTimeout(() => this.switchTableItems(data), this.isPC() ? 1 : 300);
 					}
 				});					
+			},
+			openAbout() {
+				this.showItemInfo(
+				{
+					data: [
+					{name: '作者', data: '寒枫'},
+					{name: '相关支持', data: '锅の主'},
+					{name: '联系方式', data: 'c360785655@gmail.com'},
+					],
+					cancelCallback: data => {
+						this.buttonSize = '3rem';
+					}
+				})
 			},
 			reloadTable(data) {
 				this.$root.$children[0].$emit('reloadTable', data);
