@@ -1,35 +1,36 @@
 {
     "manifest_version": 2,
-    "name": "贴吧清洁者",
-    "description": "为贴吧的环境清洁做点微小的工作，屏蔽贴吧广告，拉黑用户, 贴吧简洁化",
-    "version": "1.4.1",
+    "name": "eHunter - more powerful e-hentai/eHentai/exhentai!",
+    "short_name": "eHunter",
+    "description": "more powerful e-hentai/eHentai/exhentai",
+    "version": "1.0.0",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "browser_action": {
-        "default_popup": "./build/popup.html",
-        "default_title": "贴吧清洁者"
+        "default_popup": "popup.html",
+        "default_title": "eHunter"
     },
     "icons": {
-        "16": "./img/tieba_icon.png",
-        "24": "./img/tieba_icon.png",
-        "128": "./img/tieba_icon.png"
+        "16": "./img/icon.png",
+        "24": "./img/icon.png",
+        "128": "./img/icon.png"
     },
+    "author": "Alex Chen",
+    "incognito": "spanning",
     "permissions": [
         "activeTab",
         "https://ajax.googleapis.com/",
         "storage"
     ],
-    "content_scripts": [{
-        "matches": [
-            "*://exhentai.org/*"
-        ],
-        "js": [
-            "./src/js/utils.js",
-            "./build/main.js"
-        ],
-        "css": [
-            "./src/css/block.css"
-        ],
-        "run_at": "document_end",
-        "all_frames": true
-    }]
+    "content_scripts": [
+        {
+            "matches": [
+                "*://exhentai.org/*",
+                "*://g.e-hentai.org/*"
+            ],
+            "js": [
+                "inject.js"
+            ],
+            "run_at": "document_end"
+        }
+    ]
 }
