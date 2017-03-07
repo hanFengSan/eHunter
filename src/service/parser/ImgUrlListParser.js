@@ -1,6 +1,6 @@
-// get img urls from manga intro page
-import MultiAsyncReqService from 'src/service/MultiAsyncReqService.js'
-import IntroHtmlParser from 'src/service/IntroHtmlParser.js'
+// get img page urls from manga intro page
+import ReqQueueService from 'src/service/request/ReqQueueService.js'
+import IntroHtmlParser from './IntroHtmlParser.js'
 
 class ImgUrlListParser {
     constructor(introUrl, sumOfImgPage) {
@@ -41,12 +41,11 @@ class ImgUrlListParser {
     }
 
     _request(resolve, reject) {
-        (new MultiAsyncReqService(this.introPageUrls))
+        (new ReqQueueService(this.introPageUrls))
             .request()
             .then(map => {
                 let result = this.introPageUrls.reduce((imgUrls, introUrl) =>
                     imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl)).getImgUrls()), []);
-                console.log(result);
                 resolve(result);
             }, err => {
                 reject(err);

@@ -1,24 +1,28 @@
 <template>
     <div class="manga-container">
-        <div class="loading-container" v-if="imgList.length === 0">
+        <div class="loading-container" v-if="imgInfoList.length === 0">
             loading...
         </div>
-        <div class="scroll-view" v-if="imgList.length > 0">
-            <h1>{{ info.title }}</h1>
-            <div class="img-container" v-for="index in curImgParser.getSumOfPage()">
-                <div class="img"></div>
+        <div ref="scrollView" class="scroll-view" @scroll.stop="onScroll" v-if="imgInfoList.length > 0">
+            <h1>{{ curImgParser.getTitle() }}</h1>
+            <h1 class="location">{{ curIndex }}</h1>
+            <div class="img-container" :style="{ height: `calc(calc(80vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
+                ref="imgContainers">
+                <img class="manga-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1">
                 <label class="index">{{ index }}</label>
-            </div>
         </div>
+    </div>
     </div>
 </template>
 
 <script>
-    import ImgHtmlParser from 'src/service/ImgHtmlParser.js'
-    import IntroHtmlParser from 'src/service/IntroHtmlParser.js'
+    import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
+    import IntroHtmlParser from 'src/service/parser/IntroHtmlParser.js'
+    import ImgUrlListParser from 'src/service/parser/ImgUrlListParser.js'
+    import MultiAsyncReqService from 'src/service/request/MultiAsyncReqService.js'
+    import ReqQueueService from 'src/service/request/ReqQueueService.js'
+    import TextReqService from 'src/service/request/TextReqService.js'
     import * as api from 'src/service/api.js'
-    import MultiAsyncReqService from 'src/service/MultiAsyncReqService.js'
-    import ImgUrlListParser from 'src/service/ImgUrlListParser.js'
 
     export default {
         name: 'MangaScrollView',
@@ -26,63 +30,90 @@
         data() {
             return {
                 curImgParser: new ImgHtmlParser(document.documentElement.innerHTML),
-                imgList: [],
+                imgInfoList: [],
                 imgBaseUrl: '',
                 sumOfPage: '',
-                imgUrlMap: new Map()
+                imgUrlMap: new Map(),
+                scrollTop: 0,
+                nearbyRange: [-2, 3] // the range of necessary imgs, basing curIndex
+            }
+        },
+
+        computed: {
+            curIndex() {
+                this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe becasue of next scrollTop in callbak.
+                let cons = this.$refs.imgContainers;
+                if (cons) {
+                    // console.log(cons.indexOf(cons.find(item => item.offsetTop > this.scrollTop)));
+                    let result = cons.indexOf(cons.find(item => item.offsetTop > this.scrollTop));
+                    return result === -1 ? (this.$refs.imgContainers.length - 1) : result;
+                } else {
+                    return 0;
+                }
+            },
+            nearbyArray() {
+                let curIndex = this.curIndex;
+                let _start = curIndex + this.nearbyRange[0];
+                let start = _start >= 0 ? _start : 0;
+                let _end = curIndex + this.nearbyRange[1];
+                let end = _end >= this.imgInfoList.length - 1 ? this.imgInfoList.length - 1 : _end;
+                return this.range(start, end - start + 1);
             }
         },
 
         created() {
             this.sumOfPage = this.curImgParser.getSumOfPage();
-            this.getImgUrl();
+            this.initImgInfoList();
+            this.$nextTick(() => {
+                console.log('next tick');
+            })
         },
 
         methods: {
-            getImgUrl() {
+            initImgInfoList() {
                 (new ImgUrlListParser(this.curImgParser.getIntroUrl(), this.sumOfPage))
                     .request()
-                    .then(urls => {
-                        // console.log(urls);
-                    }, err => {});
-                // let imgUrls = [];
-                // for (let pageNum of this.range(1, 1)) {
-                //     imgUrls.push(api.getImgHtml(this.imgBaseUrl, pageNum))
-                // }
-                // console.log(imgUrls);
-                // (new MultiAsyncReqService(imgUrls))
-                //     .request()
-                //     .then(imgUrlMap => {
-                //         this.imgUrlMap = imgUrlMap;
-                //         console.log(imgUrlMap);
-                //     }, err => {
-                //         console.log(err);
-                //         // TODO: show tip for this error
-                //     });
+                    .then(imgInfoList => {
+                        this.imgInfoList = imgInfoList;
+                    }, err => { });
+            },
 
-
-                // return new Promise((resolve, reject) => {
-                //     api.getImgHtml(this.curImgParser.getImgBaseUrl, pageNum)
-                //         .then(res => {
-                //             res.text().then(text => {
-                //                 resolve((new ImgHtmlParser(text).getImgUrl()));
-                //             })
-                //         })
-                //         .catch(err => reject(err));
-                // });
+            // for lazy load img
+            getImgSrc(index) {
+                if (!this.imgInfoList[index].src) {
+                    (new TextReqService(this.imgInfoList[index].pageUrl))
+                        .request()
+                        .then(text => {
+                            this.imgInfoList[index].src = new ImgHtmlParser(text).getImgUrl();
+                        });
+                }
             },
 
             initImgSize() {
 
             },
             range(start, count) {
-                return Array.apply(0, Array(count))
-                    .map(function (element, index) {
-                        return index + start;
-                    });
-            }
-        }
+                return Array.apply(0, Array(count)).map(function (element, index) {
+                    return index + start;
+                });
+            },
 
+            detectScrollStop() {
+                window.clearTimeout(this.scrollTimeout);
+                this.scrollTimeout = setTimeout(() => {
+                    this.onScrollStopped();
+                }, 150);
+            },
+
+            onScrollStopped() {
+                this.scrollTop = this.$refs.scrollView.scrollTop;
+            },
+
+            onScroll(position) {
+                this.detectScrollStop();
+            }
+
+        }
     }
 
 </script>
@@ -109,14 +140,18 @@
                 padding: 10px 20px;
                 font-size: 18px;
                 text-align: center;
+                &.location {
+                    position: absolute;
+                    bottom: 20px;
+                    right: 20px;
+                }
             }
             > .img-container {
                 position: relative;
-                height: 720px;
-                width: 500px;
-                max-width: calc(100vw - 150px);
+                width: 1280px;
+                max-width: calc(80vw - 150px);
                 margin: 35px auto;
-                border: 5px solid $img_container_color;
+                box-shadow: inset 0px 0px 0px 5px $img_container_color;
                 > .index {
                     position: absolute;
                     color: $img_container_color;
@@ -126,6 +161,11 @@
                     transform: translate(-50%, -50%);
                     font-size: 80px;
                     z-index: -1;
+                }
+                > .manga-item {
+                    width: 1280px;
+                    max-width: calc(80vw - 150px);
+                    height: inherit;
                 }
             }
         }

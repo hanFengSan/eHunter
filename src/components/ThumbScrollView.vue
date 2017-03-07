@@ -10,10 +10,10 @@
 </template>
 
 <script>
-    import ImgHtmlParser from 'src/service/ImgHtmlParser.js'
-    import IntroHtmlParser from 'src/service/IntroHtmlParser.js'
+    import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
+    import IntroHtmlParser from 'src/service/parser/IntroHtmlParser.js'
+    import TextReqService from 'src/service/request/TextReqService.js'
     import * as api from 'src/service/api.js'
-    import TextReqService from 'src/service/TextReqService.js'
     import CookieUtil from 'src/utils/CookieUtil.js'
 
     export default {
@@ -42,35 +42,18 @@
             select(index) {
                 this.curIndex = index;
             },
-            getIntroHtml(page) {
-                const url = page > 1 ? `${this.parser.getIntroUrl()}?p=${page - 1}` : this.parser.getIntroUrl()
-                return fetch(url, {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-            },
-            getThumbListCount() {
-                // 20 is the img sum per spirit in small thumb model
-                let sumOfPage = this.parser.getSumOfPage();
-                if (sumOfPage < 20) {
-                    return 1;
-                }
-                let reminder = sumOfPage % 20;
-                if (reminder > 1) {
-                    return (sumOfPage - reminder) / 20 + 1;
-                } else {
-                    return sumOfPage / 20;
-                }
-            },
+
             initImgList() {
                 (new TextReqService(api.getIntroHtml(this.parser.getIntroUrl(), 1)))
                     .request()
                     .then(text => {
-                        let thumbKeyId = (new IntroHtmlParser(text)).getThumbKeyId();
-                        for (let i = 0; i < this.getThumbListCount(); i++) {
-                            this.imgList.push(`/m/${thumbKeyId}/${this.parser.getAlbumId()}-${i < 10 ? '0' + i : i}.jpg`);
-                        }
-                        this.computeThumbList();
+                        let introPage = new IntroHtmlParser(text);
+                        this.thumbList = introPage.getThumbObjList(this.parser.getSumOfPage(), this.parser.getAlbumId());
+                        // let thumbKeyId = (new IntroHtmlParser(text)).getThumbKeyId();
+                        // for (let i = 0; i < this.getThumbPageCount(); i++) {
+                        //     this.imgList.push(`/m/${thumbKeyId}/${this.parser.getAlbumId()}-${i < 10 ? '0' + i : i}.jpg`);
+                        // }
+                        // this.computeThumbList();
                     }, err => {
                         console.log(err);
                         // TODO: show tips for the error      

@@ -1,6 +1,7 @@
 // a parser for ablum's img page
 class ImgHtmlParser {
     constructor(html) {
+        this.htmlText = html;
         this.html = document.createElement('html');
         this.html.innerHTML = html;
         this.document = this.html.ownerDocument;
@@ -47,11 +48,8 @@ class ImgHtmlParser {
     }
 
     getImgUrl() {
-        return this.document.getElementById('img').getAttribute('src');
-    }
-
-    getImgBaseUrl() {
-        return window.location.pathname.replace(/-.*$/g, '');
+        this.htmlText.match('id="img" src="(.*?)"');
+        return RegExp.$1;
     }
 
     getOriginalImg() {
