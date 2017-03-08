@@ -1,6 +1,4 @@
-// a parser for ablum's intro page
-import TextReqService from 'src/service/request/TextReqService.js';
-
+// a parser for album's intro page
 class IntroHtmlParser {
     constructor(html) {
         this.html = document.createElement('html');
@@ -56,7 +54,7 @@ class IntroHtmlParser {
         let thumbObjList = [];
         for (let i = 0; i < imgList.length; i++) {
             for (let t = 0; t < 20; t++) {
-                if (i != imgList.length - 1 || t < sumOfPage % 20) {
+                if (i !== imgList.length - 1 || t < sumOfPage % 20) {
                     thumbObjList.push({
                         url: imgList[i],
                         offset: t * 100

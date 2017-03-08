@@ -4,7 +4,7 @@
             loading...
         </div>
         <div ref="scrollView" class="scroll-view" @scroll.stop="onScroll" v-if="imgInfoList.length > 0">
-            <h1>{{ curImgParser.getTitle() }}</h1>
+            <h1>{{ parser.getTitle() }}</h1>
             <h1 class="location">{{ curIndex }}</h1>
             <div class="img-container" :style="{ height: `calc(calc(80vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
@@ -17,19 +17,14 @@
 
 <script>
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
-    import IntroHtmlParser from 'src/service/parser/IntroHtmlParser.js'
-    import ImgUrlListParser from 'src/service/parser/ImgUrlListParser.js'
-    import MultiAsyncReqService from 'src/service/request/MultiAsyncReqService.js'
-    import ReqQueueService from 'src/service/request/ReqQueueService.js'
-    import TextReqService from 'src/service/request/TextReqService.js'
-    import * as api from 'src/service/api.js'
+    import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
 
     export default {
         name: 'MangaScrollView',
 
         data() {
             return {
-                curImgParser: new ImgHtmlParser(document.documentElement.innerHTML),
+                parser: new ImgHtmlParser(document.documentElement.innerHTML),
                 imgInfoList: [],
                 imgBaseUrl: '',
                 sumOfPage: '',
@@ -41,7 +36,7 @@
 
         computed: {
             curIndex() {
-                this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe becasue of next scrollTop in callbak.
+                this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
                 let cons = this.$refs.imgContainers;
                 if (cons) {
                     // console.log(cons.indexOf(cons.find(item => item.offsetTop > this.scrollTop)));
@@ -62,7 +57,7 @@
         },
 
         created() {
-            this.sumOfPage = this.curImgParser.getSumOfPage();
+            this.sumOfPage = this.parser.getSumOfPage();
             this.initImgInfoList();
             this.$nextTick(() => {
                 console.log('next tick');
@@ -71,22 +66,27 @@
 
         methods: {
             initImgInfoList() {
-                (new ImgUrlListParser(this.curImgParser.getIntroUrl(), this.sumOfPage))
-                    .request()
+                AlbumCacheService.instance
+                    .getImgInfos(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
                     .then(imgInfoList => {
                         this.imgInfoList = imgInfoList;
-                    }, err => { });
+                    });
             },
 
             // for lazy load img
             getImgSrc(index) {
-                if (!this.imgInfoList[index].src) {
-                    (new TextReqService(this.imgInfoList[index].pageUrl))
-                        .request()
-                        .then(text => {
-                            this.imgInfoList[index].src = new ImgHtmlParser(text).getImgUrl();
-                        });
-                }
+                AlbumCacheService.instance
+                    .getImgSrc(this.parser.getAlbumId(), index)
+                    .then(src => {
+                        this.imgInfoList[index].src = src;
+                    });
+                // if (!this.imgInfoList[index].src) {
+                //     (new TextReqService(this.imgInfoList[index].pageUrl))
+                //         .request()
+                //         .then(text => {
+                //             this.imgInfoList[index].src = new ImgHtmlParser(text).getImgUrl();
+                //         });
+                // }
             },
 
             initImgSize() {

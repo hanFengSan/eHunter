@@ -1,5 +1,6 @@
 import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
+
 // initial state
 const state = {
 }
@@ -19,8 +20,8 @@ const mutations = {
 }
 
 export default {
-	state,
-	getters,
-	actions,
-	mutations
+    state,
+    getters,
+    actions,
+    mutations
 }

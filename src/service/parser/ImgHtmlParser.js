@@ -1,4 +1,4 @@
-// a parser for ablum's img page
+// a parser for album's img page
 class ImgHtmlParser {
     constructor(html) {
         this.htmlText = html;
@@ -53,8 +53,8 @@ class ImgHtmlParser {
     }
 
     getOriginalImg() {
-        return this.document.getElementById('i7').children.length > 0 ?
-            this.document.getElementById('i7').children[1].getAttribute('href') : ''
+        return this.document.getElementById('i7').children.length > 0
+            ? this.document.getElementById('i7').children[1].getAttribute('href') : ''
     }
 
     _initI2Element() {

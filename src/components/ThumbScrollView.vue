@@ -1,7 +1,7 @@
 <template>
     <div class="thumb-scroll-view">
         <div class="indicator" :style="{top: px(154*curIndex)}"></div>
-        <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbList">
+        <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs">
             <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
             <div class="hover-mask"></div>
             <!--<span class="loc">{{ index }}</span>-->
@@ -11,9 +11,7 @@
 
 <script>
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
-    import IntroHtmlParser from 'src/service/parser/IntroHtmlParser.js'
-    import TextReqService from 'src/service/request/TextReqService.js'
-    import * as api from 'src/service/api.js'
+    import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
     import CookieUtil from 'src/utils/CookieUtil.js'
 
     export default {
@@ -24,13 +22,14 @@
                 parser: new ImgHtmlParser(document.documentElement.innerHTML),
                 info: window.info,
                 imgList: [], // origin img list
-                thumbList: [],
-                curIndex: 0,
+                thumbs: [],
+                curIndex: 0
             }
         },
 
         created() {
             // set Cookie for small thumb, important
+            // cSpell:ignore uconfig
             CookieUtil.setItem('uconfig', 'dm_t');
             this.initImgList();
         },
@@ -44,33 +43,11 @@
             },
 
             initImgList() {
-                (new TextReqService(api.getIntroHtml(this.parser.getIntroUrl(), 1)))
-                    .request()
-                    .then(text => {
-                        let introPage = new IntroHtmlParser(text);
-                        this.thumbList = introPage.getThumbObjList(this.parser.getSumOfPage(), this.parser.getAlbumId());
-                        // let thumbKeyId = (new IntroHtmlParser(text)).getThumbKeyId();
-                        // for (let i = 0; i < this.getThumbPageCount(); i++) {
-                        //     this.imgList.push(`/m/${thumbKeyId}/${this.parser.getAlbumId()}-${i < 10 ? '0' + i : i}.jpg`);
-                        // }
-                        // this.computeThumbList();
-                    }, err => {
-                        console.log(err);
-                        // TODO: show tips for the error      
-                    });
-            },
-
-            computeThumbList() {
-                for (let i = 0; i < this.imgList.length; i++) {
-                    for (let t = 0; t < 20; t++) {
-                        if (i != this.imgList.length - 1 || t < this.parser.getSumOfPage() % 20) {
-                            this.thumbList.push({
-                                url: this.imgList[i],
-                                offset: t * 100
-                            })
-                        }
-                    }
-                }
+                AlbumCacheService.instance
+                .getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
+                .then(thumbs => {
+                    this.thumbs = thumbs;
+                });
             }
         }
     }

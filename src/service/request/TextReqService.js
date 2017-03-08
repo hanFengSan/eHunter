@@ -45,7 +45,7 @@ class TextReqService {
 
     _request(successCallback, failureCallback) {
         this.curRetryTimes++;
-        fetch(this.url, {
+        window.fetch(this.url, {
             method: this.method,
             credentials: this.credentials
         }).then(res => {

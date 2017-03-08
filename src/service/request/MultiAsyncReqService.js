@@ -9,12 +9,12 @@ class MultiAsyncReqService {
 
     request() {
         return new Promise((resolve, reject) => {
-            this._initGeneretor(resolve, reject);
+            this._initGenerator(resolve, reject);
             this._request();
         });
     }
 
-    _initGeneretor(resolve, reject) {
+    _initGenerator(resolve, reject) {
         let self = this;
         this.gen = (function* () {
             try {
