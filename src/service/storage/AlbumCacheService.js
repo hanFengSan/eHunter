@@ -16,13 +16,19 @@ class AlbumCacheService {
     static get instance() {
         if (!this[singleton]) {
             this[singleton] = new AlbumCacheService(singletonEnforcer);
+            this[singleton].storage = window.localStorage;
+            if (this[singleton].storage.getItem('cache') == null ||
+                this[singleton].storage.getItem('cacheVersion') !== AlbumCacheService.version) {
+                this[singleton].storage.setItem('cacheVersion', AlbumCacheService.version);
+                this[singleton].storage.setItem('cache', '{}');
+            }
+            this[singleton].cache = JSON.parse(this[singleton].storage.getItem('cache'));
         }
-        this[singleton].storage = window.localStorage;
-        if (this[singleton].storage.getItem('cache') == null) {
-            this[singleton].storage.setItem('cache', '{}');
-        }
-        this[singleton].cache = JSON.parse(this[singleton].storage.getItem('cache'));
         return this[singleton];
+    }
+
+    static get version() {
+        return '1.1';
     }
 
     hasAlbumCache(albumId) {

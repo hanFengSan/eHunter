@@ -45,7 +45,8 @@ class ImgUrlListParser {
             .request()
             .then(map => {
                 let result = this.introPageUrls.reduce((imgUrls, introUrl) => {
-                    imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl)).getImgUrls())
+                    imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl)).getImgUrls());
+                    return imgUrls;
                 }, []);
                 resolve(result);
             }, err => {
