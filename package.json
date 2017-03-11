@@ -16,6 +16,7 @@
     "vue": "^2.2.1",
     "vue-html": "^0.3.0",
     "vue-resource": "^1.0.3",
+    "vue-scrollto": "^2.4.2",
     "vuex": "^2.0.0",
     "webpack-stream": "^3.2.0"
   },

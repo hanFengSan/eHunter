@@ -1,5 +1,5 @@
 <template>
-    <div class="content">
+    <div id="app-content">
         <thumb-scroll-view class="thumb-scroll-view"></thumb-scroll-view>
         <manga-scroll-view class="manga-scroll-view"></manga-scroll-view>
     </div>
@@ -25,8 +25,11 @@
 
 </script>
 
-<style lang="scss" scoped>
-    .content {
+<style lang="scss">
+    @import "~style/_responsive";
+    @import "~style/_variables";
+
+    #app-content {
         display: flex;
         > .thumb-scroll-view {}
         > .manga-scroll-view {

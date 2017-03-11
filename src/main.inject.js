@@ -1,10 +1,12 @@
 import Vue from 'vue'
 import VueResource from 'vue-resource'
-import App from './InjectedApp.vue'
+import vueScrollto from 'vue-scrollto'
+import App from './app.inject.vue'
 import store from './store/index.inject'
-import VueUtil from './utils/VueUtil.vue';
+import VueUtil from './utils/VueUtil.vue'
 
 Vue.use(VueResource);
+Vue.use(vueScrollto);
 Vue.mixin(VueUtil);
 
 if (document.location.pathname.includes('/s/')) {

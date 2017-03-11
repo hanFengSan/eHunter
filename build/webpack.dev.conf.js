@@ -9,8 +9,8 @@ function resolve(dir) {
 module.exports = {
   watch: true,
   entry: {
-    popup: '../src/popup.js',
-    inject: '../src/inject.js'
+    popup: '../src/main.popup.js',
+    inject: '../src/main.inject.js'
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
@@ -58,7 +58,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'popup.html',
-      template: '../src/popup.html',
+      template: '../src/index.popup.html',
       inject: true,
       excludeChunks: ['inject']
     })

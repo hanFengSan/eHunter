@@ -3,21 +3,22 @@
         <div class="loading-container" v-if="imgInfoList.length === 0">
             loading...
         </div>
-        <div ref="scrollView" class="scroll-view" @scroll.stop="onScroll" v-if="imgInfoList.length > 0">
+        <awesome-scroll-view class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
             <h1>{{ parser.getTitle() }}</h1>
             <h1 class="location">{{ curIndex }}</h1>
             <div class="img-container" :style="{ height: `calc(calc(80vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
                 <img class="manga-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1">
                 <label class="index">{{ index }}</label>
-        </div>
-    </div>
+            </div>
+        </awesome-scroll-view>
     </div>
 </template>
 
 <script>
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
+    import AwesomeScrollView from './base/AwesomeScrollView.vue'
 
     export default {
         name: 'MangaScrollView',
@@ -34,12 +35,15 @@
             }
         },
 
+        components: {
+            AwesomeScrollView
+        },
+
         computed: {
             curIndex() {
                 this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
                 let cons = this.$refs.imgContainers;
                 if (cons) {
-                    // console.log(cons.indexOf(cons.find(item => item.offsetTop > this.scrollTop)));
                     let result = cons.indexOf(cons.find(item => item.offsetTop > this.scrollTop));
                     return result === -1 ? (this.$refs.imgContainers.length - 1) : result;
                 } else {
@@ -59,9 +63,6 @@
         created() {
             this.sumOfPage = this.parser.getSumOfPage();
             this.initImgInfoList();
-            this.$nextTick(() => {
-                console.log('next tick');
-            })
         },
 
         methods: {
@@ -80,18 +81,12 @@
                     .then(src => {
                         this.imgInfoList[index].src = src;
                     });
-                // if (!this.imgInfoList[index].src) {
-                //     (new TextReqService(this.imgInfoList[index].pageUrl))
-                //         .request()
-                //         .then(text => {
-                //             this.imgInfoList[index].src = new ImgHtmlParser(text).getImgUrl();
-                //         });
-                // }
             },
 
             initImgSize() {
 
             },
+
             range(start, count) {
                 return Array.apply(0, Array(count)).map(function (element, index) {
                     return index + start;
@@ -105,14 +100,9 @@
                 }, 150);
             },
 
-            onScrollStopped() {
-                this.scrollTop = this.$refs.scrollView.scrollTop;
-            },
-
-            onScroll(position) {
-                this.detectScrollStop();
+            onScrollStopped(position) {
+                this.scrollTop = position;
             }
-
         }
     }
 
@@ -133,9 +123,8 @@
             font-weight: bolder;
         }
         > .scroll-view {
-            overflow-y: auto;
             height: 100vh;
-            > h1 {
+            h1 {
                 color: $title_color;
                 padding: 10px 20px;
                 font-size: 18px;
@@ -146,7 +135,7 @@
                     right: 20px;
                 }
             }
-            > .img-container {
+            .img-container {
                 position: relative;
                 width: 1280px;
                 max-width: calc(80vw - 150px);

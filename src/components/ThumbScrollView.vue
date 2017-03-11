@@ -1,18 +1,20 @@
 <template>
-    <div class="thumb-scroll-view">
+    <awesome-scroll-view :is-hidden="true" class="thumb-scroll-view">
         <div class="indicator" :style="{top: px(154*curIndex)}"></div>
         <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs">
             <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
             <div class="hover-mask"></div>
             <!--<span class="loc">{{ index }}</span>-->
         </div>
-    </div>
+    </awesome-scroll-view>
 </template>
 
 <script>
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
     import CookieUtil from 'src/utils/CookieUtil.js'
+    import AwesomeScrollView from './base/AwesomeScrollView.vue'
+
 
     export default {
         name: 'ThumbScrollView',
@@ -25,6 +27,10 @@
                 thumbs: [],
                 curIndex: 0
             }
+        },
+
+        components: {
+            AwesomeScrollView
         },
 
         created() {
@@ -64,9 +70,8 @@
         min-height: 100vh;
         height: 500px;
         display: inline-block;
-        overflow-y: auto;
         width: 150px;
-        > .thumb-container {
+        .thumb-container {
             position: relative;
             width: 150px;
             margin: 4px auto;
@@ -94,7 +99,7 @@
                 }
             }
         }
-        > .indicator {
+        .indicator {
             position: absolute;
             box-sizing: border-box;
             height: 154px;
@@ -102,8 +107,6 @@
             top: 0;
             right: 0;
             background: rgba($indicator_color, .3);
-            // border-top: 1px solid $indicator_color;
-            // border-bottom: 1px solid $indicator_color;
             border-left: 3px solid rgba($indicator_color, .5);
             border-right: 3px solid rgba($indicator_color, .5);
             transition: all 0.5s ease;
