@@ -3,7 +3,7 @@ import VueResource from 'vue-resource'
 import vueScrollto from 'vue-scrollto'
 import App from './app.inject.vue'
 import store from './store/index.inject'
-import VueUtil from './utils/VueUtil.vue'
+import VueUtil from './utils/VueUtil.js'
 
 Vue.use(VueResource);
 Vue.use(vueScrollto);
@@ -40,7 +40,3 @@ if (document.getElementsByClassName('vue-container').length > 0) {
         render: (h) => h(App)
     }).$mount('#app');
 }
-
-const hello = () => console.log('Hello! I am eHunter');
-
-hello();

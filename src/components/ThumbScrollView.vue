@@ -1,15 +1,15 @@
 <template>
-    <awesome-scroll-view :is-hidden="true" class="thumb-scroll-view">
+    <awesome-scroll-view ref="scrollView" :is-hidden="true" class="thumb-scroll-view">
         <div class="indicator" :style="{top: px(154*curIndex)}"></div>
-        <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs">
+        <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" ref="thumbContainers">
             <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
             <div class="hover-mask"></div>
-            <!--<span class="loc">{{ index }}</span>-->
         </div>
     </awesome-scroll-view>
 </template>
 
 <script>
+    import { mapGetters, mapActions } from 'vuex'
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
     import CookieUtil from 'src/utils/CookieUtil.js'
@@ -25,7 +25,8 @@
                 info: window.info,
                 imgList: [], // origin img list
                 thumbs: [],
-                curIndex: 0
+                curIndex: 0,
+                hover: false
             }
         },
 
@@ -35,17 +36,34 @@
 
         created() {
             // set Cookie for small thumb, important
-            // cSpell:ignore uconfig
             CookieUtil.setItem('uconfig', 'dm_t');
             this.initImgList();
+            console.log('store');
+            console.log(this.$store);
+        },
+
+        computed: {
+            ...mapGetters({
+                centerIndex: 'curIndex'
+            })
+        },
+
+        watch: {
+            centerIndex() {
+                if (this.curIndex !== this.centerIndex && !this.hover) {
+                    this.curIndex = this.centerIndex;
+                    this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
+                }
+            }
         },
 
         methods: {
-            px(num) {
-                return `${num}px`;
-            },
+            ...mapActions([
+                'setIndex'
+            ]),
             select(index) {
                 this.curIndex = index;
+                this.setIndex(index);
             },
 
             initImgList() {

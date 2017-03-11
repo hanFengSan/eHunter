@@ -35,5 +35,5 @@
         > .manga-scroll-view {
             width: calc(100% - 150px);
         }
-    }
+        }
 </style>

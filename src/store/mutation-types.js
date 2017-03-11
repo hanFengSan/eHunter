@@ -11,3 +11,5 @@ export const CLOSE_POPUPS = 'CLOSE_POPUPS'
 export const UPDATE_RANK = 'UPDATE_RANK'
 export const SET_ERROR = 'SET_ERROR'
 export const SWITCH_TABLE_ITEMS = 'SWITCH_TABLE_ITEMS'
+
+export const SET_INDEX = 'SET_INDEX'

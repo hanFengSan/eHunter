@@ -1,5 +1,5 @@
 <template>
-    <div ref="asw" :class="['awesome-scroll-view', 'scrollbar', { isHidden: isHidden }]" @scroll="onScroll">
+    <div ref="asv" :class="['awesome-scroll-view', 'scrollbar', { isHidden: isHidden }]" @scroll="onScroll">
         <slot></slot>
     </div>
 </template>
@@ -8,6 +8,8 @@
     // awesome scroll view for chrome(-webkit)
     // @author: Alex chen
     // @created: 2017-03-11
+    import BezierEasing from 'src/utils/bezier-easing.js'
+
     export default {
         name: 'AwesomeScrollView',
 
@@ -48,7 +50,7 @@
             },
 
             onScroll() {
-                this.lastKnownScrollPosition = this.$refs.asw.scrollTop;
+                this.lastKnownScrollPosition = this.$refs.asv.scrollTop;
                 if (!this.ticking) {
                     window.requestAnimationFrame(() => {
                         this.detectScrollStop();
@@ -59,12 +61,24 @@
                 this.isScrolling = true;
             },
 
-            showScrollbar() {
-
-            },
-
-            hideScrollBar() {
-
+            ScrollTo(offsetTop, duration) {
+                let startingY = this.$refs.asv.scrollTop;
+                let diff = offsetTop - startingY;
+                let start;
+                const self = this;
+                const easing = BezierEasing(0.61, 0.29, 0.3, 0.97);
+                // const easing = BezierEasing(0.7, 0.11, 0.43, 0.97);
+                // const easing = BezierEasing(.72,.07,.3,.97);
+                // const easing = BezierEasing(.61,.29,.08,.98);
+                window.requestAnimationFrame(function step(timestamp) {
+                    if (!start) start = timestamp;
+                    var time = timestamp - start;
+                    var percent = Math.min(time / duration, 1);
+                    self.$refs.asv.scrollTop = startingY + diff * easing(percent);
+                    if (time < duration) {
+                        window.requestAnimationFrame(step);
+                    }
+                })
             }
         }
     }

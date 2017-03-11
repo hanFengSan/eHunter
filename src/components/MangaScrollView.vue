@@ -3,7 +3,7 @@
         <div class="loading-container" v-if="imgInfoList.length === 0">
             loading...
         </div>
-        <awesome-scroll-view class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
+        <awesome-scroll-view ref="scrollView" class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
             <h1>{{ parser.getTitle() }}</h1>
             <h1 class="location">{{ curIndex }}</h1>
             <div class="img-container" :style="{ height: `calc(calc(80vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+    import { mapGetters, mapActions } from 'vuex'
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
     import AwesomeScrollView from './base/AwesomeScrollView.vue'
@@ -40,12 +41,17 @@
         },
 
         computed: {
+            ...mapGetters({
+                centerIndex: 'curIndex'
+            }),
             curIndex() {
                 this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
                 let cons = this.$refs.imgContainers;
                 if (cons) {
-                    let result = cons.indexOf(cons.find(item => item.offsetTop > this.scrollTop));
-                    return result === -1 ? (this.$refs.imgContainers.length - 1) : result;
+                    let result = cons.indexOf(cons.find(item => item.offsetTop >= this.scrollTop));
+                    const index = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
+                    this.setIndex(index);
+                    return index;
                 } else {
                     return 0;
                 }
@@ -60,12 +66,23 @@
             }
         },
 
+        watch: {
+            centerIndex() {
+                if (this.curIndex !== this.centerIndex) {
+                    this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.centerIndex].offsetTop - 100, 1000);
+                }
+            }
+        },
+
         created() {
             this.sumOfPage = this.parser.getSumOfPage();
             this.initImgInfoList();
         },
 
         methods: {
+            ...mapActions([
+                'setIndex'
+            ]),
             initImgInfoList() {
                 AlbumCacheService.instance
                     .getImgInfos(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
@@ -102,6 +119,10 @@
 
             onScrollStopped(position) {
                 this.scrollTop = position;
+            },
+
+            syncIndex() {
+                console.log('data changed');
             }
         }
     }
