@@ -1,11 +1,15 @@
 <template>
-    <awesome-scroll-view ref="scrollView" :is-hidden="true" class="thumb-scroll-view">
-        <div class="indicator" :style="{top: px(154*curIndex)}"></div>
-        <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" ref="thumbContainers">
-            <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
-            <div class="hover-mask"></div>
-        </div>
-    </awesome-scroll-view>
+    <div class="thumb-content">
+        <awesome-scroll-view ref="scrollView" :is-hidden="true" class="thumb-scroll-view" @mouseenter="hover=true" @mouseleave="hover=false">
+            <div class="indicator" :style="{top: px(154*curIndex)}"></div>
+            <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" ref="thumbContainers">
+                <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
+                <div class="hover-mask"></div>
+                <div class="index">{{ index + 1 }}</div>
+            </div>
+        </awesome-scroll-view>
+        <div class="toggle-button"></div>
+    </div>
 </template>
 
 <script>
@@ -81,54 +85,80 @@
 <style lang="scss" scoped>
     @import "~style/_responsive";
     @import "~style/_variables";
-    $indicator_color: white;
-    .thumb-scroll-view {
+    .thumb-content {
         position: relative;
-        background: $thumb_scroll_view_bg;
-        min-height: 100vh;
-        height: 500px;
-        display: inline-block;
-        width: 150px;
-        .thumb-container {
+        .thumb-scroll-view {
             position: relative;
-            width: 150px;
-            margin: 4px auto;
-            height: 150px;
-            text-align: center;
-            > .thumb {
-                margin: 1px auto 0;
-                width: 100px;
-                height: 144px;
-                transition: all 0.5s ease;
-            }
-            > .loc {
-                display: block;
-                color: rgba(white, .5);
-                font-size: 12px;
-            }
-            &:hover {
-                >.hover-mask {
-                    position: absolute;
-                    top: -5px;
-                    right: 0;
-                    left: 0;
-                    bottom: 0;
-                    background: rgba($indicator_color, .2);
+            background: $thumb_scroll_view_bg;
+            min-height: 100vh;
+            height: 500px;
+            display: inline-block;
+            width: $thumb-view-size;
+            .thumb-container {
+                position: relative;
+                width: $thumb-view-size;
+                margin: $thumb-view-margin auto;
+                height: $thumb-view-size;
+                text-align: center;
+                > .thumb {
+                    margin: 1px auto 0;
+                    width: $thumb-width;
+                    // 1/1.44 is the default scale of ehentai's thumb
+                    height: $thumb-width * 144 / 100; 
+                    transition: all 0.5s ease;
+                }
+                > .loc {
+                    display: block;
+                    color: rgba(white, .5);
+                    font-size: 12px;
+                }
+                > .index {
+                    display: none;
+                }
+                &:hover {
+                    >.hover-mask {
+                        position: absolute;
+                        top: $thumb-view-margin * -1;
+                        right: 0;
+                        left: 0;
+                        bottom: 0;
+                        background: rgba($indicator_color, .2);
+                    }
+                    > .index {
+                        position: absolute;
+                        display: block;
+                        font-weight: bolder;
+                        font-size: 40px;
+                        color: rgba($body_bg, .8);
+                        top: calc(50% - 4px); // 4px is $thumb-view-margin, if using $thumb-view-margin in these, will get a error 
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        z-index: 20;
+                    }
                 }
             }
+            .indicator {
+                position: absolute;
+                box-sizing: border-box;
+                height: $thumb-view-size + $thumb-view-margin;
+                left: 0;
+                top: 0;
+                right: 0;
+                background: rgba($indicator_color, .3);
+                border-left: 3px solid rgba($indicator_color, .5);
+                border-right: 3px solid rgba($indicator_color, .5);
+                transition: all 0.5s ease;
+                z-index: 10;
+                pointer-events: none;
+            }
         }
-        .indicator {
+        > .toggle-button {
             position: absolute;
-            box-sizing: border-box;
-            height: 154px;
-            left: 0;
+            height: 10px;
+            width: 10px;
+            background: red;
+            right: -20px;
             top: 0;
-            right: 0;
-            background: rgba($indicator_color, .3);
-            border-left: 3px solid rgba($indicator_color, .5);
-            border-right: 3px solid rgba($indicator_color, .5);
-            transition: all 0.5s ease;
-            z-index: 10;
         }
     }
 </style>

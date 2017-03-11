@@ -1,3 +1,4 @@
+// color
 $primary_color: #8e44ad;
 $split_grey: #DDDDDD;
 $accent_color: #af7ac5;
@@ -7,6 +8,12 @@ $table_grey: #f7f7f7;
 $text_grey: #777777;
 
 $body_bg: hsl(231, 6%, 22%);
-$thumb_scroll_view_bg: hsl(231, 6%, 27%);
 $img_container_color:hsl(231, 6%, 36%);
 $title_color:hsl(231, 6%, 80%);
+
+// thumb-view
+$thumb-view-size: 150px;
+$indicator_color: white;
+$thumb-width: 100px;
+$thumb_scroll_view_bg: hsl(231, 6%, 27%);
+$thumb-view-margin: 4px;
