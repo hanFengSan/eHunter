@@ -6,6 +6,7 @@
 </template>
 
 <script>
+    import { mapActions } from 'vuex'
     import ThumbScrollView from './components/ThumbScrollView.vue'
     import MangaScrollView from './components/MangaScrollView.vue'
 
@@ -16,6 +17,28 @@
             return {
 
             }
+        },
+
+        created() {
+            /* eslint-disable no-undef */
+            chrome.runtime.onMessage.addListener((msg, sender, response) => {
+                console.log(msg);
+                switch (msg.setting) {
+                case 'setAlbumWidth':
+                    window.setTimeout(() => {
+                        this.setAlbumWidth(msg.value);
+                    }, 0);
+                    console.log('set album width to ' + msg.value);
+                    break;
+                }
+                response();
+            });
+        },
+
+        methods: {
+            ...mapActions([
+                'setAlbumWidth'
+            ])
         },
 
         components: {
@@ -35,5 +58,12 @@
         > .manga-scroll-view {
             width: calc(100% - 150px);
         }
-        }
+    }
+    body {
+        font-family: 'San Francisco', 'Helvetica', Arial, "Hiragino Sans GB", "Heiti SC",//macOS & ios
+        "Microsoft YaHei", //windows
+        'Droid Sans', // android default
+        'WenQuanYi Micro Hei', // linux
+        sans-serif;
+    }
 </style>

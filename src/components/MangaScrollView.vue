@@ -6,7 +6,7 @@
         <h4 class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>        
         <awesome-scroll-view ref="scrollView" class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
             <h1>{{ parser.getTitle() }}</h1>
-            <div class="img-container" :style="{ height: `calc(calc(80vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
+            <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
                 <img class="manga-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1">
                 <label class="index">{{ index + 1 }}</label>
@@ -42,7 +42,8 @@
 
         computed: {
             ...mapGetters({
-                centerIndex: 'curIndex'
+                centerIndex: 'curIndex',
+                widthScale: 'albumWidth'
             }),
             curIndex() {
                 this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
@@ -162,8 +163,9 @@
             }
             .img-container {
                 position: relative;
-                width: 1280px;
-                max-width: calc(80vw - 150px);
+                // width: 1280px;
+                width: 10px;
+                transition: all 0.3s ease;
                 margin: 35px auto;
                 box-shadow: inset 0px 0px 0px 5px $img_container_color;
                 > .index {
@@ -177,8 +179,8 @@
                     z-index: -1;
                 }
                 > .manga-item {
-                    width: 1280px;
-                    max-width: calc(80vw - 150px);
+                    width: inherit;
+                    min-width: inherit;
                     height: inherit;
                 }
             }

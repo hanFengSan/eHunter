@@ -5,17 +5,22 @@ import * as types from '../mutation-types'
 const state = {
     curIndex: 0,
     thumb: { },
-    manga: { }
+    manga: { width: 80 }
 }
 
 // getters
 const getters = {
-    curIndex: state => state.curIndex
+    curIndex: state => state.curIndex,
+    albumWidth: state => state.manga.width
 }
 
 // actions
 const actions = {
-    setIndex: ({ commit }, index) => setIndex(commit, index)
+    setIndex: ({ commit }, index) => setIndex(commit, index),
+    setAlbumWidth: ({ commit }, width) => {
+        console.log('vuex get');
+        commit(types.SET_ALBUM_WIDTH, { width })
+    }
 }
 
 // mutations
@@ -23,6 +28,9 @@ const mutations = {
     [types.SET_INDEX](state, { index }) {
         state.curIndex = index;
         console.log(`toIndex: ${index}`);
+    },
+    [types.SET_ALBUM_WIDTH](state, { width }) {
+        state.manga.width = width;
     }
 }
 

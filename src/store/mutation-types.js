@@ -13,3 +13,4 @@ export const SET_ERROR = 'SET_ERROR'
 export const SWITCH_TABLE_ITEMS = 'SWITCH_TABLE_ITEMS'
 
 export const SET_INDEX = 'SET_INDEX'
+export const SET_ALBUM_WIDTH = 'SET_ALBUM_WIDTH'
