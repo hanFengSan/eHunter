@@ -1,6 +1,9 @@
 <template>
     <div class="thumb-content">
         <awesome-scroll-view ref="scrollView" :is-hidden="true" class="thumb-scroll-view" @mouseenter="hover=true" @mouseleave="hover=false">
+            <div class="header">
+                <span class="app-name">E-HUNTER</span>
+            </div>
             <div class="indicator" :style="{top: px(154*curIndex)}"></div>
             <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" ref="thumbContainers">
                 <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
@@ -8,7 +11,6 @@
                 <div class="index">{{ index + 1 }}</div>
             </div>
         </awesome-scroll-view>
-        <div class="toggle-button"></div>
     </div>
 </template>
 
@@ -94,6 +96,56 @@
             height: 500px;
             display: inline-block;
             width: $thumb-view-size;
+            >.header {
+                position: relative;
+                height: $header-height;
+                background: $header-bg;
+                > .app-name {
+                    color: white;
+                    font-weight: bolder;
+                    font-size: 18px;
+                    display: block;
+                    position: absolute;
+                    white-space: nowrap;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+                .more-vertical-solid.icon {
+                    display: block;
+                    margin-top: 18px;
+                    color: white;
+                    position: absolute;
+                    margin-left: 9px;
+                    width: 2px;
+                    height: 2px;
+                    border-radius: 50%;
+                    border: solid 1px currentColor;
+                    background-color: currentColor;
+                    &:before {
+                        content: '';
+                        position: absolute;
+                        left: -1px;
+                        top: -8px;
+                        width: 2px;
+                        height: 2px;
+                        border-radius: 50%;
+                        border: solid 1px currentColor;
+                        background-color: currentColor;
+                    }
+                    &:after {
+                        content: '';
+                        position: absolute;
+                        left: -1px;
+                        top: 6px;
+                        width: 2px;
+                        height: 2px;
+                        border-radius: 50%;
+                        border: solid 1px currentColor;
+                        background-color: currentColor;
+                    }
+                }
+            }
             .thumb-container {
                 position: relative;
                 width: $thumb-view-size;
@@ -140,6 +192,7 @@
             .indicator {
                 position: absolute;
                 box-sizing: border-box;
+                margin-top: $header-height;
                 height: $thumb-view-size + $thumb-view-margin;
                 left: 0;
                 top: 0;
@@ -151,14 +204,6 @@
                 z-index: 10;
                 pointer-events: none;
             }
-        }
-        > .toggle-button {
-            position: absolute;
-            height: 10px;
-            width: 10px;
-            background: red;
-            right: -20px;
-            top: 0;
         }
     }
 </style>

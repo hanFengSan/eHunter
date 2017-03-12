@@ -3,13 +3,13 @@
         <div class="loading-container" v-if="imgInfoList.length === 0">
             loading...
         </div>
+        <h4 class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>        
         <awesome-scroll-view ref="scrollView" class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
             <h1>{{ parser.getTitle() }}</h1>
-            <h1 class="location">{{ curIndex }}</h1>
             <div class="img-container" :style="{ height: `calc(calc(80vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
                 <img class="manga-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1">
-                <label class="index">{{ index }}</label>
+                <label class="index">{{ index + 1 }}</label>
             </div>
         </awesome-scroll-view>
     </div>
@@ -143,18 +143,22 @@
             font-size: 24px;
             font-weight: bolder;
         }
+        > .location {
+            position: absolute;
+            bottom: 5px;
+            right: 23px;
+            z-index: 10;
+            font-size: 14px;
+            color: rgba(white, 0.2);
+        }
         > .scroll-view {
+            position: relative;
             height: 100vh;
             h1 {
                 color: $title_color;
                 padding: 10px 20px;
                 font-size: 18px;
                 text-align: center;
-                &.location {
-                    position: absolute;
-                    bottom: 20px;
-                    right: 20px;
-                }
             }
             .img-container {
                 position: relative;
