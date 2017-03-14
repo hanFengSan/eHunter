@@ -64,6 +64,8 @@
 </template>
 
 <script>
+    import SettingService from 'src/service/SettingService.js'
+
     export default {
         name: 'PopupApp',
 
@@ -89,27 +91,46 @@
 
         watch: {
             'read.viewScale'() {
-                /* eslint-disable no-undef */
-                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                    chrome.tabs.sendMessage(
-                        tabs[0].id,
-                        { setting: 'setAlbumWidth', value: this.read.viewScale },
-                        () => { });
-                });
+                SettingService.instance.setSettingItem('setAlbumWidth', this.read.viewScale);
+            },
+            'read.eHunterView'() {
+                console.log('watch');
+                SettingService.instance.setSettingItem('toggleEHunter', this.read.eHunterView);
             }
         },
 
         created() {
             this.activeTab = this.read.name;
+            this.initValues();
         },
 
         methods: {
+            initValues() {
+                SettingService.instance.getSettingItem('toggleEHunter', (val) => {
+                    this.read.eHunterView = val;
+                });
+            },
             handleTabChange (val) {
                 this.activeTab = val
             },
             handleToggle (tab, key) {
                 tab[key] = !tab[key];
             }
+            // sendSettingMsg(settingName, value, callback = () => {}) {
+            //     /* eslint-disable no-undef */
+            //     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            //         chrome.tabs.sendMessage(
+            //             tabs[0].id,
+            //             { settingName, value },
+            //             callback);
+            //     });
+            // },
+            // setSettingItem(settingName, value, callback = () => {}) {
+            //     this.sendSettingMsg(settingName, value, callback);
+            //     chrome.storage.sync.set({ [settingName]: value }, () => {
+            //         console.log('chrome save');
+            //     });
+            // }
         }
     }
 

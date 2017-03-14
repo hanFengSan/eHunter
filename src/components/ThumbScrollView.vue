@@ -21,7 +21,6 @@
     import CookieUtil from 'src/utils/CookieUtil.js'
     import AwesomeScrollView from './base/AwesomeScrollView.vue'
 
-
     export default {
         name: 'ThumbScrollView',
 
@@ -74,10 +73,10 @@
 
             initImgList() {
                 AlbumCacheService.instance
-                .getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
-                .then(thumbs => {
-                    this.thumbs = thumbs;
-                });
+                    .getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
+                    .then(thumbs => {
+                        this.thumbs = thumbs;
+                    });
             }
         }
     }
@@ -100,7 +99,7 @@
                 position: relative;
                 height: $header-height;
                 background: $header-bg;
-                > .app-name {
+                >.app-name {
                     color: white;
                     font-weight: bolder;
                     font-size: 18px;
@@ -152,19 +151,19 @@
                 margin: $thumb-view-margin auto;
                 height: $thumb-view-size;
                 text-align: center;
-                > .thumb {
+                >.thumb {
                     margin: 1px auto 0;
                     width: $thumb-width;
                     // 1/1.44 is the default scale of ehentai's thumb
-                    height: $thumb-width * 144 / 100; 
+                    height: $thumb-width * 144 / 100;
                     transition: all 0.5s ease;
                 }
-                > .loc {
+                >.loc {
                     display: block;
                     color: rgba(white, .5);
                     font-size: 12px;
                 }
-                > .index {
+                >.index {
                     display: none;
                 }
                 &:hover {
@@ -176,7 +175,7 @@
                         bottom: 0;
                         background: rgba($indicator_color, .2);
                     }
-                    > .index {
+                    >.index {
                         position: absolute;
                         display: block;
                         font-weight: bolder;
@@ -206,4 +205,5 @@
             }
         }
     }
+
 </style>

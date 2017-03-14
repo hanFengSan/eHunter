@@ -1,13 +1,19 @@
+/* eslint-disable no-unused-vars,no-undef,indent */
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 import App from './app.inject.vue'
 import store from './store/index.inject'
 import VueUtil from './utils/VueUtil.js'
+import SettingService from './service/SettingService.js'
 
 Vue.use(VueResource);
 Vue.mixin(VueUtil);
 
-if (document.location.pathname.includes('/s/')) {
+function isAlbumViewPage() {
+    return document.location.pathname.includes('/s/');
+}
+
+function createEHunterView() {
     document.body.style.overflow = 'hidden';
     let element = document.createElement('div');
     element.style.position = 'fixed';
@@ -31,10 +37,63 @@ if (document.location.pathname.includes('/s/')) {
     }, 0);
 }
 
-if (document.getElementsByClassName('vue-container').length > 0) {
-    /* eslint-disable no-unused-vars */
-    const app = new Vue({
-        store,
-        render: (h) => h(App)
-    }).$mount('#app');
+function createVueView() {
+    if (document.getElementsByClassName('vue-container')
+        .length > 0) {
+        const app = new Vue({
+                store,
+                render: (h) => h(App)
+            })
+            .$mount('#app');
+    }
 }
+
+function createListener() {
+    SettingService.instance.listen(store);
+}
+
+function init() {
+    if (isAlbumViewPage()) {
+        SettingService.instance.getSettingItem('toggleEHunter', (active) => {
+            console.log(active);
+            if (active) {
+                createEHunterView();
+                createVueView();
+                createListener();
+            } else {
+                SettingService.instance.onSettingChange('toggleEHunter', (active) => {
+                    init();
+                });
+            }
+        }, true);
+        // chrome.storage('toggleEHunter', (active) => {
+        //     if (active) {
+        //         createEHunterView();
+        //         createVueView();
+        //         createListener();
+        //     }
+        // });
+    }
+}
+
+init();
+// if (isAlbumViewPage()) {
+//     SettingService.instance.getSettingItem('toggleEHunter', (active) => {
+//         if (active) {
+//             init();
+//         } else {
+//             SettingService.instance.onSettingChange('toggleEHunter', (active) => {
+//                 if (active) {
+//                     init();
+//                 }
+//             });
+//         }
+//     });
+//     // chrome.storage('toggleEHunter', (active) => {
+//     //     if (active) {
+//     //         createEHunterView();
+//     //         createVueView();
+//     //         createListener();
+//     //     }
+//     // });
+// }

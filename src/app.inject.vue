@@ -20,19 +20,6 @@
         },
 
         created() {
-            /* eslint-disable no-undef */
-            chrome.runtime.onMessage.addListener((msg, sender, response) => {
-                console.log(msg);
-                switch (msg.setting) {
-                case 'setAlbumWidth':
-                    window.setTimeout(() => {
-                        this.setAlbumWidth(msg.value);
-                    }, 0);
-                    console.log('set album width to ' + msg.value);
-                    break;
-                }
-                response();
-            });
         },
 
         methods: {
