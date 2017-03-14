@@ -1,14 +1,14 @@
 <template>
     <div id="app-content">
         <thumb-scroll-view class="thumb-scroll-view"></thumb-scroll-view>
-        <manga-scroll-view class="manga-scroll-view"></manga-scroll-view>
+        <album-scroll-view class="album-scroll-view"></album-scroll-view>
     </div>
 </template>
 
 <script>
     import { mapActions } from 'vuex'
     import ThumbScrollView from './components/ThumbScrollView.vue'
-    import MangaScrollView from './components/MangaScrollView.vue'
+    import AlbumScrollView from './components/AlbumScrollView.vue'
 
     export default {
         name: 'InjectedApp',
@@ -29,7 +29,7 @@
         },
 
         components: {
-            ThumbScrollView, MangaScrollView
+            ThumbScrollView, AlbumScrollView
         }
     }
 
@@ -42,7 +42,7 @@
     #app-content {
         display: flex;
         > .thumb-scroll-view {}
-        > .manga-scroll-view {
+        > .album-scroll-view {
             width: calc(100% - 150px);
         }
     }

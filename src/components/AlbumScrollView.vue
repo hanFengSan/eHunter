@@ -1,5 +1,5 @@
 <template>
-    <div class="manga-container">
+    <div class="album-container">
         <div class="loading-container" v-if="imgInfoList.length === 0">
             loading...
         </div>
@@ -8,7 +8,7 @@
             <h1>{{ parser.getTitle() }}</h1>
             <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
-                <img class="manga-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1">
+                <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1">
                 <label class="index">{{ index + 1 }}</label>
             </div>
         </awesome-scroll-view>
@@ -22,7 +22,7 @@
     import AwesomeScrollView from './base/AwesomeScrollView.vue'
 
     export default {
-        name: 'MangaScrollView',
+        name: 'AlbumScrollView',
 
         data() {
             return {
@@ -133,7 +133,7 @@
 <style lang="scss" scoped>
     @import "~style/_responsive";
     @import "~style/_variables";
-    .manga-container {
+    .album-container {
         position: relative;
         > .loading-container {
             position: absolute;
@@ -178,7 +178,7 @@
                     font-size: 80px;
                     z-index: -1;
                 }
-                > .manga-item {
+                > .album-item {
                     width: inherit;
                     min-width: inherit;
                     height: inherit;

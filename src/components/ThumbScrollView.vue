@@ -4,7 +4,8 @@
             <div class="header">
                 <span class="app-name">E-HUNTER</span>
             </div>
-            <div class="indicator" :style="{top: px(154*curIndex)}"></div>
+            <!-- 160 is $thumb-view-size -->
+            <div class="indicator" :style="{top: px(160*curIndex)}"></div>
             <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" ref="thumbContainers">
                 <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
                 <div class="hover-mask"></div>
@@ -57,7 +58,7 @@
             centerIndex() {
                 if (this.curIndex !== this.centerIndex && !this.hover) {
                     this.curIndex = this.centerIndex;
-                    this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
+                    this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000); // the 4 is the value of marginTop
                 }
             }
         },
@@ -148,11 +149,15 @@
             .thumb-container {
                 position: relative;
                 width: $thumb-view-size;
-                margin: $thumb-view-margin auto;
+                padding: $thumb-view-margin 0;
                 height: $thumb-view-size;
                 text-align: center;
+                display: flex; 
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
                 >.thumb {
-                    margin: 1px auto 0;
+                    display: block;
                     width: $thumb-width;
                     // 1/1.44 is the default scale of ehentai's thumb
                     height: $thumb-width * 144 / 100;
@@ -169,7 +174,7 @@
                 &:hover {
                     >.hover-mask {
                         position: absolute;
-                        top: $thumb-view-margin * -1;
+                        top: 0;
                         right: 0;
                         left: 0;
                         bottom: 0;
@@ -192,7 +197,7 @@
                 position: absolute;
                 box-sizing: border-box;
                 margin-top: $header-height;
-                height: $thumb-view-size + $thumb-view-margin;
+                height: $thumb-view-size;
                 left: 0;
                 top: 0;
                 right: 0;
