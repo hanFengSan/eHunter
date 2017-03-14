@@ -59,13 +59,13 @@ function init() {
             if (active) {
                 createEHunterView();
                 createVueView();
-                createListener();
             } else {
                 SettingService.instance.onSettingChange('toggleEHunter', (active) => {
                     init();
                 });
             }
         }, true);
+        createListener();
         // chrome.storage('toggleEHunter', (active) => {
         //     if (active) {
         //         createEHunterView();

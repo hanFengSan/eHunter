@@ -186,10 +186,12 @@
                         font-weight: bolder;
                         font-size: 40px;
                         color: rgba($body_bg, .8);
-                        top: calc(50% - 4px); // 4px is $thumb-view-margin, if using $thumb-view-margin in these, will get a error 
+                        top: 50%;
                         left: 50%;
                         transform: translate(-50%, -50%);
                         z-index: 20;
+                        user-select: none;
+                        cursor: default;
                     }
                 }
             }

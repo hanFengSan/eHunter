@@ -31,9 +31,15 @@ class SettingListener {
                     }, 0);
                     break;
                 case 'toggleEHunter':
-                    document.body.style.overflow = msg.value ? 'hidden' : '';
-                    document.getElementsByClassName('vue-container')[0].style.top = msg.value ? '0' : '-100%';
+                    if (document.getElementsByClassName('vue-container').length > 0) {
+                        document.body.style.overflow = msg.value ? 'hidden' : '';
+                        document.getElementsByClassName('vue-container')[0].style.top = msg.value ? '0' : '-100%';
+                    }
                     break;
+            }
+            // eventBus
+            if (this.eventBus[msg.settingName]) {
+                this.eventBus[msg.settingName].forEach(callback => callback(msg.value));
             }
             response();
         });
@@ -44,9 +50,6 @@ class SettingListener {
             [settingName]: value
         }, () => {
             this._sendSettingMsg(settingName, value, callback);
-            if (this.eventBus[settingName]) {
-                this.eventBus[settingName].forEach(callback => callback(value));
-            }
             console.log(`chrome saved ${settingName}`);
         });
     }
