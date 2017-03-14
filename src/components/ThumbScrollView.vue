@@ -4,7 +4,7 @@
             <div class="header">
                 <span class="app-name">E-HUNTER</span>
             </div>
-            <!-- 160 is $thumb-view-size -->
+            <!-- 160 is $thumb-view-height -->
             <div class="indicator" :style="{top: px(160*curIndex)}"></div>
             <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" ref="thumbContainers">
                 <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
@@ -95,7 +95,7 @@
             min-height: 100vh;
             height: 500px;
             display: inline-block;
-            width: $thumb-view-size;
+            width: $thumb-view-width;
             >.header {
                 position: relative;
                 height: $header-height;
@@ -148,9 +148,9 @@
             }
             .thumb-container {
                 position: relative;
-                width: $thumb-view-size;
+                width: $thumb-view-width;
                 padding: $thumb-view-margin 0;
-                height: $thumb-view-size;
+                height: $thumb-view-height;
                 text-align: center;
                 display: flex; 
                 align-items: center;
@@ -197,7 +197,7 @@
                 position: absolute;
                 box-sizing: border-box;
                 margin-top: $header-height;
-                height: $thumb-view-size;
+                height: $thumb-view-height;
                 left: 0;
                 top: 0;
                 right: 0;
