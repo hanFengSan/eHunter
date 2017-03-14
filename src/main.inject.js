@@ -77,23 +77,3 @@ function init() {
 }
 
 init();
-// if (isAlbumViewPage()) {
-//     SettingService.instance.getSettingItem('toggleEHunter', (active) => {
-//         if (active) {
-//             init();
-//         } else {
-//             SettingService.instance.onSettingChange('toggleEHunter', (active) => {
-//                 if (active) {
-//                     init();
-//                 }
-//             });
-//         }
-//     });
-//     // chrome.storage('toggleEHunter', (active) => {
-//     //     if (active) {
-//     //         createEHunterView();
-//     //         createVueView();
-//     //         createListener();
-//     //     }
-//     // });
-// }

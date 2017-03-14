@@ -22,13 +22,11 @@ class SettingListener {
 
     // listen setting's change, and send action to content's vuex
     listen(store) {
+        this._initSettings(store);
         chrome.runtime.onMessage.addListener((msg, sender, response) => {
-            console.log(msg);
             switch (msg.settingName) {
                 case 'setAlbumWidth':
-                    window.setTimeout(() => {
-                        store.dispatch('setAlbumWidth', msg.value);
-                    }, 0);
+                    store.dispatch('setAlbumWidth', msg.value);
                     break;
                 case 'toggleEHunter':
                     if (document.getElementsByClassName('vue-container').length > 0) {
@@ -85,6 +83,11 @@ class SettingListener {
                 tabs[0].id, { settingName, value },
                 callback);
         });
+    }
+
+    _initSettings(store) {
+        // viewScale
+        this.getSettingItem('setAlbumWidth', (val) => store.dispatch('setAlbumWidth', val));
     }
 }
 

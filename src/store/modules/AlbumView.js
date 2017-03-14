@@ -4,14 +4,19 @@ import * as types from '../mutation-types'
 // initial state
 const state = {
     curIndex: 0,
-    thumb: { },
-    album: { width: 80 }
+    thumb: {
+        width: 150 // px
+    },
+    album: {
+        width: 80 // percent
+    }
 }
 
 // getters
 const getters = {
     curIndex: state => state.curIndex,
-    albumWidth: state => state.album.width
+    albumWidth: state => state.album.width,
+    thumbWidth: state => state.thumb.width
 }
 
 // actions
