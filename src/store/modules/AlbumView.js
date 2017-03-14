@@ -5,13 +5,13 @@ import * as types from '../mutation-types'
 const state = {
     curIndex: 0,
     thumb: { },
-    manga: { width: 80 }
+    album: { width: 80 }
 }
 
 // getters
 const getters = {
     curIndex: state => state.curIndex,
-    albumWidth: state => state.manga.width
+    albumWidth: state => state.album.width
 }
 
 // actions
@@ -30,7 +30,7 @@ const mutations = {
         console.log(`toIndex: ${index}`);
     },
     [types.SET_ALBUM_WIDTH](state, { width }) {
-        state.manga.width = width;
+        state.album.width = width;
     }
 }
 

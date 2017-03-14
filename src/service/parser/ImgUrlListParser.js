@@ -1,4 +1,4 @@
-// get img page urls from manga intro page
+// get img page urls from album intro page
 import ReqQueueService from 'src/service/request/ReqQueueService.js'
 import IntroHtmlParser from './IntroHtmlParser.js'
 
