@@ -3,7 +3,10 @@
         <div class="loading-container" v-if="imgInfoList.length === 0">
             loading...
         </div>
-        <h4 class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>        
+        <div class="panel">
+            <h4 class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>
+            <img title="全屏" @click="fullscreen()" class="focus icon" src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDIyIDIyIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMiAyMjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8Zz4KCTxnPgoJCTxwYXRoIGQ9Ik00LDE4aDE0VjRINFYxOHogTTYsNmgxMHYxMEg2VjZ6IiBmaWxsPSIjNTk1ZDYyIi8+CgkJPHBvbHlnb24gcG9pbnRzPSIyLDE2IDAsMTYgMCwyMiA2LDIyIDYsMjAgMiwyMCAgICIgZmlsbD0iIzU5NWQ2MiIvPgoJCTxwb2x5Z29uIHBvaW50cz0iMiwyIDYsMiA2LDAgMCwwIDAsNiAyLDYgICAiIGZpbGw9IiM1OTVkNjIiLz4KCQk8cG9seWdvbiBwb2ludHM9IjIwLDIwIDE2LDIwIDE2LDIyIDIyLDIyIDIyLDE2IDIwLDE2ICAgIiBmaWxsPSIjNTk1ZDYyIi8+CgkJPHBvbHlnb24gcG9pbnRzPSIxNiwwIDE2LDIgMjAsMiAyMCw2IDIyLDYgMjIsMCAgICIgZmlsbD0iIzU5NWQ2MiIvPgoJPC9nPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=" />
+        </div>        
         <awesome-scroll-view ref="scrollView" class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
             <h1>{{ parser.getTitle() }}</h1>
             <!-- 150px is $album-view-width -->
@@ -102,29 +105,22 @@
                     });
             },
 
-            initImgSize() {
-
-            },
-
             range(start, count) {
                 return Array.apply(0, Array(count)).map(function (element, index) {
                     return index + start;
                 });
             },
 
-            detectScrollStop() {
-                window.clearTimeout(this.scrollTimeout);
-                this.scrollTimeout = setTimeout(() => {
-                    this.onScrollStopped();
-                }, 150);
-            },
-
             onScrollStopped(position) {
                 this.scrollTop = position;
             },
 
-            syncIndex() {
-                console.log('data changed');
+            fullscreen() {
+                if (!document.webkitCurrentFullScreenElement) {
+                    document.querySelector('.vue-container').webkitRequestFullScreen();
+                } else {
+                    document.webkitExitFullscreen()
+                }
             }
         }
     }
@@ -145,14 +141,33 @@
             font-size: 24px;
             font-weight: bolder;
         }
-        > .location {
+        > .panel {
             position: absolute;
             bottom: 5px;
             right: 23px;
             z-index: 10;
-            font-size: 14px;
             color: rgba(white, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            > .location {
+                font-size: 14px;
+                display: inline-block;
+            }
+            .icon-container {
+                position: relative;
+                display: inline-block;
+            }
+            .focus.icon {
+                width: 16px;
+                display: inline-block;
+                height: 16px;
+                margin-left: 10px;
+                cursor: pointer;
+            }
+
         }
+
         > .scroll-view {
             position: relative;
             height: 100vh;
