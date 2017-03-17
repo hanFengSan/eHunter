@@ -14,7 +14,8 @@ class SettingListener {
             this[singleton] = new SettingListener(singletonEnforcer);
             this[singleton].eventBus = {};
             this[singleton].initialSettings = {
-                toggleEHunter: true
+                toggleEHunter: true,
+                showPagination: true
             }
         }
         return this[singleton];
@@ -33,6 +34,9 @@ class SettingListener {
                         document.body.style.overflow = msg.value ? 'hidden' : '';
                         document.getElementsByClassName('vue-container')[0].style.top = msg.value ? '0' : '-100%';
                     }
+                    break;
+                case 'showPagination':
+                    store.dispatch('showPagination', msg.value);
                     break;
             }
             // eventBus
@@ -88,6 +92,7 @@ class SettingListener {
     _initSettings(store) {
         // viewScale
         this.getSettingItem('setAlbumWidth', (val) => store.dispatch('setAlbumWidth', val));
+        this.getSettingItem('showPagination', (val) => store.dispatch('showPagination', val));
     }
 }
 

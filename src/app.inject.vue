@@ -9,7 +9,7 @@
     import { mapActions } from 'vuex'
     import ThumbScrollView from './components/ThumbScrollView.vue'
     import AlbumScrollView from './components/AlbumScrollView.vue'
-    
+
     export default {
         name: 'InjectedApp',
 
@@ -20,7 +20,6 @@
         },
 
         created() {
-            this.initSetting();
         },
 
         methods: {

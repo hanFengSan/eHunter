@@ -3,7 +3,7 @@
         <h1>E-HUNTER</h1>
           <mu-tabs :value="activeTab" @change="handleTabChange">
             <mu-tab :value="read.name" title="阅读"/>
-            <mu-tab :value="optimize.name" title="优化"/>
+            <mu-tab :value="notification.name" title="通知"/>
             <mu-tab :value="about.name" title="关于"/>
         </mu-tabs>
          <div class="read" v-if="activeTab === read.name">
@@ -35,10 +35,8 @@
                 </mu-list-item>
             </mu-list>
         </div>
-        <div v-if="activeTab === optimize.name" class="optimize">
-            <p class="tip">
-                开发中...
-            </p>
+        <div v-if="activeTab === notification.name" class="notification">
+            <notification></notification>
         </div>
         <div v-if="activeTab === about.name" class="about">
             <table>
@@ -65,6 +63,7 @@
 
 <script>
     import SettingService from 'src/service/SettingService.js'
+    import Notification from 'src/components/Notification.vue'
 
     export default {
         name: 'PopupApp',
@@ -80,13 +79,17 @@
                     viewScale: 80,
                     cacheImg: true
                 },
-                optimize: {
+                notification: {
                     name: Symbol()
                 },
                 about: {
                     name: Symbol()
                 }
             }
+        },
+
+        components: {
+            Notification
         },
 
         watch: {
@@ -98,6 +101,9 @@
             },
             'read.thumbView'() {
                 SettingService.instance.setSettingItem('toggleThumbView', this.read.thumbView);
+            },
+            'read.paginationView'() {
+                SettingService.instance.setSettingItem('showPagination', this.read.paginationView);
             }
         },
 
@@ -113,6 +119,9 @@
                 });
                 SettingService.instance.getSettingItem('setAlbumWidth', (val) => {
                     this.read.viewScale = val;
+                });
+                SettingService.instance.getSettingItem('showPagination', (val) => {
+                    this.read.paginationView = val;
                 });
             },
             handleTabChange (val) {
@@ -167,7 +176,7 @@
             }
         }
 
-        .optimize {
+        .notification {
             .tip {
                 color: hsla(0, 0%, 0%, .2);
                 text-align: center;

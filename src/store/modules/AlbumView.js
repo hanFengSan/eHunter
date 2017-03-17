@@ -8,7 +8,8 @@ const state = {
         width: 150 // px
     },
     album: {
-        width: 80 // percent
+        width: 80, // percent
+        pagination: true
     }
 }
 
@@ -16,15 +17,16 @@ const state = {
 const getters = {
     curIndex: state => state.curIndex,
     albumWidth: state => state.album.width,
-    thumbWidth: state => state.thumb.width
+    thumbWidth: state => state.thumb.width,
+    showPagination: state => state.album.pagination
 }
 
 // actions
 const actions = {
     setIndex: ({ commit }, index) => setIndex(commit, index),
-    setAlbumWidth: ({ commit }, width) => {
-        console.log('vuex get');
-        commit(types.SET_ALBUM_WIDTH, { width })
+    setAlbumWidth: ({ commit }, width) => commit(types.SET_ALBUM_WIDTH, { width }),
+    showPagination: ({ commit }, show) => {
+        commit(types.SHOW_PAGINATION, { show })
     }
 }
 
@@ -36,6 +38,10 @@ const mutations = {
     },
     [types.SET_ALBUM_WIDTH](state, { width }) {
         state.album.width = width;
+    },
+    [types.SHOW_PAGINATION](state, { show }) {
+        console.log(show);
+        state.album.pagination = show;
     }
 }
 
