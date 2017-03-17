@@ -10,9 +10,9 @@
         "default_title": "eHunter"
     },
     "icons": {
-        "16": "./img/icon.png",
-        "24": "./img/icon.png",
-        "128": "./img/icon.png"
+        "16": "./img/ehunter_icon.png",
+        "24": "./img/ehunter_icon.png",
+        "128": "./img/ehunter_icon.png"
     },
     "author": "Alex Chen",
     "incognito": "spanning",

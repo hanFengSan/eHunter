@@ -14,13 +14,16 @@ gulp.task('clean', function() {
 gulp.task('assets', ['clean'], function() {
     gulp.src('../src/manifest.json')
         .pipe(gulp.dest('../dist/'));
-    gulp.src('../src/assets/icon.png')
+    gulp.src('../src/assets/img/*')
         .pipe(gulp.dest('../dist/img'));
 })
 
 gulp.task('dev', ['assets'], function() {
     return gulp.src('../src/main.inject.js')
         .pipe(webpackStream(require('./webpack.dev.conf.js'), webpack))
+        .on('error', function handleError() {
+            this.emit('end'); // Recover from errors
+        })
         .pipe(gulp.dest('../dist/'));
 });
 
