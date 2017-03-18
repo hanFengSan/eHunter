@@ -21,36 +21,42 @@
             <div class="tag-list-container">
                 <mu-sub-header>标签订阅列表</mu-sub-header>
                 <div class="subscribed-tag-list">
-                    <div class="item" v-for="item of tag.subscribedTagList">
-                        <span class="tag" @click="openTagPopup()" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name }}</span>
+                    <div class="item" v-for="(item, index) of tag.subscribedTagList">
+                        <span class="tag" @click="openTagPopup(index)" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name }}</span>
                     </div>
                 </div>
                 <!-- popup of tag info -->
                 <mu-popup position="bottom" popupClass="tag-popup" :open="tag.popup" @close="closeTagPopup()">
                     <header>
                         标签详情
-                        <svg class="close-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="closeTagPopup()">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                        </svg>
+                        <div class="panel">
+                            <svg class="delete-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="deleteTag(tag.curTagIndex)">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                            </svg>
+                            <svg class="close-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="closeTagPopup()">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                            </svg>
+                        </div>
                     </header>
                     <div class="tag-detail">
-                        <table>
+                        <table v-if="tag.curTagIndex!==-1">
                             <tr>
                                 <td>标签名称:</td>
-                                <td>glass</td>
+                                <td>{{ tag.subscribedTagList[tag.curTagIndex].name }}</td>
                             </tr>
                             <tr>
                                 <td>类型:</td>
-                                <td>Manga</td>
+                                <td><span v-for="type of tag.subscribedTagList[tag.curTagIndex].type">{{ type }}&nbsp;&nbsp;</span></td>
                             </tr>
                             <tr>
                                 <td>检查间隔:</td>
-                                <td>10分钟</td>
+                                <td>{{ tag.times[tag.subscribedTagList[tag.curTagIndex].time] }}</td>
                             </tr>
                             <tr>
                                 <td>语言类型:</td>
-                                <td>Chinese</td>
+                                <td><span v-for="lang of tag.subscribedTagList[tag.curTagIndex].lang">{{ lang }}&nbsp;&nbsp;</span></td>
                             </tr>
                         </table>
                     </div>
@@ -63,7 +69,7 @@
             <!-- add new tag-->
             <div class="new-tag-container" :class="{'show':tag.isEdited, 'hide':!tag.isEdited}">
                 <div class="tag-input">
-                    <mu-text-field hintText="请输入标签名称" label="标签名称"/>
+                    <mu-text-field hintText="请输入标签名称" v-model="tag.tagName" label="标签名称"/>
                 </div>
                 <div class="type-selector">
                     <mu-select-field multiple label="画册类型" hintText="默认全类型订阅" v-model="tag.type" :maxHeight="150">
@@ -81,12 +87,13 @@
                     </mu-select-field>
                 </div>
                 <div class="add">
-                    <mu-flat-button label="添加" primary/>
+                    <mu-flat-button @click="addTag()" label="添加" primary/>
                 </div>
             </div>
 
         </div>
-
+        <!-- toast -->
+        <mu-toast v-if="toast.show" class="toast" :message="toast.msg" @close="hideToast"/>
     </div>
 </template>
 
@@ -99,6 +106,7 @@
         data () {
             return {
                 activeTab: '',
+                toast: { msg: '', show: false },
                 news: {
                     name: Symbol(),
                     list: [
@@ -109,7 +117,8 @@
                 },
                 tag: {
                     name: Symbol(),
-                    type: '',
+                    tagName: '',
+                    type: [],
                     time: 1,
                     lang: '',
                     times: ['10分钟', '0.5小时', '3小时', '6小时', '12小时'],
@@ -117,6 +126,7 @@
                     langs: ['Chinese', 'English', 'Spanish', 'Japanese'],
                     isEdited: false,
                     popup: false,
+                    curTagIndex: 0,
                     subscribedTagList: [
                         { name: 'shooter', type: ['Manga'], time: 1, lang: ['Chinese'] },
                         { name: 'naruto', type: ['Doujishi'], time: 1, lang: ['Chinese'] },
@@ -142,11 +152,59 @@
             handleTabChange (val) {
                 this.activeTab = val;
             },
-            openTagPopup() {
+            openTagPopup(index) {
+                this.tag.curTagIndex = index;
                 this.tag.popup = true;
             },
             closeTagPopup() {
                 this.tag.popup = false;
+            },
+            deleteTag(index) {
+                this.tag.subscribedTagList.splice(index, 1);
+                this.tag.popup = false;
+                this.tag.curTagIndex = -1;
+                this.showToast('删除成功');
+            },
+            showToast(msg) {
+                this.toast.msg = msg;
+                this.toast.show = true;
+                if (this.toastTimer) clearTimeout(this.toastTimer);
+                this.toastTimer = setTimeout(() => { this.toast.show = false }, 2000);
+            },
+            hideToast() {
+                this.toast.show = false;
+                if (this.toastTimer) clearTimeout(this.toastTimer);
+            },
+            addTag() {
+                if (this.tag.tagName === '') {
+                    this.showToast('请输入标签名称');
+                    return;
+                }
+                if (this.tag.subscribedTagList.find(i => i.name === this.tag.tagName)) {
+                    this.showToast('已存在此标签');
+                    return;
+                }
+                console.log(this.tag.time)
+                this.tag.subscribedTagList.push({
+                    name: this.tag.tagName,
+                    type: this.tag.type.map((i) => {
+                        return this.tag.types[i]
+                    }),
+                    time: this.tag.time,
+                    lang: this.tag.lang ? [this.tag.langs[this.tag.lang]] : []
+                });
+                console.log({
+                    name: this.tag.tagName,
+                    type: this.tag.type.map((i) => {
+                        return this.tag.types[i]
+                    }),
+                    time: this.tag.time,
+                    lang: this.tag.lang ? [this.tag.langs[this.tag.lang]] : []
+                });
+                this.tag.tagName = '';
+                this.tag.type = [];
+                this.tag.lang = '';
+                this.showToast('添加成功');
             }
         }
     }
@@ -254,6 +312,7 @@
                             font-weight: lighter;
                             color: white;
                             user-select: none;
+                            word-break: break-all;
                             transition: all 0.2s ease;
                             &:hover {
                                 box-shadow: 0 0 5px 15px rgba(255, 255, 255, 0.3) inset;
@@ -329,15 +388,26 @@
             color: white;
             padding: 9/16*1em 9/16*1em;
             line-height: 180%;
-            .close-icon {
-                fill: white;
+            > .panel {
                 position: absolute;
-                height: 18 / 16 * 1em;
-                width: 18 / 16 * 1em;
-                cursor: pointer;
-                right: 10 / 16 * 1em;
                 top: 50%;
                 transform: translate(0, -50%);
+                right: 10 / 16 * 1em; 
+                height: 18 / 16 * 1em;               
+                > .delete-icon {
+                    fill: white;
+                    height: 18 / 16 * 1em;
+                    width: 18 / 16 * 1em;
+                    margin-right: 5px;
+                    cursor: pointer;
+                }
+                > .close-icon {
+                    fill: white;
+                    height: 18 / 16 * 1em;
+                    width: 18 / 16 * 1em;
+                    cursor: pointer;
+                }
+
             }
         }
         table {
@@ -346,14 +416,21 @@
             tr {
                 td {
                     &:nth-child(1) {
+                        white-space: nowrap;
                         color: #27ae60;
+                        vertical-align: top;
                     }
                     &:nth-child(2) {
+                        word-break: break-all;
                         color: $popup_secondary_text_color;
                     }
                 }
             }
         }
+    }
+
+    //toast
+    .toast {
     }
 
 </style>

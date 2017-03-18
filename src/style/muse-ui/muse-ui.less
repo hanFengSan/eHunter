@@ -2030,21 +2030,26 @@ html.pixel-ratio-3 .mu-divider {
 }
 
 .mu-toast {
-    height: 48px;
-    line-height: 48px;
+    // height: 48px;
+    // line-height: 48px;
+    line-height: 35px;
     padding: 0 24px;
     background-color: rgba(0, 0, 0, .87);
     color: #fff;
-    border-radius: 24px;
+    border-radius: 15px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     word-wrap: break-word;
-    max-width: 568px;
-    width: 100%;
+    // max-width: 568px;
+    // width: 100%;
     position: fixed;
-    left: 0;
-    bottom: 0
+    // left: 0;
+    left: 50%;
+    // bottom: 0;
+    bottom: 56px;
+    text-align: center;
+    transform: translate(-50%, 0);
 }
 
 @media only screen and (max-width:992px) and (min-width:601px) {
