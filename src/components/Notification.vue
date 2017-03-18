@@ -99,6 +99,7 @@
 
 <script>
     import ColorService from 'src/service/TypeColorService'
+    import SubsStorageService from 'src/service/storage/SubsStorageService'
 
     export default {
         name: 'Notification',
@@ -126,19 +127,20 @@
                     langs: ['Chinese', 'English', 'Spanish', 'Japanese'],
                     isEdited: false,
                     popup: false,
-                    curTagIndex: 0,
-                    subscribedTagList: [
-                        { name: 'shooter', type: ['Manga'], time: 1, lang: ['Chinese'] },
-                        { name: 'naruto', type: ['Doujishi'], time: 1, lang: ['Chinese'] },
-                        { name: 'wife', type: ['Non-H'], time: 1, lang: ['Japanese'] },
-                        { name: 'glass', type: ['Cosplay'], time: 1, lang: ['Chinese'] },
-                        { name: 'stocking', type: ['Misc'], time: 1, lang: ['English'] },
-                        { name: 'Yukiyanagi Raki', type: ['Image-Set'], time: 1, lang: ['Chinese'] },
-                        { name: 'dragon', type: ['Artist-CG'], time: 1, lang: ['Chinese'] },
-                        { name: 'koinu computer', type: ['Non-H'], time: 1, lang: ['Japanese'] },
-                        { name: 'motoyon', type: ['Western'], time: 1, lang: ['Chinese'] },
-                        { name: 'umineko no naku koro ni | when the seagulls cry', type: ['Non-H'], time: 1, lang: ['English'] }
-                    ]
+                    curTagIndex: -1,
+                    subscribedTagList: []
+                    // subscribedTagList: [
+                    //     { name: 'shooter', type: ['Manga'], time: 1, lang: ['Chinese'] },
+                    //     { name: 'naruto', type: ['Doujishi'], time: 1, lang: ['Chinese'] },
+                    //     { name: 'wife', type: ['Non-H'], time: 1, lang: ['Japanese'] },
+                    //     { name: 'glass', type: ['Cosplay'], time: 1, lang: ['Chinese'] },
+                    //     { name: 'stocking', type: ['Misc'], time: 1, lang: ['English'] },
+                    //     { name: 'Yukiyanagi Raki', type: ['Image-Set'], time: 1, lang: ['Chinese'] },
+                    //     { name: 'dragon', type: ['Artist-CG'], time: 1, lang: ['Chinese'] },
+                    //     { name: 'koinu computer', type: ['Non-H'], time: 1, lang: ['Japanese'] },
+                    //     { name: 'motoyon', type: ['Western'], time: 1, lang: ['Chinese'] },
+                    //     { name: 'umineko no naku koro ni | when the seagulls cry', type: ['Non-H'], time: 1, lang: ['English'] }
+                    // ]
                 },
                 ColorService: ColorService
             }
@@ -146,6 +148,11 @@
 
         created() {
             this.activeTab = this.news.name;
+            SubsStorageService
+                .instance
+                .then(instance => {
+                    this.tag.subscribedTagList = instance.getSubsList();
+                });
         },
 
         methods: {
@@ -160,10 +167,16 @@
                 this.tag.popup = false;
             },
             deleteTag(index) {
-                this.tag.subscribedTagList.splice(index, 1);
-                this.tag.popup = false;
-                this.tag.curTagIndex = -1;
-                this.showToast('删除成功');
+                SubsStorageService
+                    .instance
+                    .then(instance => {
+                        instance.delSubsItemByName(this.tag.subscribedTagList[index].name, () => {
+                            this.tag.subscribedTagList.splice(index, 1);
+                            this.tag.popup = false;
+                            this.tag.curTagIndex = -1;
+                            this.showToast('删除成功');
+                        });
+                    });
             },
             showToast(msg) {
                 this.toast.msg = msg;
@@ -184,27 +197,23 @@
                     this.showToast('已存在此标签');
                     return;
                 }
-                console.log(this.tag.time)
-                this.tag.subscribedTagList.push({
+                let newItem = {
                     name: this.tag.tagName,
                     type: this.tag.type.map((i) => {
                         return this.tag.types[i]
                     }),
                     time: this.tag.time,
                     lang: this.tag.lang ? [this.tag.langs[this.tag.lang]] : []
-                });
-                console.log({
-                    name: this.tag.tagName,
-                    type: this.tag.type.map((i) => {
-                        return this.tag.types[i]
-                    }),
-                    time: this.tag.time,
-                    lang: this.tag.lang ? [this.tag.langs[this.tag.lang]] : []
-                });
+                };
+                this.tag.subscribedTagList.push(newItem);
                 this.tag.tagName = '';
                 this.tag.type = [];
                 this.tag.lang = '';
-                this.showToast('添加成功');
+                SubsStorageService
+                    .instance
+                    .then(instance => {
+                        instance.addSubsItem(newItem, () => this.showToast('添加成功'));
+                    });
             }
         }
     }
