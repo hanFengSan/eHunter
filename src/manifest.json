@@ -19,7 +19,10 @@
     "permissions": [
         "activeTab",
         "https://ajax.googleapis.com/",
-        "storage"
+        "storage",
+        "background",
+        "notifications",
+        "cookies"
     ],
     "content_scripts": [
         {
@@ -32,5 +35,8 @@
             ],
             "run_at": "document_end"
         }
-    ]
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    }
 }

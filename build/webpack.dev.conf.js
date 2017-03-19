@@ -1,7 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
-// var HtmlResWebpackPlugin = require('html-res-webpack-plugin');
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir)
@@ -11,7 +10,8 @@ module.exports = {
     watch: true,
     entry: {
         popup: '../src/main.popup.js',
-        inject: '../src/main.inject.js'
+        inject: '../src/main.inject.js',
+        background: '../src/background.js'
     },
     output: {
         path: path.resolve(__dirname, '../dist'),
@@ -74,11 +74,5 @@ module.exports = {
             inject: true,
             excludeChunks: ['inject']
         })
-        // new HtmlResWebpackPlugin({
-        //     filename: "popup.html",
-        //     template: "../src/index.popup.html",
-        //     chunks: {
-        //     },
-        // })
     ]
 }

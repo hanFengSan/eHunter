@@ -1,3 +1,4 @@
+// colors of album type
 export default {
     _typeColors: {
         'Doujishi': '#e74c3c',

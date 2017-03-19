@@ -6,10 +6,17 @@ class ReqQueueService {
         this.urls = urls;
         this.maxConcurrentedNum = 5;
         this.resultMap = new Map();
+        this.fetchSetting = null;
     }
 
     setNumOfConcurrented(num) {
         this.maxConcurrentedNum = num;
+        return this;
+    }
+
+    setFetchSetting(setting) {
+        this.fetchSetting = setting;
+        return this;
     }
 
     request() {
@@ -45,6 +52,7 @@ class ReqQueueService {
     _request(reqList, resolve, reject) {
         if (reqList.length > 0) {
             (new MultiAsyncReqService(reqList[0]))
+                .setFetchSetting(this.fetchSetting)
                 .request()
                 .then(map => {
                     this._addMap(this.resultMap, map);

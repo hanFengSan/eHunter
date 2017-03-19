@@ -1,5 +1,5 @@
 <template>
-    <div class="album-container">
+    <div class="album-container" @click.stop="">
         <div class="loading-container" v-if="imgInfoList.length === 0">
             loading...
         </div>

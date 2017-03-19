@@ -5,6 +5,7 @@ class MultiAsyncReqService {
     constructor(urls) {
         this.urls = urls;
         this.resultMap = new Map();
+        this.fetchSetting = null;
     }
 
     request() {
@@ -12,6 +13,11 @@ class MultiAsyncReqService {
             this._initGenerator(resolve, reject);
             this._request();
         });
+    }
+
+    setFetchSetting(setting) {
+        this.fetchSetting = setting;
+        return this;
     }
 
     _initGenerator(resolve, reject) {
@@ -33,6 +39,7 @@ class MultiAsyncReqService {
     _request() {
         for (let url of this.urls) {
             (new TextReqService(url))
+                .setFetchSetting(this.fetchSetting)
                 .request()
                 .then(html => this.gen.next({ url: url, html: html },
                     err => this.gen.throw(err)));

@@ -17,9 +17,6 @@ class SubsStorageService {
                     let subs = i['subs'];
                     this[singleton].storage.get('subsVersion', t => {
                         let subsVersion = t['subsVersion'];
-                        // console.log(subs);
-                        // console.log(subsVersion);
-                        // console.log(SubsStorageService.version);
                         if (subs == null || subsVersion !== SubsStorageService.version) {
                             this[singleton].subs = {};
                             this[singleton].storage.set({
@@ -39,7 +36,7 @@ class SubsStorageService {
     }
 
     static get version() {
-        return '1.0';
+        return '1.1';
     }
 
     getSubsList() {
@@ -62,7 +59,6 @@ class SubsStorageService {
         if (target) {
             this.subs.list.splice(this.subs.list.indexOf(target), 1);
         }
-        console.log(this.subs);
         this._save(callback);
     }
 

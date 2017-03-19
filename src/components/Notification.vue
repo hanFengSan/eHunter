@@ -10,8 +10,8 @@
         <!-- news tab -->
         <div class="news" v-if="activeTab === news.name">
             <div class="news-item" v-for="item of news.list">
-                <span class="avatar" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.tagName[0] }}</span>
-                <a class="news-link" :href="item.url" target="_blank">{{ item.tagName + '更新了' + item.updatedNum + '项' }}</a>
+                <span class="avatar" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name[0].toUpperCase() }}</span>
+                <a class="news-link" :href="item.url" target="_blank">{{ item.name + '更新了' + item.updatedNum + '项' }}</a>
             </div>
         </div>
 
@@ -47,12 +47,16 @@
                                 <td>{{ tag.subscribedTagList[tag.curTagIndex].name }}</td>
                             </tr>
                             <tr>
+                                <td>作用网站:</td>
+                                <td><span v-for="site of tag.subscribedTagList[tag.curTagIndex].site">{{ site }}&nbsp;&nbsp;</span></td>
+                            </tr>
+                            <tr>
                                 <td>类型:</td>
                                 <td><span v-for="type of tag.subscribedTagList[tag.curTagIndex].type">{{ type }}&nbsp;&nbsp;</span></td>
                             </tr>
                             <tr>
                                 <td>检查间隔:</td>
-                                <td>{{ tag.times[tag.subscribedTagList[tag.curTagIndex].time] }}</td>
+                                <td>{{ UpdateIntervalService.getTextByVal(tag.subscribedTagList[tag.curTagIndex].time) }}</td>
                             </tr>
                             <tr>
                                 <td>语言类型:</td>
@@ -71,6 +75,11 @@
                 <div class="tag-input">
                     <mu-text-field hintText="请输入标签名称" v-model="tag.tagName" label="标签名称"/>
                 </div>
+                <div class="lang-selector">
+                    <mu-select-field label="作用网站" hintText="需确保网站可访问" v-model="tag.site" :maxHeight="150">
+                        <mu-menu-item v-for="item, index in tag.sites" :title="item" :value="index"/>
+                    </mu-select-field>
+                </div>
                 <div class="type-selector">
                     <mu-select-field multiple label="画册类型" hintText="默认全类型订阅" v-model="tag.type" :maxHeight="150">
                         <mu-menu-item v-for="item, index in tag.types" :title="item" :value="index"/>
@@ -81,6 +90,7 @@
                         <mu-menu-item v-for="item, index in tag.langs" :title="item" :value="index"/>
                     </mu-select-field>
                 </div>
+   
                 <div class="time-selector">
                     <mu-select-field label="检查间隔" v-model="tag.time" :maxHeight="150">
                         <mu-menu-item v-for="item, index in tag.times" :title="item" :value="index"/>
@@ -98,8 +108,10 @@
 </template>
 
 <script>
-    import ColorService from 'src/service/TypeColorService'
+    import ColorService from 'src/service/type/TypeColorService'
+    import UpdateIntervalService from 'src/service/type/UpdateIntervalService'
     import SubsStorageService from 'src/service/storage/SubsStorageService'
+    import NotiStorageService from 'src/service/storage/NotiStorageService'
 
     export default {
         name: 'Notification',
@@ -110,39 +122,26 @@
                 toast: { msg: '', show: false },
                 news: {
                     name: Symbol(),
-                    list: [
-                        { tagName: 'chinese', updatedNum: 5, text: '', url: 'https://exhentai.org', type: ['Manga'] },
-                        { tagName: 'manga', updatedNum: 3, text: '', url: 'https://exhentai.org', type: ['Doujishi'] },
-                        { tagName: 'wife', updatedNum: 3, text: '', url: 'https://exhentai.org', type: ['Western'] }
-                    ]
+                    list: []
                 },
                 tag: {
                     name: Symbol(),
                     tagName: '',
+                    site: '',
                     type: [],
                     time: 1,
                     lang: '',
-                    times: ['10分钟', '0.5小时', '3小时', '6小时', '12小时'],
+                    sites: ['e-hentai', 'exhentai'],
+                    times: UpdateIntervalService.getTypes(),
                     types: ['Doujishi', 'Manga', 'Artist-CG', 'Game-CG', 'Western', 'Non-H', 'Image-Set', 'Cosplay', 'Asian-Porn', 'Misc'],
                     langs: ['Chinese', 'English', 'Spanish', 'Japanese'],
                     isEdited: false,
                     popup: false,
                     curTagIndex: -1,
                     subscribedTagList: []
-                    // subscribedTagList: [
-                    //     { name: 'shooter', type: ['Manga'], time: 1, lang: ['Chinese'] },
-                    //     { name: 'naruto', type: ['Doujishi'], time: 1, lang: ['Chinese'] },
-                    //     { name: 'wife', type: ['Non-H'], time: 1, lang: ['Japanese'] },
-                    //     { name: 'glass', type: ['Cosplay'], time: 1, lang: ['Chinese'] },
-                    //     { name: 'stocking', type: ['Misc'], time: 1, lang: ['English'] },
-                    //     { name: 'Yukiyanagi Raki', type: ['Image-Set'], time: 1, lang: ['Chinese'] },
-                    //     { name: 'dragon', type: ['Artist-CG'], time: 1, lang: ['Chinese'] },
-                    //     { name: 'koinu computer', type: ['Non-H'], time: 1, lang: ['Japanese'] },
-                    //     { name: 'motoyon', type: ['Western'], time: 1, lang: ['Chinese'] },
-                    //     { name: 'umineko no naku koro ni | when the seagulls cry', type: ['Non-H'], time: 1, lang: ['English'] }
-                    // ]
                 },
-                ColorService: ColorService
+                ColorService: ColorService,
+                UpdateIntervalService: UpdateIntervalService
             }
         },
 
@@ -153,6 +152,11 @@
                 .then(instance => {
                     this.tag.subscribedTagList = instance.getSubsList();
                 });
+            NotiStorageService
+                .instance
+                .then(instance => {
+                    this.news.list = instance.getMsgList();
+                })
         },
 
         methods: {
@@ -193,22 +197,28 @@
                     this.showToast('请输入标签名称');
                     return;
                 }
+                if (this.tag.site === '') {
+                    this.showToast('请选择作用网站');
+                    return;
+                }
                 if (this.tag.subscribedTagList.find(i => i.name === this.tag.tagName)) {
                     this.showToast('已存在此标签');
                     return;
                 }
                 let newItem = {
                     name: this.tag.tagName,
+                    site: this.tag.site !== '' ? [this.tag.sites[this.tag.site]] : [],
                     type: this.tag.type.map((i) => {
                         return this.tag.types[i]
                     }),
-                    time: this.tag.time,
-                    lang: this.tag.lang ? [this.tag.langs[this.tag.lang]] : []
+                    time: UpdateIntervalService.getValByText(this.tag.times[this.tag.time]),
+                    lang: this.tag.lang !== '' ? [this.tag.langs[this.tag.lang]] : []
                 };
                 this.tag.subscribedTagList.push(newItem);
                 this.tag.tagName = '';
                 this.tag.type = [];
                 this.tag.lang = '';
+                this.tag.site = '';
                 SubsStorageService
                     .instance
                     .then(instance => {
@@ -290,7 +300,7 @@
                     text-align: center;
                 }
                 &.show {
-                    height: 500px;
+                    height: 600px;
                     overflow: hidden;
                 }
                 &.hide {

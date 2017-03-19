@@ -9,6 +9,7 @@ class TextReqService {
         this.curRetryTimes = -1;
         this.retryInterval = 1; // secs
         this.enabledLog = true;
+        this.fetchSetting = null;
     }
 
     setMethod(method) {
@@ -18,6 +19,11 @@ class TextReqService {
 
     setCredentials(credential) {
         this.credentials = credential;
+        return this;
+    }
+
+    setFetchSetting(setting) {
+        this.fetchSetting = setting;
         return this;
     }
 
@@ -45,12 +51,13 @@ class TextReqService {
 
     _request(successCallback, failureCallback) {
         this.curRetryTimes++;
-        window.fetch(this.url, {
+        window.fetch(this.url, this.fetchSetting ? this.fetchSetting : {
             method: this.method,
             credentials: this.credentials
         }).then(res => {
             successCallback(res);
         }, err => {
+            console.log(err);
             this._printErrorLog(err);
             if (this.curRetryTimes < this.retryTimes) {
                 setTimeout(() => {
