@@ -39,7 +39,6 @@ const actions = {
 const mutations = {
     [types.SET_INDEX](state, { index }) {
         state.curIndex = index;
-        console.log(`toIndex: ${index}`);
     },
     [types.SET_ALBUM_WIDTH](state, { width }) {
         state.album.width = width;

@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "eHunter - more powerful e-hentai/eHentai/exhentai!",
+    "name": "eHunter - more powerful e-hentai/exhentai!",
     "short_name": "eHunter",
-    "description": "more powerful e-hentai/eHentai/exhentai",
+    "description": "more powerful e-hentai/eHentai/exhentai! scroll view and notification",
     "version": "1.0.0",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "browser_action": {
