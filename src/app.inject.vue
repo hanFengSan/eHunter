@@ -1,12 +1,12 @@
 <template>
     <div id="app-content">
-        <thumb-scroll-view class="thumb-scroll-view"></thumb-scroll-view>
-        <album-scroll-view class="album-scroll-view"></album-scroll-view>
+        <thumb-scroll-view class="thumb-scroll-view" :style="{'margin-left': thumbView ? '' : '-152px'}"></thumb-scroll-view>
+        <album-scroll-view class="album-scroll-view" :style="{'width': `calc(100% - ${thumbView ? 150 : 0}px)`}"></album-scroll-view>
     </div>
 </template>
 
 <script>
-    import { mapActions } from 'vuex'
+    import { mapGetters, mapActions } from 'vuex'
     import ThumbScrollView from './components/ThumbScrollView.vue'
     import AlbumScrollView from './components/AlbumScrollView.vue'
 
@@ -17,6 +17,12 @@
             return {
 
             }
+        },
+
+        computed: {
+            ...mapGetters([
+                'thumbView'
+            ])
         },
 
         created() {
@@ -41,7 +47,9 @@
 
     #app-content {
         display: flex;
-        > .thumb-scroll-view {}
+        > .thumb-scroll-view {
+            transition: all 0.3s ease;
+        }
         > .album-scroll-view {
             width: calc(100% - 150px);
         }

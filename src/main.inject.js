@@ -66,14 +66,8 @@ function init() {
             }
         }, true);
         createListener();
-        // chrome.storage('toggleEHunter', (active) => {
-        //     if (active) {
-        //         createEHunterView();
-        //         createVueView();
-        //         createListener();
-        //     }
-        // });
     }
 }
 
 init();
+

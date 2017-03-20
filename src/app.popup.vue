@@ -123,6 +123,9 @@
                 SettingService.instance.getSettingItem('showPagination', (val) => {
                     this.read.paginationView = val;
                 });
+                SettingService.instance.getSettingItem('toggleThumbView', (val) => {
+                    this.read.thumbView = val;
+                });
             },
             handleTabChange (val) {
                 this.activeTab = val

@@ -15,7 +15,8 @@ class SettingListener {
             this[singleton].eventBus = {};
             this[singleton].initialSettings = {
                 toggleEHunter: true,
-                showPagination: true
+                showPagination: true,
+                toggleThumbView: true
             }
         }
         return this[singleton];
@@ -38,6 +39,8 @@ class SettingListener {
                 case 'showPagination':
                     store.dispatch('showPagination', msg.value);
                     break;
+                case 'toggleThumbView':
+                    store.dispatch('toggleThumbView', msg.value);
             }
             // eventBus
             if (this.eventBus[msg.settingName]) {
@@ -93,6 +96,7 @@ class SettingListener {
         // viewScale
         this.getSettingItem('setAlbumWidth', (val) => store.dispatch('setAlbumWidth', val));
         this.getSettingItem('showPagination', (val) => store.dispatch('showPagination', val));
+        this.getSettingItem('toggleThumbView', (val) => store.dispatch('toggleThumbView', val));
     }
 }
 

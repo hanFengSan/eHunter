@@ -5,7 +5,8 @@ import * as types from '../mutation-types'
 const state = {
     curIndex: 0,
     thumb: {
-        width: 150 // px
+        width: 150, // px
+        thumbView: true
     },
     album: {
         width: 80, // percent
@@ -18,7 +19,8 @@ const getters = {
     curIndex: state => state.curIndex,
     albumWidth: state => state.album.width,
     thumbWidth: state => state.thumb.width,
-    showPagination: state => state.album.pagination
+    showPagination: state => state.album.pagination,
+    thumbView: state => state.thumb.thumbView
 }
 
 // actions
@@ -27,6 +29,9 @@ const actions = {
     setAlbumWidth: ({ commit }, width) => commit(types.SET_ALBUM_WIDTH, { width }),
     showPagination: ({ commit }, show) => {
         commit(types.SHOW_PAGINATION, { show })
+    },
+    toggleThumbView: ({ commit }, show) => {
+        commit(types.TOGGLE_THUMB_VIEW, { show })
     }
 }
 
@@ -40,8 +45,10 @@ const mutations = {
         state.album.width = width;
     },
     [types.SHOW_PAGINATION](state, { show }) {
-        console.log(show);
         state.album.pagination = show;
+    },
+    [types.TOGGLE_THUMB_VIEW](state, { show }) {
+        state.thumb.thumbView = show;
     }
 }
 
