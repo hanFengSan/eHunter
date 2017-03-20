@@ -31,7 +31,7 @@ class NotificationService {
                     console.log(this.subscribedTagList);
                     console.log(this.requestList);
                 });
-        }, 30 * 1000); // 10 mins
+        }, 10 * 60 * 1000); // 10 mins
         // this.time += 10;
         // this._syncSubs()
         //     .then(() => {
@@ -46,8 +46,8 @@ class NotificationService {
                 .instance
                 .then(instance => {
                     this.subscribedTagList = instance.getSubsList().filter(item => {
-                        // return this.time % item.time === 0
-                        return this.time > 0
+                        return this.time % item.time === 0
+                        // return this.time > 0
                     });
                     resolve();
                 });

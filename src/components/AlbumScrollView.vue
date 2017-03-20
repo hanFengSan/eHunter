@@ -12,8 +12,19 @@
             <!-- 150px is $album-view-width -->
             <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
-                <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(imgInfo)">
-                <label class="index">{{ index + 1 }}</label>
+                <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(index)" @load="loaded(index)">
+                <div class="index">{{ index + 1 }}</div>
+                <div class="img-info-panel" v-if="nearbyArray.indexOf(index)>-1">
+                    <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&imgInfo.src">...加载图片中...</div>
+                    <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&!imgInfo.src">...加载图片地址中...</div>
+                    <div class="loading-info" v-if="imgInfo.loadStatus==loadStatus.error">图片加载失败, 请在图片框右下角点击刷新按钮重新尝试</div>
+                </div>
+                <div class="img-console-panel" v-if="imgInfo.loadStatus!=loadStatus.loaded">
+                    <svg class="refresh-btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" title="刷新" @click="getNewImgSrc(index)">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                    </svg>
+                </div>
             </div>
         </awesome-scroll-view>
     </div>
@@ -36,6 +47,7 @@
                 sumOfPage: '',
                 imgUrlMap: new Map(),
                 scrollTop: 0,
+                loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() }, // status of img loading
                 nearbyRange: [-2, 3] // the range of necessary imgs, basing curIndex
             }
         },
@@ -93,7 +105,11 @@
                 AlbumCacheService.instance
                     .getImgInfos(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
                     .then(imgInfoList => {
-                        this.imgInfoList = imgInfoList;
+                        this.imgInfoList = imgInfoList.map(i => {
+                            i.isFirstLoad = true;
+                            i.loadStatus = this.loadStatus.waiting;
+                            return i;
+                        });
                     });
             },
 
@@ -101,6 +117,19 @@
             getImgSrc(index) {
                 AlbumCacheService.instance
                     .getImgSrc(this.parser.getAlbumId(), index)
+                    .then(src => {
+                        if (this.imgInfoList[index].src !== src) {
+                            this.imgInfoList[index].src = src;
+                            this.imgInfoList[index].loadStatus = this.loadStatus.loading;
+                        }
+                    });
+            },
+
+            getNewImgSrc(index) {
+                this.imgInfoList[index].src = '';
+                this.imgInfoList[index].loadStatus = this.loadStatus.loading;
+                AlbumCacheService.instance
+                    .getNewImgSrc(this.parser.getAlbumId(), index)
                     .then(src => {
                         this.imgInfoList[index].src = src;
                     });
@@ -124,9 +153,16 @@
                 }
             },
 
-            failLoad(imgInfo) {
-                console.log('img loaded failed');
-                console.log(imgInfo);
+            failLoad(index) {
+                this.imgInfoList[index].loadStatus = this.loadStatus.error;
+                if (this.imgInfoList[index].isFirstLoad) { // auto request src when first loading is failed
+                    this.imgInfoList[index].isFirstLoad = false;
+                    this.getNewImgSrc(index);
+                }
+            },
+
+            loaded(index) {
+                this.imgInfoList[index].loadStatus = this.loadStatus.loaded;
             }
         }
     }
@@ -199,6 +235,32 @@
                     transform: translate(-50%, -50%);
                     font-size: 80px;
                     z-index: -1;
+                }
+                > .img-info-panel {
+                    position: absolute;
+                    top: calc(50% + 80px);
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: $img_container_color;
+                    font-size: 14px;
+                    z-index: -1;
+                }
+                > .img-console-panel {
+                    position: absolute;
+                    bottom: 10px;
+                    right: 10px;
+                    z-index: 1;
+                    > .refresh-btn {
+                        fill: $img_container_color;
+                        height: 20px;
+                        width: 20px;
+                        display: block;
+                        margin: 0 auto;
+                        cursor: pointer;
+                        &:hover {
+                            fill: $primary_color;
+                        }
+                    }
                 }
                 > .album-item {
                     width: inherit;

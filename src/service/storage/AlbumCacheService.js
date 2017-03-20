@@ -109,6 +109,12 @@ class AlbumCacheService {
         });
     }
 
+    getNewImgSrc(albumId, index) {
+        this.cache[albumId].imgInfos[index].src = null;
+        this.save();
+        return this.getImgSrc(albumId, index);
+    }
+
 }
 
 export default AlbumCacheService;
