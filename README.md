@@ -11,6 +11,7 @@
 content script貌似并不允许操作宿主的cookie, 而如果缩略图是`large`模式, 将无法愉快的使用爬虫.
 
 # 项目结构
+```
 |-eHunter
   |-build
     |-gulpfile.js // 部署用的gulp脚本
@@ -36,3 +37,4 @@ content script貌似并不允许操作宿主的cookie, 而如果缩略图是`lar
     |-main.inject.js // webpack入口; vue注入前的前期处理
     |-main.popup.js // webpack入口
     |-mainifest.json // chrome extension的文件/权限/说明用的清单
+```
