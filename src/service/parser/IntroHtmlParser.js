@@ -44,7 +44,11 @@ class IntroHtmlParser {
         let thumbKeyId = this._getThumbKeyId();
         let imgList = [];
         for (let i = 0; i < this._getThumbPageCount(sumOfPage); i++) {
-            imgList.push(`/m/${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
+            if (window.location.hostname === 'e-hentai.org') {
+                imgList.push(`https://ehgt.org/m/${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
+            } else {
+                imgList.push(`/m/${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
+            }
         }
         return imgList;
     }
