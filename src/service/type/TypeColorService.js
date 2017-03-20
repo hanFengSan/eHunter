@@ -1,15 +1,15 @@
-// colors of album type
+// types and colors of album type
 export default {
     _typeColors: {
-        'Doujishi': '#e74c3c',
+        'Doujinshi': '#e74c3c',
         'Manga': '#e67e22',
-        'Artist-CG': '#f1c40f',
-        'Game-CG': '#27ae60',
+        'Artist CG': '#f1c40f',
+        'Game CG': '#27ae60',
         'Western': '#2ecc71',
         'Non-H': '#3498db',
-        'Image-Set': '#2980b9',
+        'Image Set': '#2980b9',
         'Cosplay': '#9b59b6',
-        'Asian-Porn': '#8e44ad',
+        'Asian Porn': '#8e44ad',
         'Misc': '#bdc3c7',
         'none': '#2c3e50'
     },
@@ -19,5 +19,12 @@ export default {
         } else {
             return this._typeColors.none;
         }
+    },
+    getTypes() {
+        let results = [];
+        for (let i in this._typeColors) {
+            results.push(i);
+        }
+        return results;
     }
 };

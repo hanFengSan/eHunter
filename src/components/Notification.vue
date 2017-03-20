@@ -2,16 +2,26 @@
     <div class="notification">
         <footer>
             <mu-tabs :value="activeTab" @change="handleTabChange">
-                <mu-tab :value="news.name" title="标签动态"/>
+                <mu-tab :value="msg.name" title="标签动态"/>
                 <mu-tab :value="tag.name" title="标签订阅"/>
             </mu-tabs>
         </footer>
 
-        <!-- news tab -->
-        <div class="news" v-if="activeTab === news.name">
-            <div class="news-item" v-for="item of news.list">
-                <span class="avatar" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name[0].toUpperCase() }}</span>
-                <a class="news-link" :href="item.url" target="_blank">{{ item.name + '更新了' + item.updatedNum + '项' }}</a>
+        <!-- msg tab -->
+        <div class="msg" v-if="activeTab === msg.name">
+            <mu-sub-header>历史消息列表</mu-sub-header>
+            <svg class="clear-all-btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="clearMsg()">
+                <path d="M5 13h14v-2H5v2zm-2 4h14v-2H3v2zM7 7v2h14V7H7z"/>
+                <path d="M0 0h24v24H0z" fill="none"/>
+            </svg>
+            <div>
+                <div class="msg-item" v-for="item of msg.list">
+                    <div class="avatar" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name[0].toUpperCase() }}</div>
+                    <div class="msg-content">
+                        <a class="msg-link" :href="item.url" :title="`${item.name }更新了${item.updatedNum}项`" target="_blank">{{ `${item.name }更新了${item.updatedNum}项` }}</a>
+                        <span class="time">{{ DateUtil.getIntervalFromNow(item.time) }}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -112,6 +122,7 @@
     import UpdateIntervalService from 'src/service/type/UpdateIntervalService'
     import SubsStorageService from 'src/service/storage/SubsStorageService'
     import NotiStorageService from 'src/service/storage/NotiStorageService'
+    import DateUtil from 'src/utils/DateUtil'
 
     export default {
         name: 'Notification',
@@ -120,7 +131,7 @@
             return {
                 activeTab: '',
                 toast: { msg: '', show: false },
-                news: {
+                msg: {
                     name: Symbol(),
                     list: []
                 },
@@ -133,20 +144,21 @@
                     lang: '',
                     sites: ['e-hentai', 'exhentai'],
                     times: UpdateIntervalService.getTypes(),
-                    types: ['Doujishi', 'Manga', 'Artist-CG', 'Game-CG', 'Western', 'Non-H', 'Image-Set', 'Cosplay', 'Asian-Porn', 'Misc'],
-                    langs: ['Chinese', 'English', 'Spanish', 'Japanese'],
+                    types: ColorService.getTypes(),
+                    langs: ['Chinese', 'English', 'Spanish'],
                     isEdited: false,
                     popup: false,
                     curTagIndex: -1,
                     subscribedTagList: []
                 },
                 ColorService: ColorService,
-                UpdateIntervalService: UpdateIntervalService
+                UpdateIntervalService: UpdateIntervalService,
+                DateUtil: DateUtil
             }
         },
 
         created() {
-            this.activeTab = this.news.name;
+            this.activeTab = this.msg.name;
             SubsStorageService
                 .instance
                 .then(instance => {
@@ -155,7 +167,7 @@
             NotiStorageService
                 .instance
                 .then(instance => {
-                    this.news.list = instance.getMsgList();
+                    this.msg.list = instance.getMsgList().reverse();
                 })
         },
 
@@ -224,6 +236,16 @@
                     .then(instance => {
                         instance.addSubsItem(newItem, () => this.showToast('添加成功'));
                     });
+            },
+            clearMsg() {
+                NotiStorageService
+                    .instance
+                    .then(instance => {
+                        this.msg.list = instance.clearMsg(() => {
+                            this.msg.list = [];
+                            this.showToast('已清空历史消息');
+                        });
+                    })
             }
         }
     }
@@ -235,6 +257,7 @@
 
     .notification {
         z-index: 200;
+        margin-bottom: 60px;
         footer {
             position: fixed;
             bottom: 0;
@@ -242,35 +265,69 @@
             z-index: 10;            
         }
 
-        .avatar {
-            height: 35px;
-            width: 35px;
-            line-height: 35px;
-            text-align: center;
-            display: inline-block;
-            border-radius: 50%;
-            font-size: 17px;
-            font-weight: lighter;
-            color: white;
-        }
-
-        >.news {
+        >.msg {
             overflow-y: auto;
-            > .news-item {
+            position: relative;
+            > .clear-all-btn {
+                position: absolute;
+                top: 16px;
+                right: 18px;
+                fill: rgba(0, 0, 0, 0.24);
+                height: 20px;
+                width: 20px;
+                cursor: pointer;
+                &:hover {
+                    fill: $primary_color;
+                }
+            }
+            .msg-item {
                 border-bottom: 1px solid rgba(0,0,0,0.1);
                 padding: 10px;
-                display: flex;
-                > .news-link {
-                    text-decoration: none;
-                    color: rgba(0, 0, 0, 0.6);
-                    font-size: 14px;
+                display: block;
+                overflow: hidden;
+                &:last-child {
+                    border-bottom: none;
+                }
+                > .avatar {
+                    height: 35px;
+                    width: 35px;
                     line-height: 35px;
-                    white-space: nowrap;
-                    margin-left: 10px;
+                    text-align: center;
+                    display: inline-block;
+                    border-radius: 50%;
+                    font-size: 17px;
+                    font-weight: lighter;
+                    color: white;
+                    float: left;
+                }
+                > .msg-content {
+                    display: inline-flex;
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    &:hover {
-                        color: $primary_color;
+                    white-space: nowrap;
+                    width: calc(100% - 35px);
+                    justify-content: space-between;
+                    > .msg-link {
+                        text-decoration: none;
+                        color: rgba(0, 0, 0, 0.6);
+                        font-size: 14px;
+                        line-height: 35px;
+                        white-space: nowrap;
+                        margin-left: 10px;
+                        display: inline-block;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        &:hover {
+                            color: $primary_color;
+                        }
+                    }
+                    > .time {
+                        float:right;
+                        line-height: 35px;
+                        color: $popup_secondary_text_color;
+                        font-size: 12px;
+                        margin-right: 10px;
+                        display: inline-block;
                     }
                 }
             }

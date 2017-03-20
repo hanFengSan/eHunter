@@ -12,7 +12,7 @@
             <!-- 150px is $album-view-width -->
             <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
-                <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1">
+                <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(imgInfo)">
                 <label class="index">{{ index + 1 }}</label>
             </div>
         </awesome-scroll-view>
@@ -122,6 +122,11 @@
                 } else {
                     document.webkitExitFullscreen()
                 }
+            },
+
+            failLoad(imgInfo) {
+                console.log('img loaded failed');
+                console.log(imgInfo);
             }
         }
     }

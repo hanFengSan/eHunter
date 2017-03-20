@@ -12,17 +12,26 @@ class NotificationService {
         this.notiList = []; // gather together notifications to show
     }
 
+    log(msg) {
+        console.log(`${new Date().toLocaleString()}: ${msg}`);
+    }
+
     run() {
         /* eslint-disable no-undef */
-        console.log('background ok');
+        this.log('NotiService run');
         window.setInterval(() => {
             this.time += 10;
+            this.log('NotiService loop: time:');
+            console.log(this.time);
             this._syncSubs()
                 .then(() => {
                     this._initRequestUrl();
                     this._request();
+                    this.log('tags, requestUrl');
+                    console.log(this.subscribedTagList);
+                    console.log(this.requestList);
                 });
-        }, 10 * 60 * 1000); // 10 mins
+        }, 30 * 1000); // 10 mins
         // this.time += 10;
         // this._syncSubs()
         //     .then(() => {
@@ -37,8 +46,8 @@ class NotificationService {
                 .instance
                 .then(instance => {
                     this.subscribedTagList = instance.getSubsList().filter(item => {
-                        return this.time % item.time === 0
-                        // return this.time > 0
+                        // return this.time % item.time === 0
+                        return this.time > 0
                     });
                     resolve();
                 });
@@ -60,7 +69,7 @@ class NotificationService {
             }
             if (item.type.length > 0) {
                 url += item.type.reduce((sum, val) => {
-                    val = val.replace('-', '').toLowerCase();
+                    val = val.replace(' ', '').toLowerCase();
                     return `${sum}f_${val}=1&`;
                 }, '?');
             } else {
@@ -90,11 +99,11 @@ class NotificationService {
     }
 
     _compare(notiStorage, url, html) {
-        console.log('compare');
+        this.log('compare');
         const tag = this.subscribedTagList[this.requestList.indexOf(url)];
         let oldResults = notiStorage.getResultsByName(tag.name);
         let newResults = new SearchHtmlParser(html).getResultTitles();
-        console.log('old, new');
+        this.log('old, new');
         console.log(oldResults);
         console.log(newResults);
         let diffs = [];
@@ -116,15 +125,15 @@ class NotificationService {
                     instance.putItem(tag.name, newResults);
                 })
         }
-        console.log('diff');
+        this.log('diff');
         console.log(diffs);
         // create notification
-        if (diffs.length > 0) {
+        if (diffs.length > 0 && oldResults.length !== 0) {
             this.notiList.push({
                 name: tag.name,
-                message: `更新数量: ${diffs.length}`,
+                message: `更新数量: ${diffs.length >= 25 ? '>=25' : diffs.length}`,
                 time: new Date().getTime(),
-                updatedNum: diffs.length,
+                updatedNum: diffs.length >= 25 ? '>=25' : diffs.length,
                 url,
                 type: tag.type
             });

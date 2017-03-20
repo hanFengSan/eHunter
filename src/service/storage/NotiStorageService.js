@@ -60,8 +60,11 @@ class NotiStorageService {
             this.noti.msg = [];
         }
         this.noti.msg.push(item);
-        console.log('pushMsg');
-        console.log(item);
+        this._save(callback);
+    }
+
+    clearMsg(callback) {
+        this.noti.msg = [];
         this._save(callback);
     }
 }
