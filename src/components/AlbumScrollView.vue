@@ -1,7 +1,10 @@
 <template>
     <div class="album-container" @click.stop="">
         <div class="loading-container" v-if="imgInfoList.length === 0">
-            loading...
+            <span class="loading">loading...</span>
+            <p class="tip">
+                注意事项:<br>1.&nbsp;请在图册详情页(就是前面一页)上使用小图查看预览图, 即使用'normal'模式, 否则无法加载<br>
+            </p>
         </div>
         <div class="panel">
             <h4 v-show="showPagination" class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>
@@ -177,11 +180,19 @@
         > .loading-container {
             position: absolute;
             top: 50%;
-            left: calc(50% - 75px);
+            left: 50%;
             transform: translate(-50%, -50%);
             color: $img_container_color;
-            font-size: 24px;
-            font-weight: bolder;
+            > .loading {
+                display: block;
+                font-size: 24px;
+                font-weight: bolder;
+            }
+            > .tip {
+                padding: 0;
+                margin: 10px 0;
+                font-size: 16px;
+            }
         }
         > .panel {
             position: absolute;

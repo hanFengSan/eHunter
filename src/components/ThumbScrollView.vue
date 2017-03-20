@@ -41,9 +41,11 @@
         },
 
         created() {
-            // set Cookie for small thumb, important
-            CookieUtil.setItem('uconfig', 'dm_t');
+            // set Cookie for small thumb, important, but it is not work in content script. wired
+            // this.initCookie()
+                // .then(() => {
             this.initImgList();
+                // });
         },
 
         computed: {
@@ -65,9 +67,42 @@
             ...mapActions([
                 'setIndex'
             ]),
+
             select(index) {
                 this.curIndex = index;
                 this.setIndex(index);
+            },
+
+            initCookie() {
+                return new Promise((resolve, reject) => {
+                    chrome.cookies.set({
+                        url: 'exhentai.org',
+                        name: 'uconfig',
+                        value: 'dm_t'
+                    }, cookie => {
+                        console.log(cookie);
+                        resolve();
+                    });
+                });
+            },
+
+            deleteCookie(url, name, store, callback) {
+                // console.log("Delete URL: "+url+" | NAME: "+name+" |");
+                /* eslint-disable no-undef */
+                chrome.cookies.remove({
+                    'url': url,
+                    'name': name,
+                    'storeId': store
+                }, function(details) {
+                    if (typeof callback === 'undefined') {
+                        return;
+                    }
+                    if (details === null || details === undefined || details === 'undefined') {
+                        callback(false);
+                    } else {
+                        callback(true);
+                    }
+                })
             },
 
             initImgList() {
