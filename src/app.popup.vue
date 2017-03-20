@@ -26,14 +26,14 @@
                 </div>
                 <div class="slider-text">{{ read.viewScale + '%' }}</div>
             </mu-list>
-            <mu-list>
+            <!--<mu-list>
                 <mu-sub-header>存储</mu-sub-header>
                 <mu-list-item disableRipple @click="handleToggle(read, 'cacheImg')" title="缓存图片">
                     <mu-switch v-model="read.cacheImg" slot="right"/>
                 </mu-list-item>
                 <mu-list-item title="清除缓存" class="action">
                 </mu-list-item>
-            </mu-list>
+            </mu-list>-->
         </div>
         <div v-if="activeTab === notification.name" class="notification">
             <notification></notification>
