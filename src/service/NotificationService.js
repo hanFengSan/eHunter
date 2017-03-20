@@ -21,23 +21,17 @@ class NotificationService {
         this.log('NotiService run');
         window.setInterval(() => {
             this.time += 10;
-            this.log('NotiService loop: time:');
-            console.log(this.time);
+            // this.log('NotiService loop: time:');
+            // console.log(this.time);
             this._syncSubs()
                 .then(() => {
                     this._initRequestUrl();
                     this._request();
-                    this.log('tags, requestUrl');
-                    console.log(this.subscribedTagList);
-                    console.log(this.requestList);
+                    // this.log('tags, requestUrl');
+                    // console.log(this.subscribedTagList);
+                    // console.log(this.requestList);
                 });
         }, 10 * 60 * 1000); // 10 mins
-        // this.time += 10;
-        // this._syncSubs()
-        //     .then(() => {
-        //         this._initRequestUrl();
-        //         this._request();
-        //     });
     }
 
     _syncSubs() {
@@ -99,13 +93,13 @@ class NotificationService {
     }
 
     _compare(notiStorage, url, html) {
-        this.log('compare');
+        // this.log('compare');
         const tag = this.subscribedTagList[this.requestList.indexOf(url)];
         let oldResults = notiStorage.getResultsByName(tag.name);
         let newResults = new SearchHtmlParser(html).getResultTitles();
-        this.log('old, new');
-        console.log(oldResults);
-        console.log(newResults);
+        // this.log('old, new');
+        // console.log(oldResults);
+        // console.log(newResults);
         let diffs = [];
         // get new items
         if (oldResults.length > 0) {
@@ -125,8 +119,8 @@ class NotificationService {
                     instance.putItem(tag.name, newResults);
                 })
         }
-        this.log('diff');
-        console.log(diffs);
+        // this.log('diff');
+        // console.log(diffs);
         // create notification
         if (diffs.length > 0 && oldResults.length !== 0) {
             this.notiList.push({
