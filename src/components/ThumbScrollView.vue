@@ -44,8 +44,6 @@
             // set Cookie for small thumb, important
             CookieUtil.setItem('uconfig', 'dm_t');
             this.initImgList();
-            console.log('store');
-            console.log(this.$store);
         },
 
         computed: {
@@ -76,6 +74,8 @@
                 AlbumCacheService.instance
                     .getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
                     .then(thumbs => {
+                        console.log('thumbs');
+                        console.log(thumbs);
                         this.thumbs = thumbs;
                     });
             }

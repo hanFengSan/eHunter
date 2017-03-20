@@ -95,7 +95,6 @@ class AlbumCacheService {
         return new Promise((resolve, reject) => {
             this.checkAlbum(albumId);
             if (this.cache[albumId].imgInfos[index].src) {
-                console.log(`read img ${index} from cache`);
                 resolve(resolve(this.cache[albumId].imgInfos[index].src));
             } else {
                 (new TextReqService(this.cache[albumId].imgInfos[index].pageUrl))
