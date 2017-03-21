@@ -211,6 +211,8 @@
             > .location {
                 font-size: 14px;
                 display: inline-block;
+                line-height: 16px;
+                height: 16px;
             }
             .icon-container {
                 position: relative;
