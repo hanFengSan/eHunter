@@ -36,6 +36,7 @@
 <script>
     import { mapGetters, mapActions } from 'vuex'
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
+    // import Platform from 'src/service/PlatformService'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
     import AwesomeScrollView from './base/AwesomeScrollView.vue'
 
@@ -149,10 +150,14 @@
             },
 
             fullscreen() {
-                if (!document.webkitCurrentFullScreenElement) {
-                    document.querySelector('.vue-container').webkitRequestFullScreen();
+                // hack for crossing chrome and firefox
+                const elem = document.querySelector('.vue-container');
+                if (document.webkitCurrentFullScreenElement || document.mozFullScreenElement) {
+                    document.webkitExitFullscreen ? document.webkitExitFullscreen() : '';
+                    document.mozCancelFullScreen ? document.mozCancelFullScreen() : '';
                 } else {
-                    document.webkitExitFullscreen()
+                    elem.mozRequestFullScreen ? elem.mozRequestFullScreen() : '';
+                    elem.webkitRequestFullScreen ? elem.webkitRequestFullScreen() : '';
                 }
             },
 

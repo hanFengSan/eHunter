@@ -1,5 +1,6 @@
 // a service for setting, getting and storing settings
 /* eslint-disable no-undef */
+import Platform from './PlatformService'
 
 const singleton = Symbol();
 const singletonEnforcer = Symbol();
@@ -51,7 +52,7 @@ class SettingListener {
     }
 
     setSettingItem(settingName, value, callback = () => {}) {
-        chrome.storage.sync.set({
+        Platform.storage.sync.set({
             [settingName]: value
         }, () => {
             this._sendSettingMsg(settingName, value, callback);
@@ -60,7 +61,7 @@ class SettingListener {
     }
 
     getSettingItem(settingName, callback) {
-        chrome.storage.sync.get(settingName, (value) => {
+        Platform.storage.sync.get(settingName, (value) => {
             if (typeof value[settingName] !== 'undefined') {
                 callback(value[settingName]);
             } else if (typeof this.initialSettings[settingName] !== 'undefined') {

@@ -23,6 +23,7 @@ function createEHunterView() {
     element.style.background = '#34353b';
     element.style.zIndex = '10';
     element.style.top = '-100%';
+    element.style.left = '0px';
     element.classList = 'vue-container';
     let i1 = document.getElementById('i1');
 

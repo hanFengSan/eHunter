@@ -1,4 +1,6 @@
 // a storage service for tag's notification
+import Platform from '../PlatformService'
+
 const singleton = Symbol();
 const singletonEnforcer = Symbol();
 
@@ -12,7 +14,7 @@ class SubsStorageService {
         return new Promise((resolve, reject) => {
             if (!this[singleton]) {
                 this[singleton] = new SubsStorageService(singletonEnforcer);
-                this[singleton].storage = window.chrome.storage.sync;
+                this[singleton].storage = Platform.storage.local;
                 this[singleton].storage.get('subs', i => {
                     let subs = i['subs'];
                     this[singleton].storage.get('subsVersion', t => {

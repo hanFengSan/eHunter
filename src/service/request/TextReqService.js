@@ -51,7 +51,8 @@ class TextReqService {
 
     _request(successCallback, failureCallback) {
         this.curRetryTimes++;
-        window.fetch(this.url, this.fetchSetting ? this.fetchSetting : {
+        let url = this.url.includes('http') ? this.url : `${window.location.protocol}//${window.location.host}${this.url}`;
+        window.fetch(url, this.fetchSetting ? this.fetchSetting : {
             method: this.method,
             credentials: this.credentials
         }).then(res => {
