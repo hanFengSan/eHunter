@@ -12,6 +12,8 @@
     "icons": {
         "16": "./img/ehunter_icon.png",
         "24": "./img/ehunter_icon.png",
+        "48": "./img/ehunter_icon.png",
+        "96": "./img/ehunter_icon.png",
         "128": "./img/ehunter_icon.png"
     },
     "author": "Alex Chen",
