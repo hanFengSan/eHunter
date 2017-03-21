@@ -1,16 +1,22 @@
 # eHunter
 卷轴式阅读, 标签更新订阅
 
-# 大概实现
+## 大概实现
 在在原页面上新创建一个节点, 将vue注入到此节点上. 爬虫是利用fetch实现的.
 
-# 运行
+## 运行
 `npm install`后, 再`npm run dev`就可以进入dev模式了(当然,我个人喜好用yarn, 强烈推荐yarn), 在`chrome://extensions`页面顶部打开开发者模式, 选择项目的`/dist`文件夹就OK了.
 
-# 待解决问题
-content script貌似并不允许操作宿主的cookie, 而如果缩略图是`large`模式, 将无法愉快的使用爬虫.
+## 待解决问题
+1. content script貌似并不允许操作宿主的cookie, 而如果缩略图是`large`模式, 将无法愉快的使用爬虫.
 
-# 项目结构
+## TODO-LIST
+1. 下载, 打包zip
+2. 多tag交集订阅
+3. 添加错误提示, 方便用户高效反馈
+4. 在缩略图上方加一个开启按钮, 不直接跳转
+
+## 项目结构
 ```
 |-eHunter
   |-build
