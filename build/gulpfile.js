@@ -27,6 +27,15 @@ gulp.task('dev', ['assets'], function() {
         .pipe(gulp.dest('../dist/'));
 });
 
+gulp.task('build', ['assets'], function() {
+    return gulp.src('../src/main.inject.js')
+        .pipe(webpackStream(require('./webpack.prod.conf.js'), webpack))
+        .pipe(gulp.dest('../dist/'));
+});
+
+gulp.task('publish', ['build'], function() {
+    exec('web-ext build -s ../dist -a ../publish_output');
+})
+
 gulp.task('default', function() {
-    // 将你的默认的任务代码放在这
 });

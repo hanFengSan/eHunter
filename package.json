@@ -5,7 +5,9 @@
   "author": "yakami <c360785655@gmail.com>",
   "private": true,
   "scripts": {
-    "dev": "gulp dev --gulpfile build/gulpfile.js"
+    "dev": "gulp dev --gulpfile build/gulpfile.js",
+    "publish": "gulp publish --gulpfile build/gulpfile.js",
+    "build.firefox": "web-ext build -s ./dist"
   },
   "dependencies": {
     "del": "^2.2.2",
@@ -24,6 +26,7 @@
     "vue-resource": "^1.0.3",
     "vue-scrollto": "^2.4.2",
     "vuex": "^2.0.0",
+    "web-ext": "^1.8.1",
     "webpack-stream": "^3.2.0"
   },
   "devDependencies": {
