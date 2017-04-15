@@ -15,7 +15,7 @@
             <!-- 150px is $album-view-width -->
             <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
-                <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(index)" @load="loaded(index)">
+                <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(index, $event)" @load="loaded(index)">
                 <div class="index">{{ index + 1 }}</div>
                 <div class="img-info-panel" v-if="nearbyArray.indexOf(index)>-1">
                     <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&imgInfo.src">...加载图片中...</div>
@@ -70,8 +70,12 @@
                 this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
                 let cons = this.$refs.imgContainers;
                 if (cons) {
-                    let result = cons.indexOf(cons.find(item => item.offsetTop >= this.scrollTop));
+                    const _cons = cons.concat().reverse();
+                    let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
                     const index = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
+                    console.log('scroll');
+                    console.log(this.scrollTop + window.innerHeight);
+                    console.log(cons[index].offsetTop);
                     this.setIndex(index);
                     return index;
                 } else {
@@ -99,6 +103,7 @@
         created() {
             this.sumOfPage = this.parser.getSumOfPage();
             this.initImgInfoList();
+            this.blockEhActions();
         },
 
         methods: {
@@ -149,6 +154,26 @@
                 this.scrollTop = position;
             },
 
+            // block some weird actions in eh page
+            blockEhActions() {
+                var elt = document.createElement('script');
+                elt.innerHTML = `
+                    if (typeof timerId === 'undefined') {
+                        const timerId = window.setInterval(() => {
+                            if (window.onpopstate) {
+                                window.onpopstate = null;
+                                window.clearInterval(timerId);
+                                load_image_dispatch = () => {};
+                                api_response = () => {};
+                                _load_image = () => {};
+                                nl = () => {};
+                            }
+                        }, 1000);
+                    }
+                `;
+                document.body.appendChild(elt);
+            },
+
             fullscreen() {
                 // hack for crossing chrome and firefox
                 const elem = document.querySelector('.vue-container');
@@ -161,10 +186,13 @@
                 }
             },
 
-            failLoad(index) {
+            failLoad(index, e) {
                 this.imgInfoList[index].loadStatus = this.loadStatus.error;
+                console.log('加载图片失败, load image failed');
+                e.preventDefault();
                 if (this.imgInfoList[index].isFirstLoad) { // auto request src when first loading is failed
                     this.imgInfoList[index].isFirstLoad = false;
+                    console.log('重新加载图片, reloading');
                     this.getNewImgSrc(index);
                 }
             },

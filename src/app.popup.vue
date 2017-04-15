@@ -1,12 +1,12 @@
 <template>
     <div class="popup-container">
         <h1>E-HUNTER</h1>
-          <mu-tabs :value="activeTab" @change="handleTabChange">
+        <mu-tabs :value="activeTab" @change="handleTabChange">
             <mu-tab :value="read.name" title="阅读"/>
             <mu-tab :value="notification.name" title="通知"/>
             <mu-tab :value="about.name" title="关于"/>
         </mu-tabs>
-         <div class="read" v-if="activeTab === read.name">
+        <div class="read" v-if="activeTab === read.name">
             <mu-list>
                 <mu-sub-header>视图开启设置</mu-sub-header>
                 <mu-list-item disableRipple @click="handleToggle(read, 'eHunterView')" title="卷轴式阅读">
@@ -22,7 +22,7 @@
             <mu-list>
                 <mu-sub-header>视图大小</mu-sub-header>
                 <div class="slider-item">
-                      <mu-slider :step="1" :min="30" :max="100" v-model="read.viewScale" class="demo-slider"/>
+                    <mu-slider :step="1" :min="30" :max="100" v-model="read.viewScale" class="demo-slider"/>
                 </div>
                 <div class="slider-text">{{ read.viewScale + '%' }}</div>
             </mu-list>
@@ -46,7 +46,8 @@
                 </tr>
                 <tr>
                     <td>github</td>
-                    <td><a target="_blank" href="https://github.com/hanFengSan/eHunter">https://github.com/hanFengSan/eHunter</a></td>
+                    <td><a target="_blank" href="https://github.com/hanFengSan/eHunter">https://github.com/hanFengSan/eHunter</a>
+                    </td>
                 </tr>
                 <tr>
                     <td>反馈</td>
@@ -142,7 +143,7 @@
     @import "~src/style/_variables";
 
     body {
-        font-family: 'San Francisco', 'Helvetica', Arial, "Hiragino Sans GB", "Heiti SC",//macOS & ios
+        font-family: 'San Francisco', 'Helvetica', Arial, "Hiragino Sans GB", "Heiti SC", //macOS & ios
         "Microsoft YaHei", //windows
         'Droid Sans', // android default
         'WenQuanYi Micro Hei', // linux
@@ -193,7 +194,7 @@
             table {
                 padding: 10px;
                 word-break: break-all;
-                color:$popup_text_color;
+                color: $popup_text_color;
                 tr {
                     padding-bottom: 10px;
                     td {

@@ -7,3 +7,4 @@ test/e2e/reports
 .vscode
 *.zip
 web-ext-artifacts
+.idea
