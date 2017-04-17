@@ -73,9 +73,6 @@
                     const _cons = cons.concat().reverse();
                     let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
                     const index = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
-                    console.log('scroll');
-                    console.log(this.scrollTop + window.innerHeight);
-                    console.log(cons[index].offsetTop);
                     this.setIndex(index);
                     return index;
                 } else {
@@ -119,6 +116,9 @@
                             i.loadStatus = this.loadStatus.waiting;
                             return i;
                         });
+                        window.setTimeout(() => {
+                            this.setIndex(this.parser.getCurPageNum() - 1); // 同步页数
+                        }, 1000);
                     });
             },
 

@@ -19,7 +19,6 @@
     import { mapGetters, mapActions } from 'vuex'
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
-    import CookieUtil from 'src/utils/CookieUtil.js'
     import AwesomeScrollView from './base/AwesomeScrollView.vue'
 
     export default {
@@ -58,7 +57,7 @@
             centerIndex() {
                 if (this.curIndex !== this.centerIndex && !this.hover) {
                     this.curIndex = this.centerIndex;
-                    this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000); // the 4 is the value of marginTop
+                    this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
                 }
             }
         },
