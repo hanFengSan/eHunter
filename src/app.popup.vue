@@ -18,6 +18,9 @@
                 <mu-list-item disableRipple @click="handleToggle(read, 'paginationView')" title="当前页码">
                     <mu-switch v-model="read.paginationView" slot="right"/>
                 </mu-list-item>
+                <mu-list-item disableRipple @click="handleToggle(read, 'syncScroll')" title="页码同步(若页面乱跳请关闭)">
+                    <mu-switch v-model="read.syncScroll" slot="right"/>
+                </mu-list-item>
             </mu-list>
             <mu-list>
                 <mu-sub-header>视图大小</mu-sub-header>
@@ -77,6 +80,7 @@
                     eHunterView: true,
                     thumbView: true,
                     paginationView: true,
+                    syncScroll: true,
                     viewScale: 80,
                     cacheImg: true
                 },
@@ -105,6 +109,9 @@
             },
             'read.paginationView'() {
                 SettingService.instance.setSettingItem('showPagination', this.read.paginationView);
+            },
+            'read.syncScroll'() {
+                SettingService.instance.setSettingItem('toggleSyncScroll', this.read.syncScroll);
             }
         },
 
@@ -126,6 +133,9 @@
                 });
                 SettingService.instance.getSettingItem('toggleThumbView', (val) => {
                     this.read.thumbView = val;
+                });
+                SettingService.instance.getSettingItem('toggleSyncScroll', (val) => {
+                    this.read.syncScroll = val;
                 });
             },
             handleTabChange (val) {

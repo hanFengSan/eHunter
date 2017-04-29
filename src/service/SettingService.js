@@ -14,10 +14,12 @@ class SettingListener {
         if (!this[singleton]) {
             this[singleton] = new SettingListener(singletonEnforcer);
             this[singleton].eventBus = {};
+            // default setting values
             this[singleton].initialSettings = {
                 toggleEHunter: true,
                 showPagination: true,
-                toggleThumbView: true
+                toggleThumbView: true,
+                toggleSyncScroll: true
             }
         }
         return this[singleton];
@@ -42,6 +44,9 @@ class SettingListener {
                     break;
                 case 'toggleThumbView':
                     store.dispatch('toggleThumbView', msg.value);
+                    break;
+                case 'toggleSyncScroll':
+                    store.dispatch('toggleSyncScroll', msg.value);
             }
             // eventBus
             if (this.eventBus[msg.settingName]) {
@@ -98,6 +103,7 @@ class SettingListener {
         this.getSettingItem('setAlbumWidth', (val) => store.dispatch('setAlbumWidth', val));
         this.getSettingItem('showPagination', (val) => store.dispatch('showPagination', val));
         this.getSettingItem('toggleThumbView', (val) => store.dispatch('toggleThumbView', val));
+        this.getSettingItem('toggleSyncScroll', (val) => store.dispatch('toggleSyncScroll', val));
     }
 }
 

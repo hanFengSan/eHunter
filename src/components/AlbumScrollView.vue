@@ -52,7 +52,7 @@
                 imgUrlMap: new Map(),
                 scrollTop: 0,
                 loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() }, // status of img loading
-                nearbyRange: [-2, 3] // the range of necessary imgs, basing curIndex
+                nearbyRange: [-2, 3] // the range of necessary imgs, basing on curIndex
             }
         },
 
@@ -64,7 +64,8 @@
             ...mapGetters({
                 centerIndex: 'curIndex',
                 widthScale: 'albumWidth',
-                showPagination: 'showPagination'
+                showPagination: 'showPagination',
+                toggleSyncScroll: 'toggleSyncScroll'
             }),
             curIndex() {
                 this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
@@ -91,8 +92,10 @@
 
         watch: {
             centerIndex() {
-                if (this.curIndex !== this.centerIndex) {
-                    this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.centerIndex].offsetTop - 100, 1000);
+                if (this.toggleSyncScroll) {
+                    if (this.curIndex !== this.centerIndex) {
+                        this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.centerIndex].offsetTop - 100, 1000);
+                    }
                 }
             }
         },
@@ -167,6 +170,9 @@
                                 api_response = () => {};
                                 _load_image = () => {};
                                 nl = () => {};
+                                hookEvent = () => { console.log('hookEvent') };
+                                scroll_space = () => {};
+                                document.onkeydown = () => {};
                             }
                         }, 1000);
                     }
