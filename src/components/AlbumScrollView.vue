@@ -71,11 +71,16 @@
                 this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
                 let cons = this.$refs.imgContainers;
                 if (cons) {
-                    const _cons = cons.concat().reverse();
-                    let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
-                    const index = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
-                    this.setIndex(index);
-                    return index;
+                    if (this.scrollTop !== 0) { // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
+                        const _cons = cons.concat().reverse();
+                        let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
+                        const index = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
+                        this.setIndex(index);
+                        return index;
+                    } else {
+                        this.setIndex(0);
+                        return 0;
+                    }
                 } else {
                     return 0;
                 }
@@ -91,12 +96,22 @@
         },
 
         watch: {
-            centerIndex() {
-                if (this.toggleSyncScroll) {
-                    if (this.curIndex !== this.centerIndex) {
-                        this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.centerIndex].offsetTop - 100, 1000);
+            // centerIndex() {
+            //     if (this.toggleSyncScroll) {
+            //         if (this.curIndex !== this.centerIndex) {
+            //             this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.centerIndex].offsetTop - 100, 1000);
+            //         }
+            //     }
+            // }
+            centerIndex: {
+                handler: function(val, oldVal) {
+                    if (this.toggleSyncScroll) {
+                        if (this.curIndex !== this.centerIndex) {
+                            this.$refs.scrollView.ScrollTo(this.centerIndex === 0 ? 0 : (this.$refs.imgContainers[this.centerIndex].offsetTop - 100), 1000);
+                        }
                     }
-                }
+                },
+                deep: true
             }
         },
 

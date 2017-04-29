@@ -98,20 +98,50 @@
         },
 
         watch: {
-            'read.viewScale'() {
-                SettingService.instance.setSettingItem('setAlbumWidth', this.read.viewScale);
+            // 'read.viewScale'() {
+            //     SettingService.instance.setSettingItem('setAlbumWidth', this.read.viewScale);
+            // },
+            // 'read.eHunterView'() {
+            //     SettingService.instance.setSettingItem('toggleEHunter', this.read.eHunterView);
+            // },
+            // 'read.thumbView'() {
+            //     SettingService.instance.setSettingItem('toggleThumbView', this.read.thumbView);
+            // },
+            // 'read.paginationView'() {
+            //     SettingService.instance.setSettingItem('showPagination', this.read.paginationView);
+            // },
+            // 'read.syncScroll'() {
+            //     SettingService.instance.setSettingItem('toggleSyncScroll', this.read.syncScroll);
+            // },
+            'read.viewScale': {
+                handler: function(val, oldVal) {
+                    SettingService.instance.setSettingItem('setAlbumWidth', this.read.viewScale);
+                },
+                deep: true
             },
-            'read.eHunterView'() {
-                SettingService.instance.setSettingItem('toggleEHunter', this.read.eHunterView);
+            'read.eHunterView': {
+                handler: function(val, oldVal) {
+                    SettingService.instance.setSettingItem('toggleEHunter', this.read.eHunterView);
+                },
+                deep: true
             },
-            'read.thumbView'() {
-                SettingService.instance.setSettingItem('toggleThumbView', this.read.thumbView);
+            'read.thumbView': {
+                handler: function(val, oldVal) {
+                    SettingService.instance.setSettingItem('toggleThumbView', this.read.thumbView);
+                },
+                deep: true
             },
-            'read.paginationView'() {
-                SettingService.instance.setSettingItem('showPagination', this.read.paginationView);
+            'read.paginationView': {
+                handler: function(val, oldVal) {
+                    SettingService.instance.setSettingItem('showPagination', this.read.paginationView);
+                },
+                deep: true
             },
-            'read.syncScroll'() {
-                SettingService.instance.setSettingItem('toggleSyncScroll', this.read.syncScroll);
+            'read.syncScroll': {
+                handler: function(val, oldVal) {
+                    SettingService.instance.setSettingItem('toggleSyncScroll', this.read.syncScroll);
+                },
+                deep: true
             }
         },
 

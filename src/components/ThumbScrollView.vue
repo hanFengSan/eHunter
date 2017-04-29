@@ -54,11 +54,20 @@
         },
 
         watch: {
-            centerIndex() {
-                if (this.curIndex !== this.centerIndex && !this.hover) {
-                    this.curIndex = this.centerIndex;
-                    this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
-                }
+            // centerIndex() {
+            //     if (this.curIndex !== this.centerIndex && !this.hover) {
+            //         this.curIndex = this.centerIndex;
+            //         this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
+            //     }
+            // },
+            centerIndex: {
+                handler: function(val, oldVal) {
+                    if (this.curIndex !== this.centerIndex && !this.hover) {
+                        this.curIndex = this.centerIndex;
+                        this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
+                    }
+                },
+                deep: true
             }
         },
 
