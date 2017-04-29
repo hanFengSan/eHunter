@@ -163,7 +163,7 @@
                 elt.innerHTML = `
                     if (typeof timerId === 'undefined') {
                         const timerId = window.setInterval(() => {
-                            if (window.onpopstate) {
+                            if (document.onkeyup) {
                                 window.onpopstate = null;
                                 window.clearInterval(timerId);
                                 load_image_dispatch = () => {};
@@ -173,6 +173,7 @@
                                 hookEvent = () => { console.log('hookEvent') };
                                 scroll_space = () => {};
                                 document.onkeydown = () => {};
+                                document.onkeyup = () => {};
                             }
                         }, 1000);
                     }
