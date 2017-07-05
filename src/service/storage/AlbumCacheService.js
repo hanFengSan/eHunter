@@ -36,7 +36,18 @@ class AlbumCacheService {
     }
 
     save() {
+        try {
+            this.storage.setItem('cache', JSON.stringify(this.cache));
+        } catch (e) {
+            this.cutDownSize();
+        }
+    }
+
+    cutDownSize() {
+        this.cache = {};
         this.storage.setItem('cache', JSON.stringify(this.cache));
+        console.log('cut down size of album cache');
+        alert('已清洁不必要缓存,请刷新页面');
     }
 
     checkAlbum(albumId) {

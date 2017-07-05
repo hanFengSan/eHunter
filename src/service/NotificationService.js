@@ -129,6 +129,7 @@ class NotificationService {
                 time: new Date().getTime(),
                 updatedNum: diffs.length >= 25 ? '>=25' : diffs.length,
                 url,
+                diffs,
                 type: tag.type
             });
         }

@@ -59,6 +59,11 @@ class NotiStorageService {
         if (!this.noti.msg) {
             this.noti.msg = [];
         }
+        // cut down size if too big
+        if (this.noti.msg.length > 100) {
+            this.noti.msg.splice(0, 50);
+            console.log('cut down size of noti cache');
+        }
         this.noti.msg.push(item);
         this._save(callback);
     }

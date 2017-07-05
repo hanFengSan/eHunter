@@ -15,11 +15,16 @@
                 <path d="M0 0h24v24H0z" fill="none"/>
             </svg>
             <div>
-                <div class="msg-item" v-for="item of msg.list">
+                <div class="msg-item" v-for="item of msg.list" @click="open(item)">
                     <div class="avatar" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name[0].toUpperCase() }}</div>
                     <div class="msg-content">
-                        <a class="msg-link" :href="item.url" :title="`${item.name }更新了${item.updatedNum}项`" target="_blank">{{ `${item.name }更新了${item.updatedNum}项` }}</a>
+                        <a class="msg-link" :href="item.url" :title="`${item.name}更新了${item.updatedNum}项`" @click.stop="" target="_blank">{{ `${item.name }更新了${item.updatedNum}项` }}</a>
                         <span class="time">{{ DateUtil.getIntervalFromNow(item.time) }}</span>
+                    </div>
+                    <div class="diff-list" v-show="item.open">
+                        <div class="diff-item" v-for="(title, index) of item.diffs">
+                            <span>{{ `${index + 1}.  ${title}` }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -167,7 +172,11 @@
             NotiStorageService
                 .instance
                 .then(instance => {
-                    this.msg.list = instance.getMsgList().reverse();
+                    let list = instance.getMsgList().reverse();
+                    list.forEach((item) => {
+                        item.open = false;
+                        this.msg.list.push(item);
+                    });
                 })
         },
 
@@ -246,6 +255,10 @@
                             this.showToast('已清空历史消息');
                         });
                     })
+            },
+            open(msgItem) {
+                msgItem.open = !msgItem.open;
+                console.log(msgItem.open);
             }
         }
     }
@@ -285,6 +298,10 @@
                 padding: 10px;
                 display: block;
                 overflow: hidden;
+                &:hover {
+                    background: rgba($primary_color, 0.1);
+                    cursor: pointer;
+                }
                 &:last-child {
                     border-bottom: none;
                 }
@@ -299,6 +316,7 @@
                     font-weight: lighter;
                     color: white;
                     float: left;
+                    user-select: none;
                 }
                 > .msg-content {
                     display: inline-flex;
@@ -328,6 +346,20 @@
                         font-size: 12px;
                         margin-right: 10px;
                         display: inline-block;
+                        user-select: none;
+                    }
+                }
+                > .diff-list {
+                    background: $table_grey;
+                    padding: 0 5px;
+                    margin-top: 5px;
+                    > .diff-item {
+                        height: 30px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        line-height: 30px;
+                        font-size: 12px;
                     }
                 }
             }
