@@ -52,9 +52,8 @@ class ImgHtmlParser {
         return RegExp.$1;
     }
 
-    getOriginalImg() {
-        return this.document.getElementById('i7').children.length > 0
-            ? this.document.getElementById('i7').children[1].getAttribute('href') : ''
+    getOriginalImgUrl() {
+        return this.html.querySelector('#i7>a').attributes['href'].value;
     }
 
     _initI2Element() {

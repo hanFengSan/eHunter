@@ -50,6 +50,7 @@ class AlbumCacheService {
         alert('已清洁不必要缓存,请刷新页面');
     }
 
+    // make sure that album is existed
     checkAlbum(albumId) {
         if (!this.hasAlbumCache(albumId)) {
             this.cache[albumId] = {
@@ -102,16 +103,25 @@ class AlbumCacheService {
         });
     }
 
-    getImgSrc(albumId, index) {
+    getImgSrc(albumId, index, mode) {
         return new Promise((resolve, reject) => {
             this.checkAlbum(albumId);
             if (this.cache[albumId].imgInfos[index].src) {
                 resolve(resolve(this.cache[albumId].imgInfos[index].src));
             } else {
                 (new TextReqService(this.cache[albumId].imgInfos[index].pageUrl))
-                .request()
+                    .request()
                     .then(text => {
-                        this.cache[albumId].imgInfos[index].src = new ImgHtmlParser(text).getImgUrl();
+                        console.log(mode);
+                        if (mode) {
+                            switch (mode) {
+                                case 'origin': // if want to load original img
+                                    this.cache[albumId].imgInfos[index].src = new ImgHtmlParser(text).getOriginalImgUrl();
+                            }
+                        } else {
+                            // default img
+                            this.cache[albumId].imgInfos[index].src = new ImgHtmlParser(text).getImgUrl();
+                        }
                         this.save();
                         resolve(this.cache[albumId].imgInfos[index].src);
                     });
@@ -119,10 +129,10 @@ class AlbumCacheService {
         });
     }
 
-    getNewImgSrc(albumId, index) {
+    getNewImgSrc(albumId, index, mode) {
         this.cache[albumId].imgInfos[index].src = null;
         this.save();
-        return this.getImgSrc(albumId, index);
+        return this.getImgSrc(albumId, index, mode);
     }
 
 }
