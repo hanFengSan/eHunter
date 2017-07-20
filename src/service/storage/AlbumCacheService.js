@@ -46,7 +46,6 @@ class AlbumCacheService {
     cutDownSize() {
         this.cache = {};
         this.storage.setItem('cache', JSON.stringify(this.cache));
-        console.log('cut down size of album cache');
         alert('已清洁不必要缓存,请刷新页面');
     }
 
@@ -69,7 +68,7 @@ class AlbumCacheService {
                 resolve(this.cache[albumId].thumbs);
             } else {
                 (new TextReqService(API.getIntroHtml(introUrl, 1)))
-                .request()
+                    .request()
                     .then(text => {
                         let introPage = new IntroHtmlParser(text);
                         this.cache[albumId].thumbs = introPage.getThumbObjList(sumOfPage, albumId);
