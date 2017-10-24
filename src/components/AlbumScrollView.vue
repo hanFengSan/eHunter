@@ -9,12 +9,15 @@
         <div class="panel">
             <h4 v-show="showPagination" class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>
             <img title="全屏" @click="fullscreen()" class="focus icon" src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDIyIDIyIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMiAyMjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8Zz4KCTxnPgoJCTxwYXRoIGQ9Ik00LDE4aDE0VjRINFYxOHogTTYsNmgxMHYxMEg2VjZ6IiBmaWxsPSIjNTk1ZDYyIi8+CgkJPHBvbHlnb24gcG9pbnRzPSIyLDE2IDAsMTYgMCwyMiA2LDIyIDYsMjAgMiwyMCAgICIgZmlsbD0iIzU5NWQ2MiIvPgoJCTxwb2x5Z29uIHBvaW50cz0iMiwyIDYsMiA2LDAgMCwwIDAsNiAyLDYgICAiIGZpbGw9IiM1OTVkNjIiLz4KCQk8cG9seWdvbiBwb2ludHM9IjIwLDIwIDE2LDIwIDE2LDIyIDIyLDIyIDIyLDE2IDIwLDE2ICAgIiBmaWxsPSIjNTk1ZDYyIi8+CgkJPHBvbHlnb24gcG9pbnRzPSIxNiwwIDE2LDIgMjAsMiAyMCw2IDIyLDYgMjIsMCAgICIgZmlsbD0iIzU5NWQ2MiIvPgoJPC9nPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=" />
-        </div>        
+        </div>
         <awesome-scroll-view ref="scrollView" class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
             <h1>{{ parser.getTitle() }}</h1>
             <!-- 150px is $album-view-width -->
             <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
+                <div class="album-thumb" v-if="thumbBackground && imgInfo.loadStatus!=loadStatus.loaded">
+                    <img :src="thumbs[index].url" :style="{left: `calc(calc(${widthScale}vw - 145px) * -${thumbs[index].offset/100})`}" />
+                </div>
                 <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(index, $event)" @load="loaded(index)">
                 <div class="index">{{ index + 1 }}</div>
                 <div class="img-info-panel" v-if="nearbyArray.indexOf(index)>-1">
@@ -22,7 +25,7 @@
                     <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&!imgInfo.src">...加载图片地址中...</div>
                     <div class="loading-info" v-if="imgInfo.loadStatus==loadStatus.error">图片加载失败, 请在图片框右下角点击刷新按钮重新尝试</div>
                 </div>
-                 <div class="img-console-panel" v-if="imgInfo.loadStatus!=loadStatus.loaded"> 
+                 <div class="img-console-panel" v-if="imgInfo.loadStatus!=loadStatus.loaded">
                     <div class="tips" title-content="载入原图">
                         <svg class="refresh-origin-btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc(index, 'origin')" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
@@ -54,6 +57,7 @@
             return {
                 parser: new ImgHtmlParser(document.documentElement.innerHTML),
                 imgInfoList: [],
+                thumbs: [],
                 imgBaseUrl: '',
                 sumOfPage: '',
                 imgUrlMap: new Map(),
@@ -72,6 +76,7 @@
                 centerIndex: 'curIndex',
                 widthScale: 'albumWidth',
                 showPagination: 'showPagination',
+                thumbBackground: 'thumbBackground',
                 toggleSyncScroll: 'toggleSyncScroll'
             }),
             curIndex() {
@@ -137,6 +142,11 @@
                         window.setTimeout(() => {
                             this.setIndex(this.parser.getCurPageNum() - 1); // 同步页数
                         }, 1000);
+                    });
+                AlbumCacheService.instance
+                    .getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
+                    .then(thumbs => {
+                        this.thumbs = thumbs;
                     });
             },
 
@@ -351,6 +361,19 @@
                     width: inherit;
                     min-width: inherit;
                     height: inherit;
+                }
+                > .album-thumb {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                    overflow: hidden;
+
+                    >img {
+                        height: 100%;
+                        position: absolute;
+                    }
                 }
             }
         }

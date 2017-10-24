@@ -19,6 +19,7 @@ class SettingListener {
                 toggleEHunter: true,
                 showPagination: true,
                 toggleThumbView: true,
+                toggleThumbBackground: true,
                 toggleSyncScroll: true
             }
         }
@@ -44,6 +45,9 @@ class SettingListener {
                     break;
                 case 'toggleThumbView':
                     store.dispatch('toggleThumbView', msg.value);
+                    break;
+                case 'toggleThumbBackground':
+                    store.dispatch('toggleThumbBackground', msg.value);
                     break;
                 case 'toggleSyncScroll':
                     store.dispatch('toggleSyncScroll', msg.value);
@@ -103,6 +107,7 @@ class SettingListener {
         this.getSettingItem('setAlbumWidth', (val) => store.dispatch('setAlbumWidth', val));
         this.getSettingItem('showPagination', (val) => store.dispatch('showPagination', val));
         this.getSettingItem('toggleThumbView', (val) => store.dispatch('toggleThumbView', val));
+        this.getSettingItem('toggleThumbBackground', (val) => store.dispatch('toggleThumbBackground', val));
         this.getSettingItem('toggleSyncScroll', (val) => store.dispatch('toggleSyncScroll', val));
     }
 }

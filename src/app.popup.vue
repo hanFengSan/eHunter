@@ -15,6 +15,9 @@
                 <mu-list-item disableRipple @click="handleToggle(read, 'thumbView')" title="缩略图侧栏">
                     <mu-switch v-model="read.thumbView" slot="right"/>
                 </mu-list-item>
+                <mu-list-item disableRipple @click="handleToggle(read, 'thumbBackground')" title="缩略图背景">
+                    <mu-switch v-model="read.thumbBackground" slot="right"/>
+                </mu-list-item>
                 <mu-list-item disableRipple @click="handleToggle(read, 'paginationView')" title="当前页码">
                     <mu-switch v-model="read.paginationView" slot="right"/>
                 </mu-list-item>
@@ -79,6 +82,7 @@
                     name: Symbol(),
                     eHunterView: true,
                     thumbView: true,
+                    thumbBackground: true,
                     paginationView: true,
                     syncScroll: true,
                     viewScale: 80,
@@ -131,6 +135,12 @@
                 },
                 deep: true
             },
+            'read.thumbBackground': {
+                handler: function(val, oldVal) {
+                    SettingService.instance.setSettingItem('toggleThumbBackground', this.read.thumbBackground);
+                },
+                deep: true
+            },
             'read.paginationView': {
                 handler: function(val, oldVal) {
                     SettingService.instance.setSettingItem('showPagination', this.read.paginationView);
@@ -163,6 +173,9 @@
                 });
                 SettingService.instance.getSettingItem('toggleThumbView', (val) => {
                     this.read.thumbView = val;
+                });
+                SettingService.instance.getSettingItem('toggleThumbBackground', (val) => {
+                    this.read.thumbBackground = val;
                 });
                 SettingService.instance.getSettingItem('toggleSyncScroll', (val) => {
                     this.read.syncScroll = val;

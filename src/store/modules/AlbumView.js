@@ -6,7 +6,8 @@ const state = {
     curIndex: 0,
     thumb: {
         width: 150, // px
-        thumbView: true
+        thumbView: true,
+        thumbBackground: true
     },
     album: {
         width: 80, // percent
@@ -22,6 +23,7 @@ const getters = {
     thumbWidth: state => state.thumb.width,
     showPagination: state => state.album.pagination,
     thumbView: state => state.thumb.thumbView,
+    thumbBackground: state => state.thumb.thumbBackground,
     toggleSyncScroll: state => state.album.toggleSyncScroll
 }
 
@@ -34,6 +36,9 @@ const actions = {
     },
     toggleThumbView: ({ commit }, show) => {
         commit(types.TOGGLE_THUMB_VIEW, { show })
+    },
+    toggleThumbBackground: ({ commit }, show) => {
+        commit(types.TOGGLE_THUMB_BACKGROUND, { show })
     },
     toggleSyncScroll: ({ commit }, isActive) => {
         commit(types.TOGGLE_SYNC_SCROLL, { isActive })
@@ -53,6 +58,9 @@ const mutations = {
     },
     [types.TOGGLE_THUMB_VIEW](state, { show }) {
         state.thumb.thumbView = show;
+    },
+    [types.TOGGLE_THUMB_BACKGROUND](state, { show }) {
+        state.thumb.thumbBackground = show;
     },
     [types.TOGGLE_SYNC_SCROLL](state, { isActive }) {
         state.album.toggleSyncScroll = isActive;

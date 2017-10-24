@@ -195,7 +195,7 @@
                 padding: $thumb-view-margin 0;
                 height: $thumb-view-height;
                 text-align: center;
-                display: flex; 
+                display: flex;
                 align-items: center;
                 justify-content: center;
                 box-sizing: border-box;
