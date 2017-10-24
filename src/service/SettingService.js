@@ -19,7 +19,7 @@ class SettingListener {
                 toggleEHunter: true,
                 showPagination: true,
                 toggleThumbView: true,
-                toggleThumbBackground: true,
+                toggleThumbBackground: false,
                 toggleSyncScroll: true
             }
         }
