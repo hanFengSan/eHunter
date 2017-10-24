@@ -15,7 +15,7 @@
                 <mu-list-item disableRipple @click="handleToggle(read, 'thumbView')" title="缩略图侧栏">
                     <mu-switch v-model="read.thumbView" slot="right"/>
                 </mu-list-item>
-                <mu-list-item disableRipple @click="handleToggle(read, 'thumbBackground')" title="缩略图背景">
+                <mu-list-item disableRipple @click="handleToggle(read, 'thumbBackground')" title="缩略图背景(测试)">
                     <mu-switch v-model="read.thumbBackground" slot="right"/>
                 </mu-list-item>
                 <mu-list-item disableRipple @click="handleToggle(read, 'paginationView')" title="当前页码">

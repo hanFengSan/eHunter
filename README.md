@@ -8,16 +8,6 @@
 `npm install`后, 再`npm run dev`就可以进入dev模式了(当然,我个人喜好用yarn, 强烈推荐yarn), 在`chrome://extensions`页面顶部打开开发者模式, 选择项目的`/dist`文件夹就OK了.
 `npm run publish`可以直接生成chrome&firefox用的zip压缩文件到`publish_output`文件夹.
 
-## 待解决问题
-1. content script貌似并不允许操作宿主的cookie, 而如果缩略图是`large`模式, 将无法愉快的使用爬虫.
-2. 某些用户环境下滚动乱跳问题.(完全无法重现, 一脸懵逼中)
-
-## TODO-LIST
-1. 下载, 打包zip
-2. 多tag交集订阅
-3. 添加错误提示, 方便用户高效反馈
-4. 在缩略图上方加一个开启按钮, 不直接跳转
-
 ## 项目结构
 ```
 |-eHunter
