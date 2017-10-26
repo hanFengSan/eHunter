@@ -15,7 +15,7 @@
             <!-- 150px is $album-view-width -->
             <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
-                <div class="album-thumb" v-if="thumbBackground && imgInfo.loadStatus!=loadStatus.loaded">
+                <div class="album-thumb" :style="{'z-index': `${imgInfo.loadStatus==loadStatus.error?'-2':'0'}`}" v-if="thumbBackground && imgInfo.loadStatus!=loadStatus.loaded">
                     <img :src="thumbs[index].url" :style="{left: `calc(calc(${widthScale}vw - 145px) * -${thumbs[index].offset/100})`}" />
                 </div>
                 <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(index, $event)" @load="loaded(index)">
@@ -325,6 +325,7 @@
                     transform: translate(-50%, -50%);
                     color: $img_container_color;
                     font-size: 14px;
+                    text-align: center;
                     z-index: -1;
                 }
                 > .img-console-panel {
