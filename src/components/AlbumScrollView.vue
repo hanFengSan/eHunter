@@ -16,7 +16,7 @@
             <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
                 ref="imgContainers">
                 <div class="album-thumb" :style="{'z-index': `${imgInfo.loadStatus==loadStatus.error?'-2':'0'}`}" v-if="thumbBackground && imgInfo.loadStatus!=loadStatus.loaded">
-                    <img :src="thumbs[index].url" :style="{left: `calc(calc(${widthScale}vw - 145px) * -${thumbs[index].offset/100})`}" />
+                    <img :src="thumbs[index].url" :style="{height: `calc(calc(${widthScale}vw - 150px)*${thumbs[index].height?thumbs[index].height/100:1.41})`,left: `calc(calc(${widthScale}vw - 150px) * -${thumbs[index].offset/100})`}" @load="onThumbLoad($event, thumbs[index])" />
                 </div>
                 <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(index, $event)" @load="loaded(index)">
                 <div class="index">{{ index + 1 }}</div>
@@ -26,7 +26,7 @@
                     <div class="loading-info" v-if="imgInfo.loadStatus==loadStatus.error">图片加载失败, 请在图片框右下角点击刷新按钮重新尝试</div>
                 </div>
                  <div class="img-console-panel" v-if="imgInfo.loadStatus!=loadStatus.loaded">
-                    <div class="tips loading-tip" v-if="imgInfo.loadStatus!=loadStatus.error">
+                    <div class="loading-tip" v-if="imgInfo.loadStatus!=loadStatus.error">
                         <svg t="1509020077859" class="spin" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" p-id="2585" xmlns:xlink="http://www.w3.org/1999/xlink">
                             <path d="M512 38.9 512 38.9c0 19.5 15 35.8 34.4 37.3 46.9 3.6 92.4 14.7 135.7 33 52.1 22 98.8 53.5 139 93.7s71.7 86.9 93.7 139c18.3 43.3 29.4 88.8 33 135.7 1.5 19.4 17.8 34.4 37.3 34.4l0 0c21.7 0 39-18.5 37.3-40.1C1003 221.1 802.9 21 552.1 1.6 530.5-0.1 512 17.1 512 38.9z"></path>
                         </svg>
@@ -152,6 +152,7 @@
                 AlbumCacheService.instance
                     .getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
                     .then(thumbs => {
+                        thumbs = thumbs.map((i) => Object.assign({}, i, {height:''}));
                         this.thumbs = thumbs;
                     });
             },
@@ -190,6 +191,12 @@
 
             onScrollStopped(position) {
                 this.scrollTop = position;
+            },
+
+            onThumbLoad(e, thumb) {
+                var img = e.path[0];
+                var imgHeight = e.path[0].naturalHeight || '';
+                thumb.height = imgHeight;
             },
 
             // block some weird actions in eh page
@@ -398,14 +405,14 @@
                 }
                 > .album-thumb {
                     position: absolute;
-                    left: 0;
-                    right: 0;
-                    top: 0;
-                    bottom: 0;
+                    left: 4px;
+                    right: 4px;
+                    top: 4px;
+                    bottom: 4px;
                     overflow: hidden;
 
                     >img {
-                        height: 100%;
+                        // height: 100%;
                         position: absolute;
                     }
                 }
