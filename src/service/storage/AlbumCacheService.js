@@ -80,7 +80,7 @@ class AlbumCacheService {
     async getThumbs(albumId, introUrl, sumOfPage) {
         let album = await this._getAlbum(albumId);
         if (album.thumbs.length > 0) {
-            console.log('read thumbs from cache');
+            L.o('Process', 'read thumbs from cache');
             return JSON.parse(JSON.stringify(album.thumbs));
         } else {
             try {
@@ -89,7 +89,6 @@ class AlbumCacheService {
                 let thumbs = introPage.getThumbObjList(sumOfPage, albumId);
                 album.thumbs = thumbs;
                 this._album.thumbs = thumbs; // wired
-                L.o('thumbs', JSON.parse(JSON.stringify(this._album)));
                 await this._saveAlbum(albumId);
                 return JSON.parse(JSON.stringify(album.thumbs));
             } catch (e) {
@@ -102,13 +101,12 @@ class AlbumCacheService {
     async getImgInfos(albumId, introUrl, sumOfPage) {
         let album = await this._getAlbum(albumId);
         if (album.imgInfos.length > 0) {
-            console.log('read imgInfos from cache');
+            L.o('Process', 'read imgInfos from cache');
             return JSON.parse(JSON.stringify(album.imgInfos));
         } else {
             try {
                 let imgInfos = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
                 album.imgInfos = imgInfos;
-                L.o('imgInfos', JSON.parse(JSON.stringify(this._album)));
                 await this._saveAlbum(albumId);
                 return JSON.parse(JSON.stringify(album.imgInfos));
             } catch (e) {
