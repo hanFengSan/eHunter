@@ -56,7 +56,6 @@ function createListener() {
 function init() {
     if (isAlbumViewPage()) {
         SettingService.instance.getSettingItem('toggleEHunter', (active) => {
-            console.log(active);
             if (active) {
                 createEHunterView();
                 createVueView();

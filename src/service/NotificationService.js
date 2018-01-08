@@ -21,15 +21,10 @@ class NotificationService {
         this.log('NotiService run');
         window.setInterval(() => {
             this.time += 10;
-            // this.log('NotiService loop: time:');
-            // console.log(this.time);
             this._syncSubs()
                 .then(() => {
                     this._initRequestUrl();
                     this._request();
-                    // this.log('tags, requestUrl');
-                    // console.log(this.subscribedTagList);
-                    // console.log(this.requestList);
                 });
         }, 10 * 60 * 1000); // 10 mins
     }
@@ -89,17 +84,13 @@ class NotificationService {
                         this.requestList.forEach(url => this._compare(notiStorage, url, map.get(url)));
                         this._noti();
                     });
-            }, err => console.log(err));
+            }, err => console.error(err));
     }
 
     _compare(notiStorage, url, html) {
-        // this.log('compare');
         const tag = this.subscribedTagList[this.requestList.indexOf(url)];
         let oldResults = notiStorage.getResultsByName(tag.name);
         let newResults = new SearchHtmlParser(html).getResultTitles();
-        // this.log('old, new');
-        // console.log(oldResults);
-        // console.log(newResults);
         let diffs = [];
         // get new items
         if (oldResults.length > 0) {
@@ -119,8 +110,6 @@ class NotificationService {
                     instance.putItem(tag.name, newResults);
                 })
         }
-        // this.log('diff');
-        // console.log(diffs);
         // create notification
         if (diffs.length > 0 && oldResults.length !== 0) {
             this.notiList.push({

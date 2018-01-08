@@ -40,11 +40,7 @@
         },
 
         created() {
-            // set Cookie for small thumb, important, but it is not work in content script. wired
-            // this.initCookie()
-                // .then(() => {
             this.initImgList();
-                // });
         },
 
         computed: {
@@ -54,12 +50,6 @@
         },
 
         watch: {
-            // centerIndex() {
-            //     if (this.curIndex !== this.centerIndex && !this.hover) {
-            //         this.curIndex = this.centerIndex;
-            //         this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
-            //     }
-            // },
             centerIndex: {
                 handler: function(val, oldVal) {
                     if (this.curIndex !== this.centerIndex && !this.hover) {
@@ -79,38 +69,6 @@
             select(index) {
                 this.curIndex = index;
                 this.setIndex(index);
-            },
-
-            initCookie() {
-                return new Promise((resolve, reject) => {
-                    chrome.cookies.set({
-                        url: 'exhentai.org',
-                        name: 'uconfig',
-                        value: 'dm_t'
-                    }, cookie => {
-                        console.log(cookie);
-                        resolve();
-                    });
-                });
-            },
-
-            deleteCookie(url, name, store, callback) {
-                // console.log("Delete URL: "+url+" | NAME: "+name+" |");
-                /* eslint-disable no-undef */
-                chrome.cookies.remove({
-                    'url': url,
-                    'name': name,
-                    'storeId': store
-                }, function(details) {
-                    if (typeof callback === 'undefined') {
-                        return;
-                    }
-                    if (details === null || details === undefined || details === 'undefined') {
-                        callback(false);
-                    } else {
-                        callback(true);
-                    }
-                })
             },
 
             initImgList() {

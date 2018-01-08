@@ -46,7 +46,7 @@ class TextReqService {
     }
 
     _printErrorLog(err) {
-        console.log(`TextReqService: request error in ${this.url}, retry:(${this.curRetryTimes}/${this.retryTimes}), error: ${err}`);
+        console.error(`TextReqService: request error in ${this.url}, retry:(${this.curRetryTimes}/${this.retryTimes}), error: ${err}`);
     }
 
     _request(successCallback, failureCallback) {
@@ -58,7 +58,7 @@ class TextReqService {
         }).then(res => {
             successCallback(res);
         }, err => {
-            console.log(err);
+            console.error(err);
             this._printErrorLog(err);
             if (this.curRetryTimes < this.retryTimes) {
                 setTimeout(() => {

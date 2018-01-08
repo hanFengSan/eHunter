@@ -1,15 +1,16 @@
 import Storage from 'react-native-storage';
+import Logger from '../../../utils/Logger';
 
 function wrapStorageArea(storageArea) {
     return {
         async getItem(key) {
             return new Promise((resolve, reject) => {
-                console.log(`get ${key}`);
+                Logger.logText('Storage', `get ${key}`);
                 storageArea.get(key, (val) => {
                     if (typeof val[key] !== 'undefined') {
                         resolve(val[key]);
                     } else {
-                        console.log(`This key--${key} doesn't exist`);
+                        Logger.logText('Storage', `This key--${key} doesn't exist`);
                         resolve(null);
                     }
                 })
@@ -20,7 +21,7 @@ function wrapStorageArea(storageArea) {
                 storageArea.set({
                     [key]: val
                 }, () => {
-                    console.log(`chrome saved ${key}`);
+                    Logger.logText('Storage', `chrome saved ${key}`);
                     resolve();
                 });
             });
@@ -28,7 +29,7 @@ function wrapStorageArea(storageArea) {
         async removeItem(key) {
             return new Promise((resolve, reject) => {
                 storageArea.remove(key, () => {
-                    console.log(`chrome removed ${key}`);
+                    Logger.logText('Storage', `chrome removed ${key}`);
                     resolve();
                 })
             });

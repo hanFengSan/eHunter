@@ -1,8 +1,12 @@
 class Logger {
-    o(name, data) {
-        console.log('TAG: ' + name);
-        console.log(data);
-        console.log('----------');
+    logText(tag, text) {
+        console.log(`%c[${tag}] %c${text}`, 'color:red', 'color:black');
+    }
+
+    logObj(tag, obj, str = false) {
+        this.logText(tag, ':');
+        console.log(str ? JSON.parse(JSON.stringify(obj)) : obj);
+        this.logText(tag, '----------');
     }
 }
 

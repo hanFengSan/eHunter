@@ -46,6 +46,7 @@
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
     import AwesomeScrollView from './base/AwesomeScrollView.vue'
+    import Logger from '../utils/Logger.js'
 
     export default {
         name: 'AlbumScrollView',
@@ -216,10 +217,10 @@
                 e.preventDefault();
                 if (this.imgInfoList[index].src) {
                     this.imgInfoList[index].loadStatus = this.loadStatus.error;
-                    console.log('加载图片失败, load image failed');
+                    Logger.logText('LOADING', 'loading image failed');
                     if (this.imgInfoList[index].isFirstLoad) { // auto request src when first loading is failed
                         this.imgInfoList[index].isFirstLoad = false;
-                        console.log('重新加载图片, reloading');
+                        Logger.logText('LOADING', 'reloading image');
                         this.getNewImgSrc(index);
                     }
                 }

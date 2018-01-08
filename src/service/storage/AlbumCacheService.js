@@ -6,7 +6,8 @@ import IntroHtmlParser from '../parser/IntroHtmlParser.js'
 import * as API from '../api.js'
 import storage from 'src/service/storage/LocalStorage'
 import Platform from 'src/service/PlatformService'
-import L from 'src/utils/Logger'
+import Logger from 'src/utils/Logger'
+import DateWrapper from '../../utils/DateWrapper'
 
 /*
 storage
@@ -80,11 +81,20 @@ class AlbumCacheService {
     async getThumbs(albumId, introUrl, sumOfPage) {
         let album = await this._getAlbum(albumId);
         if (album.thumbs.length > 0) {
-            L.o('Process', 'read thumbs from cache');
+            Logger.logText('CacheService', 'read thumbs from cache');
             return JSON.parse(JSON.stringify(album.thumbs));
         } else {
             try {
-                let text = await (new TextReqService(API.getIntroHtml(introUrl, 1))).request();
+                let text;
+                // compatible with large mode
+                if (document.cookie.includes('uconfig=dm_t-ts_l')) {
+                    document.cookie = 'uconfig=dm_t; path=/; domain=.exhentai.org';
+                    text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
+                    document.cookie = 'uconfig=dm_t-ts_l; path=/; domain=.exhentai.org; expires=' +
+                        new DateWrapper().addYears(10).toGMTString();
+                } else {
+                    text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
+                }
                 let introPage = new IntroHtmlParser(text);
                 let thumbs = introPage.getThumbObjList(sumOfPage, albumId);
                 album.thumbs = thumbs;
@@ -92,7 +102,7 @@ class AlbumCacheService {
                 await this._saveAlbum(albumId);
                 return JSON.parse(JSON.stringify(album.thumbs));
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 // TODO: show tips for the error
             }
         }
@@ -101,7 +111,7 @@ class AlbumCacheService {
     async getImgInfos(albumId, introUrl, sumOfPage) {
         let album = await this._getAlbum(albumId);
         if (album.imgInfos.length > 0) {
-            L.o('Process', 'read imgInfos from cache');
+            Logger.logText('CacheService', 'read imgInfos from cache');
             return JSON.parse(JSON.stringify(album.imgInfos));
         } else {
             try {
@@ -110,7 +120,7 @@ class AlbumCacheService {
                 await this._saveAlbum(albumId);
                 return JSON.parse(JSON.stringify(album.imgInfos));
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 // TODO: show tips for the error
             }
         }
@@ -135,7 +145,7 @@ class AlbumCacheService {
                 await this._saveAlbum(albumId);
                 return album.imgInfos[index].src;
             } catch (e) {
-                console.log(e);
+                console.error(e);
                 // TODO: show tips for the error
             }
         }
