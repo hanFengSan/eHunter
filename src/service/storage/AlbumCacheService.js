@@ -5,6 +5,7 @@ import ImgUrlListParser from '../parser/ImgUrlListParser.js'
 import IntroHtmlParser from '../parser/IntroHtmlParser.js'
 import * as API from '../api.js'
 import storage from 'src/service/storage/LocalStorage'
+import Platform from 'src/service/PlatformService'
 import L from 'src/utils/Logger'
 
 /*
@@ -24,32 +25,30 @@ storage
 
 class AlbumCacheService {
     constructor() {
-        this.version = '2.4';
+        this.version = '2.0';
         this.storageName = 'AlbumCache';
         this.storageVersionName = 'AlbumCacheVersion';
-        this.initStorage();
-        // TODO: migrate
+        this._initStorage();
+        this._migrate();
     }
 
-    // async migrate() {
-    //     // remove version < 2.0
-    //     await Platform.storage.local.get('cache', async(value) => {
-    //         if (typeof value['cache'] !== 'undefined') {
-    //             await Platform.storage.local.remove('cache', () => {});
-    //             await Platform.storage.local.remove('cacheVersion', () => {});
-    //         }
-    //     });
-    //     // remove old version >= 2.0
-    //     console.log('migrate1');
-    //     let version = await storage.load({ key: this.storageVersionName });
-    //     await storage.save({ key: this.storageVersionName, data: this.version });
-    //     if (version !== this.version) {
-    //         await storage.clearMapForKey(this.storageName);
-    //         console.log('migrate2');
-    //     }
-    // }
+    async _migrate() {
+        // remove version < 2.0
+        await Platform.storage.local.get('cache', async(value) => {
+            if (typeof value['cache'] !== 'undefined') {
+                await Platform.storage.local.remove('cache', () => {});
+                await Platform.storage.local.remove('cacheVersion', () => {});
+            }
+        });
+        // remove old version >= 2.0
+        let version = await storage.load({ key: this.storageVersionName });
+        await storage.save({ key: this.storageVersionName, data: this.version });
+        if (version !== this.version) {
+            await storage.clearMapForKey(this.storageName);
+        }
+    }
 
-    initStorage() {
+    _initStorage() {
         storage.sync[this.storageName] = (params) => {
             let { resolve } = params;
             resolve({
