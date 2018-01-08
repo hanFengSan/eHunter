@@ -28,10 +28,18 @@ module.exports = {
                 }
             },
             {
-              test: /\.js$/,
-              loader: 'babel-loader',
-              exclude: /node_modules/
-            },
+                test: /\.js$/,
+                loader: 'babel-loader',
+                include: [
+                  resolve('node_modules/react-native-storage')
+                ],
+                query: {
+                  cacheDirectory: true,
+                  presets: ['es2015', 'stage-1', 'react'],
+                  plugins: ['transform-runtime']
+                }
+                // exclude: /node_modules/
+              },
             {
                 test: /\.(png|jpg|gif|svg)$/,
                 loader: 'file-loader',

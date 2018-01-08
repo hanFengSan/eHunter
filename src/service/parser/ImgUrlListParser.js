@@ -10,7 +10,6 @@ class ImgUrlListParser {
         this.ThumbSumPerPage = 40;
         this.sumOfIntroPage = this._getSumOfIntroPage(sumOfImgPage);
         this.introPageUrls = this._getIntroPageUrls();
-        console.log(sumOfImgPage);
     }
 
     request() {

@@ -114,11 +114,9 @@
             },
 
             initImgList() {
-                AlbumCacheService.instance
+                AlbumCacheService
                     .getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
                     .then(thumbs => {
-                        console.log('thumbs');
-                        console.log(thumbs);
                         this.thumbs = thumbs;
                     });
             }

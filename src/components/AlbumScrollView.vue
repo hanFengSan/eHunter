@@ -126,7 +126,7 @@
                 'setIndex'
             ]),
             initImgInfoList() {
-                AlbumCacheService.instance
+                AlbumCacheService
                     .getImgInfos(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
                     .then(imgInfoList => {
                         this.imgInfoList = imgInfoList.map(i => {
@@ -144,7 +144,7 @@
             getImgSrc(index) {
                 // avoid redundant getImgSrc(), overlap refreshing of 'origin'
                 if (this.imgInfoList[index].loadStatus !== this.loadStatus.loading) {
-                    AlbumCacheService.instance
+                    AlbumCacheService
                         .getImgSrc(this.parser.getAlbumId(), index)
                         .then(src => {
                             if (this.imgInfoList[index].src !== src) {
@@ -159,7 +159,7 @@
             getNewImgSrc(index, mode) {
                 this.imgInfoList[index].src = '';
                 this.imgInfoList[index].loadStatus = this.loadStatus.loading;
-                AlbumCacheService.instance
+                AlbumCacheService
                     .getNewImgSrc(this.parser.getAlbumId(), index, mode)
                     .then(src => {
                         this.imgInfoList[index].src = src;
@@ -213,13 +213,15 @@
             },
 
             failLoad(index, e) {
-                this.imgInfoList[index].loadStatus = this.loadStatus.error;
-                console.log('加载图片失败, load image failed');
                 e.preventDefault();
-                if (this.imgInfoList[index].isFirstLoad) { // auto request src when first loading is failed
-                    this.imgInfoList[index].isFirstLoad = false;
-                    console.log('重新加载图片, reloading');
-                    this.getNewImgSrc(index);
+                if (this.imgInfoList[index].src) {
+                    this.imgInfoList[index].loadStatus = this.loadStatus.error;
+                    console.log('加载图片失败, load image failed');
+                    if (this.imgInfoList[index].isFirstLoad) { // auto request src when first loading is failed
+                        this.imgInfoList[index].isFirstLoad = false;
+                        console.log('重新加载图片, reloading');
+                        this.getNewImgSrc(index);
+                    }
                 }
             },
 
