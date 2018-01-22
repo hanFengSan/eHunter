@@ -17,6 +17,7 @@
             </div>
             <div class="inner-content">
                 <div class="item">
+                    <span class="label">画面比例:</span>
                     <drop-option :list="scaleList" :change="scaleChange" :cur-val="scale + '%'"></drop-option>
                     <pop-slider 
                         :active="showScaleSlider" 
@@ -126,6 +127,10 @@ div {
     > .item {
       margin-left: 22px;
       position: relative;
+      > .label {
+          font-size: 14px;
+          margin: auto;
+      }
     }
   }
 }
