@@ -1,11 +1,15 @@
 // color
 $primary_color: hsl(145, 63%, 49%);
 $split_grey: #DDDDDD;
-$accent_color: #af7ac5;
+$accent_color: hsl(145, 63%, 42%);
 $background_grey: #EEEEEE;
 $contrast_color: #f1c40f;
 $table_grey: #f7f7f7;
 $text_grey: #777777;
+$slider_track_bg: #bdbdbd;
+$slider_track_fill_color: hsl(145, 63%, 42%);
+$slider_thumb_color: hsl(145, 63%, 49%);
+$flat_button_primary_color: hsl(145, 63%, 49%);
 
 $body_bg: hsl(231, 6%, 22%);
 $img_container_color:hsl(231, 6%, 36%);
@@ -24,6 +28,6 @@ $header-height: 40px;
 // popup view
 $popup_primary_color: hsl(145, 63%, 49%);
 $popup_alternate_text_color: white;
-$popup_text_color: hsla(0, 0%, 0%,.67);
-$popup_secondary_text_color: hsla(0 , 0%, 0%, .54);
+$popup_text_color: hsla(0, 0%, 0%, .67);
+$popup_secondary_text_color: hsla(0, 0%, 0%, .54);
 $popup_addition_bg: hsla(0, 0%, 97%, 1);

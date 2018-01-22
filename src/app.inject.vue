@@ -63,6 +63,14 @@
         sans-serif;
     }
 
+    .clickable {
+        cursor: pointer;
+    }
+    
+    .no-select {
+        user-select: none;
+    }
+
     .tips {
         position: relative;
         &:hover {

@@ -1,19 +1,27 @@
 <template>
-    <div class="album-container" @click.stop="">
+    <div class="album-container">
+        <!-- loading view -->
         <div class="loading-container" v-if="imgInfoList.length === 0">
             <span class="loading">loading...</span>
             <p class="tip">
-                注意事项:<br>1.&nbsp;请在图册详情页(就是前面一页)上使用小图查看预览图, 即使用'normal'模式, 否则无法加载<br>
+                注意事项:<br>无<br>
             </p>
         </div>
+        <!-- top bar view -->
+        <TopBar class="top-bar" />
+        <!-- panel view -->
         <div class="panel">
             <h4 v-show="showPagination" class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>
-            <img title="全屏" @click="fullscreen()" class="focus icon" src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDIyIDIyIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMiAyMjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8Zz4KCTxnPgoJCTxwYXRoIGQ9Ik00LDE4aDE0VjRINFYxOHogTTYsNmgxMHYxMEg2VjZ6IiBmaWxsPSIjNTk1ZDYyIi8+CgkJPHBvbHlnb24gcG9pbnRzPSIyLDE2IDAsMTYgMCwyMiA2LDIyIDYsMjAgMiwyMCAgICIgZmlsbD0iIzU5NWQ2MiIvPgoJCTxwb2x5Z29uIHBvaW50cz0iMiwyIDYsMiA2LDAgMCwwIDAsNiAyLDYgICAiIGZpbGw9IiM1OTVkNjIiLz4KCQk8cG9seWdvbiBwb2ludHM9IjIwLDIwIDE2LDIwIDE2LDIyIDIyLDIyIDIyLDE2IDIwLDE2ICAgIiBmaWxsPSIjNTk1ZDYyIi8+CgkJPHBvbHlnb24gcG9pbnRzPSIxNiwwIDE2LDIgMjAsMiAyMCw2IDIyLDYgMjIsMCAgICIgZmlsbD0iIzU5NWQ2MiIvPgoJPC9nPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+CjxnPgo8L2c+Cjwvc3ZnPgo=" />
-        </div>        
+            <img title="全屏" @click="fullscreen()" class="focus icon" :src="image.fullScreen" />
+        </div>
+        <!-- scroll view -->
         <awesome-scroll-view ref="scrollView" class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
             <h1>{{ parser.getTitle() }}</h1>
             <!-- 150px is $album-view-width -->
-            <div class="img-container" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" v-for="(imgInfo,index) of imgInfoList"
+            <div class="img-container" 
+                :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" 
+                v-for="(imgInfo,index) of imgInfoList"
+                :key="imgInfo.pageUrl"
                 ref="imgContainers">
                 <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(index, $event)" @load="loaded(index)">
                 <div class="index">{{ index + 1 }}</div>
@@ -46,7 +54,9 @@
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
     import AwesomeScrollView from './base/AwesomeScrollView.vue'
+    import TopBar from './TopBar.vue'
     import Logger from '../utils/Logger.js'
+    import image from '../assets/img'
 
     export default {
         name: 'AlbumScrollView',
@@ -59,13 +69,15 @@
                 sumOfPage: '',
                 imgUrlMap: new Map(),
                 scrollTop: 0,
+                image,
                 loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() }, // status of img loading
                 nearbyRange: [-2, 3] // the range of necessary imgs, basing on curIndex
             }
         },
 
         components: {
-            AwesomeScrollView
+            AwesomeScrollView,
+            TopBar
         },
 
         computed: {
@@ -256,6 +268,13 @@
                 font-size: 16px;
             }
         }
+        > .top-bar {
+            position: absolute;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
         > .panel {
             position: absolute;
             bottom: 5px;
@@ -289,10 +308,11 @@
             position: relative;
             height: 100vh;
             h1 {
-                color: $title_color;
+                color: #c9cacf;
                 padding: 10px 20px;
                 font-size: 18px;
                 text-align: center;
+                margin-top: 60px;
             }
             .img-container {
                 position: relative;
