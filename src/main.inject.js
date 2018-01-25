@@ -20,7 +20,7 @@ function createEHunterView() {
     element.style.height = '100%';
     element.style.width = '100%';
     element.style.transition = 'all 2s ease';
-    element.style.background = '#34353b';
+    element.style.background = '#333333';
     element.style.zIndex = '10';
     element.style.top = '-100%';
     element.style.left = '0px';

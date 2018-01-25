@@ -29,6 +29,12 @@
                         :change="scaleSliderChange">
                     </pop-slider>
                 </div>
+                <div class="item">
+                    <span class="label">缩略图栏:</span>
+                    <div class="bar-switch">
+                        <simple-switch :init="showThumbView" :change="changeThumbView"></simple-switch>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -38,6 +44,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import DropOption from './widget/DropOption.vue';
 import PopSlider from './widget/PopSlider.vue';
+import SimpleSwitch from './widget/SimpleSwitch.vue';
 
 export default {
     name: 'TopBar',
@@ -53,11 +60,12 @@ export default {
                 { name: '100%', val: 100 },
                 { name: '自定义', val: -1 }
             ],
-            showScaleSlider: false
+            showScaleSlider: false,
+            showThumbView: true
         };
     },
 
-    components: { DropOption, PopSlider },
+    components: { DropOption, PopSlider, SimpleSwitch },
 
     computed: {
         ...mapGetters({})
@@ -82,6 +90,10 @@ export default {
 
         closePopSlider() {
             this.showScaleSlider = false;
+        },
+
+        changeThumbView(show) {
+            this.showThumbView = show;
         }
     }
 };
@@ -130,6 +142,9 @@ div {
       > .label {
           font-size: 14px;
           margin: auto;
+      }
+      > .bar-switch {
+
       }
     }
   }

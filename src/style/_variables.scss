@@ -6,12 +6,18 @@ $background_grey: #EEEEEE;
 $contrast_color: #f1c40f;
 $table_grey: #f7f7f7;
 $text_grey: #777777;
+
 $slider_track_bg: #bdbdbd;
 $slider_track_fill_color: hsl(145, 63%, 42%);
 $slider_thumb_color: hsl(145, 63%, 49%);
 $flat_button_primary_color: hsl(145, 63%, 49%);
 
-$body_bg: hsl(231, 6%, 22%);
+$switch_track_disabled_color: #bdbdbd;
+$switch_track_enabled_color: #71ca96;
+$switch_thumb_disabled_color: #f5f5f5;
+$switch_thumb_enabled_color: #006548;
+
+$body_bg: #333333; // directly use in app.inject.js
 $img_container_color:hsl(231, 6%, 36%);
 $title_color:hsl(231, 6%, 80%);
 
@@ -20,7 +26,7 @@ $thumb-view-width: 150px;
 $thumb-view-height: 160px;
 $indicator_color: white;
 $thumb-width: 100px;
-$thumb_scroll_view_bg: hsl(231, 6%, 27%);
+$thumb_scroll_view_bg: #444444;
 $thumb-view-margin: 4px;
 $header-bg: #2ecc71;
 $header-height: 40px;
