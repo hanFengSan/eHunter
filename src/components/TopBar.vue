@@ -2,20 +2,10 @@
     <div>
         <div class="container">
             <div class="float-content">
-                <div class="button menu">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                    </svg>
-                </div>
-                <div class="button close">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        <path d="M0 0h24v24H0z" fill="none"/>
-                    </svg>
-                </div>
+                <circle-icon-button class="button" icon="menu" :rotate="true" :init-rotation="true" @click="changeTopBar"></circle-icon-button>
+                <circle-icon-button class="button" icon="close" :rotate="true"></circle-icon-button>
             </div>
-            <div class="inner-content">
+            <div :class="['inner-content', { hide: !showTopBar }]">
                 <div class="item">
                     <span class="label">画面比例:</span>
                     <drop-option :list="scaleList" :change="scaleChange" :cur-val="scale + '%'"></drop-option>
@@ -45,12 +35,16 @@ import { mapGetters, mapActions } from 'vuex';
 import DropOption from './widget/DropOption.vue';
 import PopSlider from './widget/PopSlider.vue';
 import SimpleSwitch from './widget/SimpleSwitch.vue';
+import CircleIconButton from './/widget/CircleIconButton.vue';
 
 export default {
     name: 'TopBar',
 
+    components: { DropOption, PopSlider, SimpleSwitch, CircleIconButton },
+
     data() {
         return {
+            showTopBar: true,
             scale: 80,
             scaleList: [
                 { name: '40%', val: 40 },
@@ -64,8 +58,6 @@ export default {
             showThumbView: true
         };
     },
-
-    components: { DropOption, PopSlider, SimpleSwitch },
 
     computed: {
         ...mapGetters({})
@@ -94,6 +86,10 @@ export default {
 
         changeThumbView(show) {
             this.showThumbView = show;
+        },
+
+        changeTopBar() {
+            this.showTopBar = !this.showTopBar;
         }
     }
 };
@@ -114,19 +110,9 @@ div {
     right: 0;
     height: 40px;
     align-items: center;
+    z-index: 10;
     > .button {
-      height: 26px;
-      width: 26px;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 50%;
-      justify-content: center;
-      align-items: center;
-      margin-right: 13px;
-      > svg {
-        fill: rgba(255, 255, 255, 0.9);
-        height: 18px;
-        width: 18px;
-      }
+        margin-right: 13px;
     }
   }
 
@@ -136,6 +122,7 @@ div {
     flex-grow: 1;
     background: $accent_color;
     font-size: 14px;
+    transition: all 0.4s cubic-bezier(.62,-0.62,.28,1.55);
     > .item {
       margin-left: 22px;
       position: relative;
@@ -146,6 +133,10 @@ div {
       > .bar-switch {
 
       }
+    }
+    &.hide {
+        // margin-top: -40px; // the top-bar height
+        transform: translateY(-100%);
     }
   }
 }

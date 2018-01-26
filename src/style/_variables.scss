@@ -17,6 +17,13 @@ $switch_track_enabled_color: #71ca96;
 $switch_thumb_disabled_color: #f5f5f5;
 $switch_thumb_enabled_color: #006548;
 
+$top_bar_float_btn_bg: rgba(0, 0, 0, 0.5);
+$top_bar_float_btn_icon_color: rgba(255, 255, 255, 0.9);
+$top_bar_float_btn_hover_bg: rgba(255, 255, 255, 0.9);
+$top_bar_float_btn_hover_icon_color: rgba(0, 0, 0, 0.5);
+$top_bar_float_btn_active_bg: rgba(255, 255, 255, 0.2);
+$top_bar_float_btn_active_icon_color: rgba(0, 0, 0, 0.5);
+
 $body_bg: #333333; // directly use in app.inject.js
 $img_container_color:hsl(231, 6%, 36%);
 $title_color:hsl(231, 6%, 80%);
