@@ -14,8 +14,6 @@
 </template>
 
 <script>
-import Logger from '../../utils/Logger.js';
-
 export default {
     name: 'CircleIconButton',
 
@@ -49,7 +47,6 @@ export default {
         handleClick(e) {
             if (this.rotate) {
                 this.showRotation = !this.showRotation;
-                Logger.logText('Button', this.showRotation);
             }
             this.$emit('click', e);
         }

@@ -66,7 +66,7 @@
 </template>
 
 <script>
-    import SettingService from 'src/service/SettingService.js'
+    // import SettingService from 'src/service/SettingService.js'
     import Notification from 'src/components/Notification.vue'
 
     export default {
@@ -115,31 +115,31 @@
             // },
             'read.viewScale': {
                 handler: function(val, oldVal) {
-                    SettingService.instance.setSettingItem('setAlbumWidth', this.read.viewScale);
+                    // SettingService.instance.setSettingItem('setAlbumWidth', this.read.viewScale);
                 },
                 deep: true
             },
             'read.eHunterView': {
                 handler: function(val, oldVal) {
-                    SettingService.instance.setSettingItem('toggleEHunter', this.read.eHunterView);
+                    // SettingService.instance.setSettingItem('toggleEHunter', this.read.eHunterView);
                 },
                 deep: true
             },
             'read.thumbView': {
                 handler: function(val, oldVal) {
-                    SettingService.instance.setSettingItem('toggleThumbView', this.read.thumbView);
+                    // SettingService.instance.setSettingItem('toggleThumbView', this.read.thumbView);
                 },
                 deep: true
             },
             'read.paginationView': {
                 handler: function(val, oldVal) {
-                    SettingService.instance.setSettingItem('showPagination', this.read.paginationView);
+                    // SettingService.instance.setSettingItem('showPagination', this.read.paginationView);
                 },
                 deep: true
             },
             'read.syncScroll': {
                 handler: function(val, oldVal) {
-                    SettingService.instance.setSettingItem('toggleSyncScroll', this.read.syncScroll);
+                    // SettingService.instance.setSettingItem('toggleSyncScroll', this.read.syncScroll);
                 },
                 deep: true
             }
@@ -152,21 +152,21 @@
 
         methods: {
             initValues() {
-                SettingService.instance.getSettingItem('toggleEHunter', (val) => {
-                    this.read.eHunterView = val;
-                });
-                SettingService.instance.getSettingItem('setAlbumWidth', (val) => {
-                    this.read.viewScale = val;
-                });
-                SettingService.instance.getSettingItem('showPagination', (val) => {
-                    this.read.paginationView = val;
-                });
-                SettingService.instance.getSettingItem('toggleThumbView', (val) => {
-                    this.read.thumbView = val;
-                });
-                SettingService.instance.getSettingItem('toggleSyncScroll', (val) => {
-                    this.read.syncScroll = val;
-                });
+                // SettingService.instance.getSettingItem('toggleEHunter', (val) => {
+                //     this.read.eHunterView = val;
+                // });
+                // SettingService.instance.getSettingItem('setAlbumWidth', (val) => {
+                //     this.read.viewScale = val;
+                // });
+                // SettingService.instance.getSettingItem('showPagination', (val) => {
+                //     this.read.paginationView = val;
+                // });
+                // SettingService.instance.getSettingItem('toggleThumbView', (val) => {
+                //     this.read.thumbView = val;
+                // });
+                // SettingService.instance.getSettingItem('toggleSyncScroll', (val) => {
+                //     this.read.syncScroll = val;
+                // });
             },
             handleTabChange (val) {
                 this.activeTab = val

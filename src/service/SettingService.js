@@ -1,110 +1,100 @@
-// a service for setting, getting and storing settings
-/* eslint-disable no-undef */
-import Platform from './PlatformService'
+import storage from './storage/LocalStorage';
+import store from '../store/index.inject';
 
-const singleton = Symbol();
-const singletonEnforcer = Symbol();
-
-class SettingListener {
-    constructor(enforcer) {
-        if (enforcer !== singletonEnforcer) throw new Error('throw cannot construct singleton');
+class SettingService {
+    constructor() {
+        this.version = '2.0';
+        this.storageName = 'Settings';
+        this.storageVersionName = 'SettingsVersion';
+        this._initStorage();
+        this._migrate();
     }
 
-    static get instance() {
-        if (!this[singleton]) {
-            this[singleton] = new SettingListener(singletonEnforcer);
-            this[singleton].eventBus = {};
-            // default setting values
-            this[singleton].initialSettings = {
-                toggleEHunter: true,
-                showPagination: true,
-                toggleThumbView: true,
-                toggleSyncScroll: true
+    _getDefaultSettings() {
+        return {
+            setAlbumWidth: 80,
+            toggleEHunter: true,
+            toggleThumbView: true
+        }
+    }
+
+    async _migrate() {
+        // // remove version < 2.0
+        // await Platform.storage.local.get('cache', async(value) => {
+        //     if (typeof value['cache'] !== 'undefined') {
+        //         await Platform.storage.local.remove('cache', () => {});
+        //         await Platform.storage.local.remove('cacheVersion', () => {});
+        //     }
+        // });
+        // remove old version >= 2.0
+        let version = await storage.load({ key: this.storageVersionName });
+        await storage.save({ key: this.storageVersionName, data: this.version });
+        if (version !== this.version) {
+            await storage.clearMapForKey(this.storageName);
+        }
+    }
+
+    _initStorage() {
+        storage.sync[this.storageName] = (params) => {
+            let { resolve } = params;
+            resolve(this._getDefaultSettings());
+        };
+        storage.sync[this.storageVersionName] = (params) => {
+            let { resolve } = params;
+            return resolve(this.version);
+        };
+    }
+
+    async _setSettingItem(key, val) {
+        // send change to vuex
+        if (key !== 'toggleEHunter') { // the 'toggleEHunter' don't exist in vuex
+            store.dispatch(key, val);
+        }
+        // store change
+        let settings = await storage.load({ key: this.storageName });
+        settings[key] = val;
+        await storage.save({ key: this.storageName, data: settings });
+    }
+
+    async _getSettingItem(key) {
+        let settings = await storage.load({ key: this.storageName });
+        return settings[key];
+    }
+
+    async initSettings() {
+        let settings = await storage.load({ key: this.storageName });
+        for (let key in settings) {
+            if (key !== 'toggleEHunter') {
+                store.dispatch(key, settings[key]);
             }
         }
-        return this[singleton];
     }
 
-    // listen setting's change, and send action to content's vuex
-    listen(store) {
-        this._initSettings(store);
-        chrome.runtime.onMessage.addListener((msg, sender, response) => {
-            switch (msg.settingName) {
-                case 'setAlbumWidth':
-                    store.dispatch('setAlbumWidth', msg.value);
-                    break;
-                case 'toggleEHunter':
-                    if (document.getElementsByClassName('vue-container').length > 0) {
-                        document.body.style.overflow = msg.value ? 'hidden' : '';
-                        document.getElementsByClassName('vue-container')[0].style.top = msg.value ? '0' : '-100%';
-                    }
-                    break;
-                case 'showPagination':
-                    store.dispatch('showPagination', msg.value);
-                    break;
-                case 'toggleThumbView':
-                    store.dispatch('toggleThumbView', msg.value);
-                    break;
-                case 'toggleSyncScroll':
-                    store.dispatch('toggleSyncScroll', msg.value);
-            }
-            // eventBus
-            if (this.eventBus[msg.settingName]) {
-                this.eventBus[msg.settingName].forEach(callback => callback(msg.value));
-            }
-            response();
-        });
+    async setAlbumWidth(val) {
+        await this._setSettingItem('setAlbumWidth', val);
     }
 
-    setSettingItem(settingName, value, callback = () => {}) {
-        Platform.storage.sync.set({
-            [settingName]: value
-        }, () => {
-            this._sendSettingMsg(settingName, value, callback);
-            console.log(`chrome saved ${settingName}`);
-        });
+    async getAlbumWidth(val) {
+        return await this._getSettingItem('setAlbumWidth');
     }
 
-    getSettingItem(settingName, callback) {
-        Platform.storage.sync.get(settingName, (value) => {
-            if (typeof value[settingName] !== 'undefined') {
-                callback(value[settingName]);
-            } else if (typeof this.initialSettings[settingName] !== 'undefined') {
-                callback(this.initialSettings[settingName]);
-                // init is after first get in popupView
-                if (chrome.tabs) {
-                    this.setSettingItem(settingName, this.initialSettings[settingName]);
-                }
-            } else {
-                return null;
-            }
-        });
+    async toggleEHunter(val) {
+        await this._setSettingItem('toggleEHunter', val);
     }
 
-    onSettingChange(settingName, callback) {
-        if (!this.eventBus[settingName]) {
-            this.eventBus[settingName] = [];
-        }
-        this.eventBus[settingName].push(callback);
-        console.log(this.eventBus);
+    async getEHunterStatus(val) {
+        return await this._getSettingItem('toggleEHunter');
     }
 
-    _sendSettingMsg(settingName, value, callback = () => {}) {
-        /* eslint-disable no-undef */
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.tabs.sendMessage(
-                tabs[0].id, { settingName, value },
-                callback);
-        });
+    async toggleThumbView(val) {
+        await this._setSettingItem('toggleThumbView', val);
     }
 
-    _initSettings(store) {
-        // viewScale
-        this.getSettingItem('setAlbumWidth', (val) => store.dispatch('setAlbumWidth', val));
-        this.getSettingItem('showPagination', (val) => store.dispatch('showPagination', val));
-        this.getSettingItem('toggleThumbView', (val) => store.dispatch('toggleThumbView', val));
-        this.getSettingItem('toggleSyncScroll', (val) => store.dispatch('toggleSyncScroll', val));
+    async getThumbViewStatus(val) {
+        return await this._getSettingItem('toggleThumbView');
     }
+
 }
 
-export default SettingListener;
+let instance = new SettingService();
+export default instance;

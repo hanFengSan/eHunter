@@ -4,13 +4,62 @@ import VueResource from 'vue-resource'
 import App from './app.inject.vue'
 import store from './store/index.inject'
 import VueUtil from './utils/VueUtil.js'
-import SettingService from './service/SettingService.js'
+import SettingService from './service/SettingService';
+import { setTimeout } from 'timers';
 
 Vue.use(VueResource);
 Vue.mixin(VueUtil);
 
 function isAlbumViewPage() {
     return document.location.pathname.includes('/s/');
+}
+
+function createEhunterSwitch() {
+    let container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.justifyContent = 'center';
+    container.style.alignItems = 'center';
+    container.style.position = 'absolute';
+    container.style.right = '100px';
+    container.style.top = '-150px';
+    container.style.zIndex = '10';
+    container.style.cursor = 'pointer';
+    container.style.transition = 'all 0.2s cubic-bezier(.46,-0.23,.37,2.38)';
+    container.setAttribute('title', 'open eHunter');
+    container.setAttribute('id', 'switch');
+    container.addEventListener('click', openEhunter);
+
+    let line = document.createElement('span');
+    line.style.width = '2px';
+    line.style.height = '200px';
+    line.style.background = '#2ecc71';
+    line.style.boxShadow = '0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647)';
+    container.appendChild(line);
+
+    let ring = document.createElement('span');
+    ring.style.border = '2px solid #2ecc71';
+    ring.style.borderRadius = '50%';
+    ring.style.width = '15px';
+    ring.style.height = '15px';
+    ring.style.boxShadow = '0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647)';
+    container.appendChild(ring);
+
+    let i1 = document.getElementById('i1');
+    document.body.insertBefore(container, i1);
+}
+
+// when user click the ehunter switch
+function openEhunter() {
+    var element = document.querySelector('#switch');
+    element.style.top = '-50px';
+    window.setTimeout(() => {
+        element.style.top = '-150px';
+    }, 2000);
+    SettingService.toggleEHunter(true);
+    window.setTimeout(() => {
+        eHunter.toggleEHunterView(true);
+    }, 300);
 }
 
 function createEHunterView() {
@@ -49,25 +98,30 @@ function createVueView() {
     }
 }
 
-function createListener() {
-    SettingService.instance.listen(store);
-}
-
-function init() {
+// add ehunter switch etc.
+async function init() {
     if (isAlbumViewPage()) {
-        SettingService.instance.getSettingItem('toggleEHunter', (active) => {
-            if (active) {
-                createEHunterView();
-                createVueView();
-            } else {
-                SettingService.instance.onSettingChange('toggleEHunter', (active) => {
-                    init();
-                });
-            }
-        }, true);
-        createListener();
+        createEhunterSwitch();
+        if (await SettingService.getEHunterStatus()) {
+            eHunter.toggleEHunterView(true);
+        }
     }
 }
 
-init();
+// export some global function
+let eHunter = {
+    toggleEHunterView(val) {
+        if (document.getElementsByClassName('vue-container').length > 0) {
+            document.body.style.overflow = val ? 'hidden' : '';
+            document.getElementsByClassName('vue-container')[0].style.top = val ? '0' : '-100%';
+        } else {
+            createEHunterView();
+            createVueView();
+            SettingService.initSettings();
+        }
+    }
+}
 
+export default eHunter;
+
+init();

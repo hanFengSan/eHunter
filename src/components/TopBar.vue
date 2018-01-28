@@ -3,28 +3,30 @@
         <div class="container">
             <div class="float-content">
                 <circle-icon-button class="button" icon="menu" :rotate="true" :init-rotation="true" @click="changeTopBar"></circle-icon-button>
-                <circle-icon-button class="button" icon="close" :rotate="true"></circle-icon-button>
+                <circle-icon-button class="button" icon="close" :rotate="true" @click="closeEHunter"></circle-icon-button>
             </div>
             <div :class="['inner-content', { hide: !showTopBar }]">
-                <div class="item">
-                    <span class="label">画面比例:</span>
-                    <drop-option :list="scaleList" :change="scaleChange" :cur-val="scale + '%'"></drop-option>
-                    <pop-slider 
-                        :active="showScaleSlider" 
-                        :min="10" 
-                        :max="100" 
-                        :step="1" 
-                        :init="this.scale" 
-                        :close="closePopSlider" 
-                        :change="scaleSliderChange">
-                    </pop-slider>
-                </div>
-                <div class="item">
-                    <span class="label">缩略图栏:</span>
-                    <div class="bar-switch">
-                        <simple-switch :init="showThumbView" :change="changeThumbView"></simple-switch>
+                <template v-if="readSettings">
+                    <div class="item">
+                        <span class="label">画面比例:</span>
+                        <drop-option :list="scaleList" :change="scaleChange" :cur-val="scale + '%'"></drop-option>
+                        <pop-slider 
+                            :active="showScaleSlider" 
+                            :min="30" 
+                            :max="100" 
+                            :step="1" 
+                            :init="this.scale" 
+                            :close="closePopSlider" 
+                            :change="scaleSliderChange">
+                        </pop-slider>
                     </div>
-                </div>
+                    <div class="item">
+                        <span class="label">缩略图栏:</span>
+                        <div class="bar-switch">
+                            <simple-switch :init="showThumbView" :change="changeThumbView"></simple-switch>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -35,7 +37,9 @@ import { mapGetters, mapActions } from 'vuex';
 import DropOption from './widget/DropOption.vue';
 import PopSlider from './widget/PopSlider.vue';
 import SimpleSwitch from './widget/SimpleSwitch.vue';
-import CircleIconButton from './/widget/CircleIconButton.vue';
+import CircleIconButton from './widget/CircleIconButton.vue';
+import SettingService from '../service/SettingService.js';
+import eHunter from '../main.inject';
 
 export default {
     name: 'TopBar',
@@ -45,6 +49,7 @@ export default {
     data() {
         return {
             showTopBar: true,
+            readSettings: false,
             scale: 80,
             scaleList: [
                 { name: '40%', val: 40 },
@@ -57,6 +62,12 @@ export default {
             showScaleSlider: false,
             showThumbView: true
         };
+    },
+
+    async created() {
+        this.scale = await SettingService.getAlbumWidth();
+        this.showThumbView = await SettingService.getThumbViewStatus();
+        this.readSettings = true;
     },
 
     computed: {
@@ -73,11 +84,13 @@ export default {
                     break;
                 default:
                     this.scale = this.scaleList[index].val;
+                    SettingService.setAlbumWidth(this.scale);
             }
         },
 
         scaleSliderChange(val) {
             this.scale = val;
+            SettingService.setAlbumWidth(this.scale);
         },
 
         closePopSlider() {
@@ -86,10 +99,16 @@ export default {
 
         changeThumbView(show) {
             this.showThumbView = show;
+            SettingService.toggleThumbView(show);
         },
 
         changeTopBar() {
             this.showTopBar = !this.showTopBar;
+        },
+
+        closeEHunter() {
+            SettingService.toggleEHunter(false);
+            eHunter.toggleEHunterView(false);
         }
     }
 };
@@ -130,12 +149,8 @@ div {
           font-size: 14px;
           margin: auto;
       }
-      > .bar-switch {
-
-      }
     }
     &.hide {
-        // margin-top: -40px; // the top-bar height
         transform: translateY(-100%);
     }
   }

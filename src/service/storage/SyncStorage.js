@@ -2,10 +2,11 @@ import Storage from 'src/service/storage/base/Storage'
 import Platform from 'src/service/PlatformService'
 
 var storage = new Storage({
-    size: 100,
+    size: 10,
     storageBackend: Platform.storage.sync,
     defaultExpires: null,
-    enableCache: true
+    enableCache: true,
+    sync: {}
 });
 
 export default storage;
