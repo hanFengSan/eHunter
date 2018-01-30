@@ -2,11 +2,11 @@
     <div class="thumb-content">
         <awesome-scroll-view ref="scrollView" :is-hidden="true" class="thumb-scroll-view" @mouseenter="hover=true" @mouseleave="hover=false">
             <div class="header">
-                <span class="app-name">E-HUNTER</span>
+                <span class="app-name">EHUNTER</span>
             </div>
             <!-- 160 is $thumb-view-height -->
             <div class="indicator" :style="{top: px(160*curIndex)}"></div>
-            <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" ref="thumbContainers">
+            <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" :key="item.offset" ref="thumbContainers">
                 <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
                 <div class="hover-mask"></div>
                 <div class="index">{{ index + 1 }}</div>
