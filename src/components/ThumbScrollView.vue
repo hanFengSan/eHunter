@@ -52,9 +52,14 @@
         watch: {
             centerIndex: {
                 handler: function(val, oldVal) {
+                    // sync pagination
                     if (this.curIndex !== this.centerIndex && !this.hover) {
                         this.curIndex = this.centerIndex;
-                        this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
+                        if (this.curIndex !== 0) {
+                            this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
+                        } else {
+                            this.$refs.scrollView.ScrollTo(0, 1000); // if is page 1, scroll to top, cuz of having a header
+                        }
                     }
                 },
                 deep: true
