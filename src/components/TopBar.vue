@@ -2,7 +2,14 @@
     <div>
         <div class="container">
             <div class="float-content">
-                <circle-icon-button class="button" icon="menu" :rotate="true" :init-rotation="true" @click="changeTopBar"></circle-icon-button>
+                <circle-icon-button 
+                    ref="topBarButton" 
+                    class="button" 
+                    icon="menu" 
+                    :rotate="true" 
+                    :init-rotation="true" 
+                    @click="changeTopBar">
+                </circle-icon-button>
                 <circle-icon-button class="button" icon="close" :rotate="true" @click="closeEHunter"></circle-icon-button>
             </div>
             <div :class="['inner-content', { hide: !showTopBar }]">
@@ -48,7 +55,6 @@ export default {
 
     data() {
         return {
-            showTopBar: true,
             readSettings: false,
             scale: 80,
             scaleList: [
@@ -71,11 +77,18 @@ export default {
     },
 
     computed: {
-        ...mapGetters({})
+        ...mapGetters({ showTopBar: 'showTopBar' })
+    },
+
+    watch: {
+        // sync rotating status of topBarButton
+        showTopBar(newVal, oldVal) {
+            this.$refs.topBarButton.changeRotation(newVal);
+        }
     },
 
     methods: {
-        ...mapActions([]),
+        ...mapActions(['toggleTopBar']),
 
         scaleChange(index) {
             switch (this.scaleList[index].val) {
@@ -103,7 +116,7 @@ export default {
         },
 
         changeTopBar() {
-            this.showTopBar = !this.showTopBar;
+            this.toggleTopBar(!this.showTopBar);
         },
 
         closeEHunter() {

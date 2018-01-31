@@ -8,7 +8,7 @@
     // awesome scroll view for chrome(-webkit)
     // @author: Alex chen
     // @created: 2017-03-11
-    import BezierEasing from 'src/utils/bezier-easing.js'
+    import BezierEasing from 'src/utils/bezier-easing.js';
 
     export default {
         name: 'AwesomeScrollView',
@@ -40,6 +40,17 @@
             }
         },
 
+        watch: {
+            // watch scroll position about top, for showing/hiding topBar
+            lastKnownScrollPosition(newVal, oldVal) {
+                if (newVal === 0) {
+                    this.$emit('topIn');
+                } else if (oldVal === 0) {
+                    this.$emit('topLeave');
+                }
+            }
+        },
+
         methods: {
             detectScrollStop() {
                 window.clearTimeout(this.scrollTimeout);
@@ -67,9 +78,6 @@
                 let start;
                 const self = this;
                 const easing = BezierEasing(0.61, 0.29, 0.3, 0.97);
-                // const easing = BezierEasing(0.7, 0.11, 0.43, 0.97);
-                // const easing = BezierEasing(.72,.07,.3,.97);
-                // const easing = BezierEasing(.61,.29,.08,.98);
                 window.requestAnimationFrame(function step(timestamp) {
                     if (!start) start = timestamp;
                     var time = timestamp - start;

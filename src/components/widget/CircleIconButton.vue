@@ -49,6 +49,10 @@ export default {
                 this.showRotation = !this.showRotation;
             }
             this.$emit('click', e);
+        },
+        // api for parent
+        changeRotation(val) {
+            this.showRotation = val;
         }
     }
 }

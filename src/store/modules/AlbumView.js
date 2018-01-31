@@ -11,7 +11,8 @@ const state = {
     album: {
         width: 80, // percent
         pagination: true,
-        toggleSyncScroll: true
+        toggleSyncScroll: true,
+        showTopBar: true
     }
 }
 
@@ -22,7 +23,8 @@ const getters = {
     thumbWidth: state => state.thumb.width,
     showPagination: state => state.album.pagination,
     thumbView: state => state.thumb.thumbView,
-    toggleSyncScroll: state => state.album.toggleSyncScroll
+    toggleSyncScroll: state => state.album.toggleSyncScroll,
+    showTopBar: state => state.album.showTopBar
 }
 
 // actions
@@ -37,6 +39,9 @@ const actions = {
     },
     toggleSyncScroll: ({ commit }, isActive) => {
         commit(types.TOGGLE_SYNC_SCROLL, { isActive })
+    },
+    toggleTopBar: ({ commit }, show) => {
+        commit(types.TOGGLE_SHOW_TOP_BAR, { show })
     }
 }
 
@@ -56,6 +61,9 @@ const mutations = {
     },
     [types.TOGGLE_SYNC_SCROLL](state, { isActive }) {
         state.album.toggleSyncScroll = isActive;
+    },
+    [types.TOGGLE_SHOW_TOP_BAR](state, { show }) {
+        state.album.showTopBar = show;
     }
 }
 

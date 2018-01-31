@@ -15,7 +15,13 @@
             <img title="全屏" @click="fullscreen()" class="focus icon" :src="image.fullScreen" />
         </div>
         <!-- scroll view -->
-        <awesome-scroll-view ref="scrollView" class="scroll-view" v-if="imgInfoList.length > 0" :on-scroll-stopped="onScrollStopped">
+        <awesome-scroll-view 
+            ref="scrollView" 
+            class="scroll-view" 
+            v-if="imgInfoList.length > 0" 
+            :on-scroll-stopped="onScrollStopped" 
+            @topIn="toggleTopBar(true)"
+            @topLeave="toggleTopBar(false)">
             <h1>{{ parser.getTitle() }}</h1>
             <!-- 150px is $album-view-width -->
             <div class="img-container" 
@@ -136,7 +142,8 @@
 
         methods: {
             ...mapActions([
-                'setIndex'
+                'setIndex',
+                'toggleTopBar'
             ]),
             initImgInfoList() {
                 AlbumCacheService
