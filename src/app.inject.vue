@@ -86,6 +86,14 @@
                 min-width: 50px;
                 text-align: center;
                 background: rgba(0, 0, 0, 0.8);
+                box-shadow: 0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647);
+            }
+        }
+        &.tips-down {
+            &:hover {
+                &:after {
+                    top: 130%;
+                }
             }
         }
     }

@@ -15,7 +15,7 @@
             <div :class="['inner-content', { hide: !showTopBar }]">
                 <template v-if="readSettings">
                     <div class="item">
-                        <span class="label">画面比例:</span>
+                        <span class="label tips tips-down" title-content="设置画面比例">画面比例:</span>
                         <drop-option :list="widthList" :change="(val) => dropOptionChange('width', val)" :cur-val="width + '%'"></drop-option>
                         <pop-slider 
                             :active="showWidthSlider" 
@@ -28,7 +28,7 @@
                         </pop-slider>
                     </div>
                     <div class="item">
-                        <span class="label">加载页数/次:</span>
+                        <span class="label tips tips-down" title-content="设置过大将会对网络速度要求较高">加载页数/次:</span>
                         <drop-option :list="loadNumList" :change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum"></drop-option>
                         <pop-slider 
                             :active="showLoadNumSlider" 
@@ -41,7 +41,7 @@
                         </pop-slider>
                     </div>
                     <div class="item">
-                        <span class="label">缩略图栏:</span>
+                        <span class="label tips tips-down" title-content="开启/关闭左侧缩略图栏">缩略图栏:</span>
                         <div class="bar-switch">
                             <simple-switch :init="showThumbView" :change="changeThumbView"></simple-switch>
                         </div>
@@ -216,6 +216,8 @@ div {
       > .label {
           font-size: 14px;
           margin: auto;
+          white-space: nowrap;
+          cursor: default;
       }
     }
     &.hide {
