@@ -1,6 +1,6 @@
 <template>
     <div class="thumb-content">
-        <awesome-scroll-view ref="scrollView" :is-hidden="true" class="thumb-scroll-view" @mouseenter="hover=true" @mouseleave="hover=false">
+        <awesome-scroll-view ref="scrollView"  class="thumb-scroll-view" @mouseenter="hover=true" @mouseleave="hover=false">
             <div class="header">
                 <span class="app-name">EHUNTER</span>
             </div>
