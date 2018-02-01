@@ -12,9 +12,10 @@ class SettingService {
 
     _getDefaultSettings() {
         return {
-            setAlbumWidth: 80,
-            toggleEHunter: true,
-            toggleThumbView: true
+            albumWidth: { eventName: 'setAlbumWidth', val: 80 }, // eventName is action name of vuex
+            toggleEHunter: { eventName: 'toggleEHunter', val: true },
+            toggleThumbView: { eventName: 'toggleThumbView', val: true },
+            loadNum: { eventName: 'setLoadNum', val: 3 }
         }
     }
 
@@ -30,7 +31,7 @@ class SettingService {
         let version = await storage.load({ key: this.storageVersionName });
         await storage.save({ key: this.storageVersionName, data: this.version });
         if (version !== this.version) {
-            await storage.clearMapForKey(this.storageName);
+            await storage.remove({ key: this.storageName });
         }
     }
 
@@ -46,43 +47,43 @@ class SettingService {
     }
 
     async _setSettingItem(key, val) {
-        // send change to vuex
-        if (key !== 'toggleEHunter') { // the 'toggleEHunter' don't exist in vuex
-            store.dispatch(key, val);
-        }
         // store change
         let settings = await storage.load({ key: this.storageName });
-        settings[key] = val;
+        settings[key].val = val;
         await storage.save({ key: this.storageName, data: settings });
+        // send change to vuex
+        if (key !== 'toggleEHunter') { // the 'toggleEHunter' don't exist in vuex
+            store.dispatch(settings[key].eventName, val);
+        }
     }
 
     async _getSettingItem(key) {
         let settings = await storage.load({ key: this.storageName });
-        return settings[key];
+        return settings[key].val;
     }
 
     async initSettings() {
         let settings = await storage.load({ key: this.storageName });
         for (let key in settings) {
             if (key !== 'toggleEHunter') {
-                store.dispatch(key, settings[key]);
+                store.dispatch(settings[key].eventName, settings[key].val);
             }
         }
     }
 
     async setAlbumWidth(val) {
-        await this._setSettingItem('setAlbumWidth', val);
+        await this._setSettingItem('albumWidth', val);
     }
 
-    async getAlbumWidth(val) {
-        return await this._getSettingItem('setAlbumWidth');
+    async getAlbumWidth() {
+        return await this._getSettingItem('albumWidth');
     }
 
     async toggleEHunter(val) {
         await this._setSettingItem('toggleEHunter', val);
     }
 
-    async getEHunterStatus(val) {
+    async getEHunterStatus() {
         return await this._getSettingItem('toggleEHunter');
     }
 
@@ -90,10 +91,17 @@ class SettingService {
         await this._setSettingItem('toggleThumbView', val);
     }
 
-    async getThumbViewStatus(val) {
+    async getThumbViewStatus() {
         return await this._getSettingItem('toggleThumbView');
     }
 
+    async setLoadNum(val) {
+        await this._setSettingItem('loadNum', val);
+    }
+
+    async getLoadNum() {
+        return await this._getSettingItem('loadNum');
+    }
 }
 
 let instance = new SettingService();

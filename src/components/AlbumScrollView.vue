@@ -91,7 +91,8 @@
                 centerIndex: 'curIndex',
                 widthScale: 'albumWidth',
                 showPagination: 'showPagination',
-                toggleSyncScroll: 'toggleSyncScroll'
+                toggleSyncScroll: 'toggleSyncScroll',
+                loadNum: 'loadNum'
             }),
             curIndex() {
                 this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
@@ -111,11 +112,13 @@
                     return 0;
                 }
             },
+            // return a indexes array. the index is index of page, determining the show of pages.
             nearbyArray() {
+                Logger.logText('Setting', this.loadNum);
                 let curIndex = this.curIndex;
-                let _start = curIndex + this.nearbyRange[0];
+                let _start = curIndex - this.loadNum;
                 let start = _start >= 0 ? _start : 0;
-                let _end = curIndex + this.nearbyRange[1];
+                let _end = curIndex + this.loadNum;
                 let end = _end >= this.imgInfoList.length - 1 ? this.imgInfoList.length - 1 : _end;
                 return this.range(start, end - start + 1);
             }

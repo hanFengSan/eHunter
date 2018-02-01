@@ -12,7 +12,8 @@ const state = {
         width: 80, // percent
         pagination: true,
         toggleSyncScroll: true,
-        showTopBar: true
+        showTopBar: true,
+        loadNum: 3
     }
 }
 
@@ -24,7 +25,8 @@ const getters = {
     showPagination: state => state.album.pagination,
     thumbView: state => state.thumb.thumbView,
     toggleSyncScroll: state => state.album.toggleSyncScroll,
-    showTopBar: state => state.album.showTopBar
+    showTopBar: state => state.album.showTopBar,
+    loadNum: state => state.album.loadNum
 }
 
 // actions
@@ -42,6 +44,9 @@ const actions = {
     },
     toggleTopBar: ({ commit }, show) => {
         commit(types.TOGGLE_SHOW_TOP_BAR, { show })
+    },
+    setLoadNum: ({ commit }, num) => {
+        commit(types.SET_LOAD_NUM, { num })
     }
 }
 
@@ -64,6 +69,9 @@ const mutations = {
     },
     [types.TOGGLE_SHOW_TOP_BAR](state, { show }) {
         state.album.showTopBar = show;
+    },
+    [types.SET_LOAD_NUM](state, { num }) {
+        state.album.loadNum = num;
     }
 }
 

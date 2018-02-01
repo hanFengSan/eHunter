@@ -16,15 +16,28 @@
                 <template v-if="readSettings">
                     <div class="item">
                         <span class="label">画面比例:</span>
-                        <drop-option :list="scaleList" :change="scaleChange" :cur-val="scale + '%'"></drop-option>
+                        <drop-option :list="widthList" :change="(val) => dropOptionChange('width', val)" :cur-val="width + '%'"></drop-option>
                         <pop-slider 
-                            :active="showScaleSlider" 
+                            :active="showWidthSlider" 
                             :min="30" 
                             :max="100" 
                             :step="1" 
-                            :init="this.scale" 
-                            :close="closePopSlider" 
-                            :change="scaleSliderChange">
+                            :init="width" 
+                            :close="() => closeDropOptionSlider('width')" 
+                            :change="(val) => dropOptionSliderChange('width', val)">
+                        </pop-slider>
+                    </div>
+                    <div class="item">
+                        <span class="label">加载页数/次:</span>
+                        <drop-option :list="loadNumList" :change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum"></drop-option>
+                        <pop-slider 
+                            :active="showLoadNumSlider" 
+                            :min="1" 
+                            :max="100" 
+                            :step="1" 
+                            :init="loadNum" 
+                            :close="() => closeDropOptionSlider('loadNum')" 
+                            :change="(val) => dropOptionSliderChange('loadNum', val)">
                         </pop-slider>
                     </div>
                     <div class="item">
@@ -56,8 +69,9 @@ export default {
     data() {
         return {
             readSettings: false,
-            scale: 80,
-            scaleList: [
+            // width
+            width: 0,
+            widthList: [
                 { name: '40%', val: 40 },
                 { name: '70%', val: 70 },
                 { name: '80%', val: 80 },
@@ -65,13 +79,25 @@ export default {
                 { name: '100%', val: 100 },
                 { name: '自定义', val: -1 }
             ],
-            showScaleSlider: false,
+            showWidthSlider: false,
+            // loadNum
+            loadNum: 0,
+            loadNumList: [
+                { name: '1', val: 1 },
+                { name: '2', val: 2 },
+                { name: '3', val: 3 },
+                { name: '5', val: 5 },
+                { name: '10', val: 10 },
+                { name: '自定义', val: -1 }
+            ],
+            showLoadNumSlider: false,
             showThumbView: true
         };
     },
 
     async created() {
-        this.scale = await SettingService.getAlbumWidth();
+        this.width = await SettingService.getAlbumWidth();
+        this.loadNum = await SettingService.getLoadNum();
         this.showThumbView = await SettingService.getThumbViewStatus();
         this.readSettings = true;
     },
@@ -90,24 +116,53 @@ export default {
     methods: {
         ...mapActions(['toggleTopBar']),
 
-        scaleChange(index) {
-            switch (this.scaleList[index].val) {
-                case -1:
-                    this.showScaleSlider = true;
+        dropOptionChange(tag, index) {
+            switch (tag) {
+                case 'width':
+                    switch (this.widthList[index].val) {
+                        case -1:
+                            this.showWidthSlider = true;
+                            break;
+                        default:
+                            this.width = this.widthList[index].val;
+                            SettingService.setAlbumWidth(this.width);
+                    }
                     break;
-                default:
-                    this.scale = this.scaleList[index].val;
-                    SettingService.setAlbumWidth(this.scale);
+                case 'loadNum':
+                    switch (this.loadNumList[index].val) {
+                        case -1:
+                            this.showLoadNumSlider = true;
+                            break;
+                        default:
+                            this.loadNum = this.loadNumList[index].val;
+                            SettingService.setLoadNum(this.loadNum);
+                    }
+                    break;
             }
         },
 
-        scaleSliderChange(val) {
-            this.scale = val;
-            SettingService.setAlbumWidth(this.scale);
+        dropOptionSliderChange(tag, val) {
+            switch (tag) {
+                case 'width':
+                    this.width = val;
+                    SettingService.setAlbumWidth(this.width);
+                    break;
+                case 'loadNum':
+                    this.loadNum = val;
+                    SettingService.setLoadNum(this.loadNum);
+                    break;
+            }
         },
 
-        closePopSlider() {
-            this.showScaleSlider = false;
+        closeDropOptionSlider(tag) {
+            switch (tag) {
+                case 'width':
+                    this.showWidthSlider = false;
+                    break;
+                case 'loadNum':
+                    this.showLoadNumSlider = false;
+                    break;
+            }
         },
 
         changeThumbView(show) {
