@@ -24,6 +24,15 @@ $top_bar_float_btn_hover_icon_color: rgba(0, 0, 0, 0.5);
 $top_bar_float_btn_active_bg: rgba(255, 255, 255, 0.2);
 $top_bar_float_btn_active_icon_color: rgba(0, 0, 0, 0.5);
 
+$pagination_icon_active_color: #c9cacf;
+$pagination_icon_disabled_color: rgba(#c9cacf, 0.6);
+$pagination_icon_hovered_color: white;
+$pagination_item_text_normal_color: #c9cacf;
+$pagination_item_text_actived__color: white;
+$pagination_item_text_hovered__color: white;
+$pagination_item_background_actived__color: hsl(145, 63%, 49%);
+$pagination_item_background_hovered__color: #777777;
+
 $body_bg: #333333; // directly use in app.inject.js
 $img_container_color:hsl(231, 6%, 36%);
 $title_color:hsl(231, 6%, 80%);

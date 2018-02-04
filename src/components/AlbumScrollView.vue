@@ -23,6 +23,7 @@
             @topIn="toggleTopBar(true)"
             @topLeave="toggleTopBar(false)">
             <h1>{{ parser.getTitle() }}</h1>
+            <pagination></pagination>
             <!-- 150px is $album-view-width -->
             <div class="img-container" 
                 :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" 
@@ -63,6 +64,7 @@
     import TopBar from './TopBar.vue'
     import Logger from '../utils/Logger.js'
     import image from '../assets/img'
+    import Pagination from './widget/Pagination.vue';
 
     export default {
         name: 'AlbumScrollView',
@@ -83,7 +85,8 @@
 
         components: {
             AwesomeScrollView,
-            TopBar
+            TopBar,
+            Pagination
         },
 
         computed: {

@@ -29,7 +29,7 @@
                     </div>
                     <div class="item">
                         <span class="label tips tips-down" title-content="设置过大将会对网络速度要求较高">加载页数/次:</span>
-                        <drop-option :list="loadNumList" :change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum"></drop-option>
+                        <drop-option :list="loadNumList" :change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum + 'P'"></drop-option>
                         <pop-slider 
                             :active="showLoadNumSlider" 
                             :min="1" 
@@ -83,11 +83,11 @@ export default {
             // loadNum
             loadNum: 0,
             loadNumList: [
-                { name: '1', val: 1 },
-                { name: '2', val: 2 },
-                { name: '3', val: 3 },
-                { name: '5', val: 5 },
-                { name: '10', val: 10 },
+                { name: '1P', val: 1 },
+                { name: '2P', val: 2 },
+                { name: '3P', val: 3 },
+                { name: '5P', val: 5 },
+                { name: '10P', val: 10 },
                 { name: '自定义', val: -1 }
             ],
             showLoadNumSlider: false,
