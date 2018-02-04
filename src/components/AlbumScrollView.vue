@@ -11,7 +11,7 @@
         <TopBar class="top-bar" />
         <!-- panel view -->
         <div class="panel">
-            <h4 v-show="showPagination" class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>
+            <h4 class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>
             <img title="全屏" @click="fullscreen()" class="focus icon" :src="image.fullScreen" />
         </div>
         <!-- scroll view -->
@@ -93,7 +93,6 @@
             ...mapGetters({
                 centerIndex: 'curIndex',
                 widthScale: 'albumWidth',
-                showPagination: 'showPagination',
                 toggleSyncScroll: 'toggleSyncScroll',
                 loadNum: 'loadNum'
             }),

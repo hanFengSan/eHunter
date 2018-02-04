@@ -10,7 +10,6 @@ const state = {
     },
     album: {
         width: 80, // percent
-        pagination: true,
         toggleSyncScroll: true,
         showTopBar: true,
         loadNum: 3
@@ -22,7 +21,6 @@ const getters = {
     curIndex: state => state.curIndex,
     albumWidth: state => state.album.width,
     thumbWidth: state => state.thumb.width,
-    showPagination: state => state.album.pagination,
     thumbView: state => state.thumb.thumbView,
     toggleSyncScroll: state => state.album.toggleSyncScroll,
     showTopBar: state => state.album.showTopBar,
@@ -33,9 +31,6 @@ const getters = {
 const actions = {
     setIndex: ({ commit }, index) => setIndex(commit, index),
     setAlbumWidth: ({ commit }, width) => commit(types.SET_ALBUM_WIDTH, { width }),
-    showPagination: ({ commit }, show) => {
-        commit(types.SHOW_PAGINATION, { show })
-    },
     toggleThumbView: ({ commit }, show) => {
         commit(types.TOGGLE_THUMB_VIEW, { show })
     },
@@ -57,9 +52,6 @@ const mutations = {
     },
     [types.SET_ALBUM_WIDTH](state, { width }) {
         state.album.width = width;
-    },
-    [types.SHOW_PAGINATION](state, { show }) {
-        state.album.pagination = show;
     },
     [types.TOGGLE_THUMB_VIEW](state, { show }) {
         state.thumb.thumbView = show;

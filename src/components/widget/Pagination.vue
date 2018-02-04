@@ -24,7 +24,7 @@ export default {
 
     data() {
         return {
-            pageSum: 20,
+            pageSum: 2,
             curIndex: 1,
             range: 3
         };
