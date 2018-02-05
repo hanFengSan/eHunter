@@ -18,12 +18,16 @@ function wrapStorageArea(storageArea) {
         },
         async setItem(key, val) {
             return new Promise((resolve, reject) => {
-                storageArea.set({
-                    [key]: val
-                }, () => {
-                    Logger.logText('Storage', `chrome saved ${key}`);
-                    resolve();
-                });
+                if (key) {
+                    storageArea.set({
+                        [key]: val
+                    }, () => {
+                        Logger.logText('Storage', `chrome saved ${key}`);
+                        resolve();
+                    });
+                } else {
+                    Logger.logText('Storage', `ERROR: setItem, key is null, ${val}`);
+                }
             });
         },
         async removeItem(key) {

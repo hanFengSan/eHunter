@@ -3,7 +3,7 @@ import store from '../store/index.inject';
 
 class SettingService {
     constructor() {
-        this.version = '2.0';
+        this.version = '2.1';
         this.storageName = 'Settings';
         this.storageVersionName = 'SettingsVersion';
         this._initStorage();
@@ -15,7 +15,8 @@ class SettingService {
             albumWidth: { eventName: 'setAlbumWidth', val: 80 }, // eventName is action name of vuex
             toggleEHunter: { eventName: 'toggleEHunter', val: true },
             toggleThumbView: { eventName: 'toggleThumbView', val: true },
-            loadNum: { eventName: 'setLoadNum', val: 3 }
+            loadNum: { eventName: 'setLoadNum', val: 3 },
+            volumeSize: { eventName: 'setVolumeSize', val: 50 }
         }
     }
 
@@ -101,6 +102,14 @@ class SettingService {
 
     async getLoadNum() {
         return await this._getSettingItem('loadNum');
+    }
+
+    async setVolumeSize(val) {
+        await this._setSettingItem('volumeSize', val);
+    }
+
+    async getVolumeSize() {
+        return await this._getSettingItem('volumeSize');
     }
 }
 

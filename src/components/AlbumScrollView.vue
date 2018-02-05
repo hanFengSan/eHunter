@@ -127,6 +127,7 @@
             centerIndex: {
                 handler: function(val, oldVal) {
                     if (this.curIndex !== this.centerIndex) {
+                        // sync index
                         if (this.centerIndex === this.volFirstIndex) {
                             this.$refs.scrollView.ScrollTo(0, 1000);
                             this.curIndex = this.volFirstIndex;
@@ -134,12 +135,18 @@
                             this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.volIndex(this.centerIndex)].offsetTop - 100, 1000);
                         }
                     }
+                    // if in the last page of current volume, preload next volume
+                    if (val === this.volFirstIndex + this.volumeSize - 1) {
+                        this.preloadVolume();
+                    }
                 },
                 deep: true
             },
 
+            // watch scrollTop to calculate curIndex
             scrollTop() {
-                let cons = this.$refs.imgContainers;
+                // sort again, because if changing volume size, it may be out-of-order
+                let cons = this.$refs.imgContainers.sort((a, b) => a.offsetTop - b.offsetTop);
                 if (cons) {
                     if (this.scrollTop !== 0) { // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
                         const _cons = cons.concat().reverse();
@@ -184,8 +191,9 @@
                         for (let i = 0; i < imgInfoList.length; i++) {
                             this.pageUrlsObj[imgInfoList[i].pageUrl] = i;
                         }
+                        // sync location of page
                         window.setTimeout(() => {
-                            this.setIndex(this.parser.getCurPageNum() - 1); // sync location of page
+                            this.setIndex(this.parser.getCurPageNum() - 1);
                         }, 1000);
                     });
             },
@@ -297,6 +305,24 @@
                 // this.$refs.scrollView.ScrollTo(0, 1000);
                 let newIndex = index * this.volumeSize; // set index to first index of target volume
                 this.setIndex(newIndex);
+            },
+
+            // preload image
+            preload(index) {
+                this.getImgSrc(index);
+            },
+
+            // preload next volume
+            preloadVolume() {
+                if (this.volumeSum > this.curVolume + 1) {
+                    let volLastIndex = this.volFirstIndex + this.volumeSize - 1;
+                    this.preload(volLastIndex + 1);
+                    Logger.logText('Album', 'preload 1');
+                    if (this.parser.getSumOfPage() - 1 >= volLastIndex + 2) {
+                        this.preload(volLastIndex + 2);
+                        Logger.logText('Album', 'preload 2');
+                    }
+                }
             }
         }
     }

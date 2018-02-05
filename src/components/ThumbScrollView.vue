@@ -63,8 +63,10 @@
                     // sync pagination
                     if (this.curIndex !== this.centerIndex && !this.hover) {
                         this.curIndex = this.centerIndex;
-                        if (this.curIndex !== 0) {
-                            this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.volIndex(this.centerIndex)].offsetTop, 1000);
+                        if (this.curIndex !== this.volFirstIndex) {
+                            // sort again, because if changing volume size, it may be out-of-order
+                            let cons = this.$refs.thumbContainers.sort((a, b) => a.offsetTop - b.offsetTop);
+                            this.$refs.scrollView.ScrollTo(cons[this.volIndex(this.centerIndex)].offsetTop, 1000);
                         } else {
                             this.$refs.scrollView.ScrollTo(0, 1000); // if is page 1, scroll to top, cuz of having a header
                         }

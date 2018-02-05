@@ -41,6 +41,19 @@
                         </pop-slider>
                     </div>
                     <div class="item">
+                        <span class="label tips tips-down" title-content="设置过大将会对性能要求较高">分卷页数:</span>
+                        <drop-option :list="volSizeList" :change="(val) => dropOptionChange('volSize', val)" :cur-val="volumeSize + 'P'"></drop-option>
+                        <pop-slider 
+                            :active="showVolSizeSlider" 
+                            :min="1" 
+                            :max="200" 
+                            :step="1" 
+                            :init="volumeSize" 
+                            :close="() => closeDropOptionSlider('volSize')" 
+                            @change="(val) => dropOptionSliderChange('volSize', val)">
+                        </pop-slider>
+                    </div>
+                    <div class="item">
                         <span class="label tips tips-down" title-content="开启/关闭左侧缩略图栏">缩略图栏:</span>
                         <div class="bar-switch">
                             <simple-switch :active="showThumbView" @change="changeThumbView"></simple-switch>
@@ -88,7 +101,17 @@ export default {
                 { name: '10P', val: 10 },
                 { name: '自定义', val: -1 }
             ],
-            showLoadNumSlider: false
+            showLoadNumSlider: false,
+            // volSize
+            volSizeList: [
+                { name: '10P', val: 10 },
+                { name: '20P', val: 20 },
+                { name: '30P', val: 30 },
+                { name: '50P', val: 50 },
+                { name: '100P', val: 100 },
+                { name: '自定义', val: -1 }
+            ],
+            showVolSizeSlider: false
         };
     },
 
@@ -101,7 +124,8 @@ export default {
             showTopBar: 'showTopBar',
             albumWidth: 'albumWidth',
             loadNum: 'loadNum',
-            showThumbView: 'showThumbView'
+            showThumbView: 'showThumbView',
+            volumeSize: 'volumeSize'
         })
     },
 
@@ -135,6 +159,15 @@ export default {
                             SettingService.setLoadNum(this.loadNumList[index].val);
                     }
                     break;
+                case 'volSize':
+                    switch (this.volSizeList[index].val) {
+                        case -1:
+                            this.showVolSizeSlider = true;
+                            break;
+                        default:
+                            SettingService.setVolumeSize(this.volSizeList[index].val);
+                    }
+                    break;
             }
         },
 
@@ -146,6 +179,9 @@ export default {
                 case 'loadNum':
                     SettingService.setLoadNum(val);
                     break;
+                case 'volSize':
+                    SettingService.setVolumeSize(val);
+                    break;
             }
         },
 
@@ -156,6 +192,9 @@ export default {
                     break;
                 case 'loadNum':
                     this.showLoadNumSlider = false;
+                    break;
+                case 'volSize':
+                    this.showVolSizeSlider = false;
                     break;
             }
         },

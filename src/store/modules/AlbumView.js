@@ -1,6 +1,5 @@
 // import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
-import Logger from '../../utils/Logger'
 
 // initial state
 const state = {
@@ -40,12 +39,10 @@ const actions = {
     setIndex: ({ commit }, index) => commit(types.SET_INDEX, { index }),
     setAlbumWidth: ({ commit }, width) => commit(types.SET_ALBUM_WIDTH, { width }),
     toggleThumbView: ({ commit }, show) => commit(types.TOGGLE_THUMB_VIEW, { show }),
-    toggleSyncScroll: ({ commit }, isActive) =>
-        commit(types.TOGGLE_SYNC_SCROLL, { isActive }),
-    toggleTopBar: ({ commit }, show) =>
-        commit(types.TOGGLE_SHOW_TOP_BAR, { show }),
-    setLoadNum: ({ commit }, num) =>
-        commit(types.SET_LOAD_NUM, { num })
+    toggleSyncScroll: ({ commit }, isActive) => commit(types.TOGGLE_SYNC_SCROLL, { isActive }),
+    toggleTopBar: ({ commit }, show) => commit(types.TOGGLE_SHOW_TOP_BAR, { show }),
+    setLoadNum: ({ commit }, num) => commit(types.SET_LOAD_NUM, { num }),
+    setVolumeSize: ({ commit }, num) => commit(types.SET_VOLUME_SIZE, { num })
 }
 
 // mutations
@@ -67,6 +64,10 @@ const mutations = {
     },
     [types.SET_LOAD_NUM](state, { num }) {
         state.album.loadNum = num;
+    },
+    [types.SET_VOLUME_SIZE](state, { num }) {
+        state.volumeSize = num;
+        state.curIndex = 0;
     }
 }
 
