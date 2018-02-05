@@ -5,11 +5,11 @@
                 <span class="app-name">EHUNTER</span>
             </div>
             <!-- 160 is $thumb-view-height -->
-            <div class="indicator" :style="{top: px(160*curIndex)}"></div>
-            <div class="thumb-container" @click="select(index)" v-for="(item, index) of thumbs" :key="item.offset" ref="thumbContainers">
+            <div class="indicator" :style="{top: px(160*(curIndex - volFirstIndex))}"></div>
+            <div class="thumb-container" @click="select(index(i))" v-for="(item, i) of volThumbs" :key="item.offset" ref="thumbContainers">
                 <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
                 <div class="hover-mask"></div>
-                <div class="index">{{ index + 1 }}</div>
+                <div class="index">{{ index(i) + 1 }}</div>
             </div>
         </awesome-scroll-view>
     </div>
@@ -20,6 +20,7 @@
     import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
     import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
     import AwesomeScrollView from './base/AwesomeScrollView.vue'
+    import Logger from '../utils/Logger';
 
     export default {
         name: 'ThumbScrollView',
@@ -45,8 +46,15 @@
 
         computed: {
             ...mapGetters({
-                centerIndex: 'curIndex'
-            })
+                centerIndex: 'curIndex',
+                volumeSize: 'volumeSize',
+                volFirstIndex: 'volFirstIndex'
+            }),
+
+            // the thumbs of current volume
+            volThumbs() {
+                return this.thumbs.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
+            }
         },
 
         watch: {
@@ -56,7 +64,7 @@
                     if (this.curIndex !== this.centerIndex && !this.hover) {
                         this.curIndex = this.centerIndex;
                         if (this.curIndex !== 0) {
-                            this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.centerIndex].offsetTop, 1000);
+                            this.$refs.scrollView.ScrollTo(this.$refs.thumbContainers[this.volIndex(this.centerIndex)].offsetTop, 1000);
                         } else {
                             this.$refs.scrollView.ScrollTo(0, 1000); // if is page 1, scroll to top, cuz of having a header
                         }
@@ -82,6 +90,16 @@
                     .then(thumbs => {
                         this.thumbs = thumbs;
                     });
+            },
+
+            // get index of album for index of current volume
+            index(i) {
+                return this.volFirstIndex + i;
+            },
+
+            // get index of current volume for index of album
+            volIndex(i) {
+                return i - this.volFirstIndex;
             }
         }
     }

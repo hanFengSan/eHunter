@@ -1,18 +1,20 @@
 // import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
+import Logger from '../../utils/Logger'
 
 // initial state
 const state = {
     curIndex: 0,
+    volumeSize: 10,
     thumb: {
         width: 150, // px
         thumbView: true
     },
     album: {
-        width: 80, // percent
+        width: 80, // percent, the scale of img
         toggleSyncScroll: true,
         showTopBar: true,
-        loadNum: 3
+        loadNum: 3 // the sum of pages per loading
     }
 }
 
@@ -24,25 +26,26 @@ const getters = {
     thumbView: state => state.thumb.thumbView,
     toggleSyncScroll: state => state.album.toggleSyncScroll,
     showTopBar: state => state.album.showTopBar,
-    loadNum: state => state.album.loadNum
+    loadNum: state => state.album.loadNum,
+    volumeSize: state => state.volumeSize,
+    curVolume: state => {
+        let remainder = state.curIndex % state.volumeSize;
+        return (state.curIndex - remainder) / state.volumeSize;
+    },
+    volFirstIndex: state => getters.curVolume(state) * state.volumeSize
 }
 
 // actions
 const actions = {
-    setIndex: ({ commit }, index) => setIndex(commit, index),
+    setIndex: ({ commit }, index) => commit(types.SET_INDEX, { index }),
     setAlbumWidth: ({ commit }, width) => commit(types.SET_ALBUM_WIDTH, { width }),
-    toggleThumbView: ({ commit }, show) => {
-        commit(types.TOGGLE_THUMB_VIEW, { show })
-    },
-    toggleSyncScroll: ({ commit }, isActive) => {
-        commit(types.TOGGLE_SYNC_SCROLL, { isActive })
-    },
-    toggleTopBar: ({ commit }, show) => {
-        commit(types.TOGGLE_SHOW_TOP_BAR, { show })
-    },
-    setLoadNum: ({ commit }, num) => {
+    toggleThumbView: ({ commit }, show) => commit(types.TOGGLE_THUMB_VIEW, { show }),
+    toggleSyncScroll: ({ commit }, isActive) =>
+        commit(types.TOGGLE_SYNC_SCROLL, { isActive }),
+    toggleTopBar: ({ commit }, show) =>
+        commit(types.TOGGLE_SHOW_TOP_BAR, { show }),
+    setLoadNum: ({ commit }, num) =>
         commit(types.SET_LOAD_NUM, { num })
-    }
 }
 
 // mutations
@@ -72,8 +75,4 @@ export default {
     getters,
     actions,
     mutations
-}
-
-function setIndex(commit, index) {
-    commit(types.SET_INDEX, { index });
 }

@@ -1,13 +1,13 @@
 <template>
 <div class="pagination">
-    <div :class="['item', { disable: curIndex === 1 }]" @click="prev()">
+    <div :class="['item', { disable: curIndex === 0 }]" @click="prev()">
         <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/>
             <path d="M0-.5h24v24H0z" fill="none"/>
         </svg>
     </div>
     <span :class="['item', { active: n === curIndex }]" v-for="n in pages" :key="n" @click="selectPage(n)">{{ showNum(n) }}</span>
-    <div :class="['item', { disable: curIndex === pageSum }]" @click="next()">
+    <div :class="['item', { disable: curIndex === pageSum - 1 }]" @click="next()">
         <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/>
             <path d="M0-.25h24v24H0z" fill="none"/>
@@ -17,15 +17,20 @@
 </template>
 
 <script>
-import Logger from '../../utils/Logger.js';
-
 export default {
     name: 'Pagination',
 
+    props: {
+        curIndex: {
+            type: Number
+        },
+        pageSum: {
+            type: Number
+        }
+    },
+
     data() {
         return {
-            pageSum: 2,
-            curIndex: 1,
             range: 3
         };
     },
@@ -40,13 +45,13 @@ export default {
                 }
             }
             for (let i = 1; i <= this.range; i++) {
-                if (this.curIndex + i <= this.pageSum) {
+                if (this.curIndex + i < this.pageSum - 1) {
                     list.push(this.curIndex + i);
                 }
             }
-            list.push(1);
+            list.push(0);
             list.push(this.curIndex);
-            list.push(this.pageSum);
+            list.push(this.pageSum - 1);
             list = [...new Set(list)].sort((a, b) => { return a - b }); // sort and remove duplicated items
             if (list[1] - list[0] > 1) {
                 let centerNum1 = Math.floor((list[1] - list[0]) / 2 + list[0]);
@@ -63,26 +68,26 @@ export default {
     methods: {
         showNum(val) {
             if (Math.abs(val - this.curIndex) <= this.range) {
-                return val;
-            } else if (val === 1 || val === this.pageSum) {
-                return val;
+                return val + 1;
+            } else if (val === 0 || val === this.pageSum - 1) {
+                return val + 1;
             } else {
                 return '...';
             }
         },
 
         selectPage(n) {
-            this.curIndex = n;
+            this.$emit('change', n);
         },
 
         prev() {
-            if (this.curIndex !== 1) {
+            if (this.curIndex !== 0) {
                 this.curIndex--;
             }
         },
 
         next() {
-            if (this.curIndex !== this.pageSum) {
+            if (this.curIndex !== this.pageSum - 1) {
                 this.curIndex++;
             }
         }

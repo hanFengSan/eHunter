@@ -15,7 +15,7 @@
             <img title="全屏" @click="fullscreen()" class="focus icon" :src="image.fullScreen" />
         </div>
         <!-- scroll view -->
-        <awesome-scroll-view 
+        <awesome-scroll-view
             ref="scrollView" 
             class="scroll-view" 
             v-if="imgInfoList.length > 0" 
@@ -23,29 +23,34 @@
             @topIn="toggleTopBar(true)"
             @topLeave="toggleTopBar(false)">
             <h1>{{ parser.getTitle() }}</h1>
-            <pagination></pagination>
+            <pagination :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"></pagination>
             <!-- 150px is $album-view-width -->
             <div class="img-container" 
                 :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" 
-                v-for="(imgInfo,index) of imgInfoList"
+                v-for="(imgInfo, i) of volImgInfoList"
                 :key="imgInfo.pageUrl"
                 ref="imgContainers">
-                <img class="album-item" :src="imgInfo.src" :get-src="getImgSrc(index)" v-if="nearbyArray.indexOf(index) > -1" @error="failLoad(index, $event)" @load="loaded(index)">
-                <div class="index">{{ index + 1 }}</div>
-                <div class="img-info-panel" v-if="nearbyArray.indexOf(index)>-1">
+                <img class="album-item" 
+                    v-if="nearbyArray.indexOf(index(i)) > -1" 
+                    :src="imgInfo.src" 
+                    :get-src="getImgSrc(index(i))" 
+                    @load="loaded(index(i, imgInfo.pageUrl))"
+                    @error="failLoad(index(i, imgInfo.pageUrl), $event)">
+                <div class="index">{{ index(i) + 1 }}</div>
+                <div class="img-info-panel" v-if="nearbyArray.indexOf(index(i))>-1">
                     <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&imgInfo.src">...加载图片中...</div>
                     <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&!imgInfo.src">...加载图片地址中...</div>
                     <div class="loading-info" v-if="imgInfo.loadStatus==loadStatus.error">图片加载失败, 请在图片框右下角点击刷新按钮重新尝试</div>
                 </div>
                  <div class="img-console-panel" v-if="imgInfo.loadStatus!=loadStatus.loaded"> 
                     <div class="tips" title-content="载入原图">
-                        <svg class="refresh-origin-btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc(index, 'origin')" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="refresh-origin-btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc(index(i), 'origin')" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
                             <path d="M0 0h24v24H0z" fill="none"/>
                         </svg>
                     </div>
                     <div class="tips" title-content="刷新">
-                        <svg class="refresh-btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="getNewImgSrc(index)">
+                        <svg class="refresh-btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="getNewImgSrc(index(i))">
                             <path d="M0 0h24v24H0z" fill="none"/>
                             <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
                         </svg>
@@ -64,7 +69,7 @@
     import TopBar from './TopBar.vue'
     import Logger from '../utils/Logger.js'
     import image from '../assets/img'
-    import Pagination from './widget/Pagination.vue';
+    import Pagination from './widget/Pagination.vue'
 
     export default {
         name: 'AlbumScrollView',
@@ -73,13 +78,12 @@
             return {
                 parser: new ImgHtmlParser(document.documentElement.innerHTML),
                 imgInfoList: [],
-                imgBaseUrl: '',
-                sumOfPage: '',
-                imgUrlMap: new Map(),
+                pageUrlsObj: {}, // hash, for fast get page index by pagUrl
                 scrollTop: 0,
-                image,
+                image, // for use image util within html
                 loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() }, // status of img loading
-                nearbyRange: [-2, 3] // the range of necessary imgs, basing on curIndex
+                nearbyRange: [-2, 3], // the range of necessary imgs, basing on curIndex
+                curIndex: 0
             }
         },
 
@@ -93,53 +97,67 @@
             ...mapGetters({
                 centerIndex: 'curIndex',
                 widthScale: 'albumWidth',
-                toggleSyncScroll: 'toggleSyncScroll',
-                loadNum: 'loadNum'
+                loadNum: 'loadNum',
+                volumeSize: 'volumeSize',
+                volFirstIndex: 'volFirstIndex',
+                curVolume: 'curVolume'
             }),
-            curIndex() {
-                this.scrollTop; // if no use scrollTop, Vue would no watch curIndex, maybe because of next scrollTop in callback.
-                let cons = this.$refs.imgContainers;
-                if (cons) {
-                    if (this.scrollTop !== 0) { // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
-                        const _cons = cons.concat().reverse();
-                        let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
-                        const index = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
-                        this.setIndex(index);
-                        return index;
-                    } else {
-                        this.setIndex(0);
-                        return 0;
-                    }
-                } else {
-                    return 0;
-                }
-            },
+
             // return a indexes array. the index is index of page, determining the show of pages.
             nearbyArray() {
-                Logger.logText('Setting', this.loadNum);
                 let curIndex = this.curIndex;
                 let _start = curIndex - this.loadNum;
                 let start = _start >= 0 ? _start : 0;
                 let _end = curIndex + this.loadNum;
                 let end = _end >= this.imgInfoList.length - 1 ? this.imgInfoList.length - 1 : _end;
                 return this.range(start, end - start + 1);
+            },
+
+            volImgInfoList() {
+                return this.imgInfoList.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
+            },
+
+            volumeSum() {
+                return Math.ceil(this.parser.getSumOfPage() / this.volumeSize);
             }
         },
 
         watch: {
             centerIndex: {
                 handler: function(val, oldVal) {
-                    if (this.toggleSyncScroll) {
-                        if (this.curIndex !== this.centerIndex) {
-                            this.$refs.scrollView.ScrollTo(this.centerIndex === 0 ? 0 : (this.$refs.imgContainers[this.centerIndex].offsetTop - 100), 1000);
+                    if (this.curIndex !== this.centerIndex) {
+                        if (this.centerIndex === this.volFirstIndex) {
+                            this.$refs.scrollView.ScrollTo(0, 1000);
+                        } else {
+                            this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.volIndex(this.centerIndex)].offsetTop - 100, 1000);
                         }
                     }
                 },
                 deep: true
+            },
+
+            scrollTop() {
+                let cons = this.$refs.imgContainers;
+                if (cons) {
+                    if (this.scrollTop !== 0) { // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
+                        const _cons = cons.concat().reverse();
+                        let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
+                        const volIndex = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
+                        const index = volIndex + this.volFirstIndex;
+                        this.setIndex(index);
+                        this.curIndex = index;
+                    } else {
+                        this.setIndex(this.volFirstIndex);
+                        this.curIndex = this.volFirstIndex;
+                    }
+                } else {
+                    this.curIndex = this.volFirstIndex;
+                }
             }
         },
 
         created() {
+            this.curIndex = this.volFirstIndex;
             this.sumOfPage = this.parser.getSumOfPage();
             this.initImgInfoList();
             this.blockEhActions();
@@ -150,6 +168,7 @@
                 'setIndex',
                 'toggleTopBar'
             ]),
+
             initImgInfoList() {
                 AlbumCacheService
                     .getImgInfos(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
@@ -159,8 +178,12 @@
                             i.loadStatus = this.loadStatus.waiting;
                             return i;
                         });
+                        // init pageUrlsObj
+                        for (let i = 0; i < imgInfoList.length; i++) {
+                            this.pageUrlsObj[imgInfoList[i].pageUrl] = i;
+                        }
                         window.setTimeout(() => {
-                            this.setIndex(this.parser.getCurPageNum() - 1); // 同步页数
+                            this.setIndex(this.parser.getCurPageNum() - 1); // sync location of page
                         }, 1000);
                     });
             },
@@ -252,6 +275,26 @@
 
             loaded(index) {
                 this.imgInfoList[index].loadStatus = this.loadStatus.loaded;
+            },
+
+            // get index of album for index of current volume
+            index(i, pageUrl) {
+                if (pageUrl) { // fix errors in delay methods
+                    return this.pageUrlsObj[pageUrl];
+                } else {
+                    return this.volFirstIndex + i;
+                }
+            },
+
+            // get index of current volume for index of album
+            volIndex(i) {
+                return i - this.volFirstIndex;
+            },
+
+            selectVol(index) {
+                let newIndex = index * this.volumeSize; // set index to first index of target volume
+                this.setIndex(newIndex);
+                this.curIndex = newIndex;
             }
         }
     }
