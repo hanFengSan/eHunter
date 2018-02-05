@@ -1,7 +1,7 @@
 <template>
-    <popover class="PopSlider" :active="active">
+    <popover class="PopSlider" :active="active" :close="close">
         <div class="content">
-            <slider class="slider" :min="min" :max="max" :step="step" :init="init" :change="change"></slider>
+            <slider class="slider" :min="min" :max="max" :step="step" :init="init" @change="change"></slider>
             <flat-button class="button" label="确定" @click="handleClick"></flat-button>
         </div>
     </popover>
@@ -15,7 +15,7 @@ import FlatButton from './FlatButton.vue';
 export default {
     name: 'PopSlider',
 
-    props: ['active', 'min', 'max', 'step', 'init', 'change', 'close'],
+    props: ['active', 'min', 'max', 'step', 'init', 'close'],
 
     components: { Popover, Slider, FlatButton },
 
@@ -28,6 +28,10 @@ export default {
     methods: {
         handleClick() {
             this.close();
+        },
+
+        change(val) {
+            this.$emit('change', val);
         }
     }
 }

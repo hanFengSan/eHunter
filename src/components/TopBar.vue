@@ -16,15 +16,15 @@
                 <template v-if="readSettings">
                     <div class="item">
                         <span class="label tips tips-down" title-content="设置画面比例">画面比例:</span>
-                        <drop-option :list="widthList" :change="(val) => dropOptionChange('width', val)" :cur-val="width + '%'"></drop-option>
+                        <drop-option :list="widthList" :change="(val) => dropOptionChange('width', val)" :cur-val="albumWidth + '%'"></drop-option>
                         <pop-slider 
                             :active="showWidthSlider" 
                             :min="30" 
                             :max="100" 
                             :step="1" 
-                            :init="width" 
+                            :init="albumWidth" 
                             :close="() => closeDropOptionSlider('width')" 
-                            :change="(val) => dropOptionSliderChange('width', val)">
+                            @change="(val) => dropOptionSliderChange('width', val)">
                         </pop-slider>
                     </div>
                     <div class="item">
@@ -37,13 +37,13 @@
                             :step="1" 
                             :init="loadNum" 
                             :close="() => closeDropOptionSlider('loadNum')" 
-                            :change="(val) => dropOptionSliderChange('loadNum', val)">
+                            @change="(val) => dropOptionSliderChange('loadNum', val)">
                         </pop-slider>
                     </div>
                     <div class="item">
                         <span class="label tips tips-down" title-content="开启/关闭左侧缩略图栏">缩略图栏:</span>
                         <div class="bar-switch">
-                            <simple-switch :init="showThumbView" :change="changeThumbView"></simple-switch>
+                            <simple-switch :active="showThumbView" @change="changeThumbView"></simple-switch>
                         </div>
                     </div>
                 </template>
@@ -70,7 +70,6 @@ export default {
         return {
             readSettings: false,
             // width
-            width: 0,
             widthList: [
                 { name: '40%', val: 40 },
                 { name: '70%', val: 70 },
@@ -81,7 +80,6 @@ export default {
             ],
             showWidthSlider: false,
             // loadNum
-            loadNum: 0,
             loadNumList: [
                 { name: '1P', val: 1 },
                 { name: '2P', val: 2 },
@@ -90,20 +88,21 @@ export default {
                 { name: '10P', val: 10 },
                 { name: '自定义', val: -1 }
             ],
-            showLoadNumSlider: false,
-            showThumbView: true
+            showLoadNumSlider: false
         };
     },
 
     async created() {
-        this.width = await SettingService.getAlbumWidth();
-        this.loadNum = await SettingService.getLoadNum();
-        this.showThumbView = await SettingService.getThumbViewStatus();
         this.readSettings = true;
     },
 
     computed: {
-        ...mapGetters({ showTopBar: 'showTopBar' })
+        ...mapGetters({
+            showTopBar: 'showTopBar',
+            albumWidth: 'albumWidth',
+            loadNum: 'loadNum',
+            showThumbView: 'showThumbView'
+        })
     },
 
     watch: {
@@ -124,8 +123,7 @@ export default {
                             this.showWidthSlider = true;
                             break;
                         default:
-                            this.width = this.widthList[index].val;
-                            SettingService.setAlbumWidth(this.width);
+                            SettingService.setAlbumWidth(this.widthList[index].val);
                     }
                     break;
                 case 'loadNum':
@@ -134,8 +132,7 @@ export default {
                             this.showLoadNumSlider = true;
                             break;
                         default:
-                            this.loadNum = this.loadNumList[index].val;
-                            SettingService.setLoadNum(this.loadNum);
+                            SettingService.setLoadNum(this.loadNumList[index].val);
                     }
                     break;
             }
@@ -144,12 +141,10 @@ export default {
         dropOptionSliderChange(tag, val) {
             switch (tag) {
                 case 'width':
-                    this.width = val;
-                    SettingService.setAlbumWidth(this.width);
+                    SettingService.setAlbumWidth(val);
                     break;
                 case 'loadNum':
-                    this.loadNum = val;
-                    SettingService.setLoadNum(this.loadNum);
+                    SettingService.setLoadNum(val);
                     break;
             }
         },
@@ -166,7 +161,6 @@ export default {
         },
 
         changeThumbView(show) {
-            this.showThumbView = show;
             SettingService.toggleThumbView(show);
         },
 

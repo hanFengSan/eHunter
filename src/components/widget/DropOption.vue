@@ -5,7 +5,7 @@
         <path d="M7 10l5 5 5-5z"/>
         <path d="M0 0h24v24H0z" fill="none"/>
     </svg>
-    <popover :active="active" :custom-style="{'margin-left': '7px', 'margin-top': '4px'}">
+    <popover :active="active" :custom-style="{'margin-left': '7px', 'margin-top': '4px'}" :close="close">
         <div class="options no-select">
             <div class="item" v-for="(item, index) in list" :key="item" @click="onClick(index)">{{ item.name || item }}</div>
         </div>
@@ -40,6 +40,10 @@ export default {
         onClick(index) {
             this.select();
             this.change(index);
+        },
+
+        close() {
+            this.active = false;
         }
     }
 };

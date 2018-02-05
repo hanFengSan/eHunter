@@ -1,6 +1,6 @@
 <template>
     <transition name="slide-fade">
-        <div class="popover" v-if="active" :style="customStyle">
+        <div class="popover" v-if="active" :style="customStyle" @click="handleClick($event)">
                 <slot></slot>
         </div>
     </transition>
@@ -10,12 +10,45 @@
 export default {
     name: 'Popover',
 
-    props: ['active', 'customStyle', 'close'],
+    props: ['active', 'customStyle', 'close', 'canCancel'],
 
     data() {
         return {
-
+            timer: {}
         };
+    },
+
+    watch: {
+        active(newVal, oldVal) {
+            if (!this.canCancel) {
+                // when user click outside, close popover
+                if (newVal) {
+                    // user a timer, avoiding call 'close' when 'open'
+                    this.timer = setTimeout(() => {
+                        document.addEventListener('click', this.handleOuterClick);
+                    }, 500);
+                }
+                if (oldVal) {
+                    document.removeEventListener('click', this.handleOuterClick);
+                    // remove timer if closing is too fast to having no time for adding event
+                    if (this.timer) {
+                        clearTimeout(this.timer);
+                    }
+                }
+            }
+        }
+    },
+
+    methods: {
+        handleOuterClick() {
+            if (this.close) {
+                this.close();
+            }
+        },
+
+        handleClick(e) {
+            e.stopPropagation(); // avoiding emit click event within popover
+        }
     }
 }
 </script>

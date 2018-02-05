@@ -1,7 +1,7 @@
 <template>
     <div id="app-content">
-        <thumb-scroll-view class="thumb-scroll-view" :style="{'margin-left': thumbView ? '' : '-150px'}"></thumb-scroll-view>
-        <album-scroll-view class="album-scroll-view" :style="{'width': `calc(100% - ${thumbView ? 150 : 0}px)`}"></album-scroll-view>
+        <thumb-scroll-view class="thumb-scroll-view" :style="{'margin-left': showThumbView ? '' : '-150px'}"></thumb-scroll-view>
+        <album-scroll-view class="album-scroll-view" :style="{'width': `calc(100% - ${showThumbView ? 150 : 0}px)`}"></album-scroll-view>
     </div>
 </template>
 
@@ -21,7 +21,7 @@
 
         computed: {
             ...mapGetters([
-                'thumbView'
+                'showThumbView'
             ])
         },
 

@@ -1,7 +1,7 @@
 <template>
 <div class="switch" @click="handleClick">
-    <div :class="{ 'track': true, enabled }"></div>
-    <div :class="{ 'thumb': true, enabled }"></div>
+    <div :class="{ 'track': true, active }"></div>
+    <div :class="{ 'thumb': true, active }"></div>
 </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
     name: 'SimpleSwitch',
 
     props: {
-        init: {
+        active: {
             type: Boolean
         },
         change: {
@@ -21,18 +21,12 @@ export default {
 
     data() {
         return {
-            enabled: false
         };
-    },
-
-    created() {
-        this.enabled = this.init;
     },
 
     methods: {
         handleClick() {
-            this.enabled = !this.enabled;
-            this.change(this.enabled);
+            this.$emit('change', !this.active);
         }
     }
 }
@@ -57,7 +51,7 @@ export default {
         border-radius: 30px;
         background: $switch_track_disabled_color;
         transition: all .45s cubic-bezier(.23,1,.32,1);
-        &.enabled {
+        &.active {
            background: $switch_track_enabled_color;
         }
     }
@@ -71,7 +65,7 @@ export default {
         left: 0;
         transform: translateX(-50%);
         box-shadow: 0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647);
-        &.enabled {
+        &.active {
             background: $switch_thumb_enabled_color;
             left: 100%;
         }

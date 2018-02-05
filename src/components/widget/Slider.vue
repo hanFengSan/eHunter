@@ -11,12 +11,10 @@
 </template>
 
 <script>
-import Logger from '../../utils/Logger';
-
 export default {
     name: 'Slider',
 
-    props: ['min', 'max', 'step', 'init', 'change'],
+    props: ['min', 'max', 'step', 'init'],
 
     data() {
         return {
@@ -77,7 +75,7 @@ export default {
             } else {
                 this.val = this.getValByStep(x < this.min ? this.min : x);
             }
-            this.change(this.val);
+            this.$emit('change', this.val);
         },
         getStepPrecision(val) {
             return String(String(this.step).match('.[0-9]')).length - 1;
