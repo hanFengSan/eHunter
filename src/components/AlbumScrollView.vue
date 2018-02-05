@@ -23,7 +23,7 @@
             @topIn="toggleTopBar(true)"
             @topLeave="toggleTopBar(false)">
             <h1>{{ parser.getTitle() }}</h1>
-            <pagination :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"></pagination>
+            <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
             <!-- 150px is $album-view-width -->
             <div class="img-container" 
                 :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" 
@@ -57,6 +57,7 @@
                     </div>
                 </div>
             </div>
+            <pagination v-if="volumeSum != 1" class="bottom-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
         </awesome-scroll-view>
     </div>
 </template>
@@ -128,6 +129,7 @@
                     if (this.curIndex !== this.centerIndex) {
                         if (this.centerIndex === this.volFirstIndex) {
                             this.$refs.scrollView.ScrollTo(0, 1000);
+                            this.curIndex = this.volFirstIndex;
                         } else {
                             this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.volIndex(this.centerIndex)].offsetTop - 100, 1000);
                         }
@@ -292,9 +294,9 @@
             },
 
             selectVol(index) {
+                // this.$refs.scrollView.ScrollTo(0, 1000);
                 let newIndex = index * this.volumeSize; // set index to first index of target volume
                 this.setIndex(newIndex);
-                this.curIndex = newIndex;
             }
         }
     }
@@ -368,6 +370,12 @@
                 font-size: 18px;
                 text-align: center;
                 margin-top: 60px;
+            }
+            > .top-pagination {
+                margin-top: 20px;
+            }
+            > .bottom-pagination {
+                margin-bottom: 40px;
             }
             .img-container {
                 position: relative;

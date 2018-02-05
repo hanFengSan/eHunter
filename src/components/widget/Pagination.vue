@@ -82,13 +82,13 @@ export default {
 
         prev() {
             if (this.curIndex !== 0) {
-                this.curIndex--;
+                this.$emit('change', this.curIndex - 1);
             }
         },
 
         next() {
             if (this.curIndex !== this.pageSum - 1) {
-                this.curIndex++;
+                this.$emit('change', this.curIndex + 1);
             }
         }
     }
