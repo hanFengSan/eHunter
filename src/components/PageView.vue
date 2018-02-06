@@ -1,18 +1,22 @@
 <template>
 <div class="page-view">
-    <img class="album-item" 
+    <!-- <img class="album-item" 
         v-if="active" 
         :src="imgInfo.src" 
         :get-src="getImgSrc()"
         @load="loaded()"
-        @error="failLoad($event)">
-    <div class="index">{{ index + 1 }}</div>
+        @error="failLoad($event)"> -->
+    <!-- <div class="layer preview-layer" :style="{background:`transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div> -->
+    <div class="layer loading-layer"></div>
+    <div class="layer img-layer"></div>
+    <div class="layer console-layer"></div>
+    <!-- <div class="index">{{ index + 1 }}</div>
     <div class="img-info-panel" v-if="active">
         <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&imgInfo.src">...加载图片中...</div>
         <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&!imgInfo.src">...加载图片地址中...</div>
         <div class="loading-info" v-if="imgInfo.loadStatus==loadStatus.error">图片加载失败, 请在图片框右下角点击刷新按钮重新尝试</div>
     </div>
-        <div class="img-console-panel" v-if="imgInfo.loadStatus!=loadStatus.loaded"> 
+    <div class="img-console-panel" v-if="imgInfo.loadStatus!=loadStatus.loaded"> 
         <div class="tips" title-content="载入原图">
             <svg class="refresh-origin-btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc('origin')" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
@@ -25,7 +29,7 @@
                 <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
             </svg>
         </div>
-    </div>
+    </div> -->
 </div>
 </template>
 
@@ -55,6 +59,7 @@ export default {
     data() {
         return {
             imgInfo: {},
+            thumb: {},
             loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() } // status of img loading
         };
     },
@@ -63,6 +68,7 @@ export default {
         this.imgInfo = JSON.parse(JSON.stringify(this.data));
         this.imgInfo.isFirstLoad = true;
         this.imgInfo.loadStatus = this.loadStatus.waiting;
+        this.thumb = this.getThumb();
     },
 
     methods: {
@@ -107,6 +113,13 @@ export default {
 
         loaded() {
             this.imgInfo.loadStatus = this.loadStatus.loaded;
+        },
+
+        async getThumb() {
+            // AlbumCacheService.getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage());
+            //         .then(thumbs => {
+            //             this.thumbs = thumbs;
+            //         });
         }
     }
 };
@@ -116,7 +129,32 @@ export default {
 @import "~style/_responsive";
 @import "~style/_variables";
 
+* div {
+    display: flex;
+}
+
 .page-view {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transition: all 0.3s ease;
+    > .layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    > .loading-layer {
+        box-shadow: inset 0px 0px 0px 5px $img_container_color;
+    }
+
+
+
+
     > .index {
         position: absolute;
         color: $img_container_color;
