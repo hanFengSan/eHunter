@@ -6,11 +6,10 @@
                     ref="topBarButton" 
                     class="button" 
                     icon="menu" 
-                    :rotate="true" 
-                    :init-rotation="true" 
+                    :rotate="showTopBar" 
                     @click="changeTopBar">
                 </circle-icon-button>
-                <circle-icon-button class="button" icon="close" :rotate="true" @click="closeEHunter"></circle-icon-button>
+                <circle-icon-button class="button" icon="close" @click="closeEHunter"></circle-icon-button>
             </div>
             <div :class="['inner-content', { hide: !showTopBar }]">
                 <template v-if="readSettings">
@@ -127,13 +126,6 @@ export default {
             showThumbView: 'showThumbView',
             volumeSize: 'volumeSize'
         })
-    },
-
-    watch: {
-        // sync rotating status of topBarButton
-        showTopBar(newVal, oldVal) {
-            this.$refs.topBarButton.changeRotation(newVal);
-        }
     },
 
     methods: {
