@@ -39,7 +39,7 @@ export default {
 
         onClick(index) {
             this.select();
-            this.change(index);
+            this.$emit('change', index);
         },
 
         close() {

@@ -15,7 +15,7 @@
                 <template v-if="readSettings">
                     <div class="item">
                         <span class="label tips tips-down" title-content="设置画面比例">画面比例:</span>
-                        <drop-option :list="widthList" :change="(val) => dropOptionChange('width', val)" :cur-val="albumWidth + '%'"></drop-option>
+                        <drop-option :list="widthList" @change="(val) => dropOptionChange('width', val)" :cur-val="albumWidth + '%'"></drop-option>
                         <pop-slider 
                             :active="showWidthSlider" 
                             :min="30" 
@@ -28,7 +28,7 @@
                     </div>
                     <div class="item">
                         <span class="label tips tips-down" title-content="设置过大将会对网络速度要求较高">加载页数/次:</span>
-                        <drop-option :list="loadNumList" :change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum + 'P'"></drop-option>
+                        <drop-option :list="loadNumList" @change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum + 'P'"></drop-option>
                         <pop-slider 
                             :active="showLoadNumSlider" 
                             :min="1" 
@@ -41,7 +41,7 @@
                     </div>
                     <div class="item">
                         <span class="label tips tips-down" title-content="设置过大将会对性能要求较高">分卷页数:</span>
-                        <drop-option :list="volSizeList" :change="(val) => dropOptionChange('volSize', val)" :cur-val="volumeSize + 'P'"></drop-option>
+                        <drop-option :list="volSizeList" @change="(val) => dropOptionChange('volSize', val)" :cur-val="volumeSize + 'P'"></drop-option>
                         <pop-slider 
                             :active="showVolSizeSlider" 
                             :min="1" 
