@@ -1,470 +1,346 @@
 <template>
-    <div class="album-container">
-        <!-- loading view -->
-        <div class="loading-container" v-if="imgInfoList.length === 0">
-            <span class="loading">loading...</span>
-            <p class="tip">
-                注意事项:<br>无<br>
-            </p>
-        </div>
-        <!-- top bar view -->
-        <TopBar class="top-bar" />
-        <!-- panel view -->
-        <div class="panel">
-            <h4 class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>
-            <img title="全屏" @click="fullscreen()" class="focus icon" :src="image.fullScreen" />
-        </div>
-        <!-- scroll view -->
-        <awesome-scroll-view
-            ref="scrollView" 
-            class="scroll-view" 
-            v-if="imgInfoList.length > 0" 
-            :on-scroll-stopped="onScrollStopped" 
-            @topIn="toggleTopBar(true)"
-            @topLeave="toggleTopBar(false)">
-            <h1>{{ parser.getTitle() }}</h1>
-            <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
-            <!-- 150px is $album-view-width -->
-            <div class="img-container" 
-                :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }" 
-                v-for="(imgInfo, i) of volImgInfoList"
-                :key="imgInfo.pageUrl"
-                ref="imgContainers">
-                <img class="album-item" 
-                    v-if="nearbyArray.indexOf(index(i)) > -1" 
-                    :src="imgInfo.src" 
-                    :get-src="getImgSrc(index(i))" 
-                    @load="loaded(index(i, imgInfo.pageUrl))"
-                    @error="failLoad(index(i, imgInfo.pageUrl), $event)">
-                <div class="index">{{ index(i) + 1 }}</div>
-                <div class="img-info-panel" v-if="nearbyArray.indexOf(index(i))>-1">
-                    <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&imgInfo.src">...加载图片中...</div>
-                    <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&!imgInfo.src">...加载图片地址中...</div>
-                    <div class="loading-info" v-if="imgInfo.loadStatus==loadStatus.error">图片加载失败, 请在图片框右下角点击刷新按钮重新尝试</div>
-                </div>
-                 <div class="img-console-panel" v-if="imgInfo.loadStatus!=loadStatus.loaded"> 
-                    <div class="tips" title-content="载入原图">
-                        <svg class="refresh-origin-btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc(index(i), 'origin')" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                        </svg>
-                    </div>
-                    <div class="tips" title-content="刷新">
-                        <svg class="refresh-btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="getNewImgSrc(index(i))">
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-            <pagination v-if="volumeSum != 1" class="bottom-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
-        </awesome-scroll-view>
+<div class="album-container">
+    <!-- loading view -->
+    <div class="loading-container" v-if="imgInfoList.length === 0">
+        <span class="loading">loading...</span>
+        <p class="tip">
+            注意事项:<br>无<br>
+        </p>
     </div>
+    <!-- top bar view -->
+    <TopBar class="top-bar" />
+    <!-- panel view -->
+    <div class="panel">
+        <h4 class="location">{{ (curIndex + 1) + '/' + parser.getSumOfPage() }}</h4>
+        <img title="全屏" @click="fullscreen()" class="focus icon" :src="image.fullScreen" />
+    </div>
+    <!-- scroll view -->
+    <awesome-scroll-view
+        ref="scrollView" 
+        class="scroll-view" 
+        v-if="imgInfoList.length > 0" 
+        :on-scroll-stopped="onScrollStopped" 
+        @topIn="toggleTopBar(true)"
+        @topLeave="toggleTopBar(false)">
+        <h1>{{ parser.getTitle() }}</h1>
+        <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
+        <div class="img-container" ref="imgContainers" v-for="(imgInfo, i) of volImgInfoList" :key="imgInfo.pageUrl" :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }">
+            <page-view
+                :index="index(i, imgInfo.pageUrl)"
+                :active="nearbyArray.indexOf(index(i)) > -1"
+                :album-id="parser.getAlbumId()"
+                :data="imgInfo"
+                :style="{'min-width': `calc(${widthScale}vw - 150px)`, 'height': `calc(calc(${widthScale}vw - 150px)*${imgInfo.heightOfWidth})` }"
+            ></page-view>
+        </div>
+        <pagination v-if="volumeSum != 1" class="bottom-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
+    </awesome-scroll-view>
+</div>
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
-    import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
-    import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
-    import AwesomeScrollView from './base/AwesomeScrollView.vue'
-    import TopBar from './TopBar.vue'
-    import Logger from '../utils/Logger.js'
-    import image from '../assets/img'
-    import Pagination from './widget/Pagination.vue'
+import { mapGetters, mapActions } from 'vuex'
+import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
+import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
+import AwesomeScrollView from './base/AwesomeScrollView.vue'
+import TopBar from './TopBar.vue'
+import Logger from '../utils/Logger.js'
+import image from '../assets/img'
+import Pagination from './widget/Pagination.vue'
+import PageView from './PageView.vue'
 
-    export default {
-        name: 'AlbumScrollView',
+export default {
+    name: 'AlbumScrollView',
 
-        data() {
-            return {
-                parser: new ImgHtmlParser(document.documentElement.innerHTML),
-                imgInfoList: [],
-                pageUrlsObj: {}, // hash, for fast get page index by pagUrl
-                scrollTop: 0,
-                image, // for use image util within html
-                loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() }, // status of img loading
-                nearbyRange: [-2, 3], // the range of necessary imgs, basing on curIndex
-                curIndex: 0
-            }
+    data() {
+        return {
+            parser: new ImgHtmlParser(document.documentElement.innerHTML),
+            imgInfoList: [],
+            pageUrlsObj: {}, // hash, for fast get page index by pagUrl
+            scrollTop: 0,
+            image, // for use image util within html
+            loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() }, // status of img loading
+            curIndex: 0
+        }
+    },
+
+    components: {
+        AwesomeScrollView,
+        TopBar,
+        Pagination,
+        PageView
+    },
+
+    computed: {
+        ...mapGetters({
+            centerIndex: 'curIndex',
+            widthScale: 'albumWidth',
+            loadNum: 'loadNum',
+            volumeSize: 'volumeSize',
+            volFirstIndex: 'volFirstIndex',
+            curVolume: 'curVolume'
+        }),
+
+        // return a indexes array. the index is index of page, determining the show of pages.
+        nearbyArray() {
+            let curIndex = this.curIndex;
+            let _start = curIndex - this.loadNum;
+            let start = _start >= 0 ? _start : 0;
+            let _end = curIndex + this.loadNum;
+            let end = _end >= this.imgInfoList.length - 1 ? this.imgInfoList.length - 1 : _end;
+            return this.range(start, end - start + 1);
         },
 
-        components: {
-            AwesomeScrollView,
-            TopBar,
-            Pagination
+        volImgInfoList() {
+            return this.imgInfoList.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
         },
 
-        computed: {
-            ...mapGetters({
-                centerIndex: 'curIndex',
-                widthScale: 'albumWidth',
-                loadNum: 'loadNum',
-                volumeSize: 'volumeSize',
-                volFirstIndex: 'volFirstIndex',
-                curVolume: 'curVolume'
-            }),
+        volumeSum() {
+            return Math.ceil(this.parser.getSumOfPage() / this.volumeSize);
+        }
+    },
 
-            // return a indexes array. the index is index of page, determining the show of pages.
-            nearbyArray() {
-                let curIndex = this.curIndex;
-                let _start = curIndex - this.loadNum;
-                let start = _start >= 0 ? _start : 0;
-                let _end = curIndex + this.loadNum;
-                let end = _end >= this.imgInfoList.length - 1 ? this.imgInfoList.length - 1 : _end;
-                return this.range(start, end - start + 1);
-            },
-
-            volImgInfoList() {
-                return this.imgInfoList.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
-            },
-
-            volumeSum() {
-                return Math.ceil(this.parser.getSumOfPage() / this.volumeSize);
-            }
-        },
-
-        watch: {
-            centerIndex: {
-                handler: function(val, oldVal) {
-                    if (this.curIndex !== this.centerIndex) {
-                        // sync index
-                        if (this.centerIndex === this.volFirstIndex) {
-                            this.$refs.scrollView.ScrollTo(0, 1000);
-                            this.curIndex = this.volFirstIndex;
-                        } else {
-                            this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.volIndex(this.centerIndex)].offsetTop - 100, 1000);
-                        }
-                    }
-                    // if in the last page of current volume, preload next volume
-                    if (val === this.volFirstIndex + this.volumeSize - 1) {
-                        this.preloadVolume();
-                    }
-                },
-                deep: true
-            },
-
-            // watch scrollTop to calculate curIndex
-            scrollTop() {
-                // sort again, because if changing volume size, it may be out-of-order
-                let cons = this.$refs.imgContainers.sort((a, b) => a.offsetTop - b.offsetTop);
-                if (cons) {
-                    if (this.scrollTop !== 0) { // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
-                        const _cons = cons.concat().reverse();
-                        let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
-                        const volIndex = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
-                        const index = volIndex + this.volFirstIndex;
-                        this.setIndex(index);
-                        this.curIndex = index;
-                    } else {
-                        this.setIndex(this.volFirstIndex);
+    watch: {
+        centerIndex: {
+            handler: function(val, oldVal) {
+                if (this.curIndex !== this.centerIndex) {
+                    // sync index
+                    if (this.centerIndex === this.volFirstIndex) {
+                        this.$refs.scrollView.ScrollTo(0, 1000);
                         this.curIndex = this.volFirstIndex;
+                    } else {
+                        this.$refs.scrollView.ScrollTo(this.$refs.imgContainers[this.volIndex(this.centerIndex)].offsetTop - 100, 1000);
                     }
+                }
+                // if in the last page of current volume, preload next volume
+                if (val === this.volFirstIndex + this.volumeSize - 1) {
+                    this.preloadVolume();
+                }
+            },
+            deep: true
+        },
+
+        // watch scrollTop to calculate curIndex
+        scrollTop() {
+            // sort again, because if changing volume size, it may be out-of-order
+            let cons = this.$refs.imgContainers.sort((a, b) => a.offsetTop - b.offsetTop);
+            if (cons) {
+                if (this.scrollTop !== 0) { // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
+                    const _cons = cons.concat().reverse();
+                    let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
+                    const volIndex = result === -1 ? (this.$refs.imgContainers.length - 1) : result;
+                    const index = volIndex + this.volFirstIndex;
+                    this.setIndex(index);
+                    this.curIndex = index;
                 } else {
+                    this.setIndex(this.volFirstIndex);
                     this.curIndex = this.volFirstIndex;
                 }
+            } else {
+                this.curIndex = this.volFirstIndex;
+            }
+        }
+    },
+
+    created() {
+        this.curIndex = this.volFirstIndex;
+        this.sumOfPage = this.parser.getSumOfPage();
+        this.initImgInfoList();
+    },
+
+    methods: {
+        ...mapActions([
+            'setIndex',
+            'toggleTopBar'
+        ]),
+
+        initImgInfoList() {
+            AlbumCacheService
+                .getImgInfos(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
+                .then(imgInfoList => {
+                    this.imgInfoList = imgInfoList;
+                    // init pageUrlsObj
+                    for (let i = 0; i < imgInfoList.length; i++) {
+                        this.pageUrlsObj[imgInfoList[i].pageUrl] = i;
+                    }
+                    // sync location of page
+                    window.setTimeout(() => {
+                        this.setIndex(this.parser.getCurPageNum() - 1);
+                    }, 1000);
+                });
+        },
+
+        // for lazy load img
+        getImgSrc(index) {
+            // avoid redundant getImgSrc(), overlap refreshing of 'origin'
+            if (this.imgInfoList[index].loadStatus !== this.loadStatus.loading) {
+                AlbumCacheService
+                    .getImgSrc(this.parser.getAlbumId(), index)
+                    .then(src => {
+                        if (this.imgInfoList[index].src !== src) {
+                            this.imgInfoList[index].src = src;
+                            this.imgInfoList[index].loadStatus = this.loadStatus.loading;
+                        }
+                    });
             }
         },
 
-        created() {
-            this.curIndex = this.volFirstIndex;
-            this.sumOfPage = this.parser.getSumOfPage();
-            this.initImgInfoList();
-            this.blockEhActions();
+        // refresh img
+        getNewImgSrc(index, mode) {
+            this.imgInfoList[index].src = '';
+            this.imgInfoList[index].loadStatus = this.loadStatus.loading;
+            AlbumCacheService
+                .getNewImgSrc(this.parser.getAlbumId(), index, mode)
+                .then(src => {
+                    this.imgInfoList[index].src = src;
+                });
         },
 
-        methods: {
-            ...mapActions([
-                'setIndex',
-                'toggleTopBar'
-            ]),
+        range(start, count) {
+            return Array.apply(0, Array(count)).map(function (element, index) {
+                return index + start;
+            });
+        },
 
-            initImgInfoList() {
-                AlbumCacheService
-                    .getImgInfos(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage())
-                    .then(imgInfoList => {
-                        this.imgInfoList = imgInfoList.map(i => {
-                            i.isFirstLoad = true;
-                            i.loadStatus = this.loadStatus.waiting;
-                            return i;
-                        });
-                        // init pageUrlsObj
-                        for (let i = 0; i < imgInfoList.length; i++) {
-                            this.pageUrlsObj[imgInfoList[i].pageUrl] = i;
-                        }
-                        // sync location of page
-                        window.setTimeout(() => {
-                            this.setIndex(this.parser.getCurPageNum() - 1);
-                        }, 1000);
-                    });
-            },
+        onScrollStopped(position) {
+            this.scrollTop = position;
+        },
 
-            // for lazy load img
-            getImgSrc(index) {
-                // avoid redundant getImgSrc(), overlap refreshing of 'origin'
-                if (this.imgInfoList[index].loadStatus !== this.loadStatus.loading) {
-                    AlbumCacheService
-                        .getImgSrc(this.parser.getAlbumId(), index)
-                        .then(src => {
-                            if (this.imgInfoList[index].src !== src) {
-                                this.imgInfoList[index].src = src;
-                                this.imgInfoList[index].loadStatus = this.loadStatus.loading;
-                            }
-                        });
-                }
-            },
+        fullscreen() {
+            // hack for crossing chrome and firefox
+            const elem = document.querySelector('.vue-container');
+            if (document.webkitCurrentFullScreenElement || document.mozFullScreenElement) {
+                document.webkitExitFullscreen ? document.webkitExitFullscreen() : '';
+                document.mozCancelFullScreen ? document.mozCancelFullScreen() : '';
+            } else {
+                elem.mozRequestFullScreen ? elem.mozRequestFullScreen() : '';
+                elem.webkitRequestFullScreen ? elem.webkitRequestFullScreen() : '';
+            }
+        },
 
-            // refresh img
-            getNewImgSrc(index, mode) {
-                this.imgInfoList[index].src = '';
-                this.imgInfoList[index].loadStatus = this.loadStatus.loading;
-                AlbumCacheService
-                    .getNewImgSrc(this.parser.getAlbumId(), index, mode)
-                    .then(src => {
-                        this.imgInfoList[index].src = src;
-                    });
-            },
+        // get index of album for index of current volume
+        index(i, pageUrl) {
+            if (pageUrl) { // fix errors in delay methods
+                return this.pageUrlsObj[pageUrl];
+            } else {
+                return this.volFirstIndex + i;
+            }
+        },
 
-            range(start, count) {
-                return Array.apply(0, Array(count)).map(function (element, index) {
-                    return index + start;
-                });
-            },
+        // get index of current volume for index of album
+        volIndex(i) {
+            return i - this.volFirstIndex;
+        },
 
-            onScrollStopped(position) {
-                this.scrollTop = position;
-            },
+        selectVol(index) {
+            // this.$refs.scrollView.ScrollTo(0, 1000);
+            let newIndex = index * this.volumeSize; // set index to first index of target volume
+            this.setIndex(newIndex);
+        },
 
-            // block some weird actions in eh page
-            blockEhActions() {
-                var elt = document.createElement('script');
-                elt.innerHTML = `
-                    if (typeof timerId === 'undefined') {
-                        const timerId = window.setInterval(() => {
-                            if (document.onkeyup) {
-                                window.onpopstate = null;
-                                window.clearInterval(timerId);
-                                load_image_dispatch = () => {};
-                                api_response = () => {};
-                                _load_image = () => {};
-                                nl = () => {};
-                                hookEvent = () => { console.log('hookEvent') };
-                                scroll_space = () => {};
-                                document.onkeydown = () => {};
-                                document.onkeyup = () => {};
-                            }
-                        }, 1000);
-                    }
-                `;
-                document.body.appendChild(elt);
-            },
+        // preload image
+        preload(index) {
+            this.getImgSrc(index);
+        },
 
-            fullscreen() {
-                // hack for crossing chrome and firefox
-                const elem = document.querySelector('.vue-container');
-                if (document.webkitCurrentFullScreenElement || document.mozFullScreenElement) {
-                    document.webkitExitFullscreen ? document.webkitExitFullscreen() : '';
-                    document.mozCancelFullScreen ? document.mozCancelFullScreen() : '';
-                } else {
-                    elem.mozRequestFullScreen ? elem.mozRequestFullScreen() : '';
-                    elem.webkitRequestFullScreen ? elem.webkitRequestFullScreen() : '';
-                }
-            },
-
-            failLoad(index, e) {
-                e.preventDefault();
-                if (this.imgInfoList[index].src) {
-                    this.imgInfoList[index].loadStatus = this.loadStatus.error;
-                    Logger.logText('LOADING', 'loading image failed');
-                    if (this.imgInfoList[index].isFirstLoad) { // auto request src when first loading is failed
-                        this.imgInfoList[index].isFirstLoad = false;
-                        Logger.logText('LOADING', 'reloading image');
-                        this.getNewImgSrc(index);
-                    }
-                }
-            },
-
-            loaded(index) {
-                this.imgInfoList[index].loadStatus = this.loadStatus.loaded;
-            },
-
-            // get index of album for index of current volume
-            index(i, pageUrl) {
-                if (pageUrl) { // fix errors in delay methods
-                    return this.pageUrlsObj[pageUrl];
-                } else {
-                    return this.volFirstIndex + i;
-                }
-            },
-
-            // get index of current volume for index of album
-            volIndex(i) {
-                return i - this.volFirstIndex;
-            },
-
-            selectVol(index) {
-                // this.$refs.scrollView.ScrollTo(0, 1000);
-                let newIndex = index * this.volumeSize; // set index to first index of target volume
-                this.setIndex(newIndex);
-            },
-
-            // preload image
-            preload(index) {
-                this.getImgSrc(index);
-            },
-
-            // preload next volume
-            preloadVolume() {
-                if (this.volumeSum > this.curVolume + 1) {
-                    let volLastIndex = this.volFirstIndex + this.volumeSize - 1;
-                    this.preload(volLastIndex + 1);
-                    Logger.logText('Album', 'preload 1');
-                    if (this.parser.getSumOfPage() - 1 >= volLastIndex + 2) {
-                        this.preload(volLastIndex + 2);
-                        Logger.logText('Album', 'preload 2');
-                    }
+        // preload next volume
+        preloadVolume() {
+            if (this.volumeSum > this.curVolume + 1) {
+                let volLastIndex = this.volFirstIndex + this.volumeSize - 1;
+                this.preload(volLastIndex + 1);
+                Logger.logText('Album', 'preload volume');
+                if (this.parser.getSumOfPage() - 1 >= volLastIndex + 2) {
+                    this.preload(volLastIndex + 2);
                 }
             }
         }
     }
+}
 
 </script>
 
 <style lang="scss" scoped>
-    @import "~style/_responsive";
-    @import "~style/_variables";
-    .album-container {
-        position: relative;
-        > .loading-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: $img_container_color;
-            > .loading {
-                display: block;
-                font-size: 24px;
-                font-weight: bolder;
-            }
-            > .tip {
-                padding: 0;
-                margin: 10px 0;
-                font-size: 16px;
-            }
+@import "~style/_responsive";
+@import "~style/_variables";
+.album-container {
+    position: relative;
+    > .loading-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: $img_container_color;
+        > .loading {
+            display: block;
+            font-size: 24px;
+            font-weight: bolder;
         }
-        > .top-bar {
-            position: absolute;
-            z-index: 10;
-            left: 0;
-            top: 0;
-            width: 100%;
-        }
-        > .panel {
-            position: absolute;
-            bottom: 5px;
-            right: 23px;
-            z-index: 10;
-            color: rgba(white, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            > .location {
-                font-size: 14px;
-                display: inline-block;
-                line-height: 16px;
-                height: 16px;
-            }
-            .icon-container {
-                position: relative;
-                display: inline-block;
-            }
-            .focus.icon {
-                width: 16px;
-                display: inline-block;
-                height: 16px;
-                cursor: pointer;
-                margin: 18px 0 18px 10px;
-            }
-
-        }
-
-        > .scroll-view {
-            position: relative;
-            height: 100vh;
-            h1 {
-                color: #c9cacf;
-                padding: 10px 20px;
-                font-size: 18px;
-                text-align: center;
-                margin-top: 60px;
-            }
-            > .top-pagination {
-                margin-top: 20px;
-            }
-            > .bottom-pagination {
-                margin-bottom: 40px;
-            }
-            .img-container {
-                position: relative;
-                // width: 1280px;
-                width: 10px;
-                transition: all 0.3s ease;
-                margin: 35px auto;
-                box-shadow: inset 0px 0px 0px 5px $img_container_color;
-                > .index {
-                    position: absolute;
-                    color: $img_container_color;
-                    font-weight: bolder;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    font-size: 80px;
-                    z-index: -1;
-                }
-                > .img-info-panel {
-                    position: absolute;
-                    top: calc(50% + 80px);
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: $img_container_color;
-                    font-size: 14px;
-                    z-index: -1;
-                }
-                > .img-console-panel {
-                    position: absolute;
-                    bottom: 10px;
-                    right: 10px;
-                    z-index: 1;
-                    display: flex;
-                    flex-direction: row;
-                    .refresh-btn {
-                        fill: $img_container_color;
-                        height: 20px;
-                        width: 20px;
-                        display: block;
-                        margin: 0 auto;
-                        cursor: pointer;
-                        &:hover {
-                            fill: $primary_color;
-                        }
-                    }
-                    .refresh-origin-btn {
-                        fill: $img_container_color;
-                        height: 20px;
-                        width: 20px;
-                        display: block;
-                        margin: 0 auto;
-                        cursor: pointer;
-                        &:hover {
-                            fill: $primary_color;
-                        }
-                    }
-                }
-                > .album-item {
-                    width: inherit;
-                    min-width: inherit;
-                    height: inherit;
-                }
-            }
+        > .tip {
+            padding: 0;
+            margin: 10px 0;
+            font-size: 16px;
         }
     }
+    > .top-bar {
+        position: absolute;
+        z-index: 10;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    > .panel {
+        position: absolute;
+        bottom: 5px;
+        right: 23px;
+        z-index: 10;
+        color: rgba(white, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        > .location {
+            font-size: 14px;
+            display: inline-block;
+            line-height: 16px;
+            height: 16px;
+        }
+        .icon-container {
+            position: relative;
+            display: inline-block;
+        }
+        .focus.icon {
+            width: 16px;
+            display: inline-block;
+            height: 16px;
+            cursor: pointer;
+            margin: 18px 0 18px 10px;
+        }
+
+    }
+
+    > .scroll-view {
+        position: relative;
+        height: 100vh;
+        h1 {
+            color: #c9cacf;
+            padding: 10px 20px;
+            font-size: 18px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        > .top-pagination {
+            margin-top: 20px;
+        }
+        > .bottom-pagination {
+            margin-bottom: 40px;
+        }
+        .img-container {
+            position: relative;
+            // width: 1280px;
+            width: 10px;
+            transition: all 0.3s ease;
+            margin: 35px auto;
+            box-shadow: inset 0px 0px 0px 5px $img_container_color;
+        }
+    }
+}
 </style>

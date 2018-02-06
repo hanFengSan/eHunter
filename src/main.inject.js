@@ -98,6 +98,30 @@ function createVueView() {
     }
 }
 
+// some actions of eh will make some wired errors
+function blockEhActions() {
+    var elt = document.createElement('script');
+    elt.innerHTML = `
+        if (typeof timerId === 'undefined') {
+            const timerId = window.setInterval(() => {
+                if (document.onkeyup) {
+                    window.onpopstate = null;
+                    window.clearInterval(timerId);
+                    load_image_dispatch = () => {};
+                    api_response = () => {};
+                    _load_image = () => {};
+                    nl = () => {};
+                    hookEvent = () => { console.log('hookEvent') };
+                    scroll_space = () => {};
+                    document.onkeydown = () => {};
+                    document.onkeyup = () => {};
+                }
+            }, 1000);
+        }
+    `;
+    document.body.appendChild(elt);
+}
+
 // add ehunter switch etc.
 async function init() {
     if (isAlbumViewPage()) {
@@ -115,6 +139,7 @@ let eHunter = {
             document.body.style.overflow = val ? 'hidden' : '';
             document.getElementsByClassName('vue-container')[0].style.top = val ? '0' : '-100%';
         } else {
+            blockEhActions();
             createEHunterView();
             createVueView();
             SettingService.initSettings();
