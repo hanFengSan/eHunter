@@ -1,77 +1,69 @@
 <template>
-    <div id="app-content">
+    <div class="app">
         <thumb-scroll-view class="thumb-scroll-view" :style="thumbStyle"></thumb-scroll-view>
         <album-scroll-view class="album-scroll-view"></album-scroll-view>
     </div>
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
-    import ThumbScrollView from './components/ThumbScrollView.vue'
-    import AlbumScrollView from './components/AlbumScrollView.vue'
+import { mapGetters } from 'vuex'
+import ThumbScrollView from './components/ThumbScrollView.vue'
+import AlbumScrollView from './components/AlbumScrollView.vue'
 
-    export default {
-        name: 'InjectedApp',
+export default {
+    name: 'InjectedApp',
 
-        data() {
-            return {
+    data() {
+        return {
+        };
+    },
 
+    components: {
+        ThumbScrollView, AlbumScrollView
+    },
+
+    computed: {
+        ...mapGetters([
+            'showThumbView',
+            'thumbWidth'
+        ]),
+        thumbStyle() {
+            if (this.showThumbView) {
+                return '';
+            } else {
+                return `margin-left: -${this.thumbWidth}px`;
             }
-        },
-
-        computed: {
-            ...mapGetters([
-                'showThumbView',
-                'thumbWidth'
-            ]),
-            thumbStyle() {
-                if (this.showThumbView) {
-                    return '';
-                } else {
-                    return `margin-left: -${this.thumbWidth}px`;
-                }
-            }
-        },
-
-        created() {
-        },
-
-        methods: {
-            ...mapActions([
-                'setAlbumWidth'
-            ])
-        },
-
-        components: {
-            ThumbScrollView, AlbumScrollView
         }
     }
-
+}
 </script>
 
 <style lang="scss">
-    @import "~style/_responsive";
-    @import "~style/_variables";
+@import "~style/_responsive";
+@import "~style/_variables";
 
-    #app-content {
-        display: flex;
-        > .thumb-scroll-view {
-            transition: all 0.3s ease;
-            &.hide {
-                margin: -100%;
-            }
-        }
-        > .album-scroll-view {
-            flex-grow: 1;
+.app {
+    display: flex;
+    > .thumb-scroll-view {
+        transition: all 0.3s ease;
+        &.hide {
+            margin: -100%;
         }
     }
+    > .album-scroll-view {
+        flex-grow: 1;
+    }
 
-    body {
-        font-family: 'San Francisco', 'Helvetica', Arial, "Hiragino Sans GB", "Heiti SC",//macOS & ios
-        "Microsoft YaHei", //windows
-        'Droid Sans', // android default
-        'WenQuanYi Micro Hei', // linux
-        sans-serif;
+    section, header, nav {
+        display: flex;
+    }
+
+    p {
+        padding: 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        margin: 0;
     }
 
     .clickable {
@@ -92,7 +84,8 @@
                 left: 50%;
                 transform: translate(-50%, 0);
                 font-size: 12px;
-                padding: 2px 4px;
+                white-space: nowrap;
+                padding: 4px 6px 5px 6px;
                 border-radius: 2px;
                 min-width: 50px;
                 text-align: center;
@@ -108,4 +101,13 @@
             }
         }
     }
+}
+
+body {
+    font-family: 'San Francisco', 'Helvetica', Arial, "Hiragino Sans GB", "Heiti SC",//macOS & ios
+    "Microsoft YaHei", //windows
+    'Droid Sans', // android default
+    'WenQuanYi Micro Hei', // linux
+    sans-serif;
+}
 </style>

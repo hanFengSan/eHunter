@@ -1,5 +1,6 @@
 // color
 $primary_color: hsl(145, 63%, 49%);
+$light_primary_color: hsl(145, 63%, 60%);
 $split_grey: #DDDDDD;
 $accent_color: hsl(145, 63%, 42%);
 $background_grey: #EEEEEE;
@@ -10,7 +11,10 @@ $text_grey: #777777;
 $slider_track_bg: #bdbdbd;
 $slider_track_fill_color: hsl(145, 63%, 42%);
 $slider_thumb_color: hsl(145, 63%, 49%);
+
 $flat_button_primary_color: hsl(145, 63%, 49%);
+$flat_button_light_color: hsl(145, 63%, 60%);
+$flat_button_dark_color: hsl(145, 63%, 30%);
 
 $switch_track_disabled_color: #bdbdbd;
 $switch_track_enabled_color: #71ca96;
@@ -32,6 +36,14 @@ $pagination_item_text_actived__color: white;
 $pagination_item_text_hovered__color: white;
 $pagination_item_background_actived__color: hsl(145, 63%, 49%);
 $pagination_item_background_hovered__color: #777777;
+
+$page_view_thumb_mask_color: rgba(0, 0, 0, 0.5);
+$page_view_index_color: rgba(255, 255, 255, 0.5);
+$page_view_border_color: hsl(231, 6%, 36%);
+$page_view_info_color: white;
+$page_view_loading_btn_color: rgba(255, 255, 255, 0.8);
+$page_view_loading_btn_hovered_color: hsl(145, 63%, 60%);
+$page_view_loading_btn_actived_color: hsl(145, 63%, 30%);
 
 $body_bg: #333333; // directly use in app.inject.js
 $img_container_color:hsl(231, 6%, 36%);

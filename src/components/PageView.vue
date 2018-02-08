@@ -1,5 +1,5 @@
 <template>
-<div class="page-view">
+<section class="page-view">
     <!-- <img class="album-item" 
         v-if="active" 
         :src="imgInfo.src" 
@@ -7,10 +7,33 @@
         @load="loaded()"
         @error="failLoad($event)"> -->
     <div class="layer preview-layer" :style="AlbumService.getPreviewThumbnailStyle(index, imgInfo, thumb)"></div>
-    <div class="layer loading-layer"></div>
+    <div class="layer loading-layer">
+        <h6 class="index">{{ index + 1 }}</h6>
+        <article class="loading-info-panel" v-if="active">
+            <p class="loading-info" v-if="active&&imgInfo.loadStatus!=loadStatus.loaded">
+                {{ loadingInfo }}
+                <flat-button class="tips" title-content="加载原图, 可有效解决加载问题" label="原图" mode="inline" @click="getNewImgSrc('origin')"></flat-button>
+                <flat-button class="tips" title-content="刷新, 获取普通图片" label="刷新" mode="inline" @click="getNewImgSrc()"></flat-button>
+            </p>
+        </article>
+        <div class="loading-console-panel" v-if="active&&imgInfo.loadStatus!=loadStatus.loaded"> 
+            <div class="tips" title-content="载入原图">
+                <svg class="btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc('origin')" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                </svg>
+            </div>
+            <div class="tips" title-content="刷新">
+                <svg class="btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="getNewImgSrc()">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="index">{{ index + 1 }}</div>
     <div class="layer img-layer"></div>
     <div class="layer console-layer"></div>
-    <!-- <div class="index">{{ index + 1 }}</div>
     <div class="img-info-panel" v-if="active">
         <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&imgInfo.src">...加载图片中...</div>
         <div class="loading-info" v-if="imgInfo.loadStatus!=loadStatus.error&&!imgInfo.src">...加载图片地址中...</div>
@@ -30,11 +53,12 @@
             </svg>
         </div>
     </div> -->
-</div>
+</section>
 </template>
 
 <script>
 import AlbumService from 'src/service/AlbumService.js'
+import FlatButton from './widget/FlatButton.vue'
 import Logger from '../utils/Logger.js'
 
 export default {
@@ -55,10 +79,13 @@ export default {
         }
     },
 
+    components: { FlatButton },
+
     data() {
         return {
             imgInfo: {},
             thumb: {},
+            reloadTimes: 0,
             loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() } // status of img loading
         };
     },
@@ -71,7 +98,19 @@ export default {
     },
 
     computed: {
-        AlbumService: () => AlbumService
+        AlbumService: () => AlbumService,
+        loadingInfo() {
+            let reloadInfo = this.reloadTimes ? `[重载-${this.reloadTimes}] ` : '';
+            if (this.imgInfo.loadStatus !== this.loadStatus.error) {
+                if (this.imgInfo.src) {
+                    return reloadInfo + '加载图片中';
+                } else {
+                    return reloadInfo + '加载图片地址中';
+                }
+            } else {
+                return reloadInfo + '图片加载失败, 请刷新';
+            }
+        }
     },
 
     methods: {
@@ -89,6 +128,7 @@ export default {
 
         // refresh img
         async getNewImgSrc(mode) {
+            this.reloadTimes++;
             this.imgInfo.src = '';
             this.imgInfo.loadStatus = this.loadStatus.loading;
             let src = await AlbumService.getImgSrc(this.index, mode);
@@ -122,7 +162,7 @@ export default {
 @import "~style/_responsive";
 @import "~style/_variables";
 
-* div {
+div {
     display: flex;
 }
 
@@ -145,70 +185,69 @@ export default {
         overflow: hidden;
         background-color: black;
         background-repeat: no-repeat;
-        background-size: 2000%;
-        > .preview-img {
-            background-color: transparent;
-            background-repeat: no-repeat;
-            // background-size: cover;
+        &:after {
+            display: block;
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: $page_view_thumb_mask_color;
         }
     }
 
     > .loading-layer {
-        box-shadow: inset 0px 0px 0px 5px $img_container_color;
-    }
-
-
-
-
-    > .index {
-        position: absolute;
-        color: $img_container_color;
-        font-weight: bolder;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 80px;
-        z-index: -1;
-    }
-    > .img-info-panel {
-        position: absolute;
-        top: calc(50% + 80px);
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: $img_container_color;
-        font-size: 14px;
-        z-index: -1;
-    }
-    > .img-console-panel {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        z-index: 1;
-        display: flex;
-        flex-direction: row;
-        .refresh-btn {
-            fill: $img_container_color;
-            height: 20px;
-            width: 20px;
-            display: block;
-            margin: 0 auto;
-            cursor: pointer;
-            &:hover {
-                fill: $primary_color;
+        box-shadow: inset 0px 0px 0px 5px $page_view_border_color;
+        > .index {
+            position: absolute;
+            color: $page_view_index_color;
+            font-weight: bolder;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            margin: 0;
+        }
+        > .loading-info-panel {
+            position: absolute;
+            top: calc(50% + 80px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: $page_view_info_color;
+            font-size: 14px;
+            > .loading-info {
+                display: flex;
+                align-items: center;
             }
         }
-        .refresh-origin-btn {
-            fill: $img_container_color;
-            height: 20px;
-            width: 20px;
-            display: block;
-            margin: 0 auto;
-            cursor: pointer;
-            &:hover {
-                fill: $primary_color;
+        > .loading-console-panel {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1;
+            display: flex;
+            flex-direction: row;
+            .btn {
+                height: 20px;
+                width: 20px;
+                display: block;
+                margin: 0 auto;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                fill: $page_view_loading_btn_color;
+                &:hover {
+                    fill: $page_view_loading_btn_hovered_color;
+                }
+                &:active {
+                    fill: $page_view_loading_btn_actived_color;
+                }
             }
         }
     }
+
+
+
     > .album-item {
         width: inherit;
         min-width: inherit;

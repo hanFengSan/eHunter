@@ -1,6 +1,6 @@
 <template>
-<div class="FlatButton">
-    <a @click="handleClick">{{ label }}</a>
+<div :class="['flat-button', mode]">
+    <a :class="[mode]" @click="handleClick">{{ label }}</a>
 </div>
 </template>
 
@@ -11,6 +11,10 @@ export default {
     props: {
         label: {
             type: String
+        },
+        mode: {
+            type: String,
+            default: 'default'
         }
     },
 
@@ -31,20 +35,33 @@ export default {
 <style lang="scss" scoped>
 @import "~style/_responsive";
 @import "~style/_variables";
-.FlatButton {
+.flat-button {
     > a {
         font-size: 14px;
         color: $flat_button_primary_color;
-        padding: 5px 10px;
         cursor: pointer;
-        white-space: nowrap;
         user-select: none;
+        white-space: nowrap;
         transition: all 0.2s ease;
+    }
+    > .default {
+        padding: 5px 10px;
         &:hover {
             background: rgba(0, 0, 0, 0.05);
         }
         &:active {
             background: rgba(0, 0, 0, 0.15);
+        }
+    }
+    &.inline {
+        margin-left: 10px;
+    }
+    > .inline {
+        &:hover {
+            color: $flat_button_light_color;
+        }
+        &:active {
+            color: $flat_button_dark_color;
         }
     }
 }

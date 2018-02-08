@@ -1,67 +1,65 @@
 <template>
-    <div>
-        <div class="container">
-            <div class="float-content">
-                <circle-icon-button 
-                    ref="topBarButton" 
-                    class="button" 
-                    icon="menu" 
-                    :rotate="showTopBar" 
-                    @click="changeTopBar">
-                </circle-icon-button>
-                <circle-icon-button class="button" icon="close" @click="closeEHunter"></circle-icon-button>
-            </div>
-            <div :class="['inner-content', { hide: !showTopBar }]">
-                <template v-if="readSettings">
-                    <div class="item">
-                        <span class="label tips tips-down" title-content="设置画面比例">画面比例:</span>
-                        <drop-option :list="widthList" @change="(val) => dropOptionChange('width', val)" :cur-val="albumWidth + '%'"></drop-option>
-                        <pop-slider 
-                            :active="showWidthSlider" 
-                            :min="30" 
-                            :max="100" 
-                            :step="1" 
-                            :init="albumWidth" 
-                            :close="() => closeDropOptionSlider('width')" 
-                            @change="(val) => dropOptionSliderChange('width', val)">
-                        </pop-slider>
-                    </div>
-                    <div class="item">
-                        <span class="label tips tips-down" title-content="设置过大将会对网络速度要求较高">加载页数/次:</span>
-                        <drop-option :list="loadNumList" @change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum + 'P'"></drop-option>
-                        <pop-slider 
-                            :active="showLoadNumSlider" 
-                            :min="1" 
-                            :max="100" 
-                            :step="1" 
-                            :init="loadNum" 
-                            :close="() => closeDropOptionSlider('loadNum')" 
-                            @change="(val) => dropOptionSliderChange('loadNum', val)">
-                        </pop-slider>
-                    </div>
-                    <div class="item">
-                        <span class="label tips tips-down" title-content="设置过大将会对性能要求较高">分卷页数:</span>
-                        <drop-option :list="volSizeList" @change="(val) => dropOptionChange('volSize', val)" :cur-val="volumeSize + 'P'"></drop-option>
-                        <pop-slider 
-                            :active="showVolSizeSlider" 
-                            :min="1" 
-                            :max="200" 
-                            :step="1" 
-                            :init="volumeSize" 
-                            :close="() => closeDropOptionSlider('volSize')" 
-                            @change="(val) => dropOptionSliderChange('volSize', val)">
-                        </pop-slider>
-                    </div>
-                    <div class="item">
-                        <span class="label tips tips-down" title-content="开启/关闭左侧缩略图栏">缩略图栏:</span>
-                        <div class="bar-switch">
-                            <simple-switch :active="showThumbView" @change="changeThumbView"></simple-switch>
-                        </div>
-                    </div>
-                </template>
-            </div>
+    <nav class="top-bar">
+        <div class="float-content">
+            <circle-icon-button 
+                ref="topBarButton" 
+                class="button" 
+                icon="menu" 
+                :rotate="showTopBar" 
+                @click="changeTopBar">
+            </circle-icon-button>
+            <circle-icon-button class="button" icon="close" @click="closeEHunter"></circle-icon-button>
         </div>
-    </div>
+        <div :class="['inner-content', { hide: !showTopBar }]">
+            <template v-if="readSettings">
+                <div class="item">
+                    <span class="label tips tips-down" title-content="设置画面比例">画面比例:</span>
+                    <drop-option :list="widthList" @change="(val) => dropOptionChange('width', val)" :cur-val="albumWidth + '%'"></drop-option>
+                    <pop-slider 
+                        :active="showWidthSlider" 
+                        :min="30" 
+                        :max="100" 
+                        :step="1" 
+                        :init="albumWidth" 
+                        :close="() => closeDropOptionSlider('width')" 
+                        @change="(val) => dropOptionSliderChange('width', val)">
+                    </pop-slider>
+                </div>
+                <div class="item">
+                    <span class="label tips tips-down" title-content="设置过大将会对网络速度要求较高">加载页数/次:</span>
+                    <drop-option :list="loadNumList" @change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum + 'P'"></drop-option>
+                    <pop-slider 
+                        :active="showLoadNumSlider" 
+                        :min="1" 
+                        :max="100" 
+                        :step="1" 
+                        :init="loadNum" 
+                        :close="() => closeDropOptionSlider('loadNum')" 
+                        @change="(val) => dropOptionSliderChange('loadNum', val)">
+                    </pop-slider>
+                </div>
+                <div class="item">
+                    <span class="label tips tips-down" title-content="设置过大将会对性能要求较高">分卷页数:</span>
+                    <drop-option :list="volSizeList" @change="(val) => dropOptionChange('volSize', val)" :cur-val="volumeSize + 'P'"></drop-option>
+                    <pop-slider 
+                        :active="showVolSizeSlider" 
+                        :min="1" 
+                        :max="200" 
+                        :step="1" 
+                        :init="volumeSize" 
+                        :close="() => closeDropOptionSlider('volSize')" 
+                        @change="(val) => dropOptionSliderChange('volSize', val)">
+                    </pop-slider>
+                </div>
+                <div class="item">
+                    <span class="label tips tips-down" title-content="开启/关闭左侧缩略图栏">缩略图栏:</span>
+                    <div class="bar-switch">
+                        <simple-switch :active="showThumbView" @change="changeThumbView"></simple-switch>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </nav>
 </template>
 
 <script>
@@ -213,7 +211,7 @@ export default {
 div {
   display: flex;
 }
-.container {
+.top-bar {
   width: 100%;
   position: relative;
   > .float-content {

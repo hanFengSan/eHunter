@@ -1,5 +1,5 @@
 <template>
-    <div class="thumb-content">
+    <aside class="thumb-content">
         <awesome-scroll-view ref="scrollView"  class="thumb-scroll-view" @mouseenter="hover=true" @mouseleave="hover=false">
             <div class="header">
                 <span class="app-name">EHUNTER</span>
@@ -12,7 +12,7 @@
                 <div class="index">{{ index(i) + 1 }}</div>
             </div>
         </awesome-scroll-view>
-    </div>
+    </aside>
 </template>
 
 <script>
