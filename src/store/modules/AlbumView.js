@@ -5,6 +5,7 @@ import * as types from '../mutation-types'
 const state = {
     curIndex: 0,
     volumeSize: 10,
+    volumePreloadCount: 2, // the preload count of page of next volume
     thumb: {
         width: 150, // px
         thumbView: true
@@ -31,7 +32,8 @@ const getters = {
         let remainder = state.curIndex % state.volumeSize;
         return (state.curIndex - remainder) / state.volumeSize;
     },
-    volFirstIndex: state => getters.curVolume(state) * state.volumeSize
+    volFirstIndex: state => getters.curVolume(state) * state.volumeSize,
+    volumePreloadCount: state => state.volumePreloadCount
 }
 
 // actions

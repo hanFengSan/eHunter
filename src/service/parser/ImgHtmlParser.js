@@ -56,6 +56,11 @@ class ImgHtmlParser {
         return this.html.querySelector('#i7>a').attributes['href'].value;
     }
 
+    getSourceId() {
+        this.html.querySelector('#loadfail').attributes['onclick'].value.match(/nl\('(.*?)'\)/g);
+        return RegExp.$1;
+    }
+
     _initI2Element() {
         this.i2 = this.document.getElementById('i2');
     }

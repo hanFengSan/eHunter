@@ -14,6 +14,9 @@
         <h4 class="location">{{ (curIndex + 1) + '/' + AlbumService.getSumOfPage() }}</h4>
         <img title="全屏" @click="fullscreen()" class="focus icon" :src="image.fullScreen" />
     </div>
+    <div class="preload">
+        <img :src="src" width="100" height="144" v-for="src of preloadImgs" :key="src">
+    </div>
     <!-- scroll view -->
     <awesome-scroll-view
         ref="scrollView" 
@@ -61,8 +64,8 @@ export default {
             imgInfoList: [],
             pageUrlsObj: {}, // hash, for fast get page index by pagUrl
             scrollTop: 0,
-            loadStatus: { loading: Symbol(), error: Symbol(), waiting: Symbol(), loaded: Symbol() }, // status of img loading
-            curIndex: 0
+            curIndex: 0,
+            preloadImgs: []
         }
     },
 
@@ -80,7 +83,8 @@ export default {
             loadNum: 'loadNum',
             volumeSize: 'volumeSize',
             volFirstIndex: 'volFirstIndex',
-            curVolume: 'curVolume'
+            curVolume: 'curVolume',
+            volumePreloadCount: 'volumePreloadCount'
         }),
 
         // return a indexes array. the index is index of page, determining the show of pages.
@@ -171,26 +175,6 @@ export default {
             }, 1000);
         },
 
-        // for lazy load img
-        async getImgSrc(index) {
-            // avoid redundant getImgSrc(), overlap refreshing of 'origin'
-            if (this.imgInfoList[index].loadStatus !== this.loadStatus.loading) {
-                let src = await AlbumService.getImgSrc(index);
-                if (this.imgInfoList[index].src !== src) {
-                    this.imgInfoList[index].src = src;
-                    this.imgInfoList[index].loadStatus = this.loadStatus.loading;
-                }
-            }
-        },
-
-        // refresh img
-        async getNewImgSrc(index, mode) {
-            this.imgInfoList[index].src = '';
-            this.imgInfoList[index].loadStatus = this.loadStatus.loading;
-            let src = AlbumService.getNewImgSrc(index, mode);
-            this.imgInfoList[index].src = src;
-        },
-
         range(start, count) {
             return Array.apply(0, Array(count)).map(function (element, index) {
                 return index + start;
@@ -234,19 +218,23 @@ export default {
         },
 
         // preload image
-        preload(index) {
-            this.getImgSrc(index);
+        async preload(index) {
+            if (this.preloadImgs.length === this.volumePreloadCount) {
+                this.preloadImgs = [];
+            }
+            this.preloadImgs.push(await AlbumService.getImgSrc(index));
         },
 
         // preload next volume
         preloadVolume() {
             if (this.volumeSum > this.curVolume + 1) {
                 let volLastIndex = this.volFirstIndex + this.volumeSize - 1;
-                this.preload(volLastIndex + 1);
-                Logger.logText('Album', 'preload volume');
-                if (AlbumService.getSumOfPage() - 1 >= volLastIndex + 2) {
-                    this.preload(volLastIndex + 2);
+                for (let i = 1; i <= this.volumePreloadCount; i++) {
+                    if (AlbumService.getSumOfPage() - 1 >= volLastIndex + i) {
+                        this.preload(volLastIndex + i);
+                    }
                 }
+                Logger.logText('Album', 'preload volume');
             }
         }
     }
@@ -315,6 +303,16 @@ export default {
             margin: 18px 0 18px 10px;
         }
 
+    }
+
+    > .preload {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 144px;
+        z-index: -10;
+        opacity: 0;
     }
 
     > .scroll-view {

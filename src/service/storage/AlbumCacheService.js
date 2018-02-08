@@ -127,28 +127,37 @@ class AlbumCacheService {
         }
     }
 
-    async getImgSrc(albumId, index, mode) {
+    async getImgSrc(albumId, index, mode, sourceId) {
         let album = await this._getAlbum(albumId);
         if (album.imgInfos[index].src) {
             return album.imgInfos[index].src;
-        } else {
-            try {
-                let text = await (new TextReqService(album.imgInfos[index].pageUrl)).request();
-                if (mode) {
-                    switch (mode) {
-                        case 'origin': // if want to load original img
-                            album.imgInfos[index].src = new ImgHtmlParser(text).getOriginalImgUrl();
+        }
+        try {
+            let param = sourceId ? `?nl=${sourceId}` : ''; // change source 0f img
+            let text = await (new TextReqService(album.imgInfos[index].pageUrl + param)).request();
+            let parser = new ImgHtmlParser(text);
+            switch (mode) {
+                case 'ORIGIN': // if want to load original img
+                    try {
+                        Logger.logText('Cache', 'FUCK');
+                        album.imgInfos[index].src = parser.getOriginalImgUrl();
+                    } catch (e) {
+                        return Error('NO_ORIGIN');
                     }
-                } else {
-                    // default img
-                    album.imgInfos[index].src = new ImgHtmlParser(text).getImgUrl();
-                }
-                await this._saveAlbum(albumId);
-                return album.imgInfos[index].src;
-            } catch (e) {
-                console.error(e);
-                // TODO: show tips for the error
+                    break;
+                case 'CHANGE_SOURCE':
+                    if (!sourceId) {
+                        return await this.getImgSrc(albumId, index, null, parser.getSourceId());
+                    }
+                    break;
+                default:
+                    album.imgInfos[index].src = parser.getImgUrl();
             }
+            await this._saveAlbum(albumId);
+            return album.imgInfos[index].src;
+        } catch (e) {
+            console.error(e);
+            // TODO: show tips for the error
         }
     }
 
