@@ -179,7 +179,7 @@ export default {
             >.thumb {
                 display: block;
                 width: $thumb-width;
-                // 1/1.44 is the default scale of ehentai's thumb
+                // 1/1.44 is the default scale of ehentai's thumb. 100px width per one thumb in img.
                 height: $thumb-width * 144 / 100;
                 transition: all 0.5s ease;
             }

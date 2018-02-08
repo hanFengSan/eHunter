@@ -26,7 +26,7 @@ storage
 
 class AlbumCacheService {
     constructor() {
-        this.version = '2.0';
+        this.version = '2.1';
         this.storageName = 'AlbumCache';
         this.storageVersionName = 'AlbumCacheVersion';
         this._initStorage();
@@ -46,6 +46,7 @@ class AlbumCacheService {
         await storage.save({ key: this.storageVersionName, data: this.version });
         if (version !== this.version) {
             await storage.clearMapForKey(this.storageName);
+            window.alert('已更新数据库: AlbumCache, 请刷新页面');
         }
     }
 

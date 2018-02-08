@@ -6,7 +6,7 @@
         :get-src="getImgSrc()"
         @load="loaded()"
         @error="failLoad($event)"> -->
-    <!-- <div class="layer preview-layer" :style="{background:`transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div> -->
+    <div class="layer preview-layer" :style="AlbumService.getPreviewThumbnailStyle(index, imgInfo, thumb)"></div>
     <div class="layer loading-layer"></div>
     <div class="layer img-layer"></div>
     <div class="layer console-layer"></div>
@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import AlbumCacheService from 'src/service/storage/AlbumCacheService.js'
+import AlbumService from 'src/service/AlbumService.js'
 import Logger from '../utils/Logger.js'
 
 export default {
@@ -64,38 +63,36 @@ export default {
         };
     },
 
-    created() {
+    async created() {
         this.imgInfo = JSON.parse(JSON.stringify(this.data));
         this.imgInfo.isFirstLoad = true;
         this.imgInfo.loadStatus = this.loadStatus.waiting;
-        this.thumb = this.getThumb();
+        this.thumb = await AlbumService.getThumb(this.index);
+    },
+
+    computed: {
+        AlbumService: () => AlbumService
     },
 
     methods: {
         // for lazy load img
-        getImgSrc() {
+        async getImgSrc() {
             // avoid redundant getImgSrc(), overlap refreshing of 'origin'
             if (this.imgInfo.loadStatus !== this.loadStatus.loading) {
-                AlbumCacheService
-                    .getImgSrc(this.albumId, this.index)
-                    .then(src => {
-                        if (this.imgInfo.src !== src) {
-                            this.imgInfo.src = src;
-                            this.imgInfo.loadStatus = this.loadStatus.loading;
-                        }
-                    });
+                let src = await AlbumService.getImgSrc(this.index);
+                if (this.imgInfo.src !== src) {
+                    this.imgInfo.src = src;
+                    this.imgInfo.loadStatus = this.loadStatus.loading;
+                }
             }
         },
 
         // refresh img
-        getNewImgSrc(mode) {
+        async getNewImgSrc(mode) {
             this.imgInfo.src = '';
             this.imgInfo.loadStatus = this.loadStatus.loading;
-            AlbumCacheService
-                .getNewImgSrc(this.albumId, this.index, mode)
-                .then(src => {
-                    this.imgInfo.src = src;
-                });
+            let src = await AlbumService.getImgSrc(this.index, mode);
+            this.imgInfo.src = src;
         },
 
         failLoad(e) {
@@ -115,11 +112,7 @@ export default {
             this.imgInfo.loadStatus = this.loadStatus.loaded;
         },
 
-        async getThumb() {
-            // AlbumCacheService.getThumbs(this.parser.getAlbumId(), this.parser.getIntroUrl(), this.parser.getSumOfPage());
-            //         .then(thumbs => {
-            //             this.thumbs = thumbs;
-            //         });
+        getThumbOffsetPercentage() {
         }
     }
 };
@@ -146,6 +139,18 @@ export default {
         left: 0;
         width: 100%;
         height: 100%;
+    }
+
+    > .preview-layer {
+        overflow: hidden;
+        background-color: black;
+        background-repeat: no-repeat;
+        background-size: 2000%;
+        > .preview-img {
+            background-color: transparent;
+            background-repeat: no-repeat;
+            // background-size: cover;
+        }
     }
 
     > .loading-layer {

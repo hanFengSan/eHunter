@@ -33,6 +33,7 @@ class SettingService {
         await storage.save({ key: this.storageVersionName, data: this.version });
         if (version !== this.version) {
             await storage.remove({ key: this.storageName });
+            window.alert('已更新数据库: Settings, 请刷新页面');
         }
     }
 
