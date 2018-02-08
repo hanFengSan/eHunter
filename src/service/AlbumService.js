@@ -9,9 +9,9 @@ class AlbumService {
         this.thumbs = [];
     }
 
-    getSumOfPage() {
+    getPageCount() {
         if (!this.sumOfPage) {
-            this.sumOfPage = this.imgHtmlParser.getSumOfPage();
+            this.sumOfPage = this.imgHtmlParser.getPageCount();
         }
         return this.sumOfPage;
     }
@@ -49,7 +49,7 @@ class AlbumService {
     }
 
     getImgInfos() {
-        return this.cacheService.getImgInfos(this.getAlbumId(), this.getIntroUrl(), this.getSumOfPage());
+        return this.cacheService.getImgInfos(this.getAlbumId(), this.getIntroUrl(), this.getPageCount());
     }
 
     async getImgInfo(index) {
@@ -66,7 +66,7 @@ class AlbumService {
 
     getThumbs(cache = true) {
         if (!cache || this.thumbs.length === 0) {
-            this.thumbs = this.cacheService.getThumbs(this.getAlbumId(), this.getIntroUrl(), this.getSumOfPage());
+            this.thumbs = this.cacheService.getThumbs(this.getAlbumId(), this.getIntroUrl(), this.getPageCount());
         }
         return this.thumbs;
     }
@@ -114,11 +114,11 @@ class AlbumService {
     */
     getPreviewThumbnailStyle(index, imgInfo, thumb) {
         const indexInThumbSprite = index % 20;
-        const sumOfThumbInSprite = (this.getSumOfPage() - (index + 1)) >= this.getSumOfPage() % 20
-                                    ? 20 : (this.getSumOfPage() % 20);
+        const sumOfThumbInSprite = (this.getPageCount() - (index + 1)) >= this.getPageCount() % 20
+                                    ? 20 : (this.getPageCount() % 20);
         let percentage;
         if (imgInfo.heightOfWidth >= 1.43) {
-            percentage = 1 / (sumOfThumbInSprite * (1 - (1 / imgInfo.heightOfWidth) * (imgInfo.height / (sumOfThumbInSprite * 100))));
+            percentage = 1 / (sumOfThumbInSprite * (1 - (1 / imgInfo.heightOfWidth) * (imgInfo.thumbHeight / (sumOfThumbInSprite * 100))));
         } else {
             percentage = 1 / (sumOfThumbInSprite - 1);
         }

@@ -9,14 +9,14 @@ class IntroHtmlParser {
     getImgUrls() {
         return Array.prototype.slice.call(this.html.getElementsByClassName('gdtm'), 0).map(item => {
             item.children[0].getAttribute('style').match(/width:(.*?)px; height:(.*?)px;/g);
-            const height = Number(RegExp.$2);
-            const width = Number(RegExp.$1);
+            const thumbHeight = Number(RegExp.$2);
+            const thumbWidth = Number(RegExp.$1);
             return {
                 pageUrl: item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '',
                 src: '',
-                height,
-                width,
-                heightOfWidth: height / width
+                thumbHeight,
+                thumbWidth,
+                heightOfWidth: thumbHeight / thumbWidth
             };
         })
     }

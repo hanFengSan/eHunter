@@ -18,7 +18,7 @@ class ImgHtmlParser {
         return this.i2.getElementsByTagName('span')[0].textContent * 1;
     }
 
-    getSumOfPage() {
+    getPageCount() {
         return this.i2.getElementsByTagName('span')[1].textContent * 1;
     }
 

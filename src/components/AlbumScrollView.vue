@@ -11,7 +11,7 @@
     <TopBar class="top-bar" />
     <!-- panel view -->
     <div class="panel">
-        <h4 class="location">{{ (curIndex + 1) + '/' + AlbumService.getSumOfPage() }}</h4>
+        <h4 class="location">{{ (curIndex + 1) + '/' + AlbumService.getPageCount() }}</h4>
         <img title="全屏" @click="fullscreen()" class="focus icon" :src="image.fullScreen" />
     </div>
     <div class="preload">
@@ -102,7 +102,7 @@ export default {
         },
 
         volumeSum() {
-            return Math.ceil(AlbumService.getSumOfPage() / this.volumeSize);
+            return Math.ceil(AlbumService.getPageCount() / this.volumeSize);
         },
 
         AlbumService: () => AlbumService,
@@ -230,7 +230,7 @@ export default {
             if (this.volumeSum > this.curVolume + 1) {
                 let volLastIndex = this.volFirstIndex + this.volumeSize - 1;
                 for (let i = 1; i <= this.volumePreloadCount; i++) {
-                    if (AlbumService.getSumOfPage() - 1 >= volLastIndex + i) {
+                    if (AlbumService.getPageCount() - 1 >= volLastIndex + i) {
                         this.preload(volLastIndex + i);
                     }
                 }
