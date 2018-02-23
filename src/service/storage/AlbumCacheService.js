@@ -112,6 +112,7 @@ class AlbumCacheService {
     async getImgInfos(albumId, introUrl, sumOfPage) {
         let album = await this._getAlbum(albumId);
         if (album.imgInfos.length > 0) {
+            Logger.logText('CacheService', 'read imgInfos from cache');
             return JSON.parse(JSON.stringify(album.imgInfos));
         } else {
             try {
