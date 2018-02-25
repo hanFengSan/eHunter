@@ -19,12 +19,12 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import AlbumScrollView from './AlbumScrollView.vue'
-import TopBar from './TopBar.vue'
-import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js'
-import AlbumService from '../service/AlbumService'
-import image from '../assets/img'
+import { mapGetters, mapActions } from 'vuex';
+import AlbumScrollView from './AlbumScrollView.vue';
+import TopBar from './TopBar.vue';
+import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js';
+import AlbumService from '../service/AlbumService';
+import image from '../assets/img';
 // import Logger from '../utils/Logger'
 
 export default {
@@ -77,12 +77,12 @@ export default {
             }
         }
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-@import "~style/_responsive";
-@import "~style/_variables";
+@import '~style/_responsive';
+@import '~style/_variables';
 
 div {
     display: flex;
@@ -92,7 +92,7 @@ div {
     position: relative;
     flex-direction: column;
     align-items: center;
-        > .loading-container {
+    > .loading-container {
         position: absolute;
         flex-direction: column;
         top: 50%;

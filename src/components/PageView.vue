@@ -40,9 +40,9 @@
 </template>
 
 <script>
-import AlbumService from 'src/service/AlbumService.js'
-import FlatButton from './widget/FlatButton.vue'
-import Logger from '../utils/Logger.js'
+import AlbumService from 'src/service/AlbumService.js';
+import FlatButton from './widget/FlatButton.vue';
+import Logger from '../utils/Logger.js';
 
 export default {
     name: 'PageView',
@@ -140,7 +140,8 @@ export default {
             if (this.imgInfo.src) {
                 this.curLoadStatus = this.loadStatus.error;
                 Logger.logText('LOADING', 'loading image failed');
-                if (this.imgInfo.isFirstLoad) { // auto request src when first loading is failed
+                if (this.imgInfo.isFirstLoad) {
+                    // auto request src when first loading is failed
                     this.imgInfo.isFirstLoad = false;
                     Logger.logText('LOADING', 'reloading image');
                     this.getNewImgSrc();
@@ -156,8 +157,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "~style/_responsive";
-@import "~style/_variables";
+@import '~style/_responsive';
+@import '~style/_variables';
 
 div {
     display: flex;

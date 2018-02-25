@@ -16,9 +16,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import AlbumService from 'src/service/AlbumService.js'
-import AwesomeScrollView from './base/AwesomeScrollView.vue'
+import { mapGetters, mapActions } from 'vuex';
+import AlbumService from 'src/service/AlbumService.js';
+import AwesomeScrollView from './base/AwesomeScrollView.vue';
 // import Logger from '../utils/Logger'
 
 export default {
@@ -31,7 +31,7 @@ export default {
             thumbs: [],
             curIndex: 0,
             hover: false
-        }
+        };
     },
 
     components: {
@@ -65,8 +65,13 @@ export default {
                     this.curIndex = this.centerIndex;
                     if (this.curIndex !== this.volFirstIndex) {
                         // sort again, because if changing volume size, it may be out-of-order
-                        let cons = this.$refs.thumbContainers.sort((a, b) => a.offsetTop - b.offsetTop);
-                        this.$refs.scrollView.ScrollTo(cons[this.volIndex(this.centerIndex)].offsetTop, 1000);
+                        let cons = this.$refs.thumbContainers.sort(
+                            (a, b) => a.offsetTop - b.offsetTop
+                        );
+                        this.$refs.scrollView.ScrollTo(
+                            cons[this.volIndex(this.centerIndex)].offsetTop,
+                            1000
+                        );
                     } else {
                         this.$refs.scrollView.ScrollTo(0, 1000); // if is page 1, scroll to top, cuz of having a header
                     }
@@ -77,9 +82,7 @@ export default {
     },
 
     methods: {
-        ...mapActions([
-            'setIndex'
-        ]),
+        ...mapActions(['setIndex']),
 
         select(index) {
             this.curIndex = index;
@@ -100,13 +103,12 @@ export default {
             return i - this.volFirstIndex;
         }
     }
-}
-
+};
 </script>
 
 <style lang="scss" scoped>
-@import "~style/_responsive";
-@import "~style/_variables";
+@import '~style/_responsive';
+@import '~style/_variables';
 .thumb-content {
     position: relative;
     .thumb-scroll-view {
@@ -116,11 +118,11 @@ export default {
         height: 500px;
         display: inline-block;
         width: $thumb-view-width;
-        >.header {
+        > .header {
             position: relative;
             height: $header-height;
             background: $header-bg;
-            >.app-name {
+            > .app-name {
                 color: white;
                 font-weight: bolder;
                 font-size: 18px;
@@ -172,40 +174,40 @@ export default {
             padding: $thumb-view-margin 0;
             height: $thumb-view-height;
             text-align: center;
-            display: flex; 
+            display: flex;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
-            >.thumb {
+            > .thumb {
                 display: block;
                 width: $thumb-width;
                 // 1/1.44 is the default scale of ehentai's thumb. 100px width per one thumb in img.
                 height: $thumb-width * 144 / 100;
                 transition: all 0.5s ease;
             }
-            >.loc {
+            > .loc {
                 display: block;
-                color: rgba(white, .5);
+                color: rgba(white, 0.5);
                 font-size: 12px;
             }
-            >.index {
+            > .index {
                 display: none;
             }
             &:hover {
-                >.hover-mask {
+                > .hover-mask {
                     position: absolute;
                     top: 0;
                     right: 0;
                     left: 0;
                     bottom: 0;
-                    background: rgba($indicator_color, .2);
+                    background: rgba($indicator_color, 0.2);
                 }
-                >.index {
+                > .index {
                     position: absolute;
                     display: block;
                     font-weight: bolder;
                     font-size: 40px;
-                    color: rgba($body_bg, .8);
+                    color: rgba($body_bg, 0.8);
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
@@ -223,9 +225,9 @@ export default {
             left: 0;
             top: 0;
             right: 0;
-            background: rgba($indicator_color, .3);
-            border-left: 3px solid rgba($indicator_color, .5);
-            border-right: 3px solid rgba($indicator_color, .5);
+            background: rgba($indicator_color, 0.3);
+            border-left: 3px solid rgba($indicator_color, 0.5);
+            border-right: 3px solid rgba($indicator_color, 0.5);
             transition: all 0.5s ease;
             z-index: 10;
             pointer-events: none;

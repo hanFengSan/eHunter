@@ -1,19 +1,17 @@
 <template>
-<div class="book-view">
+<div class="album-book-view">
 
 </div>
 </template>
 
 <script>
 export default {
-    name: 'BookView',
+    name: 'AlbumBookView',
 
     data() {
-        return {
-
-        };
+        return {};
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -21,7 +19,6 @@ div {
     display: flex;
 }
 
-.book-view {
-
+.album-book-view {
 }
 </style>

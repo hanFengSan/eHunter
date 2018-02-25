@@ -1,7 +1,6 @@
 // get img page urls from album intro page
 import ReqQueueService from 'src/service/request/ReqQueueService.js'
 import IntroHtmlParser from './IntroHtmlParser.js'
-import Logger from '../../utils/Logger'
 
 class ImgUrlListParser {
     constructor(introUrl, sumOfImgPage) {
@@ -41,7 +40,7 @@ class ImgUrlListParser {
     }
 
     _request(resolve, reject) {
-        (new ReqQueueService(this.introPageUrls))
+        new ReqQueueService(this.introPageUrls)
             .request()
             .then(map => {
                 let result = this.introPageUrls.reduce((imgUrls, introUrl) => {

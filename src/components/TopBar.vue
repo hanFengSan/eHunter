@@ -206,46 +206,46 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "~style/_responsive";
-@import "~style/_variables";
+@import '~style/_responsive';
+@import '~style/_variables';
 div {
-  display: flex;
+    display: flex;
 }
 .top-bar {
-  width: 100%;
-  position: relative;
-  > .float-content {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 40px;
-    align-items: center;
-    z-index: 10;
-    > .button {
-        margin-right: 13px;
+    width: 100%;
+    position: relative;
+    > .float-content {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 40px;
+        align-items: center;
+        z-index: 10;
+        > .button {
+            margin-right: 13px;
+        }
     }
-  }
 
-  > .inner-content {
-    height: 40px;
-    color: white;
-    flex-grow: 1;
-    background: $accent_color;
-    font-size: 14px;
-    transition: all 0.4s cubic-bezier(.62,-0.62,.28,1.55);
-    > .item {
-      margin-left: 22px;
-      position: relative;
-      > .label {
-          font-size: 14px;
-          margin: auto;
-          white-space: nowrap;
-          cursor: default;
-      }
+    > .inner-content {
+        height: 40px;
+        color: white;
+        flex-grow: 1;
+        background: $accent_color;
+        font-size: 14px;
+        transition: all 0.4s cubic-bezier(0.62, -0.62, 0.28, 1.55);
+        > .item {
+            margin-left: 22px;
+            position: relative;
+            > .label {
+                font-size: 14px;
+                margin: auto;
+                white-space: nowrap;
+                cursor: default;
+            }
+        }
+        &.hide {
+            transform: translateY(-100%);
+        }
     }
-    &.hide {
-        transform: translateY(-100%);
-    }
-  }
 }
 </style>

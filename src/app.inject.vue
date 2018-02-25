@@ -6,27 +6,24 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import ThumbScrollView from './components/ThumbScrollView.vue'
-import ReaderView from './components/ReaderView.vue'
+import { mapGetters } from 'vuex';
+import ThumbScrollView from './components/ThumbScrollView.vue';
+import ReaderView from './components/ReaderView.vue';
 
 export default {
     name: 'InjectedApp',
 
     data() {
-        return {
-        };
+        return {};
     },
 
     components: {
-        ThumbScrollView, ReaderView
+        ThumbScrollView,
+        ReaderView
     },
 
     computed: {
-        ...mapGetters([
-            'showThumbView',
-            'thumbWidth'
-        ]),
+        ...mapGetters(['showThumbView', 'thumbWidth']),
         thumbStyle() {
             if (this.showThumbView) {
                 return '';
@@ -35,12 +32,12 @@ export default {
             }
         }
     }
-}
+};
 </script>
 
 <style lang="scss">
-@import "~style/_responsive";
-@import "~style/_variables";
+@import '~style/_responsive';
+@import '~style/_variables';
 
 .app {
     display: flex;
@@ -54,7 +51,9 @@ export default {
         flex-grow: 1;
     }
 
-    section, header, nav {
+    section,
+    header,
+    nav {
         display: flex;
     }
 
@@ -62,14 +61,19 @@ export default {
         padding: 0;
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         margin: 0;
     }
 
     .clickable {
         cursor: pointer;
     }
-    
+
     .no-select {
         user-select: none;
     }
@@ -90,7 +94,7 @@ export default {
                 min-width: 50px;
                 text-align: center;
                 background: rgba(0, 0, 0, 0.8);
-                box-shadow: 0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647);
+                box-shadow: 0 1px 6px rgba(0, 0, 0, 0.117647), 0 1px 4px rgba(0, 0, 0, 0.117647);
             }
         }
         &.tips-down {
@@ -104,10 +108,10 @@ export default {
 
     // 过渡效果
     .slide-fade-enter-active {
-        transition: all .2s ease;
+        transition: all 0.2s ease;
     }
     .slide-fade-leave-active {
-        transition: all .2s ease;
+        transition: all 0.2s ease;
     }
     .slide-fade-enter,
     .slide-fade-leave-active {
@@ -117,10 +121,7 @@ export default {
 }
 
 body {
-    font-family: 'San Francisco', 'Helvetica', Arial, "Hiragino Sans GB", "Heiti SC",//macOS & ios
-    "Microsoft YaHei", //windows
-    'Droid Sans', // android default
-    'WenQuanYi Micro Hei', // linux
-    sans-serif;
+    font-family: 'San Francisco', 'Helvetica', Arial, 'Hiragino Sans GB', 'Heiti SC',
+        'Microsoft YaHei', 'Droid Sans', 'WenQuanYi Micro Hei', sans-serif;
 }
 </style>

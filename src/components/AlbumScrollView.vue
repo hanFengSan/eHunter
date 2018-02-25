@@ -31,14 +31,14 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import AwesomeScrollView from './base/AwesomeScrollView.vue'
-import TopBar from './TopBar.vue'
-import Logger from '../utils/Logger.js'
-import image from '../assets/img'
-import Pagination from './widget/Pagination.vue'
-import PageView from './PageView.vue'
-import AlbumService from '../service/AlbumService'
+import { mapGetters, mapActions } from 'vuex';
+import AwesomeScrollView from './base/AwesomeScrollView.vue';
+import TopBar from './TopBar.vue';
+import Logger from '../utils/Logger.js';
+import image from '../assets/img';
+import Pagination from './widget/Pagination.vue';
+import PageView from './PageView.vue';
+import AlbumService from '../service/AlbumService';
 
 export default {
     name: 'AlbumScrollView',
@@ -57,7 +57,7 @@ export default {
             scrollTop: 0,
             curIndex: 0,
             preloadImgs: []
-        }
+        };
     },
 
     components: {
@@ -110,7 +110,11 @@ export default {
                         this.curIndex = this.volFirstIndex;
                     } else {
                         // Logger.logText('Album', this.volIndex(this.centerIndex));
-                        this.$refs.scrollView.ScrollTo(this.$refs.pageContainers[this.volIndex(this.centerIndex)].offsetTop - 100, 1000);
+                        this.$refs.scrollView.ScrollTo(
+                            this.$refs.pageContainers[this.volIndex(this.centerIndex)].offsetTop -
+                                100,
+                            1000
+                        );
                     }
                 }
                 // if in the last page of current volume, preload next volume
@@ -126,10 +130,13 @@ export default {
             // sort again, because if changing volume size, it may be out-of-order
             let cons = this.$refs.pageContainers.sort((a, b) => a.offsetTop - b.offsetTop);
             if (cons) {
-                if (this.scrollTop !== 0) { // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
+                if (this.scrollTop !== 0) {
+                    // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
                     const _cons = cons.concat().reverse();
-                    let result = cons.indexOf(_cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight));
-                    const volIndex = result === -1 ? (this.$refs.pageContainers.length - 1) : result;
+                    let result = cons.indexOf(
+                        _cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight)
+                    );
+                    const volIndex = result === -1 ? this.$refs.pageContainers.length - 1 : result;
                     const index = volIndex + this.volFirstIndex;
                     this.setIndex(index);
                     this.curIndex = index;
@@ -149,13 +156,10 @@ export default {
     },
 
     methods: {
-        ...mapActions([
-            'setIndex',
-            'toggleTopBar'
-        ]),
+        ...mapActions(['setIndex', 'toggleTopBar']),
 
         range(start, count) {
-            return Array.apply(0, Array(count)).map(function (element, index) {
+            return Array.apply(0, Array(count)).map(function(element, index) {
                 return index + start;
             });
         },
@@ -166,7 +170,8 @@ export default {
 
         // get index of album for index of current volume
         index(i, pageUrl) {
-            if (pageUrl) { // fix errors in delay methods
+            if (pageUrl) {
+                // fix errors in delay methods
                 return this.pageUrlsObj[pageUrl];
             } else {
                 return this.volFirstIndex + i;
@@ -205,12 +210,12 @@ export default {
             }
         }
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-@import "~style/_responsive";
-@import "~style/_variables";
+@import '~style/_responsive';
+@import '~style/_variables';
 * div {
     display: flex;
 }
