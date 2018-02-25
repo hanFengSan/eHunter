@@ -1,14 +1,14 @@
 <template>
     <div class="app">
-        <thumb-scroll-view class="thumb-scroll-view" :style="thumbStyle"></thumb-scroll-view>
-        <album-scroll-view class="album-scroll-view"></album-scroll-view>
+        <thumb-scroll-view class="thumb-column" :style="thumbStyle"></thumb-scroll-view>
+        <reader-view class="reader-column"></reader-view>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import ThumbScrollView from './components/ThumbScrollView.vue'
-import AlbumScrollView from './components/AlbumScrollView.vue'
+import ReaderView from './components/ReaderView.vue'
 
 export default {
     name: 'InjectedApp',
@@ -19,7 +19,7 @@ export default {
     },
 
     components: {
-        ThumbScrollView, AlbumScrollView
+        ThumbScrollView, ReaderView
     },
 
     computed: {
@@ -44,13 +44,13 @@ export default {
 
 .app {
     display: flex;
-    > .thumb-scroll-view {
+    > .thumb-column {
         transition: all 0.3s ease;
         &.hide {
             margin: -100%;
         }
     }
-    > .album-scroll-view {
+    > .reader-column {
         flex-grow: 1;
     }
 
