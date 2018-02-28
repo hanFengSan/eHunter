@@ -253,7 +253,6 @@ export default {
         .page-container {
             transition: all 0.3s ease;
             margin: 35px 0;
-            background: red;
             height: 0;
             position: relative;
         }

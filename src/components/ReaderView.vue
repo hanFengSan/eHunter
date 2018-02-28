@@ -11,10 +11,11 @@
     <top-bar class="top-bar" />
     <!-- panel view -->
     <div class="panel">
-        <h4 class="location">{{ (curIndex + 1) + '/' + AlbumService.getPageCount() }}</h4>
+        <h4 class="location">{{ location }}</h4>
         <img title="全屏" @click="fullscreen" class="focus icon" :src="image.fullScreen" />
     </div>
-    <album-scroll-view class="scroll-mode" v-if="!isloadingImgInfos" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
+    <!-- <album-scroll-view class="content scroll-mode" v-if="!isloadingImgInfos" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view> -->
+    <album-book-view class="content book-mode" v-if="!isloadingImgInfos" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
 </div>
 </template>
 
@@ -25,12 +26,13 @@ import TopBar from './TopBar.vue';
 import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js';
 import AlbumService from '../service/AlbumService';
 import image from '../assets/img';
+import AlbumBookView from './AlbumBookView.vue';
 // import Logger from '../utils/Logger'
 
 export default {
     name: 'reader-view',
 
-    components: { AlbumScrollView, TopBar },
+    components: { AlbumScrollView, AlbumBookView, TopBar },
 
     data() {
         return {
@@ -46,13 +48,24 @@ export default {
 
     computed: {
         ...mapGetters({
-            curIndex: 'curIndex'
+            curIndex: 'curIndex',
+            readingMode: 'readingMode',
+            bookIndex: 'bookIndex',
+            bookScreenSize: 'bookScreenSize'
         }),
         isloadingImgInfos() {
             return this.imgInfoList.length === 0;
         },
         AlbumService: () => AlbumService,
-        image: () => image
+        image: () => image,
+        location() {
+            switch (this.readingMode) {
+                case 0:
+                    return `${this.curIndex + 1} / ${AlbumService.getPageCount()}`;
+                case 1:
+                    return `${this.bookIndex + 1} / ${AlbumService.getBookScreenCount(this.bookScreenSize)}`;
+            }
+        }
     },
 
     methods: {
@@ -122,11 +135,11 @@ div {
         bottom: 5px;
         right: 23px;
         z-index: 10;
-        color: rgba(white, 0.2);
         display: flex;
         align-items: center;
         justify-content: center;
         > .location {
+            color: $reader_view_location_color;
             font-size: 14px;
             display: inline-block;
             line-height: 16px;
@@ -144,8 +157,13 @@ div {
             margin: 18px 0 18px 10px;
         }
     }
-    > .scroll-mode {
+
+    > .content {
         align-self: stretch;
+    }
+
+    > .book-mode {
+        flex: 1;
     }
 }
 </style>

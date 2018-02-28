@@ -1,6 +1,6 @@
 import ImgHtmlParser from './parser/ImgHtmlParser';
 import AlbumCacheService from './storage/AlbumCacheService';
-import Logger from '../utils/Logger';
+// import Logger from '../utils/Logger';
 
 class AlbumService {
     constructor(imgHtml) {
@@ -14,6 +14,11 @@ class AlbumService {
             this.sumOfPage = this.imgHtmlParser.getPageCount();
         }
         return this.sumOfPage;
+    }
+
+    getBookScreenCount(screenSize) {
+        // 2 is start page and end page
+        return Math.ceil((this.getPageCount() + 2) / screenSize);
     }
 
     getIntroUrl() {

@@ -4,6 +4,7 @@ import * as types from '../mutation-types'
 // initial state
 const state = {
     curIndex: 0,
+    readingMode: 1, // 0: scroll mode, 1: book mode
     volumeSize: 10,
     volumePreloadCount: 2, // the preload count of page of next volume
     thumb: {
@@ -15,6 +16,11 @@ const state = {
         toggleSyncScroll: true,
         showTopBar: true,
         loadNum: 3 // the sum of pages per loading
+    },
+    book: {
+        screenSize: 2,
+        showBookScreenAnimation: false,
+        direction: 0 // 0: RTL, 1: LTR
     }
 }
 
@@ -33,7 +39,13 @@ const getters = {
         return (state.curIndex - remainder) / state.volumeSize;
     },
     volFirstIndex: state => getters.curVolume(state) * state.volumeSize,
-    volumePreloadCount: state => state.volumePreloadCount
+    volumePreloadCount: state => state.volumePreloadCount,
+    bookScreenSize: state => state.book.screenSize,
+    bookIndex: state => (state.curIndex - state.curIndex % state.book.screenSize) / state.book.screenSize,
+    bookLoadNum: state => Math.ceil(state.album.loadNum / state.book.screenSize),
+    readingMode: state => state.readingMode,
+    showBookScreenAnimation: state => state.book.showBookScreenAnimation,
+    bookDirection: state => state.book.direction
 }
 
 // actions
@@ -44,7 +56,11 @@ const actions = {
     toggleSyncScroll: ({ commit }, isActive) => commit(types.TOGGLE_SYNC_SCROLL, { isActive }),
     toggleTopBar: ({ commit }, show) => commit(types.TOGGLE_SHOW_TOP_BAR, { show }),
     setLoadNum: ({ commit }, num) => commit(types.SET_LOAD_NUM, { num }),
-    setVolumeSize: ({ commit }, num) => commit(types.SET_VOLUME_SIZE, { num })
+    setVolumeSize: ({ commit }, num) => commit(types.SET_VOLUME_SIZE, { num }),
+    setBookIndex: ({ commit }, index) => commit(types.SET_BOOK_INDEX, { index }),
+    setReadingMode: ({ commit }, mode) => commit(types.SET_READING_MODE, { mode }),
+    setBookScreenAnimation: ({ commit }, show) => commit(types.SET_BOOK_SCREEN_ANIMATION, { show }),
+    setBookDirection: ({ commit }, mode) => commit(types.SET_BOOK_DIRECTION, { mode })
 }
 
 // mutations
@@ -70,6 +86,18 @@ const mutations = {
     [types.SET_VOLUME_SIZE](state, { num }) {
         state.volumeSize = num;
         state.curIndex = 0;
+    },
+    [types.SET_BOOK_INDEX](state, { index }) {
+        state.curIndex = index * state.book.screenSize;
+    },
+    [types.SET_READING_MODE](state, { mode }) {
+        state.readingMode = mode;
+    },
+    [types.SET_BOOK_SCREEN_ANIMATION](state, { show }) {
+        state.book.showBookScreenAnimation = show;
+    },
+    [types.SET_BOOK_DIRECTION](state, { mode }) {
+        state.book.direction = mode;
     }
 }
 

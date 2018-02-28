@@ -9,7 +9,7 @@
                     {{ loadingInfo }}
                     <flat-button class="tips" title-content="加载原图, 可有效解决加载问题" label="原图" mode="inline" @click="getNewImgSrc('ORIGIN')"></flat-button>
                     <flat-button class="tips" title-content="刷新, 获取普通图片" label="刷新" mode="inline" @click="getNewImgSrc()"></flat-button>
-                    <flat-button v-if="reloadTimes>2" class="tips" title-content="通过其他服务器获取普通图片" label="换源刷新" mode="inline" @click="getNewImgSrc('CHANGE_SOURCE')"></flat-button>
+                    <flat-button v-if="reloadTimes>1" class="tips" title-content="通过其他服务器获取普通图片" label="换源刷新" mode="inline" @click="getNewImgSrc('CHANGE_SOURCE')"></flat-button>
                 </p>
             </transition>
         </article>
