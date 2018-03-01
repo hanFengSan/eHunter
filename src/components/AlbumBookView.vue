@@ -38,7 +38,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import PageView from './PageView.vue';
 import AlbumService from 'src/service/AlbumService.js';
-import Logger from '../utils/Logger';
+// import Logger from '../utils/Logger';
 
 export default {
     name: 'AlbumBookView',
@@ -145,16 +145,14 @@ export default {
         watchKeyboard(e) {
             switch (e.key) {
                 case 'ArrowLeft':
-                    this.setBookIndex(this.bookIndex > 0 ? this.bookIndex - 1 : 0);
-                    Logger.logText('Book', 'prev page');
+                    if (this.bookIndex > 0) {
+                        this.setBookIndex(this.bookIndex - 1);
+                    }
                     break;
                 case 'ArrowRight':
-                    this.setBookIndex(
-                        this.bookIndex === this.screens.length - 1
-                            ? this.screens.length - 1
-                            : this.bookIndex + 1
-                    );
-                    Logger.logText('Book', 'next page');
+                    if (this.bookIndex < this.screens.length - 1) {
+                        this.setBookIndex(this.bookIndex + 1);
+                    }
                     break;
             }
         }

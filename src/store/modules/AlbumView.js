@@ -1,10 +1,11 @@
 // import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
+import * as tags from '../../service/tags'
 import Logger from '../../utils/Logger'
 
 // initial state
 const state = {
-    curIndex: 0,
+    curIndex: { val: 0, updater: '' },
     readingMode: 1, // 0: scroll mode, 1: book mode
     volumeSize: 10,
     volumePreloadCount: 2, // the preload count of page of next volume
@@ -36,13 +37,13 @@ const getters = {
     loadNum: state => state.album.loadNum,
     volumeSize: state => state.volumeSize,
     curVolume: state => {
-        let remainder = state.curIndex % state.volumeSize;
-        return (state.curIndex - remainder) / state.volumeSize;
+        let remainder = state.curIndex.val % state.volumeSize;
+        return (state.curIndex.val - remainder) / state.volumeSize;
     },
     volFirstIndex: state => getters.curVolume(state) * state.volumeSize,
     volumePreloadCount: state => state.volumePreloadCount,
     bookScreenSize: state => state.book.screenSize,
-    bookIndex: state => (state.curIndex - state.curIndex % state.book.screenSize) / state.book.screenSize,
+    bookIndex: state => (state.curIndex.val - state.curIndex.val % state.book.screenSize) / state.book.screenSize,
     bookLoadNum: state => Math.ceil(state.album.loadNum / state.book.screenSize),
     readingMode: state => state.readingMode,
     showBookScreenAnimation: state => state.book.showBookScreenAnimation,
@@ -51,7 +52,9 @@ const getters = {
 
 // actions
 const actions = {
-    setIndex: ({ commit }, index) => commit(types.SET_INDEX, { index }),
+    setIndex: ({ commit }, { val, updater }) => {
+        commit(types.SET_INDEX, { val, updater });
+    },
     setAlbumWidth: ({ commit }, width) => commit(types.SET_ALBUM_WIDTH, { width }),
     toggleThumbView: ({ commit }, show) => commit(types.TOGGLE_THUMB_VIEW, { show }),
     toggleSyncScroll: ({ commit }, isActive) => commit(types.TOGGLE_SYNC_SCROLL, { isActive }),
@@ -67,8 +70,10 @@ const actions = {
 
 // mutations
 const mutations = {
-    [types.SET_INDEX](state, { index }) {
-        state.curIndex = index;
+    [types.SET_INDEX](state, { val, updater }) {
+        state.curIndex.val = val;
+        state.curIndex.updater = updater;
+        Logger.logObj('VUEX', state.curIndex, true);
     },
     [types.SET_ALBUM_WIDTH](state, { width }) {
         state.album.width = width;
@@ -87,14 +92,16 @@ const mutations = {
     },
     [types.SET_VOLUME_SIZE](state, { num }) {
         state.volumeSize = num;
-        state.curIndex = 0;
+        state.curIndex.val = 0;
+        state.curIndex.updater = tags.TOP_BAR;
     },
     [types.SET_BOOK_INDEX](state, { index }) {
-        state.curIndex = index * state.book.screenSize;
+        state.curIndex.val = index * state.book.screenSize;
+        state.curIndex.updater = tags.BOOK_VIEW;
+        Logger.logObj('VUEX', state.curIndex, true);
     },
     [types.SET_READING_MODE](state, { mode }) {
         state.readingMode = mode;
-        Logger.logText('VUEX', mode);
     },
     [types.SET_BOOK_SCREEN_ANIMATION](state, { show }) {
         state.book.showBookScreenAnimation = show;

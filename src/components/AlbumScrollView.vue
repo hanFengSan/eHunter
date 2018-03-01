@@ -39,6 +39,7 @@ import image from '../assets/img';
 import Pagination from './widget/Pagination.vue';
 import PageView from './PageView.vue';
 import AlbumService from '../service/AlbumService';
+import * as tags from '../service/tags';
 
 export default {
     name: 'AlbumScrollView',
@@ -55,7 +56,6 @@ export default {
     data() {
         return {
             scrollTop: 0,
-            curIndex: 0,
             preloadImgs: []
         };
     },
@@ -69,7 +69,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            centerIndex: 'curIndex',
+            curIndex: 'curIndex',
             widthScale: 'albumWidth',
             loadNum: 'loadNum',
             volumeSize: 'volumeSize',
@@ -80,7 +80,7 @@ export default {
 
         // return a indexes array. the index is index of page, determining the show of pages.
         nearbyArray() {
-            let curIndex = this.curIndex;
+            let curIndex = this.curIndex.val;
             let _start = curIndex - this.loadNum;
             let start = _start >= 0 ? _start : 0;
             let _end = curIndex + this.loadNum;
@@ -101,18 +101,16 @@ export default {
     },
 
     watch: {
-        centerIndex: {
+        curIndex: {
             handler: function(val, oldVal) {
-                if (this.curIndex !== this.centerIndex) {
+                if (this.curIndex.updater !== tags.SCROLL_VIEW && this.$refs.pageContainers) {
                     // sync index
-                    if (this.centerIndex === this.volFirstIndex) {
+                    if (this.curIndex.val === this.volFirstIndex) {
                         this.$refs.scrollView.ScrollTo(0, 1000);
-                        this.curIndex = this.volFirstIndex;
                     } else {
                         // Logger.logText('Album', this.volIndex(this.centerIndex));
                         this.$refs.scrollView.ScrollTo(
-                            this.$refs.pageContainers[this.volIndex(this.centerIndex)].offsetTop -
-                                100,
+                            this.$refs.pageContainers[this.volIndex(this.curIndex.val)].offsetTop - 100,
                             1000
                         );
                     }
@@ -129,6 +127,7 @@ export default {
         scrollTop() {
             // sort again, because if changing volume size, it may be out-of-order
             let cons = this.$refs.pageContainers.sort((a, b) => a.offsetTop - b.offsetTop);
+            let index;
             if (cons) {
                 if (this.scrollTop !== 0) {
                     // avoiding that in the top, page 1 and page 2 show at the same time, the index is 1
@@ -137,21 +136,19 @@ export default {
                         _cons.find(item => item.offsetTop <= this.scrollTop + window.innerHeight)
                     );
                     const volIndex = result === -1 ? this.$refs.pageContainers.length - 1 : result;
-                    const index = volIndex + this.volFirstIndex;
-                    this.setIndex(index);
-                    this.curIndex = index;
+                    index = volIndex + this.volFirstIndex;
                 } else {
-                    this.setIndex(this.volFirstIndex);
-                    this.curIndex = this.volFirstIndex;
+                    index = this.volFirstIndex;
                 }
-            } else {
-                this.curIndex = this.volFirstIndex;
+                if (index !== this.curIndex.val) { // avoiding to update updater of curIndex
+                    this.setIndex({ val: index, updater: tags.SCROLL_VIEW });
+                }
             }
         }
     },
 
     created() {
-        this.curIndex = this.volFirstIndex;
+        // this.curIndex = this.volFirstIndex;
     },
 
     methods: {
@@ -185,7 +182,7 @@ export default {
         selectVol(index) {
             // this.$refs.scrollView.ScrollTo(0, 1000);
             let newIndex = index * this.volumeSize; // set index to first index of target volume
-            this.setIndex(newIndex);
+            this.setIndex({ val: newIndex, updater: tags.SCROLL_VIEW_VOL });
         },
 
         // preload image

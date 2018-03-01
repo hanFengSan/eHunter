@@ -27,7 +27,8 @@ import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js';
 import AlbumService from '../service/AlbumService';
 import image from '../assets/img';
 import AlbumBookView from './AlbumBookView.vue';
-// import Logger from '../utils/Logger'
+import * as tags from '../service/tags';
+// import Logger from '../utils/Logger';
 
 export default {
     name: 'reader-view',
@@ -44,7 +45,7 @@ export default {
 
     async created() {
         await this.initImgInfoList();
-        this.setIndex(AlbumService.getCurPageNum() - 1);
+        this.setIndex({ val: AlbumService.getCurPageNum() - 1, updater: tags.READER_VIEW });
     },
 
     computed: {
@@ -62,7 +63,7 @@ export default {
         location() {
             switch (this.readingMode) {
                 case 0:
-                    return `${this.curIndex + 1} / ${AlbumService.getPageCount()}`;
+                    return `${this.curIndex.val + 1} / ${AlbumService.getPageCount()}`;
                 case 1:
                     return `${this.bookIndex + 1} / 
                     ${AlbumService.getBookScreenCount(this.bookScreenSize)}`;

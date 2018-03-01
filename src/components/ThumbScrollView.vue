@@ -1,11 +1,11 @@
 <template>
     <aside class="thumb-content">
-        <awesome-scroll-view ref="scrollView"  class="thumb-scroll-view" @mouseenter="hover=true" @mouseleave="hover=false">
+        <awesome-scroll-view ref="scrollView"  class="thumb-scroll-view">
             <div class="header">
                 <span class="app-name">EHUNTER</span>
             </div>
             <!-- 160 is $thumb-view-height -->
-            <div class="indicator" :style="{top: px(160*(curIndex - volFirstIndex))}"></div>
+            <div class="indicator" :style="{top: px(160*(curIndex.val - volFirstIndex))}"></div>
             <div class="thumb-container" @click="select(index(i))" v-for="(item, i) of volThumbs" :key="item.url+item.offset" ref="thumbContainers">
                 <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
                 <div class="hover-mask"></div>
@@ -19,7 +19,8 @@
 import { mapGetters, mapActions } from 'vuex';
 import AlbumService from 'src/service/AlbumService.js';
 import AwesomeScrollView from './base/AwesomeScrollView.vue';
-// import Logger from '../utils/Logger'
+import * as tags from '../service/tags';
+// import Logger from '../utils/Logger';
 
 export default {
     name: 'ThumbScrollView',
@@ -28,9 +29,7 @@ export default {
         return {
             info: window.info,
             imgList: [], // origin img list
-            thumbs: [],
-            curIndex: 0,
-            hover: false
+            thumbs: []
         };
     },
 
@@ -44,7 +43,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            centerIndex: 'curIndex',
+            curIndex: 'curIndex',
             volumeSize: 'volumeSize',
             volFirstIndex: 'volFirstIndex',
             readingMode: 'readingMode'
@@ -59,20 +58,14 @@ export default {
     },
 
     watch: {
-        centerIndex: {
+        curIndex: {
             handler: function(val, oldVal) {
                 // sync pagination
-                if (this.readingMode === 0 && this.curIndex !== this.centerIndex && !this.hover) {
-                    this.curIndex = this.centerIndex;
-                    if (this.curIndex !== this.volFirstIndex) {
+                if (this.readingMode === 0 && this.curIndex.updater !== tags.THUMB_VIEW) {
+                    if (this.curIndex.val !== this.volFirstIndex && this.$refs.thumbContainers) {
                         // sort again, because if changing volume size, it may be out-of-order
-                        let cons = this.$refs.thumbContainers.sort(
-                            (a, b) => a.offsetTop - b.offsetTop
-                        );
-                        this.$refs.scrollView.ScrollTo(
-                            cons[this.volIndex(this.centerIndex)].offsetTop,
-                            1000
-                        );
+                        let cons = this.$refs.thumbContainers.sort((a, b) => a.offsetTop - b.offsetTop);
+                        this.$refs.scrollView.ScrollTo(cons[this.volIndex(this.curIndex.val)].offsetTop, 1000);
                     } else {
                         this.$refs.scrollView.ScrollTo(0, 1000); // if is page 1, scroll to top, cuz of having a header
                     }
@@ -86,8 +79,7 @@ export default {
         ...mapActions(['setIndex']),
 
         select(index) {
-            this.curIndex = index;
-            this.setIndex(index);
+            this.setIndex({ val: index, updater: tags.THUMB_VIEW });
         },
 
         async initImgList() {
