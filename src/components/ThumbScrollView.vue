@@ -51,7 +51,7 @@ export default {
 
         // the thumbs of current volume
         volThumbs() {
-            return this.thumbs.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
+            return (this.thumbs || []).slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
         },
 
         AlbumService: () => AlbumService

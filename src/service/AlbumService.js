@@ -61,8 +61,8 @@ class AlbumService {
         return await this.getImgInfos()[index];
     }
 
-    getImgSrc(index) {
-        return this.cacheService.getImgSrc(this.getAlbumId(), index);
+    getImgSrc(index, mode) {
+        return this.cacheService.getImgSrc(this.getAlbumId(), index, mode);
     }
 
     getNewImgSrc(index, mode) {

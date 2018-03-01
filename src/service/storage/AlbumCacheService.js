@@ -8,7 +8,7 @@ import storage from 'src/service/storage/LocalStorage'
 import Platform from 'src/service/PlatformService'
 import Logger from 'src/utils/Logger'
 import DateWrapper from '../../utils/DateWrapper'
-
+import * as tags from '../tags'
 /*
 storage
   |-albumId
@@ -134,18 +134,21 @@ class AlbumCacheService {
         }
         try {
             let param = sourceId ? `?nl=${sourceId}` : ''; // change source 0f img
-            let text = await (new TextReqService(album.imgInfos[index].pageUrl + param)).request();
+            let req = new TextReqService(album.imgInfos[index].pageUrl + param);
+            if (mode === tags.MODE_FAST) { // fast fetch
+                req.setTimeOutTime(3);
+            }
+            let text = await req.request();
             let parser = new ImgHtmlParser(text);
             switch (mode) {
-                case 'ORIGIN': // if want to load original img
+                case tags.MODE_ORIGIN: // if want to load original img
                     try {
-                        Logger.logText('Cache', 'FUCK');
                         album.imgInfos[index].src = parser.getOriginalImgUrl();
                     } catch (e) {
-                        return Error('NO_ORIGIN');
+                        return Error(tags.ERROR_NO_ORIGIN);
                     }
                     break;
-                case 'CHANGE_SOURCE':
+                case tags.MODE_CHANGE_SOURCE:
                     if (!sourceId) {
                         return await this.getImgSrc(albumId, index, null, parser.getSourceId());
                     }

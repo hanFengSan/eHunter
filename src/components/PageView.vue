@@ -7,15 +7,15 @@
             <transition name="slide-fade">
                 <p class="loading-info" v-if="curLoadStatus!=loadStatus.loaded">
                     {{ loadingInfo }}
-                    <flat-button class="tips" title-content="加载原图, 可有效解决加载问题" label="原图" mode="inline" @click="getNewImgSrc('ORIGIN')"></flat-button>
+                    <flat-button class="tips" title-content="加载原图, 可有效解决加载问题" label="原图" mode="inline" @click="getNewImgSrc(tags.MODE_ORIGIN)"></flat-button>
                     <flat-button class="tips" title-content="刷新, 获取普通图片" label="刷新" mode="inline" @click="getNewImgSrc()"></flat-button>
-                    <flat-button v-if="reloadTimes>1" class="tips" title-content="通过其他服务器获取普通图片" label="换源刷新" mode="inline" @click="getNewImgSrc('CHANGE_SOURCE')"></flat-button>
+                    <flat-button v-if="reloadTimes>1" class="tips" title-content="通过其他服务器获取普通图片" label="换源刷新" mode="inline" @click="getNewImgSrc(tags.MODE_CHANGE_SOURCE)"></flat-button>
                 </p>
             </transition>
         </article>
         <div class="loading-console-panel" v-if="active&&curLoadStatus!=loadStatus.loaded"> 
             <div class="tips" title-content="载入原图">
-                <svg class="btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc('ORIGIN')" xmlns="http://www.w3.org/2000/svg">
+                <svg class="btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc(tags.MODE_ORIGIN)" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
                     <path d="M0 0h24v24H0z" fill="none"/>
                 </svg>
@@ -43,6 +43,7 @@
 import AlbumService from 'src/service/AlbumService.js';
 import FlatButton from './widget/FlatButton.vue';
 import Logger from '../utils/Logger.js';
+import * as tags from '../service/tags';
 
 export default {
     name: 'PageView',
@@ -84,6 +85,7 @@ export default {
 
     computed: {
         AlbumService: () => AlbumService,
+        tags: () => tags,
         loadingInfo() {
             let reloadInfo = this.reloadTimes ? `[重载-${this.reloadTimes}] ` : '';
             if (this.message) {
@@ -106,7 +108,7 @@ export default {
         async getImgSrc() {
             // avoid redundant getImgSrc(), overlap refreshing of 'origin'
             if (this.curLoadStatus !== this.loadStatus.loading) {
-                let src = await AlbumService.getImgSrc(this.index);
+                let src = await AlbumService.getImgSrc(this.index, tags.MODE_FAST);
                 if (this.imgInfo.src !== src) {
                     this.imgInfo.src = src;
                     this.curLoadStatus = this.loadStatus.loading;
@@ -125,9 +127,8 @@ export default {
                 this.imgInfo.src = src;
             } else {
                 switch (src.message) {
-                    case 'NO_ORIGIN':
+                    case tags.ERROR_NO_ORIGIN:
                         this.message = '无原图地址, 请刷新';
-                        Logger.logText('PageView', 'fuck');
                         break;
                     default:
                         this.message = '加载错误';
@@ -144,7 +145,7 @@ export default {
                     // auto request src when first loading is failed
                     this.imgInfo.isFirstLoad = false;
                     Logger.logText('LOADING', 'reloading image');
-                    this.getNewImgSrc();
+                    this.getNewImgSrc(tags.MODE_FAST);
                 }
             }
         },

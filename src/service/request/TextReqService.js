@@ -5,8 +5,9 @@ class TextReqService {
         this.url = url;
         this.method = 'GET';
         this.credentials = 'include';
-        this.retryTimes = 5;
-        this.curRetryTimes = -1;
+        this.retryTimes = 3;
+        this.timeoutTime = 15; // secs
+        this.curRetryTimes = 0;
         this.retryInterval = 1; // secs
         this.enabledLog = true;
         this.fetchSetting = null;
@@ -35,6 +36,10 @@ class TextReqService {
         this.retryInterval = secs;
     }
 
+    setTimeOutTime(secs) {
+        this.timeoutTime = secs;
+    }
+
     request() {
         return new Promise((resolve, reject) => {
             this._request(res => {
@@ -52,22 +57,26 @@ class TextReqService {
     _request(successCallback, failureCallback) {
         this.curRetryTimes++;
         let url = this.url.includes('http') ? this.url : `${window.location.protocol}//${window.location.host}${this.url}`;
-        window.fetch(url, this.fetchSetting ? this.fetchSetting : {
+        let timeout = new Promise((resolve, reject) => {
+            setTimeout(reject, this.timeoutTime * 1000 * this.curRetryTimes, 'request timed out');
+        });
+        let req = window.fetch(url, this.fetchSetting ? this.fetchSetting : {
             method: this.method,
             credentials: this.credentials
-        }).then(res => {
-            successCallback(res);
-        }, err => {
-            console.error(err);
-            this._printErrorLog(err);
-            if (this.curRetryTimes < this.retryTimes) {
-                setTimeout(() => {
-                    this._request(successCallback, failureCallback);
-                }, this.retryInterval * 1000);
-            } else {
-                failureCallback(err);
-            }
         });
+        Promise
+            .race([timeout, req])
+            .then(res => successCallback(res))
+            .catch(err => {
+                this._printErrorLog(err);
+                if (this.curRetryTimes < this.retryTimes) {
+                    setTimeout(() => {
+                        this._request(successCallback, failureCallback);
+                    }, this.retryInterval * 1000);
+                } else {
+                    failureCallback(err);
+                }
+            });
     }
 }
 
