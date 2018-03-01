@@ -14,8 +14,12 @@
         <h4 class="location">{{ location }}</h4>
         <img title="全屏" @click="fullscreen" class="focus icon" :src="image.fullScreen" />
     </div>
-    <album-scroll-view class="content scroll-mode" v-if="!isloadingImgInfos&&readingMode===0" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
-    <album-book-view class="content book-mode" v-if="!isloadingImgInfos&&readingMode===1" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
+    <transition name="slow-vertical-fade">
+        <album-scroll-view class="content scroll-mode" v-if="!isloadingImgInfos&&readingMode===0" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
+    </transition>
+    <transition name="slow-horizontal-fade">
+        <album-book-view class="content book-mode" v-if="!isloadingImgInfos&&readingMode===1" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
+    </transition>
 </div>
 </template>
 
@@ -162,11 +166,20 @@ div {
     }
 
     > .content {
-        align-self: stretch;
+        // align-self: stretch;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
     }
 
     > .book-mode {
-        flex: 1;
+        // height: 100%;
+    }
+
+    > .scroll-mode {
+        // height: 100%;
     }
 }
 </style>

@@ -25,7 +25,7 @@ export default {
     computed: {
         ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode']),
         thumbStyle() {
-            if (this.showThumbView) {
+            if (this.readingMode === 0 && this.showThumbView) {
                 return '';
             } else {
                 return `margin-left: -${this.thumbWidth}px`;
@@ -39,11 +39,13 @@ export default {
 @import '~style/_responsive';
 @import '~style/_variables';
 
+$change_mode_time: 0.8s;
+
 .app {
     display: flex;
     height: 100%;
     > .thumb-column {
-        transition: all 0.3s ease;
+        transition: all $change_mode_time ease;
         &.hide {
             margin: -100%;
         }
@@ -119,10 +121,34 @@ export default {
         transform: translateX(10px);
         opacity: 0;
     }
+
+    .slow-vertical-fade-enter-active {
+        transition: all $change_mode_time ease;
+    }
+    .slow-vertical-fade-leave-active {
+        transition: all $change_mode_time ease;
+    }
+    .slow-vertical-fade-enter,
+    .slow-vertical-fade-leave-active {
+        transform: translateX(20%);
+        opacity: 0;
+    }
+
+    .slow-horizontal-fade-enter-active {
+        transition: all $change_mode_time ease;
+    }
+    .slow-horizontal-fade-leave-active {
+        transition: all $change_mode_time ease;
+    }
+    .slow-horizontal-fade-enter,
+    .slow-horizontal-fade-leave-active {
+        transform: translate(-20%, 20%);
+        opacity: 0;
+    }
 }
 
 body {
-    font-family: 'San Francisco', 'Helvetica', Arial, 'Hiragino Sans GB', 'Heiti SC',
-        'Microsoft YaHei', 'Droid Sans', 'WenQuanYi Micro Hei', sans-serif;
+    font-family: 'San Francisco', 'Helvetica', Arial, 'Hiragino Sans GB', 'Heiti SC', 'Microsoft YaHei', 'Droid Sans',
+        'WenQuanYi Micro Hei', sans-serif;
 }
 </style>
