@@ -1,6 +1,6 @@
 <template>
     <div class="app">
-        <thumb-scroll-view class="thumb-column" :style="thumbStyle"></thumb-scroll-view>
+        <thumb-scroll-view v-if="readingMode===0" class="thumb-column" :style="thumbStyle"></thumb-scroll-view>
         <reader-view class="reader-column"></reader-view>
     </div>
 </template>
@@ -23,7 +23,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(['showThumbView', 'thumbWidth']),
+        ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode']),
         thumbStyle() {
             if (this.showThumbView) {
                 return '';
