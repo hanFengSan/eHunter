@@ -16,10 +16,18 @@
                 :data="page.imgInfo">
             </page-view>
             <div class="page start-page" v-if="page.type===TYPE_START">
-                {{ AlbumService.getTitle() }}
+                <div :class="['ehunter-tag', { 'left': bookDirection===1 }]">
+                    EHUNTER
+                </div>
+                <h1>
+                    {{ AlbumService.getTitle() }}
+                </h1>
             </div>
             <div class="page end-page" v-if="page.type===TYPE_END">
-                {{ AlbumService.getTitle() }}
+                <div :class="['ehunter-tag', { 'left': bookDirection===0 }]">
+                    EHUNTER
+                </div>
+                <h1>END</h1>
             </div>
         </div>
     </div>
@@ -191,6 +199,43 @@ div {
                 background: white;
                 flex: 1;
                 align-self: stretch;
+                overflow: hidden;
+                > .ehunter-tag {
+                    position: absolute;
+                    right: 70px;
+                    bottom: 70px;
+                    padding: 10px 100px;
+                    background: #28af60;
+                    color: white;
+                    font-size: 18px;
+                    transform-origin: center;
+                    transform: translate(50%, 50%) rotate(-45deg);
+                    &.left {
+                        left: 70px;
+                        right: initial;
+                        transform: translate(-50%, 50%) rotate(45deg);
+                    }
+                }
+                &.start-page {
+                    position: relative;
+                    > h1 {
+                        font-size: 30px;
+                        font-weight: lighter;
+                        margin: 40% 20px;
+                        text-align: left;
+                        color: $book_view_title_color;
+                    }
+                }
+                &.end-page {
+                    position: relative;
+                    justify-content: center;
+                    align-items: center;
+                    > h1 {
+                        color: rgba(0, 0, 0, 0.7);
+                        font-size: 50px;
+                        padding-bottom: 20%;
+                    }
+                }
             }
         }
     }
