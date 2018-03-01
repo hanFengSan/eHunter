@@ -134,6 +134,13 @@ class AlbumService {
             'background-size': imgInfo.heightOfWidth >= 1.43 ? 'cover' : `${sumOfThumbInSprite * 100}%`
         };
     }
+
+    // avoiding the overflow of index
+    getRealCurIndex(curIndex) {
+        let index = curIndex.val;
+        index = index > this.getPageCount() - 1 ? this.getPageCount() - 1 : index;
+        return { val: index, updater: curIndex.updater };
+    }
 }
 
 let instance = new AlbumService(document.location.pathname.includes('/s/') ? document.documentElement.innerHTML : null);

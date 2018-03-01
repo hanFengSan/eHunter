@@ -43,7 +43,7 @@ export default {
 
     computed: {
         ...mapGetters({
-            curIndex: 'curIndex',
+            centerIndex: 'curIndex',
             volumeSize: 'volumeSize',
             volFirstIndex: 'volFirstIndex',
             readingMode: 'readingMode'
@@ -54,17 +54,21 @@ export default {
             return (this.thumbs || []).slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
         },
 
-        AlbumService: () => AlbumService
+        AlbumService: () => AlbumService,
+        curIndex() {
+            return AlbumService.getRealCurIndex(this.centerIndex)
+        }
     },
 
     watch: {
-        curIndex: {
+        centerIndex: {
             handler: function(val, oldVal) {
                 // sync pagination
                 if (this.readingMode === 0 && this.curIndex.updater !== tags.THUMB_VIEW) {
                     if (this.curIndex.val !== this.volFirstIndex && this.$refs.thumbContainers) {
                         // sort again, because if changing volume size, it may be out-of-order
                         let cons = this.$refs.thumbContainers.sort((a, b) => a.offsetTop - b.offsetTop);
+                        // Logger.logText('Thumb', this.curIndex.val);
                         this.$refs.scrollView.ScrollTo(cons[this.volIndex(this.curIndex.val)].offsetTop, 1000);
                     } else {
                         this.$refs.scrollView.ScrollTo(0, 1000); // if is page 1, scroll to top, cuz of having a header

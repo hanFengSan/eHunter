@@ -20,6 +20,7 @@ const state = {
         loadNum: 3 // the sum of pages per loading
     },
     book: {
+        bookIndex: 0,
         screenSize: 2,
         showBookScreenAnimation: false,
         direction: 0 // 0: RTL, 1: LTR
@@ -43,7 +44,20 @@ const getters = {
     volFirstIndex: state => getters.curVolume(state) * state.volumeSize,
     volumePreloadCount: state => state.volumePreloadCount,
     bookScreenSize: state => state.book.screenSize,
-    bookIndex: state => (state.curIndex.val - state.curIndex.val % state.book.screenSize) / state.book.screenSize,
+    bookIndex: state => { // map curIndex to bookIndex
+        // ((state.curIndex.val + 1) - (state.curIndex.val + 1) % state.book.screenSize) / state.book.screenSize
+        if (state.curIndex.val <= state.book.screenSize - 2) {
+            return 0;
+        } else {
+            let num = state.curIndex.val + 2;
+            let remainder = num % state.book.screenSize;
+            if (remainder === 0) {
+                return (num - num % state.book.screenSize) / state.book.screenSize - 1;
+            } else {
+                return (num - num % state.book.screenSize) / state.book.screenSize;
+            }
+        }
+    },
     bookLoadNum: state => Math.ceil(state.album.loadNum / state.book.screenSize),
     readingMode: state => state.readingMode,
     showBookScreenAnimation: state => state.book.showBookScreenAnimation,
@@ -73,6 +87,18 @@ const mutations = {
     [types.SET_INDEX](state, { val, updater }) {
         state.curIndex.val = val;
         state.curIndex.updater = updater;
+        // update bookIndex
+        if (state.curIndex.val <= state.book.screenSize - 2) {
+            state.book.bookIndex = 0;
+        } else {
+            let num = state.curIndex.val + 2;
+            let remainder = num % state.book.screenSize;
+            if (remainder === 0) {
+                state.book.bookIndex = (num - num % state.book.screenSize) / state.book.screenSize - 1;
+            } else {
+                state.book.bookIndex = (num - num % state.book.screenSize) / state.book.screenSize;
+            }
+        }
     },
     [types.SET_ALBUM_WIDTH](state, { width }) {
         state.album.width = width;
@@ -95,7 +121,8 @@ const mutations = {
         state.curIndex.updater = tags.TOP_BAR;
     },
     [types.SET_BOOK_INDEX](state, { index }) {
-        state.curIndex.val = index * state.book.screenSize;
+        let i = index * state.book.screenSize - 1;
+        state.curIndex.val = i < 0 ? 0 : i;
         state.curIndex.updater = tags.BOOK_VIEW;
     },
     [types.SET_READING_MODE](state, { mode }) {

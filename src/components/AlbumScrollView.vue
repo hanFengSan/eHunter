@@ -67,9 +67,13 @@ export default {
         PageView
     },
 
+    created() {
+        setTimeout(() => this.setIndex({ val: this.curIndex.val, updater: tags.SCROLL_VIEW_VOL }), 1000);
+    },
+
     computed: {
         ...mapGetters({
-            curIndex: 'curIndex',
+            centerIndex: 'curIndex',
             widthScale: 'albumWidth',
             loadNum: 'loadNum',
             volumeSize: 'volumeSize',
@@ -97,18 +101,20 @@ export default {
         },
 
         AlbumService: () => AlbumService,
-        image: () => image
+        image: () => image,
+        curIndex() {
+            return AlbumService.getRealCurIndex(this.centerIndex)
+        }
     },
 
     watch: {
-        curIndex: {
+        centerIndex: {
             handler: function(val, oldVal) {
                 if (this.curIndex.updater !== tags.SCROLL_VIEW && this.$refs.pageContainers) {
                     // sync index
                     if (this.curIndex.val === this.volFirstIndex) {
                         this.$refs.scrollView.ScrollTo(0, 1000);
                     } else {
-                        // Logger.logText('Album', this.volIndex(this.centerIndex));
                         this.$refs.scrollView.ScrollTo(
                             this.$refs.pageContainers[this.volIndex(this.curIndex.val)].offsetTop - 100,
                             1000
@@ -140,15 +146,12 @@ export default {
                 } else {
                     index = this.volFirstIndex;
                 }
-                if (index !== this.curIndex.val) { // avoiding to update updater of curIndex
+                if (index !== this.curIndex.val) {
+                    // avoiding to update updater of curIndex
                     this.setIndex({ val: index, updater: tags.SCROLL_VIEW });
                 }
             }
         }
-    },
-
-    created() {
-        // this.curIndex = this.volFirstIndex;
     },
 
     methods: {

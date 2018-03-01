@@ -1,6 +1,6 @@
 import storage from './storage/LocalStorage';
 import store from '../store/index.inject';
-import Logger from '../utils/Logger';
+// import Logger from '../utils/Logger';
 
 class SettingService {
     constructor() {
@@ -130,7 +130,6 @@ class SettingService {
     }
 
     async setReadingMode(val) {
-        Logger.logText('Setting', val);
         await this._setSettingItem('readingMode', val);
     }
 

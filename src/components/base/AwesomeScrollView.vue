@@ -61,15 +61,19 @@ export default {
         },
 
         onScroll() {
-            this.lastKnownScrollPosition = this.$refs.asv.scrollTop;
-            if (!this.ticking) {
-                window.requestAnimationFrame(() => {
-                    this.detectScrollStop();
-                    this.ticking = false;
-                });
+            try {
+                this.lastKnownScrollPosition = this.$refs.asv.scrollTop;
+                if (!this.ticking) {
+                    window.requestAnimationFrame(() => {
+                        this.detectScrollStop();
+                        this.ticking = false;
+                    });
+                }
+                this.ticking = true;
+                this.isScrolling = true;
+            } catch (e) {
+
             }
-            this.ticking = true;
-            this.isScrolling = true;
         },
 
         ScrollTo(offsetTop, duration) {

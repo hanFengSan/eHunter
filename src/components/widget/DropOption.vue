@@ -7,7 +7,9 @@
     </svg>
     <popover :active="active" :custom-style="{'margin-left': '7px', 'margin-top': '4px'}" :close="close">
         <div class="options no-select">
-            <div class="item" v-for="(item, index) in list" :key="item" @click="onClick(index)">{{ item.name || item }}</div>
+            <div class="item" v-for="(item, index) in list" :key="item" @click="onClick(index)">
+                <span>{{ item.name || item }}</span>
+            </div>
         </div>
     </popover>
 </div>
@@ -82,13 +84,16 @@ div {
             padding: 7px 11px;
             min-width: 52px;
             transition: all 0.3s ease;
+            > span {
+                transition: all 0.3s ease;
+            }
             &:hover {
                 cursor: pointer;
-                // transition: background-color 0.3s ease, color 0.3s ease, padding-left 0.3s ease;
-                color: $accent_color;
                 background: rgba(0, 0, 0, 0.1);
-                padding-left: 15px;
-                padding-right: 5px;
+                > span {
+                    color: $accent_color;
+                    transform: translateX(5px);
+                }
             }
         }
     }
