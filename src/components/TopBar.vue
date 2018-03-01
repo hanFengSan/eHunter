@@ -62,6 +62,14 @@
                     </div>
                 </div>
                 <div class="item" v-if="readingMode===1">
+                    <span class="label tips tips-down" title-content="一个屏幕同时容纳的页数">同屏页数:</span>
+                    <drop-option :list="screenSizeList" @change="(val) => dropOptionChange('screenSize', val)" :cur-val="bookScreenSize + 'P'"></drop-option>
+                </div>
+                <div class="item" v-if="readingMode===1">
+                    <span class="label tips tips-down" title-content="一个屏幕下各页的布局方向">阅读方向:</span>
+                    <drop-option :list="directionList" @change="(val) => dropOptionChange('direction', val)" :cur-val="directionList[bookDirection].sname"></drop-option>
+                </div>
+                <div class="item" v-if="readingMode===1">
                     <span class="label tips tips-down" title-content="开启/关闭换页时的滑动动画">换页动画:</span>
                     <div class="bar-switch">
                         <simple-switch :active="showBookScreenAnimation" @change="changeBookScreenAnimation"></simple-switch>
@@ -120,7 +128,20 @@ export default {
             ],
             showVolSizeSlider: false,
             // readingMode
-            readingModeList: [{ name: '卷轴模式', val: 0 }, { name: '书本模式', val: 1 }]
+            readingModeList: [{ name: '卷轴模式', val: 0 }, { name: '书本模式', val: 1 }],
+            // screenSize
+            screenSizeList: [
+                { name: '1P', val: 1 },
+                { name: '2P', val: 2 },
+                { name: '3P', val: 3 },
+                { name: '4P', val: 4 },
+                { name: '5P', val: 5 }
+            ],
+            // direction
+            directionList: [
+                { name: 'RTL (从右至左)', sname: 'RTL', val: 0 },
+                { name: 'LTR (从左至右)', sname: 'LTR', val: 1 }
+            ]
         };
     },
 
@@ -136,7 +157,9 @@ export default {
             'showThumbView',
             'volumeSize',
             'readingMode',
-            'showBookScreenAnimation'
+            'showBookScreenAnimation',
+            'bookScreenSize',
+            'bookDirection'
         ])
     },
 
@@ -174,6 +197,12 @@ export default {
                     break;
                 case 'readingMode':
                     SettingService.setReadingMode(this.readingModeList[index].val);
+                    break;
+                case 'screenSize':
+                    SettingService.setBookScreenSize(this.screenSizeList[index].val);
+                    break;
+                case 'direction':
+                    SettingService.setBookDirection(this.directionList[index].val);
                     break;
             }
         },

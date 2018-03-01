@@ -1,7 +1,7 @@
 // import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
 import * as tags from '../../service/tags'
-import Logger from '../../utils/Logger'
+// import Logger from '../../utils/Logger'
 
 // initial state
 const state = {
@@ -73,7 +73,6 @@ const mutations = {
     [types.SET_INDEX](state, { val, updater }) {
         state.curIndex.val = val;
         state.curIndex.updater = updater;
-        Logger.logObj('VUEX', state.curIndex, true);
     },
     [types.SET_ALBUM_WIDTH](state, { width }) {
         state.album.width = width;
@@ -98,7 +97,6 @@ const mutations = {
     [types.SET_BOOK_INDEX](state, { index }) {
         state.curIndex.val = index * state.book.screenSize;
         state.curIndex.updater = tags.BOOK_VIEW;
-        Logger.logObj('VUEX', state.curIndex, true);
     },
     [types.SET_READING_MODE](state, { mode }) {
         state.readingMode = mode;
