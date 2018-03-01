@@ -46,7 +46,8 @@ export default {
         ...mapGetters({
             centerIndex: 'curIndex',
             volumeSize: 'volumeSize',
-            volFirstIndex: 'volFirstIndex'
+            volFirstIndex: 'volFirstIndex',
+            readingMode: 'readingMode'
         }),
 
         // the thumbs of current volume
@@ -61,7 +62,7 @@ export default {
         centerIndex: {
             handler: function(val, oldVal) {
                 // sync pagination
-                if (this.curIndex !== this.centerIndex && !this.hover) {
+                if (this.readingMode === 0 && this.curIndex !== this.centerIndex && !this.hover) {
                     this.curIndex = this.centerIndex;
                     if (this.curIndex !== this.volFirstIndex) {
                         // sort again, because if changing volume size, it may be out-of-order
@@ -114,8 +115,7 @@ export default {
     .thumb-scroll-view {
         position: relative;
         background: $thumb_scroll_view_bg;
-        min-height: 100vh;
-        height: 500px;
+        height: 100%;
         display: inline-block;
         width: $thumb-view-width;
         > .header {

@@ -13,6 +13,10 @@
         <div :class="['inner-content', { hide: !showTopBar }]">
             <template v-if="readSettings">
                 <div class="item">
+                    <span class="label tips tips-down" title-content="设置阅读模式">阅读模式:</span>
+                    <drop-option :list="readingModeList" @change="(val) => dropOptionChange('readingMode', val)" :cur-val="readingModeList[readingMode].name"></drop-option>
+                </div>
+                <div class="item" v-if="readingMode===0">
                     <span class="label tips tips-down" title-content="设置画面比例">画面比例:</span>
                     <drop-option :list="widthList" @change="(val) => dropOptionChange('width', val)" :cur-val="albumWidth + '%'"></drop-option>
                     <pop-slider 
@@ -38,7 +42,7 @@
                         @change="(val) => dropOptionSliderChange('loadNum', val)">
                     </pop-slider>
                 </div>
-                <div class="item">
+                <div class="item" v-if="readingMode===0">
                     <span class="label tips tips-down" title-content="设置过大将会对性能要求较高">分卷页数:</span>
                     <drop-option :list="volSizeList" @change="(val) => dropOptionChange('volSize', val)" :cur-val="volumeSize + 'P'"></drop-option>
                     <pop-slider 
@@ -51,10 +55,16 @@
                         @change="(val) => dropOptionSliderChange('volSize', val)">
                     </pop-slider>
                 </div>
-                <div class="item">
+                <div class="item" v-if="readingMode===0">
                     <span class="label tips tips-down" title-content="开启/关闭左侧缩略图栏">缩略图栏:</span>
                     <div class="bar-switch">
                         <simple-switch :active="showThumbView" @change="changeThumbView"></simple-switch>
+                    </div>
+                </div>
+                <div class="item" v-if="readingMode===1">
+                    <span class="label tips tips-down" title-content="开启/关闭换页时的滑动动画">换页动画:</span>
+                    <div class="bar-switch">
+                        <simple-switch :active="showBookScreenAnimation" @change="changeBookScreenAnimation"></simple-switch>
                     </div>
                 </div>
             </template>
@@ -108,7 +118,9 @@ export default {
                 { name: '100P', val: 100 },
                 { name: '自定义', val: -1 }
             ],
-            showVolSizeSlider: false
+            showVolSizeSlider: false,
+            // readingMode
+            readingModeList: [{ name: '卷轴模式', val: 0 }, { name: '书本模式', val: 1 }]
         };
     },
 
@@ -117,13 +129,15 @@ export default {
     },
 
     computed: {
-        ...mapGetters({
-            showTopBar: 'showTopBar',
-            albumWidth: 'albumWidth',
-            loadNum: 'loadNum',
-            showThumbView: 'showThumbView',
-            volumeSize: 'volumeSize'
-        })
+        ...mapGetters([
+            'showTopBar',
+            'albumWidth',
+            'loadNum',
+            'showThumbView',
+            'volumeSize',
+            'readingMode',
+            'showBookScreenAnimation'
+        ])
     },
 
     methods: {
@@ -157,6 +171,9 @@ export default {
                         default:
                             SettingService.setVolumeSize(this.volSizeList[index].val);
                     }
+                    break;
+                case 'readingMode':
+                    SettingService.setReadingMode(this.readingModeList[index].val);
                     break;
             }
         },
@@ -200,6 +217,10 @@ export default {
         closeEHunter() {
             SettingService.toggleEHunter(false);
             eHunter.toggleEHunterView(false);
+        },
+
+        changeBookScreenAnimation(show) {
+            SettingService.setBookScreenAnimation(show);
         }
     }
 };

@@ -65,7 +65,11 @@ export default {
     },
 
     created() {
-        this.watchKeyboard();
+        document.addEventListener('keydown', this.watchKeyboard);
+    },
+
+    destroyed() {
+        document.removeEventListener('keydown', this.watchKeyboard);
     },
 
     computed: {
@@ -138,23 +142,21 @@ export default {
             }
         },
 
-        watchKeyboard() {
-            document.addEventListener('keydown', e => {
-                switch (e.key) {
-                    case 'ArrowLeft':
-                        this.setBookIndex(this.bookIndex > 0 ? this.bookIndex - 1 : 0);
-                        Logger.logText('Book', 'prev page');
-                        break;
-                    case 'ArrowRight':
-                        this.setBookIndex(
-                            this.bookIndex === this.screens.length - 1
-                                ? this.screens.length - 1
-                                : this.bookIndex + 1
-                        );
-                        Logger.logText('Book', 'next page');
-                        break;
-                }
-            });
+        watchKeyboard(e) {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    this.setBookIndex(this.bookIndex > 0 ? this.bookIndex - 1 : 0);
+                    Logger.logText('Book', 'prev page');
+                    break;
+                case 'ArrowRight':
+                    this.setBookIndex(
+                        this.bookIndex === this.screens.length - 1
+                            ? this.screens.length - 1
+                            : this.bookIndex + 1
+                    );
+                    Logger.logText('Book', 'next page');
+                    break;
+            }
         }
     }
 };
@@ -170,6 +172,7 @@ div {
 .album-book-view {
     flex-direction: column;
     position: relative;
+    overflow: hidden;
     > .screen {
         width: 100%;
         height: 100vh;

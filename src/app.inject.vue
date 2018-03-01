@@ -1,6 +1,6 @@
 <template>
     <div class="app">
-        <thumb-scroll-view v-if="readingMode===0" class="thumb-column" :style="thumbStyle"></thumb-scroll-view>
+        <thumb-scroll-view class="thumb-column" :style="thumbStyle"></thumb-scroll-view>
         <reader-view class="reader-column"></reader-view>
     </div>
 </template>
@@ -41,6 +41,7 @@ export default {
 
 .app {
     display: flex;
+    height: 100%;
     > .thumb-column {
         transition: all 0.3s ease;
         &.hide {
@@ -48,7 +49,7 @@ export default {
         }
     }
     > .reader-column {
-        flex-grow: 1;
+        flex: 1;
     }
 
     section,

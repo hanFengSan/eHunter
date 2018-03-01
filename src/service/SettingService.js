@@ -1,9 +1,10 @@
 import storage from './storage/LocalStorage';
 import store from '../store/index.inject';
+import Logger from '../utils/Logger';
 
 class SettingService {
     constructor() {
-        this.version = '2.1';
+        this.version = '2.2';
         this.storageName = 'Settings';
         this.storageVersionName = 'SettingsVersion';
         this._initStorage();
@@ -16,7 +17,11 @@ class SettingService {
             toggleEHunter: { eventName: 'toggleEHunter', val: true },
             toggleThumbView: { eventName: 'toggleThumbView', val: true },
             loadNum: { eventName: 'setLoadNum', val: 3 },
-            volumeSize: { eventName: 'setVolumeSize', val: 50 }
+            volumeSize: { eventName: 'setVolumeSize', val: 50 },
+            showBookScreenAnimation: { eventName: 'setBookScreenAnimation', val: false },
+            readingMode: { eventName: 'setReadingMode', val: 0 },
+            bookDirection: { eventName: 'setBookDirection', val: 0 },
+            bookScreenSize: { eventName: 'setBookScreenSize', val: 2 }
         }
     }
 
@@ -51,6 +56,9 @@ class SettingService {
     async _setSettingItem(key, val) {
         // store change
         let settings = await storage.load({ key: this.storageName });
+        if (!settings[key]) { // smoothly add new setting item
+            settings[key] = this._getDefaultSettings()[key];
+        }
         settings[key].val = val;
         await storage.save({ key: this.storageName, data: settings });
         // send change to vuex
@@ -112,6 +120,40 @@ class SettingService {
     async getVolumeSize() {
         return await this._getSettingItem('volumeSize');
     }
+
+    async setBookScreenAnimation(val) {
+        await this._setSettingItem('showBookScreenAnimation', val);
+    }
+
+    async getBookScreenAnimation() {
+        return await this._getSettingItem('showBookScreenAnimation');
+    }
+
+    async setReadingMode(val) {
+        Logger.logText('Setting', val);
+        await this._setSettingItem('readingMode', val);
+    }
+
+    async getReadingMode() {
+        return await this._getSettingItem('readingMode');
+    }
+
+    async setBookDirection(val) {
+        await this._setSettingItem('bookDirection', val);
+    }
+
+    async getBookDirection() {
+        return await this._getSettingItem('bookDirection');
+    }
+
+    async setBookScreenSize(val) {
+        await this._setSettingItem('bookScreenSize', val);
+    }
+
+    async getBookScreenSize() {
+        return await this._getSettingItem('bookScreenSize');
+    }
+
 }
 
 let instance = new SettingService();

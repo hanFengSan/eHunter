@@ -152,7 +152,6 @@ export default {
 
     created() {
         this.curIndex = this.volFirstIndex;
-        this.setIndex(AlbumService.getCurPageNum() - 1);
     },
 
     methods: {
@@ -235,7 +234,7 @@ export default {
     > .scroll-view {
         flex-direction: column;
         align-items: center;
-        height: 100vh;
+        height: 100%;
         width: 100%;
         h1 {
             color: #c9cacf;

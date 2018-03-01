@@ -14,8 +14,8 @@
         <h4 class="location">{{ location }}</h4>
         <img title="全屏" @click="fullscreen" class="focus icon" :src="image.fullScreen" />
     </div>
-    <!-- <album-scroll-view class="content scroll-mode" v-if="!isloadingImgInfos" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view> -->
-    <album-book-view class="content book-mode" v-if="!isloadingImgInfos" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
+    <album-scroll-view class="content scroll-mode" v-if="!isloadingImgInfos&&readingMode===0" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
+    <album-book-view class="content book-mode" v-if="!isloadingImgInfos&&readingMode===1" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
 </div>
 </template>
 
@@ -44,6 +44,7 @@ export default {
 
     async created() {
         await this.initImgInfoList();
+        this.setIndex(AlbumService.getCurPageNum() - 1);
     },
 
     computed: {
@@ -63,13 +64,14 @@ export default {
                 case 0:
                     return `${this.curIndex + 1} / ${AlbumService.getPageCount()}`;
                 case 1:
-                    return `${this.bookIndex + 1} / ${AlbumService.getBookScreenCount(this.bookScreenSize)}`;
+                    return `${this.bookIndex + 1} / 
+                    ${AlbumService.getBookScreenCount(this.bookScreenSize)}`;
             }
         }
     },
 
     methods: {
-        ...mapActions([]),
+        ...mapActions(['setIndex']),
         async initImgInfoList() {
             this.imgInfoList = await AlbumService.getImgInfos();
             // init pageUrlsObj

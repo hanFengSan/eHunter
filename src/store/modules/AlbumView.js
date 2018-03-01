@@ -1,5 +1,6 @@
 // import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
+import Logger from '../../utils/Logger'
 
 // initial state
 const state = {
@@ -60,7 +61,8 @@ const actions = {
     setBookIndex: ({ commit }, index) => commit(types.SET_BOOK_INDEX, { index }),
     setReadingMode: ({ commit }, mode) => commit(types.SET_READING_MODE, { mode }),
     setBookScreenAnimation: ({ commit }, show) => commit(types.SET_BOOK_SCREEN_ANIMATION, { show }),
-    setBookDirection: ({ commit }, mode) => commit(types.SET_BOOK_DIRECTION, { mode })
+    setBookDirection: ({ commit }, mode) => commit(types.SET_BOOK_DIRECTION, { mode }),
+    setBookScreenSize: ({ commit }, num) => commit(types.SET_BOOK_SCREEN_SIZE, { num })
 }
 
 // mutations
@@ -92,12 +94,16 @@ const mutations = {
     },
     [types.SET_READING_MODE](state, { mode }) {
         state.readingMode = mode;
+        Logger.logText('VUEX', mode);
     },
     [types.SET_BOOK_SCREEN_ANIMATION](state, { show }) {
         state.book.showBookScreenAnimation = show;
     },
     [types.SET_BOOK_DIRECTION](state, { mode }) {
         state.book.direction = mode;
+    },
+    [types.SET_BOOK_SCREEN_SIZE](state, { num }) {
+        state.book.screenSize = num;
     }
 }
 
