@@ -87,7 +87,7 @@ $change_mode_time: 0.8s;
             &:after {
                 content: attr(title-content);
                 position: absolute;
-                top: -130%;
+                top: -110%;
                 left: 50%;
                 transform: translate(-50%, 0);
                 font-size: 12px;
@@ -104,6 +104,23 @@ $change_mode_time: 0.8s;
             &:hover {
                 &:after {
                     top: 130%;
+                }
+            }
+        }
+        &.tips-right {
+            &:hover {
+                &:after {
+                    left: -10%;
+                    transform: initial;
+                }
+            }
+        }
+        &.tips-left {
+            &:hover {
+                &:after {
+                    right: -20%;
+                    left: initial;
+                    transform: initial;
                 }
             }
         }

@@ -12,7 +12,12 @@
     <!-- panel view -->
     <div class="panel">
         <h4 class="location">{{ location }}</h4>
-        <img title="全屏" @click="fullscreen" class="focus icon" :src="image.fullScreen" />
+        <div class="full-screen tips tips-left" :title-content="string.fullScreen" @click="fullscreen">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+            </svg>
+        </div>
     </div>
     <transition name="slow-horizontal-fade">
         <album-scroll-view class="content scroll-mode" v-if="!isloadingImgInfos&&readingMode===0" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
@@ -57,7 +62,8 @@ export default {
             curIndex: 'curIndex',
             readingMode: 'readingMode',
             bookIndex: 'bookIndex',
-            bookScreenSize: 'bookScreenSize'
+            bookScreenSize: 'bookScreenSize',
+            string: 'string'
         }),
         isloadingImgInfos() {
             return this.imgInfoList.length === 0;
@@ -138,30 +144,37 @@ div {
         width: 100%;
     }
     > .panel {
-        position: absolute;
-        bottom: 5px;
-        right: 23px;
-        z-index: 10;
         display: flex;
         align-items: center;
         justify-content: center;
+        position: absolute;
+        bottom: 2vh;
+        right: 2vh;
+        z-index: 10;
+        opacity: 0.5;
+        transition: all 0.2s ease;
+        &:hover {
+            opacity: 1;
+        }
         > .location {
             color: $reader_view_location_color;
-            font-size: 14px;
             display: inline-block;
+            font-size: 16px;
             line-height: 16px;
-            height: 16px;
+            margin-top: 2px;
         }
         .icon-container {
             position: relative;
             display: inline-block;
         }
-        .focus.icon {
-            width: 16px;
-            display: inline-block;
-            height: 16px;
+        > .full-screen {
             cursor: pointer;
-            margin: 18px 0 18px 10px;
+            margin-left: 5px;
+            > svg {
+                fill: $reader_view_full_screen_color;
+                width: 26px;
+                height: 26px;
+            }
         }
     }
 

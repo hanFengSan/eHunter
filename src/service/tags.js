@@ -16,3 +16,12 @@ export const ID_END = 'ID_END';
 export const TYPE_NORMAL = 'TYPE_NORMAL';
 export const TYPE_START = 'TYPE_START';
 export const TYPE_END = 'TYPE_END';
+
+export const LANG_EN = 'LANG_EN';
+export const LANG_CN = 'LANG_CN';
+export const LANG_JP = 'LANG_JP';
+
+export const STATE_WAITING = 'STATE_WAITING';
+export const STATE_LOADING = 'STATE_LOADING';
+export const STATE_ERRORED = 'STATE_ERRORED';
+export const STATE_LOADED = 'STATE_LOADED';

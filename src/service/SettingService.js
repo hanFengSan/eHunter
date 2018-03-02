@@ -1,10 +1,11 @@
-import storage from './storage/LocalStorage';
-import store from '../store/index.inject';
+import storage from './storage/LocalStorage'
+import store from '../store/index.inject'
+import * as tags from '../service/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {
     constructor() {
-        this.version = '2.2';
+        this.version = '2.0';
         this.storageName = 'Settings';
         this.storageVersionName = 'SettingsVersion';
         this._initStorage();
@@ -22,7 +23,8 @@ class SettingService {
             showBookPagination: { eventName: 'setBookPagination', val: true },
             readingMode: { eventName: 'setReadingMode', val: 0 },
             bookDirection: { eventName: 'setBookDirection', val: 0 },
-            bookScreenSize: { eventName: 'setBookScreenSize', val: 2 }
+            bookScreenSize: { eventName: 'setBookScreenSize', val: 2 },
+            lang: { eventName: 'setString', val: tags.LANG_EN }
         }
     }
 
@@ -39,7 +41,7 @@ class SettingService {
         await storage.save({ key: this.storageVersionName, data: this.version });
         if (version !== this.version) {
             await storage.remove({ key: this.storageName });
-            window.alert('已更新数据库: Settings, 请刷新页面');
+            window.location.reload(); // TODO: need a notification
         }
     }
 
@@ -160,6 +162,14 @@ class SettingService {
 
     async getBookScreenSize() {
         return await this._getSettingItem('bookScreenSize');
+    }
+
+    async setLang(val) {
+        await this._setSettingItem('lang', val);
+    }
+
+    async getLang() {
+        return await this._getSettingItem('lang');
     }
 
 }

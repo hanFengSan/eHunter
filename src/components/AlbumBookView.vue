@@ -266,24 +266,25 @@ div {
                 overflow: hidden;
                 > .ehunter-tag {
                     position: absolute;
-                    right: 70px;
-                    bottom: 70px;
-                    padding: 10px 100px;
+                    right: 8vh;
+                    bottom: 8vh;
+                    padding: 1vh 10vh;
                     background: $book_view_ehunter_tag_bg;
                     color: $book_view_ehunter_tag_text_color;
-                    font-size: 18px;
+                    font-size: 1.8vh;
                     transform-origin: center;
                     transform: translate(50%, 50%) rotate(-45deg);
                     &.left {
-                        left: 70px;
+                        left: 7vh;
                         right: initial;
                         transform: translate(-50%, 50%) rotate(45deg);
                     }
                 }
                 &.start-page {
                     position: relative;
+                    justify-content: center;
                     > h1 {
-                        font-size: 30px;
+                        font-size: 4vh;
                         font-weight: lighter;
                         margin: 40% 20px;
                         text-align: left;
@@ -296,7 +297,7 @@ div {
                     align-items: center;
                     > h1 {
                         color: $book_view_end_page_text_color;
-                        font-size: 50px;
+                        font-size: 6vh;
                         padding-bottom: 20%;
                     }
                 }

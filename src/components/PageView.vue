@@ -5,22 +5,42 @@
         <h6 class="index">{{ index + 1 }}</h6>
         <article class="loading-info-panel" v-if="active">
             <transition name="slide-fade">
-                <p class="loading-info" v-if="curLoadStatus!=loadStatus.loaded">
-                    {{ loadingInfo }}
-                    <flat-button class="tips" title-content="加载原图, 可有效解决加载问题" label="原图" mode="inline" @click="getNewImgSrc(tags.MODE_ORIGIN)"></flat-button>
-                    <flat-button class="tips" title-content="刷新, 获取普通图片" label="刷新" mode="inline" @click="getNewImgSrc()"></flat-button>
-                    <flat-button v-if="reloadTimes>1" class="tips" title-content="通过其他服务器获取普通图片" label="换源刷新" mode="inline" @click="getNewImgSrc(tags.MODE_CHANGE_SOURCE)"></flat-button>
+                <p class="loading-info" v-if="curLoadStatus!=tags.STATE_LOADED">
+                    <span class="text">{{ loadingInfo }}</span>
+                    <span class="operation">
+                        <flat-button 
+                            class="tips tips-down no-margin" 
+                            :title-content="string.originImgTip" 
+                            :label="string.originImg" 
+                            mode="inline" 
+                            @click="getNewImgSrc(tags.MODE_ORIGIN)">
+                        </flat-button>
+                        <flat-button 
+                            class="tips tips-down" 
+                            :title-content="string.refreshTip" 
+                            :label="string.refresh" 
+                            mode="inline" 
+                            @click="getNewImgSrc()">
+                        </flat-button>
+                        <flat-button 
+                            class="tips tips-down" 
+                            :title-content="string.refreshByOtherSourceTip" 
+                            :label="string.refreshByOtherSource" 
+                            mode="inline" 
+                            @click="getNewImgSrc(tags.MODE_CHANGE_SOURCE)">
+                        </flat-button>
+                    </span>
                 </p>
             </transition>
         </article>
-        <div class="loading-console-panel" v-if="active&&curLoadStatus!=loadStatus.loaded"> 
-            <div class="tips" title-content="载入原图">
+        <div class="loading-console-panel" v-if="active&&curLoadStatus!=tags.STATE_LOADED"> 
+            <div class="tips tips-left" :title-content="string.originImgTip">
                 <svg class="btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc(tags.MODE_ORIGIN)" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
                     <path d="M0 0h24v24H0z" fill="none"/>
                 </svg>
             </div>
-            <div class="tips" title-content="刷新">
+            <div class="tips tips-left" :title-content="string.refresh">
                 <svg class="btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="getNewImgSrc()">
                     <path d="M0 0h24v24H0z" fill="none"/>
                     <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
@@ -32,7 +52,6 @@
         <img class="album-item" 
             v-if="active" 
             :src="imgInfo.src" 
-            :get-src="getImgSrc()"
             @load="loaded()"
             @error="failLoad($event)">
     </div>
@@ -40,6 +59,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import AlbumService from 'src/service/AlbumService.js';
 import FlatButton from './widget/FlatButton.vue';
 import Logger from '../utils/Logger.js';
@@ -71,34 +91,47 @@ export default {
             thumb: {},
             reloadTimes: 0,
             message: '',
-            curLoadStatus: null,
-            loadStatus: { loading: 'loading', error: 'error', waiting: 'waiting', loaded: 'loaded' }
+            curLoadStatus: null
         };
     },
 
     async created() {
         this.imgInfo = JSON.parse(JSON.stringify(this.data));
         this.imgInfo.isFirstLoad = true;
-        this.curLoadStatus = this.loadStatus.waiting;
+        this.curLoadStatus = tags.STATE_WAITING;
+        if (this.active) {
+            this.getImgSrc();
+        }
         this.thumb = await AlbumService.getThumb(this.index);
     },
 
     computed: {
+        ...mapGetters(['string']),
         AlbumService: () => AlbumService,
         tags: () => tags,
         loadingInfo() {
-            let reloadInfo = this.reloadTimes ? `[重载-${this.reloadTimes}] ` : '';
+            let reloadInfo = this.reloadTimes ? `[${this.string.reload}-${this.reloadTimes}] ` : '';
             if (this.message) {
                 return reloadInfo + this.message;
             }
-            if (this.curLoadStatus !== this.loadStatus.error) {
-                if (this.imgInfo.src) {
-                    return reloadInfo + '加载图片中';
-                } else {
-                    return reloadInfo + '加载图片地址中';
-                }
-            } else {
-                return reloadInfo + '图片加载失败, 请刷新';
+            switch (this.curLoadStatus) {
+                case tags.STATE_ERRORED:
+                    return reloadInfo + this.string.loadingImgFailed;
+                case tags.STATE_LOADED:
+                    return reloadInfo + this.string.imgLoaded;
+                case tags.STATE_WAITING:
+                    return reloadInfo + this.string.waiting;
+                case tags.STATE_LOADING:
+                default:
+                    return reloadInfo + this.string.loadingImg;
+            }
+        }
+    },
+
+    watch: {
+        active(val, oldVal) {
+            if (val) {
+                this.getImgSrc();
             }
         }
     },
@@ -107,12 +140,12 @@ export default {
         // for lazy load img
         async getImgSrc() {
             // avoid redundant getImgSrc(), overlap refreshing of 'origin'
-            if (this.curLoadStatus !== this.loadStatus.loading) {
+            if (this.curLoadStatus !== tags.STATE_LOADING) {
                 let src = await AlbumService.getImgSrc(this.index, tags.MODE_FAST);
                 if (this.imgInfo.src !== src) {
                     this.imgInfo.src = src;
-                    this.curLoadStatus = this.loadStatus.loading;
                 }
+                this.curLoadStatus = tags.STATE_LOADING;
             }
         },
 
@@ -121,17 +154,17 @@ export default {
             this.reloadTimes++;
             this.message = '';
             this.imgInfo.src = '';
-            this.curLoadStatus = this.loadStatus.loading;
+            this.curLoadStatus = tags.STATE_LOADING;
             let src = await AlbumService.getNewImgSrc(this.index, mode);
             if (!(src instanceof Error)) {
                 this.imgInfo.src = src;
             } else {
                 switch (src.message) {
                     case tags.ERROR_NO_ORIGIN:
-                        this.message = '无原图地址, 请刷新';
+                        this.message = this.string.noOriginalImg;
                         break;
                     default:
-                        this.message = '加载错误';
+                        this.message = this.string.loadingFailed;
                 }
             }
         },
@@ -139,7 +172,7 @@ export default {
         failLoad(e) {
             e.preventDefault();
             if (this.imgInfo.src) {
-                this.curLoadStatus = this.loadStatus.error;
+                this.curLoadStatus = tags.STATE_ERRORED;
                 Logger.logText('LOADING', 'loading image failed');
                 if (this.imgInfo.isFirstLoad) {
                     // auto request src when first loading is failed
@@ -151,7 +184,7 @@ export default {
         },
 
         loaded() {
-            this.curLoadStatus = this.loadStatus.loaded;
+            this.curLoadStatus = tags.STATE_LOADED;
         }
     }
 };
@@ -161,7 +194,8 @@ export default {
 @import '~style/_responsive';
 @import '~style/_variables';
 
-div {
+div,
+span {
     display: flex;
 }
 
@@ -172,6 +206,7 @@ div {
     left: 0;
     right: 0;
     transition: all 0.3s ease;
+    overflow: hidden;
     > .layer {
         position: absolute;
         top: 0;
@@ -219,6 +254,13 @@ div {
             .loading-info {
                 display: flex;
                 align-items: center;
+                flex-direction: column;
+                > .operation {
+                    margin-top: 2px;
+                    > .no-margin {
+                        margin-left: 0;
+                    }
+                }
             }
         }
         > .loading-console-panel {
