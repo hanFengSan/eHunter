@@ -118,6 +118,7 @@ export default {
             let begin = this.bookIndex - this.bookLoadNum;
             return this.screens.slice(begin >= 0 ? begin : 0, this.bookIndex + this.bookLoadNum);
         },
+        // calc each size of page
         pageSizes() {
             let pageSizes = [];
             for (let pages of this.screens) {
@@ -126,24 +127,19 @@ export default {
                     return max;
                 }, 0);
                 let pagesRatio = maxPageRatio / pages.length; // assume the all the widths of each page are 1
+                let width;
                 if (pagesRatio >= this.screenSize.screenRatio) {
-                    pages.forEach(page => {
-                        pageSizes.push({
-                            id: page.id,
-                            height: this.screenSize.height,
-                            width: this.screenSize.height / page.imgInfo.heightOfWidth
-                        });
-                    });
+                    width = this.screenSize.height / maxPageRatio;
                 } else {
-                    pages.forEach(page => {
-                        let width = this.screenSize.width / pages.length;
-                        pageSizes.push({
-                            id: page.id,
-                            height: width * page.imgInfo.heightOfWidth,
-                            width
-                        });
-                    });
+                    width = this.screenSize.width / pages.length;
                 }
+                pages.forEach(page => {
+                    pageSizes.push({
+                        id: page.id,
+                        height: width * page.imgInfo.heightOfWidth,
+                        width
+                    });
+                });
             }
             return pageSizes;
         }
