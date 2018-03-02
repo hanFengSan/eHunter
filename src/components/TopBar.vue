@@ -1,6 +1,6 @@
 <template>
     <nav class="top-bar">
-        <div class="float-content">
+        <div class="float-content" :style="topBarStyle">
             <circle-icon-button 
                 ref="topBarButton" 
                 class="button" 
@@ -10,7 +10,7 @@
             </circle-icon-button>
             <circle-icon-button class="button" icon="close" @click="closeEHunter"></circle-icon-button>
         </div>
-        <div :class="['inner-content', { hide: !showTopBar }]">
+        <div :class="['inner-content', { hide: !showTopBar }]" :style="topBarStyle">
             <template v-if="readSettings">
                 <div class="item">
                     <span class="label tips tips-down" title-content="设置阅读模式">阅读模式:</span>
@@ -152,6 +152,7 @@ export default {
     computed: {
         ...mapGetters([
             'showTopBar',
+            'topBarHeight',
             'albumWidth',
             'loadNum',
             'showThumbView',
@@ -160,7 +161,10 @@ export default {
             'showBookScreenAnimation',
             'bookScreenSize',
             'bookDirection'
-        ])
+        ]),
+        topBarStyle() {
+            return { height: this.px(this.topBarHeight) };
+        }
     },
 
     methods: {
@@ -268,7 +272,6 @@ div {
         position: absolute;
         top: 0;
         right: 0;
-        height: 40px;
         align-items: center;
         z-index: 10;
         > .button {
@@ -277,7 +280,6 @@ div {
     }
 
     > .inner-content {
-        height: 40px;
         color: white;
         flex-grow: 1;
         background: $accent_color;

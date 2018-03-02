@@ -10,3 +10,9 @@ export const MODE_ORIGIN = 'MODE_ORIGIN';
 export const MODE_CHANGE_SOURCE = 'MODE_CHANGE_SOURCE';
 
 export const ERROR_NO_ORIGIN = 'ERROR_NO_ORIGIN';
+
+export const ID_START = 'ID_START';
+export const ID_END = 'ID_END';
+export const TYPE_NORMAL = 'TYPE_NORMAL';
+export const TYPE_START = 'TYPE_START';
+export const TYPE_END = 'TYPE_END';

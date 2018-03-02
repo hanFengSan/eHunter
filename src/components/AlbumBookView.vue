@@ -1,21 +1,22 @@
 <template>
 <section class="album-book-view">
-    <div :class="['screen', { 'avoid-top-bar': showTopBar, 'animation': showBookScreenAnimation, 'rtl': bookDirection===0 }]" 
+    <div :class="['screen', {'animation': showBookScreenAnimation, 'rtl': bookDirection===0 }]" 
         v-for="screen in activedScreens" 
         :style="getScreenStyle(screen)"
         :key="screen">
         <div 
-            :class="['page-container', { 'avoid-top-bar': showTopBar }]" 
+            class="page-container" 
             v-for="page in screen"
+            :style="getPageStyle(page)"
             :key="page.id">
             <page-view
-                v-if="page.type===TYPE_NORMAL"
+                v-if="page.type===tags.TYPE_NORMAL"
                 :index="index(0, page.imgInfo.pageUrl)"
                 :active="true"
                 :album-id="AlbumService.getAlbumId()"
                 :data="page.imgInfo">
             </page-view>
-            <div class="page start-page" v-if="page.type===TYPE_START">
+            <div class="page start-page" v-if="page.type===tags.TYPE_START">
                 <div :class="['ehunter-tag', { 'left': bookDirection===1 }]">
                     EHUNTER
                 </div>
@@ -23,7 +24,7 @@
                     {{ AlbumService.getTitle() }}
                 </h1>
             </div>
-            <div class="page end-page" v-if="page.type===TYPE_END">
+            <div class="page end-page" v-if="page.type===tags.TYPE_END">
                 <div :class="['ehunter-tag', { 'left': bookDirection===0 }]">
                     EHUNTER
                 </div>
@@ -38,6 +39,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import PageView from './PageView.vue';
 import AlbumService from 'src/service/AlbumService.js';
+import * as tags from '../service/tags';
 // import Logger from '../utils/Logger';
 
 export default {
@@ -56,19 +58,18 @@ export default {
 
     data() {
         return {
-            ID_START: 'ID_START',
-            ID_END: 'ID_END',
-            TYPE_NORMAL: 'TYPE_NORMAL',
-            TYPE_START: 'TYPE_START',
-            TYPE_END: 'TYPE_END'
+            appSize: { height: 0, width: 0 }
         };
     },
 
     created() {
+        this.appSize = this.getAppSize();
+        window.addEventListener('resize', this.watchResize);
         document.addEventListener('keydown', this.watchKeyboard);
     },
 
     destroyed() {
+        window.removeEventListener('resize', this.watchResize);
         document.removeEventListener('keydown', this.watchKeyboard);
     },
 
@@ -77,22 +78,32 @@ export default {
             bookScreenSize: 'bookScreenSize',
             bookIndex: 'bookIndex',
             showTopBar: 'showTopBar',
+            topBarHeight: 'topBarHeight',
             bookLoadNum: 'bookLoadNum',
             showBookScreenAnimation: 'showBookScreenAnimation',
             bookDirection: 'bookDirection'
         }),
         AlbumService: () => AlbumService,
+        tags: () => tags,
+        screenSize() {
+            let height = this.appSize.height - (this.showTopBar ? this.topBarHeight : 0);
+            return {
+                height,
+                width: this.appSize.width,
+                screenRatio: height / this.appSize.width
+            };
+        },
         pages() {
             return [
-                { id: this.ID_START, type: this.TYPE_START },
+                { id: tags.ID_START, type: tags.TYPE_START, imgInfo: { heightOfWidth: 1.45 } },
                 ...this.imgInfoList.map(i => {
                     return {
                         id: i.pageUrl,
-                        type: this.TYPE_NORMAL,
+                        type: tags.TYPE_NORMAL,
                         imgInfo: i
                     };
                 }),
-                { id: this.ID_END, type: this.TYPE_END }
+                { id: tags.ID_END, type: tags.TYPE_END, imgInfo: { heightOfWidth: 1.45 } }
             ];
         },
         screens() {
@@ -106,6 +117,35 @@ export default {
         activedScreens() {
             let begin = this.bookIndex - this.bookLoadNum;
             return this.screens.slice(begin >= 0 ? begin : 0, this.bookIndex + this.bookLoadNum);
+        },
+        pageSizes() {
+            let pageSizes = [];
+            for (let pages of this.screens) {
+                let maxPageRatio = pages.reduce((max, i) => {
+                    max = i.imgInfo.heightOfWidth > max ? i.imgInfo.heightOfWidth : max;
+                    return max;
+                }, 0);
+                let pagesRatio = maxPageRatio / pages.length; // assume the all the widths of each page are 1
+                if (pagesRatio >= this.screenSize.screenRatio) {
+                    pages.forEach(page => {
+                        pageSizes.push({
+                            id: page.id,
+                            height: this.screenSize.height,
+                            width: this.screenSize.height / page.imgInfo.heightOfWidth
+                        });
+                    });
+                } else {
+                    pages.forEach(page => {
+                        let width = this.screenSize.width / pages.length;
+                        pageSizes.push({
+                            id: page.id,
+                            height: width * page.imgInfo.heightOfWidth,
+                            width
+                        });
+                    });
+                }
+            }
+            return pageSizes;
         }
     },
 
@@ -132,14 +172,20 @@ export default {
         },
 
         getScreenStyle(screen) {
+            let style = {};
             let index = this.screens.indexOf(screen);
-            if (index === this.bookIndex) {
-                return {};
-            } else if (index < this.bookIndex) {
-                return { left: '-100%' };
+            if (index < this.bookIndex) {
+                style.left = '-100%';
             } else if (index > this.bookIndex) {
-                return { left: '100%' };
+                style.left = '100%';
             }
+            style['padding-top'] = this.showTopBar ? this.px(this.topBarHeight) : 'initial';
+            return style;
+        },
+
+        getPageStyle(page) {
+            let pageSize = this.pageSizes.find(i => i.id === page.id);
+            return { height: this.px(pageSize.height), width: this.px(pageSize.width) };
         },
 
         watchKeyboard(e) {
@@ -155,6 +201,23 @@ export default {
                     }
                     break;
             }
+        },
+
+        getAppSize() {
+            if (!this.vueContainer) {
+                this.vueContainer = document.querySelector('.vue-container');
+            }
+            return {
+                height: this.vueContainer.offsetHeight,
+                width: this.vueContainer.offsetWidth
+            };
+        },
+
+        watchResize(e) {
+            window.clearTimeout(this.resizeTimeoutId);
+            this.resizeTimeoutId = window.setTimeout(() => {
+                this.appSize = this.getAppSize();
+            }, 250);
         }
     }
 };
@@ -172,30 +235,25 @@ div {
     position: relative;
     overflow: hidden;
     > .screen {
+        box-sizing: border-box;
         width: 100%;
-        height: 100vh;
+        height: 100%;
         justify-content: center;
+        align-items: center;
         position: absolute;
         top: 0;
         left: 0;
+        transition: padding 0.3s ease;
         &.animation {
-            transition: all 0.5s ease;
+            transition: left 0.5s ease;
         }
         &.rtl {
             flex-direction: row-reverse;
         }
-        &.avoid-top-bar {
-            margin-top: 40px;
-            height: calc(100vh - 40px);
-        }
         > .page-container {
-            width: calc(100vh / 1.45);
-            height: 100%;
             position: relative;
             transition: all 0.3s ease;
-            &.avoid-top-bar {
-                width: calc((100vh - 40px) / 1.45);
-            }
+            user-select: none;
             > .page {
                 background: white;
                 flex: 1;

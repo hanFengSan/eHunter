@@ -9,6 +9,7 @@ const state = {
     readingMode: 1, // 0: scroll mode, 1: book mode
     volumeSize: 10,
     volumePreloadCount: 2, // the preload count of page of next volume
+    topBarHeight: 40, // px, for calc
     thumb: {
         width: 150, // px
         thumbView: true
@@ -35,6 +36,7 @@ const getters = {
     showThumbView: state => state.thumb.thumbView,
     toggleSyncScroll: state => state.album.toggleSyncScroll,
     showTopBar: state => state.album.showTopBar,
+    topBarHeight: state => state.topBarHeight,
     loadNum: state => state.album.loadNum,
     volumeSize: state => state.volumeSize,
     curVolume: state => {

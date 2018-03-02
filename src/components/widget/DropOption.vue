@@ -67,6 +67,7 @@ div {
         margin-left: 7px;
         padding: 3px 5px;
         background: rgba(0, 0, 0, 0.2);
+        white-space: nowrap;
     }
     > .icon-drop-down {
         fill: white;
