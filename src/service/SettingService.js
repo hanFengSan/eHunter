@@ -19,6 +19,7 @@ class SettingService {
             loadNum: { eventName: 'setLoadNum', val: 3 },
             volumeSize: { eventName: 'setVolumeSize', val: 50 },
             showBookScreenAnimation: { eventName: 'setBookScreenAnimation', val: false },
+            showBookPagination: { eventName: 'setBookPagination', val: true },
             readingMode: { eventName: 'setReadingMode', val: 0 },
             bookDirection: { eventName: 'setBookDirection', val: 0 },
             bookScreenSize: { eventName: 'setBookScreenSize', val: 2 }
@@ -127,6 +128,14 @@ class SettingService {
 
     async getBookScreenAnimation() {
         return await this._getSettingItem('showBookScreenAnimation');
+    }
+
+    async setBookPagination(val) {
+        await this._setSettingItem('showBookPagination', val);
+    }
+
+    async getBookPagination() {
+        return await this._getSettingItem('showBookPagination');
     }
 
     async setReadingMode(val) {

@@ -24,6 +24,7 @@ const state = {
         bookIndex: 0,
         screenSize: 2,
         showBookScreenAnimation: false,
+        showBookPagination: true,
         direction: 0 // 0: RTL, 1: LTR
     }
 }
@@ -63,6 +64,7 @@ const getters = {
     bookLoadNum: state => Math.ceil(state.album.loadNum / state.book.screenSize),
     readingMode: state => state.readingMode,
     showBookScreenAnimation: state => state.book.showBookScreenAnimation,
+    showBookPagination: state => state.book.showBookPagination,
     bookDirection: state => state.book.direction
 }
 
@@ -80,6 +82,7 @@ const actions = {
     setBookIndex: ({ commit }, index) => commit(types.SET_BOOK_INDEX, { index }),
     setReadingMode: ({ commit }, mode) => commit(types.SET_READING_MODE, { mode }),
     setBookScreenAnimation: ({ commit }, show) => commit(types.SET_BOOK_SCREEN_ANIMATION, { show }),
+    setBookPagination: ({ commit }, show) => commit(types.SET_BOOK_PAGINATION, { show }),
     setBookDirection: ({ commit }, mode) => commit(types.SET_BOOK_DIRECTION, { mode }),
     setBookScreenSize: ({ commit }, num) => commit(types.SET_BOOK_SCREEN_SIZE, { num })
 }
@@ -132,6 +135,9 @@ const mutations = {
     },
     [types.SET_BOOK_SCREEN_ANIMATION](state, { show }) {
         state.book.showBookScreenAnimation = show;
+    },
+    [types.SET_BOOK_PAGINATION](state, { show }) {
+        state.book.showBookPagination = show;
     },
     [types.SET_BOOK_DIRECTION](state, { mode }) {
         state.book.direction = mode;

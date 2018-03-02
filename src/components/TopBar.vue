@@ -70,6 +70,12 @@
                     <drop-option :list="directionList" @change="(val) => dropOptionChange('direction', val)" :cur-val="directionList[bookDirection].sname"></drop-option>
                 </div>
                 <div class="item" v-if="readingMode===1">
+                    <span class="label tips tips-down" title-content="显示/隐藏底部页目录悬浮栏">页目录:</span>
+                    <div class="bar-switch">
+                        <simple-switch :active="showBookPagination" @change="changeBookPagination"></simple-switch>
+                    </div>
+                </div>
+                <div class="item" v-if="readingMode===1">
                     <span class="label tips tips-down" title-content="开启/关闭换页时的滑动动画">换页动画:</span>
                     <div class="bar-switch">
                         <simple-switch :active="showBookScreenAnimation" @change="changeBookScreenAnimation"></simple-switch>
@@ -159,6 +165,7 @@ export default {
             'volumeSize',
             'readingMode',
             'showBookScreenAnimation',
+            'showBookPagination',
             'bookScreenSize',
             'bookDirection'
         ]),
@@ -254,6 +261,10 @@ export default {
 
         changeBookScreenAnimation(show) {
             SettingService.setBookScreenAnimation(show);
+        },
+
+        changeBookPagination(show) {
+            SettingService.setBookPagination(show);
         }
     }
 };

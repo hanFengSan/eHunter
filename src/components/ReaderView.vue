@@ -14,10 +14,10 @@
         <h4 class="location">{{ location }}</h4>
         <img title="全屏" @click="fullscreen" class="focus icon" :src="image.fullScreen" />
     </div>
-    <transition name="slow-vertical-fade">
+    <transition name="slow-horizontal-fade">
         <album-scroll-view class="content scroll-mode" v-if="!isloadingImgInfos&&readingMode===0" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
     </transition>
-    <transition name="slow-horizontal-fade">
+    <transition name="slow-vertical-fade">
         <album-book-view class="content book-mode" v-if="!isloadingImgInfos&&readingMode===1" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
     </transition>
 </div>

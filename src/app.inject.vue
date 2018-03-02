@@ -122,16 +122,16 @@ $change_mode_time: 0.8s;
         opacity: 0;
     }
 
-    .slow-vertical-fade-enter-active {
+    .center-horizontal-fade-enter-active {
         transition: all $change_mode_time ease;
     }
-    .slow-vertical-fade-leave-active {
+    .center-horizontal-fade-leave-active {
         transition: all $change_mode_time ease;
     }
-    .slow-vertical-fade-enter,
-    .slow-vertical-fade-leave-active {
-        transform: translateX(20%);
-        opacity: 0;
+    .center-horizontal-fade-enter,
+    .center-horizontal-fade-leave-active {
+        transform: translateX(-40%) !important;
+        opacity: 0 !important;
     }
 
     .slow-horizontal-fade-enter-active {
@@ -142,6 +142,18 @@ $change_mode_time: 0.8s;
     }
     .slow-horizontal-fade-enter,
     .slow-horizontal-fade-leave-active {
+        transform: translateX(20%);
+        opacity: 0;
+    }
+
+    .slow-vertical-fade-enter-active {
+        transition: all $change_mode_time ease;
+    }
+    .slow-vertical-fade-leave-active {
+        transition: all $change_mode_time ease;
+    }
+    .slow-vertical-fade-enter,
+    .slow-vertical-fade-leave-active {
         transform: translate(-20%, 20%);
         opacity: 0;
     }

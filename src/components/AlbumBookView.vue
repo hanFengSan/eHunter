@@ -32,12 +32,16 @@
             </div>
         </div>
     </div>
+    <transition name="center-horizontal-fade">
+        <pagination v-if="showBookPagination" class="bottom-pagination" :cur-index="bookIndex" :page-sum="screens.length" @change="selectBookIndex"/>
+    </transition>
 </section>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import PageView from './PageView.vue';
+import Pagination from './widget/Pagination.vue';
 import AlbumService from 'src/service/AlbumService.js';
 import * as tags from '../service/tags';
 // import Logger from '../utils/Logger';
@@ -54,7 +58,7 @@ export default {
         }
     },
 
-    components: { PageView },
+    components: { PageView, Pagination },
 
     data() {
         return {
@@ -81,7 +85,8 @@ export default {
             topBarHeight: 'topBarHeight',
             bookLoadNum: 'bookLoadNum',
             showBookScreenAnimation: 'showBookScreenAnimation',
-            bookDirection: 'bookDirection'
+            bookDirection: 'bookDirection',
+            showBookPagination: 'showBookPagination'
         }),
         AlbumService: () => AlbumService,
         tags: () => tags,
@@ -214,6 +219,10 @@ export default {
             this.resizeTimeoutId = window.setTimeout(() => {
                 this.appSize = this.getAppSize();
             }, 250);
+        },
+
+        selectBookIndex(index) {
+            this.setBookIndex(index);
         }
     }
 };
@@ -251,7 +260,7 @@ div {
             transition: all 0.3s ease;
             user-select: none;
             > .page {
-                background: white;
+                background: $book_view_page_bg;
                 flex: 1;
                 align-self: stretch;
                 overflow: hidden;
@@ -260,8 +269,8 @@ div {
                     right: 70px;
                     bottom: 70px;
                     padding: 10px 100px;
-                    background: #28af60;
-                    color: white;
+                    background: $book_view_ehunter_tag_bg;
+                    color: $book_view_ehunter_tag_text_color;
                     font-size: 18px;
                     transform-origin: center;
                     transform: translate(50%, 50%) rotate(-45deg);
@@ -286,12 +295,27 @@ div {
                     justify-content: center;
                     align-items: center;
                     > h1 {
-                        color: rgba(0, 0, 0, 0.7);
+                        color: $book_view_end_page_text_color;
                         font-size: 50px;
                         padding-bottom: 20%;
                     }
                 }
             }
+        }
+    }
+
+    > .bottom-pagination {
+        position: absolute;
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: $book_view_pagination_bg;
+        border-radius: 3px;
+        opacity: 0.5;
+        box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        &:hover {
+            opacity: 1;
         }
     }
 }
