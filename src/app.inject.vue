@@ -28,7 +28,7 @@ export default {
             if (this.readingMode === 0 && this.showThumbView) {
                 return '';
             } else {
-                return `margin-left: -${this.thumbWidth}px`;
+                return { 'margin-left': this.px(-this.thumbWidth) };
             }
         }
     }
