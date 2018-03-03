@@ -12,9 +12,18 @@ $slider_track_bg: #bdbdbd;
 $slider_track_fill_color: hsl(145, 63%, 42%);
 $slider_thumb_color: hsl(145, 63%, 49%);
 
-$flat_button_primary_color: hsl(145, 63%, 49%);
-$flat_button_light_color: hsl(145, 63%, 60%);
-$flat_button_dark_color: hsl(145, 63%, 30%);
+$flat_button_positive_color: hsl(145, 63%, 49%);
+$flat_button_positive_light_color: lighten($flat_button_positive_color, 10%);
+$flat_button_positive_dark_color: darken($flat_button_positive_color, 10%);
+$flat_button_negative_color: #AAAAAA;
+$flat_button_negative_light_color: lighten($flat_button_negative_color, 10%);
+$flat_button_negative_dark_color: darken($flat_button_negative_color, 10%);
+$flat_button_plain_color: hsl(145, 63%, 42%);
+$flat_button_plain_light_color: lighten($flat_button_plain_color, 10%);
+$flat_button_plain_dark_color: darken($flat_button_plain_color, 10%);
+$flat_button_warning_color: #e74c3c;
+$flat_button_warning_light_color: lighten($flat_button_warning_color, 10%);
+$flat_button_warning_dark_color: darken($flat_button_warning_color, 10%);
 
 $switch_track_disabled_color: #bdbdbd;
 $switch_track_enabled_color: #71ca96;
@@ -57,6 +66,12 @@ $book_view_ehunter_tag_text_color: white;
 $book_view_end_page_text_color: rgba(0, 0, 0, 0.7);
 $book_view_pagination_bg: rgb(51, 51, 51);
 
+$modal_view_bg: rgba(0, 0, 0, 0.6);
+
+
+
+
+/* mussy */
 $body_bg: #333333; // directly use in app.inject.js
 $img_container_color:hsl(235, 16%, 13%);
 $title_color:hsl(231, 6%, 80%);

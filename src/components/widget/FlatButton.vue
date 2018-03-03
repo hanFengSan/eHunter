@@ -1,6 +1,6 @@
 <template>
 <div :class="['flat-button', mode]">
-    <a :class="[mode]" @click="handleClick">{{ label }}</a>
+    <a :class="[mode, type]" @click="handleClick">{{ label }}</a>
 </div>
 </template>
 
@@ -12,9 +12,13 @@ export default {
         label: {
             type: String
         },
-        mode: {
+        mode: { // mode: [inline, default]
             type: String,
             default: 'default'
+        },
+        type: { // mode: [plain, negative, positive, warning]
+            type: String,
+            default: 'plain'
         }
     },
 
@@ -35,10 +39,11 @@ export default {
 <style lang="scss" scoped>
 @import "~style/_responsive";
 @import "~style/_variables";
+$color: $flat_button_plain_color;
+
 .flat-button {
     > a {
         font-size: 14px;
-        color: $flat_button_primary_color;
         cursor: pointer;
         user-select: none;
         white-space: nowrap;
@@ -46,22 +51,44 @@ export default {
     }
     > .default {
         padding: 5px 10px;
-        &:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-        &:active {
-            background: rgba(0, 0, 0, 0.15);
-        }
     }
     &.inline {
         margin-left: 10px;
     }
-    > .inline {
+    > .plain {
+        color: $flat_button_plain_color;
         &:hover {
-            color: $flat_button_light_color;
+            color: $flat_button_plain_light_color;
         }
         &:active {
-            color: $flat_button_dark_color;
+            color: $flat_button_plain_dark_color;
+        }
+    }
+    > .positive {
+        color: $flat_button_positive_color;
+        &:hover {
+            color: $flat_button_positive_light_color;
+        }
+        &:active {
+            color: $flat_button_positive_dark_color;
+        }
+    }
+    > .negative {
+        color: $flat_button_negative_color;
+        &:hover {
+            color: $flat_button_negative_light_color;
+        }
+        &:active {
+            color: $flat_button_negative_dark_color;
+        }
+    }
+    > .warning {
+        color: $flat_button_warning_color;
+        &:hover {
+            color: $flat_button_warning_light_color;
+        }
+        &:active {
+            color: $flat_button_warning_dark_color;
         }
     }
 }

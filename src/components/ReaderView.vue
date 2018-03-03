@@ -3,9 +3,9 @@
     <!-- loading view -->
     <div class="loading-container" v-if="isloadingImgInfos">
         <span class="loading">loading...</span>
-        <p class="tip">
+        <!-- <p class="tip">
             注意事项:<br>无<br>
-        </p>
+        </p> -->
     </div>
     <!-- top bar view -->
     <top-bar class="top-bar" />

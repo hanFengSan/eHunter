@@ -203,5 +203,15 @@ export default {
         cn: '显示/隐藏顶栏',
         en: 'Show/hide top bar',
         jp: 'トップバーの表示/非表示'
+    },
+    confirm: {
+        cn: '确定',
+        en: 'CONFIRM',
+        jp: '確認'
+    },
+    cancel: {
+        cn: '取消',
+        en: 'CANCEL',
+        jp: '取り消し'
     }
 }

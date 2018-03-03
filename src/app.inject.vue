@@ -2,6 +2,7 @@
     <div class="app">
         <thumb-scroll-view class="thumb-column" :style="thumbStyle"></thumb-scroll-view>
         <reader-view class="reader-column"></reader-view>
+        <modal-manager class="modal"></modal-manager>
     </div>
 </template>
 
@@ -9,6 +10,7 @@
 import { mapGetters } from 'vuex';
 import ThumbScrollView from './components/ThumbScrollView.vue';
 import ReaderView from './components/ReaderView.vue';
+import ModalManager from './components/ModalManager.vue';
 
 export default {
     name: 'InjectedApp',
@@ -19,7 +21,8 @@ export default {
 
     components: {
         ThumbScrollView,
-        ReaderView
+        ReaderView,
+        ModalManager
     },
 
     computed: {
@@ -52,6 +55,15 @@ $change_mode_time: 0.8s;
     }
     > .reader-column {
         flex: 1;
+    }
+    > .modal {
+        position: fixed;
+        top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+        z-index: 100;
+        overflow-y: auto;
     }
 
     section,
