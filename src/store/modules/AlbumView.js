@@ -5,26 +5,26 @@ import * as tags from '../../service/tags'
 
 // initial state
 const state = {
-    curIndex: { val: 0, updater: '' },
+    curIndex: { val: 0, updater: '' }, // current index of page
     readingMode: 1, // 0: scroll mode, 1: book mode
-    volumeSize: 10,
+    volumeSize: 10, // the page quantity per volume
     volumePreloadCount: 2, // the preload count of page of next volume
     topBarHeight: 40, // px, for calc
     thumb: {
         width: 150, // px
-        thumbView: true
+        thumbView: true // show/hide the column of thumbnail
     },
     album: {
         width: 80, // percent, the scale of img
-        toggleSyncScroll: true,
+        toggleSyncScroll: true, // ununsed
         showTopBar: true,
         loadNum: 3 // the sum of pages per loading
     },
     book: {
-        bookIndex: 0,
-        screenSize: 2,
-        showBookScreenAnimation: false,
-        showBookPagination: true,
+        bookIndex: 0, // index of screens
+        screenSize: 2,  // the page quantity per screen
+        showBookScreenAnimation: false, // show/hide sliding animation when changing location
+        showBookPagination: true, // show/hide bottom floating pagination bar
         direction: 0 // 0: RTL, 1: LTR
     }
 }
