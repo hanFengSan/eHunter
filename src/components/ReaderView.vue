@@ -2,10 +2,7 @@
 <div class="reader-view">
     <!-- loading view -->
     <div class="loading-container" v-if="isloadingImgInfos">
-        <span class="loading">loading...</span>
-        <!-- <p class="tip">
-            注意事项:<br>无<br>
-        </p> -->
+        <span class="loading">Loading...</span>
     </div>
     <!-- top bar view -->
     <top-bar class="top-bar" />
@@ -129,6 +126,8 @@ div {
             display: block;
             font-size: 24px;
             font-weight: bolder;
+            font-size: 4vw;
+            color: rgba(255,255,255,0.1);
         }
         > .tip {
             padding: 0;
