@@ -1,7 +1,5 @@
-// import StringService from '../../service/StringService'
 import * as types from '../mutation-types'
-// import * as tags from '../../service/tags'
-// import Logger from '../../utils/Logger'
+import Logger from '../../utils/Logger'
 
 // initial state
 const state = {
@@ -23,6 +21,7 @@ const actions = {
 const mutations = {
     [types.ADD_DIALOG](state, { dialogBean }) {
         state.dialogs.push(dialogBean);
+        Logger.logText('Modal', 'Add');
     },
     [types.REMOVE_DIALOG](state, { dialogBean }) {
         state.dialogs.splice(state.dialogs.indexOf(dialogBean), 1);

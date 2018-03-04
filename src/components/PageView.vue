@@ -13,6 +13,7 @@
                             :title-content="string.originImgTip" 
                             :label="string.originImg" 
                             mode="inline" 
+                            type="positive"
                             @click="getNewImgSrc(tags.MODE_ORIGIN)">
                         </flat-button>
                         <flat-button 
@@ -20,6 +21,7 @@
                             :title-content="string.refreshTip" 
                             :label="string.refresh" 
                             mode="inline" 
+                            type="positive"
                             @click="getNewImgSrc()">
                         </flat-button>
                         <flat-button 
@@ -27,6 +29,7 @@
                             :title-content="string.refreshByOtherSourceTip" 
                             :label="string.refreshByOtherSource" 
                             mode="inline" 
+                            type="positive"
                             @click="getNewImgSrc(tags.MODE_CHANGE_SOURCE)">
                         </flat-button>
                     </span>
@@ -63,7 +66,7 @@ import { mapGetters } from 'vuex';
 import AlbumService from 'src/service/AlbumService.js';
 import FlatButton from './widget/FlatButton.vue';
 import Logger from '../utils/Logger.js';
-import * as tags from '../service/tags';
+import * as tags from '../assets/value/tags';
 
 export default {
     name: 'PageView',

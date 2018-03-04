@@ -41,8 +41,10 @@ export default {
 <style lang="scss">
 @import '~style/_responsive';
 @import '~style/_variables';
+@import '~style/_markdown';
 
 $change_mode_time: 0.8s;
+$general_animtation_time: 0.2s;
 
 .app {
     display: flex;
@@ -59,9 +61,9 @@ $change_mode_time: 0.8s;
     > .modal {
         position: fixed;
         top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         z-index: 100;
         overflow-y: auto;
     }
@@ -139,11 +141,9 @@ $change_mode_time: 0.8s;
     }
 
     // 过渡效果
-    .slide-fade-enter-active {
-        transition: all 0.2s ease;
-    }
+    .slide-fade-enter-active,
     .slide-fade-leave-active {
-        transition: all 0.2s ease;
+        transition: all $general_animtation_time ease;
     }
     .slide-fade-enter,
     .slide-fade-leave-active {
@@ -151,9 +151,7 @@ $change_mode_time: 0.8s;
         opacity: 0;
     }
 
-    .center-horizontal-fade-enter-active {
-        transition: all $change_mode_time ease;
-    }
+    .center-horizontal-fade-enter-active,
     .center-horizontal-fade-leave-active {
         transition: all $change_mode_time ease;
     }
@@ -163,9 +161,7 @@ $change_mode_time: 0.8s;
         opacity: 0 !important;
     }
 
-    .slow-horizontal-fade-enter-active {
-        transition: all $change_mode_time ease;
-    }
+    .slow-horizontal-fade-enter-active,
     .slow-horizontal-fade-leave-active {
         transition: all $change_mode_time ease;
     }
@@ -175,9 +171,7 @@ $change_mode_time: 0.8s;
         opacity: 0;
     }
 
-    .slow-vertical-fade-enter-active {
-        transition: all $change_mode_time ease;
-    }
+    .slow-vertical-fade-enter-active,
     .slow-vertical-fade-leave-active {
         transition: all $change_mode_time ease;
     }
@@ -185,6 +179,25 @@ $change_mode_time: 0.8s;
     .slow-vertical-fade-leave-active {
         transform: translate(-20%, 20%);
         opacity: 0;
+    }
+
+    .slow-opacity-fade-enter-active,
+    .slow-opacity-fade-leave-active {
+        transition: all 0.3s ease;
+    }
+    .slow-opacity-fade-enter,
+    .slow-opacity-fade-leave-active {
+        opacity: 0;
+    }
+
+    .vertical-list-enter-active,
+    .vertical-list-leave-active {
+        transition: all 0.5s;
+    }
+    .vertical-list-enter,
+    .vertical-list-leave-to {
+        opacity: 0;
+        transform: translateY(10%);
     }
 }
 

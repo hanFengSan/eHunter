@@ -1,11 +1,9 @@
 <template>
 <div class="simple-dialog">
-    <div class="background"></div>
+    <div class="background" @click="close"></div>
     <article>
         <h4>{{ data.title }}</h4>
-        <p>
-            {{ data.text }}
-        </p>
+        <p class="markdown" v-html="MdRenderer.render(data.text)"></p>
         <div class="operation-bar">
             <flat-button
                 class="operation"
@@ -14,7 +12,7 @@
                 :label="operation.name"
                 :type="getType(operation.type)"
                 mode="inline"
-                @click="operation.onClick">
+                @click="onClick(operation)">
             </flat-button>
         </div>
     </article>
@@ -24,7 +22,8 @@
 <script>
 import DialogBean from '../../bean/DialogBean';
 import FlatButton from './FlatButton.vue';
-import * as tags from '../../service/tags';
+import MdRenderer from '../../utils/MdRenderer';
+import * as tags from '../../assets/value/tags';
 
 export default {
     name: 'SimpleDialog',
@@ -38,7 +37,9 @@ export default {
     components: { FlatButton },
 
     data() {
-        return {};
+        return {
+            MdRenderer
+        };
     },
 
     methods: {
@@ -52,6 +53,16 @@ export default {
                     return 'negative';
                 case tags.DIALOG_OPERATION_TYPE_WARNING:
                     return 'warning';
+            }
+        },
+        onClick(operation) {
+            if (operation.onClick()) {
+                this.$emit('close');
+            }
+        },
+        close(isCompulsive) {
+            if (this.data.type === tags.DIALOG_NORMAL) {
+                this.$emit('close');
             }
         }
     }
@@ -104,8 +115,7 @@ div {
         > .operation-bar {
             flex-direction: row-reverse;
             margin-top: 10px;
-            > .operation {
-            }
+            flex-shrink: 0;
         }
     }
 }

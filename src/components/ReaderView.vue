@@ -36,7 +36,7 @@ import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js';
 import AlbumService from '../service/AlbumService';
 import image from '../assets/img';
 import AlbumBookView from './AlbumBookView.vue';
-import * as tags from '../service/tags';
+import * as tags from '../assets/value/tags';
 // import Logger from '../utils/Logger';
 
 export default {

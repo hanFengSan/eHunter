@@ -1,4 +1,5 @@
-import string from '../assets/value/String'
+import string from '../assets/value/string'
+import instruction from '../assets/value/instruction'
 
 class StringService {
     constructor() {
@@ -14,6 +15,9 @@ class StringService {
             this.en[key] = string[key].en;
             this.jp[key] = string[key].jp;
         }
+        this.cn['p_instruction'] = instruction.cn;
+        this.en['p_instruction'] = instruction.en;
+        this.jp['p_instruction'] = instruction.jp;
     }
 }
 

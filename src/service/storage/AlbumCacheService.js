@@ -8,7 +8,7 @@ import storage from 'src/service/storage/LocalStorage'
 import Platform from 'src/service/PlatformService'
 import Logger from 'src/utils/Logger'
 import DateWrapper from '../../utils/DateWrapper'
-import * as tags from '../tags'
+import * as tags from '../../assets/value/tags'
 /*
 storage
   |-albumId

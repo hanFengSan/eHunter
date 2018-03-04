@@ -1,6 +1,6 @@
 import storage from './storage/LocalStorage'
 import store from '../store/index.inject'
-import * as tags from '../service/tags'
+import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {

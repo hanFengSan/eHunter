@@ -19,7 +19,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import AlbumService from 'src/service/AlbumService.js';
 import AwesomeScrollView from './base/AwesomeScrollView.vue';
-import * as tags from '../service/tags';
+import * as tags from '../assets/value/tags';
 // import Logger from '../utils/Logger';
 
 export default {

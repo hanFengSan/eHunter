@@ -39,7 +39,7 @@ import image from '../assets/img';
 import Pagination from './widget/Pagination.vue';
 import PageView from './PageView.vue';
 import AlbumService from '../service/AlbumService';
-import * as tags from '../service/tags';
+import * as tags from '../assets/value/tags';
 
 export default {
     name: 'AlbumScrollView',

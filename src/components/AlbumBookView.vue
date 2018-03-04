@@ -43,7 +43,7 @@ import { mapGetters, mapActions } from 'vuex';
 import PageView from './PageView.vue';
 import Pagination from './widget/Pagination.vue';
 import AlbumService from 'src/service/AlbumService.js';
-import * as tags from '../service/tags';
+import * as tags from '../assets/value/tags';
 // import Logger from '../utils/Logger';
 
 export default {

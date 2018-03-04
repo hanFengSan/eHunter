@@ -213,5 +213,20 @@ export default {
         cn: '取消',
         en: 'CANCEL',
         jp: '取り消し'
+    },
+    infoTip: {
+        cn: '查看说明和关于',
+        en: 'Look the Instructions and About',
+        jp: '指示と情報を見てください'
+    },
+    githubTip: {
+        cn: '前往项目主页(Github)',
+        en: 'Go to the project home page(Github)',
+        jp: 'プロジェクトのホームページに行く(Github)'
+    },
+    instructionsAndAbouts: {
+        cn: '说明和关于',
+        en: 'Instructions & About',
+        jp: '説明と概要'
     }
 }

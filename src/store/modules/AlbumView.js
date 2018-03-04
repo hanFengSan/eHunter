@@ -1,6 +1,6 @@
 // import string from 'assets/value/string-cn.json'
 import * as types from '../mutation-types'
-import * as tags from '../../service/tags'
+import * as tags from '../../assets/value/tags'
 // import Logger from '../../utils/Logger'
 
 // initial state

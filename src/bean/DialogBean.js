@@ -1,7 +1,7 @@
 import DialogOperation from './DialogOperation'
 
 export default class DialogBean {
-    constructor(type, title, text, operations) {
+    constructor(type, title, text, ...operations) {
         this.id = new Date().getTime();
         this.type = type;
         this.title = title;
