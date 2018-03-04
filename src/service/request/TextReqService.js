@@ -1,7 +1,7 @@
 // a good resolution for poor network
 
 class TextReqService {
-    constructor(url) {
+    constructor(url, rejectError = true) {
         this.url = url;
         this.method = 'GET';
         this.credentials = 'include';
@@ -11,6 +11,7 @@ class TextReqService {
         this.retryInterval = 1; // secs
         this.enabledLog = true;
         this.fetchSetting = null;
+        this.rejectError = rejectError;
     }
 
     setMethod(method) {
@@ -45,7 +46,11 @@ class TextReqService {
             this._request(res => {
                 res.text().then(text => resolve(text));
             }, err => {
-                reject(err);
+                if (this.rejectError) {
+                    reject(err);
+                } else {
+                    console.error(err);
+                }
             });
         });
     }

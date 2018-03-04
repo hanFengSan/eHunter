@@ -29,24 +29,19 @@ class InfoService {
         let message;
         let lastShowDialogTime = await SettingService.getUpdateTime();
         Promise
-            .race([new TextReqService(config.updateServer1).request(), new TextReqService(config.updateServer2).request()])
+            .race([new TextReqService(config.updateServer1, false).request(), new TextReqService(config.updateServer2, false).request()])
             .then(data => {
                 message = new ServerMessage(JSON.parse(data));
                 let isNewVersion = message.version !== config.version;
                 let isReleaseTime = new Date().getTime() > message.time;
                 let isOverDuration = (new Date().getTime() - lastShowDialogTime) > message.duration;
-                Logger.logText('InfoService', isNewVersion);
-                Logger.logText('InfoService', isReleaseTime);
-                Logger.logText('InfoService', isOverDuration);
                 if (isNewVersion && isReleaseTime && isOverDuration) {
                     SettingService.setUpdateTime(new Date().getTime());
                     this.showUpdateInfo(message);
-                } else if (lastShowDialogTime !== 0) {
-                    SettingService.setUpdateTime(0);
                 }
             })
             .catch(e => {
-
+                Logger.logObj('InfoService', e);
             });
     }
 
