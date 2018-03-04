@@ -1,6 +1,6 @@
 <template>
     <div class="popup-container">
-        <h1>E-HUNTER</h1>
+        <h1>EHUNTER</h1>
         <span>For the best reading experience!</span>
     </div>
 </template>

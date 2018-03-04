@@ -34,8 +34,13 @@
     "content_scripts": [
         {
             "matches": [
+                "*://alexskye.org/*",
+                "*://alexskye.info/*",
+                "*://anime-sales.com/*",
                 "*://exhentai.org/*",
-                "*://e-hentai.org/*"
+                "*://hanfengsan.org/*",
+                "*://e-hentai.org/*",
+                "*://mingzuozhibiba.cn/*"
             ],
             "js": [
                 "inject.js"
