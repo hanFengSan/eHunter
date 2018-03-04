@@ -24,7 +24,8 @@ class SettingService {
             readingMode: { eventName: 'setReadingMode', val: 0 },
             bookDirection: { eventName: 'setBookDirection', val: 0 },
             bookScreenSize: { eventName: 'setBookScreenSize', val: 2 },
-            lang: { eventName: 'setString', val: tags.LANG_EN }
+            lang: { eventName: 'setString', val: tags.LANG_EN },
+            updateTime: { val: 0 }
         }
     }
 
@@ -59,26 +60,30 @@ class SettingService {
     async _setSettingItem(key, val) {
         // store change
         let settings = await storage.load({ key: this.storageName });
-        if (!settings[key]) { // smoothly add new setting item
+        if (!settings.hasOwnProperty(key)) { // smoothly add new setting item
             settings[key] = this._getDefaultSettings()[key];
         }
         settings[key].val = val;
         await storage.save({ key: this.storageName, data: settings });
         // send change to vuex
-        if (key !== 'toggleEHunter') { // the 'toggleEHunter' don't exist in vuex
+        if (key !== 'toggleEHunter' && key !== 'updateTime') { // the 'toggleEHunter' & 'updateTime' don't exist in vuex
             store.dispatch(settings[key].eventName, val);
         }
     }
 
     async _getSettingItem(key) {
         let settings = await storage.load({ key: this.storageName });
-        return settings[key].val;
+        if (settings.hasOwnProperty(key)) {
+            return settings[key].val;
+        } else {
+            return this._getDefaultSettings()[key].val;
+        }
     }
 
     async initSettings() {
         let settings = await storage.load({ key: this.storageName });
         for (let key in settings) {
-            if (key !== 'toggleEHunter') {
+            if (key !== 'toggleEHunter' && key !== 'updateTime') {
                 store.dispatch(settings[key].eventName, settings[key].val);
             }
         }
@@ -170,6 +175,14 @@ class SettingService {
 
     async getLang() {
         return await this._getSettingItem('lang');
+    }
+
+    async setUpdateTime(val) {
+        await this._setSettingItem('updateTime', val);
+    }
+
+    async getUpdateTime() {
+        return await this._getSettingItem('updateTime');
     }
 
 }

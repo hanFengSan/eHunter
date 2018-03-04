@@ -2,10 +2,18 @@ import store from '../store/index.inject'
 import DialogBean from '../bean/DialogBean'
 import DialogOperation from '../bean/DialogOperation'
 import * as tags from '../assets/value/tags'
-// import Logger from '../utils/Logger'
+import TextReqService from '../service/request/TextReqService'
+import config from '../config'
+import ServerMessage from '../bean/ServerMessage'
+import SettingService from '../service/SettingService'
+import Logger from '../utils/Logger'
 
 class InfoService {
-    showInstruction(isCompulsive) {
+    constructor() {
+        this.checkUpdate();
+    }
+
+    async showInstruction(isCompulsive) {
         let dialog = new DialogBean(
             isCompulsive ? tags.DIALOG_COMPULSIVE : tags.DIALOG_NORMAL,
             store.getters.string.instructionsAndAbouts,
@@ -13,6 +21,51 @@ class InfoService {
             new DialogOperation(store.getters.string.confirm, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
                 return true;
             })
+        );
+        store.dispatch('addDialog', dialog);
+    }
+
+    async checkUpdate() {
+        let message;
+        let lastShowDialogTime = await SettingService.getUpdateTime();
+        Promise
+            .race([new TextReqService(config.updateServer1).request(), new TextReqService(config.updateServer2).request()])
+            .then(data => {
+                message = new ServerMessage(JSON.parse(data));
+                let isNewVersion = message.version !== config.version;
+                let isReleaseTime = new Date().getTime() > message.time;
+                let isOverDuration = (new Date().getTime() - lastShowDialogTime) > message.duration;
+                Logger.logText('InfoService', isNewVersion);
+                Logger.logText('InfoService', isReleaseTime);
+                Logger.logText('InfoService', isOverDuration);
+                if (isNewVersion && isReleaseTime && isOverDuration) {
+                    SettingService.setUpdateTime(new Date().getTime());
+                    this.showUpdateInfo(message);
+                } else if (lastShowDialogTime !== 0) {
+                    SettingService.setUpdateTime(0);
+                }
+            })
+            .catch(e => {
+
+            });
+    }
+
+    showUpdateInfo(message) {
+        let operations = [];
+        operations.push(new DialogOperation(store.getters.string.later, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
+            return true;
+        }));
+        message.operations.forEach(i => {
+            operations.push(new DialogOperation(i.name, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
+                window.open(i.url, '_blank');
+                return true;
+            }));
+        });
+        let dialog = new DialogBean(
+            tags.DIALOG_COMPULSIVE,
+            message.title,
+            message.text,
+            ...operations
         );
         store.dispatch('addDialog', dialog);
     }

@@ -1,3 +1,5 @@
+import config from '../../config'
+
 export default {
     cn: `
 1.Change language/切换语言/言語を変更
@@ -21,7 +23,7 @@ export default {
 * 可发邮件到我邮箱: c360785655@gmail.com
 
 ### 关于
-* 版本: v2.0
+* 版本: ${config.version}
 * 作者: Alex Chen (hanFeng)
 * 项目开源地址: [Github](https://github.com/hanFengSan/eHunter)
 
@@ -49,7 +51,7 @@ export default {
 * Send email to c360785655@gmail.com
 
 ### About
-* Version: v2.0
+* Version: ${config.version}
 * Author: Alex Chen (hanFeng)
 * Home page of this project: [Github](https://github.com/hanFengSan/eHunter)
 
@@ -77,7 +79,7 @@ If you like this extension, I hope you can give a five-star rating in store. 8-)
 * c360785655@gmail.comにメールを送信する
 
 ### 〜について
-* バージョン: v2.0
+* バージョン: ${config.version}
 * 著者: Alex Chen (hanFeng)
 * このプロジェクトのホームページ: [Github](https://github.com/hanFengSan/eHunter)
 

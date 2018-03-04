@@ -24,7 +24,8 @@
     "incognito": "spanning",
     "permissions": [
         "activeTab",
-        "https://ajax.googleapis.com/",
+        "http://*/",
+        "https://*/",
         "storage",
         "background",
         "notifications",
