@@ -50,5 +50,8 @@
     ],
     "web_accessible_resources": [
         "img/*"
-    ]
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    }
 }

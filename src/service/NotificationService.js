@@ -25,22 +25,14 @@ class NotificationService {
                 .then(() => {
                     this._initRequestUrl();
                     this._request();
+                    this.log('tags, requestUrl');
                 });
         }, 10 * 60 * 1000); // 10 mins
     }
 
-    _syncSubs() {
-        return new Promise((resolve, reject) => {
-            SubsStorageService
-                .instance
-                .then(instance => {
-                    this.subscribedTagList = instance.getSubsList().filter(item => {
-                        return this.time % item.time === 0
-                        // return this.time > 0
-                    });
-                    resolve();
-                });
-        });
+    async _syncSubs() {
+        let instance = await SubsStorageService.instance;
+        this.subscribedTagList = (await instance.getNewSubsList()).list.filter(item => this.time % item.time === 0);
     }
 
     _initRequestUrl() {
@@ -75,7 +67,7 @@ class NotificationService {
 
     _request() {
         (new ReqQueueService(this.requestList))
-            .setNumOfConcurrented(1)
+        .setNumOfConcurrented(1)
             .request()
             .then(map => {
                 NotiStorageService
