@@ -1,22 +1,26 @@
 # eHunter
-卷轴式阅读, 标签更新订阅
+提供卷轴式/书本式阅读
+
+# 预览
+<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_1.jpg" style="width: 800px; display: block; padding: 10px;"/>
+<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_2.jpg" style="width: 800px; display: block; padding: 10px;"/>
+<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg" style="width: 800px; display: block; padding: 10px;"/>
 
 ## 实现方式概要
 在在原页面上新创建一个节点, 将vue注入到此节点上. 爬虫是利用fetch实现的.
+实现上基本隔离了具体环境, 可很容易得移植到其他漫画网站/平台等.
+
+## 获取
+Chrome版本: [地址](https://chrome.google.com/webstore/detail/ehunter-more-powerful-e-h/dnnicnedpmjkbkdeijccbjkkcpcbmdoo)
+Firefox版本: [地址](https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/)
+油猴版本: [地址](https://greasyfork.org/zh-CN/scripts/39198-ehunter)
 
 ## 运行
-`npm install`后, 再`npm run dev`就可以进入dev模式了(当然,我个人喜好用yarn, 强烈推荐yarn), 在`chrome://extensions`页面顶部打开开发者模式, 选择项目的`/dist`文件夹就OK了.
+`npm install`后, 再`npm run dev`就可以进入dev模式了(当然,我个人喜好用yarn).
+在`chrome://extensions`页面顶部打开开发者模式, 选择项目的`/dist`文件夹就OK了.
 `npm run publish`可以直接生成chrome&firefox用的zip压缩文件到`publish_output`文件夹.
+油猴的话, 直接把`npm run publish`后, `/dist/inject.js`的内容顶部加上油猴需要的相关注释信息就可以了.
 
-## 待解决问题
-1. content script貌似并不允许操作宿主的cookie, 而如果缩略图是`large`模式, 将无法愉快的使用爬虫.
-2. 某些用户环境下滚动乱跳问题.(完全无法重现, 一脸懵逼中)
-
-## TODO-LIST
-1. 下载, 打包zip
-2. 多tag交集订阅
-3. 添加错误提示, 方便用户高效反馈
-4. 在缩略图上方加一个开启按钮, 不直接跳转
 
 ## 项目结构
 ```
