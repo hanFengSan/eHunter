@@ -1,5 +1,5 @@
 import * as types from '../mutation-types'
-import Logger from '../../utils/Logger'
+// import Logger from '../../utils/Logger'
 
 // initial state
 const state = {

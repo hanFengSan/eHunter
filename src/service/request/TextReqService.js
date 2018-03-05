@@ -8,7 +8,7 @@ class TextReqService {
         this.retryTimes = 3;
         this.timeoutTime = 15; // secs
         this.curRetryTimes = 0;
-        this.retryInterval = 1; // secs
+        this.retryInterval = 3; // secs
         this.enabledLog = true;
         this.fetchSetting = null;
         this.noCache = noCache;
@@ -75,7 +75,14 @@ class TextReqService {
         });
         Promise
             .race([timeout, req])
-            .then(res => successCallback(res))
+            .then(res => {
+                console.log(res);
+                if (res.status === 200) {
+                    successCallback(res);
+                } else {
+                    throw new Error(`${url}: ${res.status}`);
+                }
+            })
             .catch(err => {
                 this._printErrorLog(err);
                 if (this.curRetryTimes < this.retryTimes) {
