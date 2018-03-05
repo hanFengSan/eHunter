@@ -15,7 +15,7 @@ class SettingService {
     _getDefaultSettings() {
         return {
             albumWidth: { eventName: 'setAlbumWidth', val: 80 }, // eventName is action name of vuex
-            toggleEHunter: { eventName: 'toggleEHunter', val: true },
+            toggleEHunter: { val: true },
             toggleThumbView: { eventName: 'toggleThumbView', val: true },
             loadNum: { eventName: 'setLoadNum', val: 3 },
             volumeSize: { eventName: 'setVolumeSize', val: 50 },
@@ -25,7 +25,9 @@ class SettingService {
             bookDirection: { eventName: 'setBookDirection', val: 0 },
             bookScreenSize: { eventName: 'setBookScreenSize', val: 2 },
             lang: { eventName: 'setString', val: tags.LANG_EN },
-            updateTime: { val: 0 }
+            updateTime: { val: 0 }, // the time stamp of last showing a dialog of update
+            firstOpen: { val: true }, // show instructions dialog for the users of first opening the eHunter
+            firstOpenBookMode: { val: true } // show instructions dialog for the users of first opening the book mode
         }
     }
 
@@ -66,7 +68,7 @@ class SettingService {
         settings[key].val = val;
         await storage.save({ key: this.storageName, data: settings });
         // send change to vuex
-        if (key !== 'toggleEHunter' && key !== 'updateTime') { // the 'toggleEHunter' & 'updateTime' don't exist in vuex
+        if (settings[key].eventName) {
             store.dispatch(settings[key].eventName, val);
         }
     }
@@ -83,7 +85,7 @@ class SettingService {
     async initSettings() {
         let settings = await storage.load({ key: this.storageName });
         for (let key in settings) {
-            if (key !== 'toggleEHunter' && key !== 'updateTime') {
+            if (settings[key].eventName) {
                 store.dispatch(settings[key].eventName, settings[key].val);
             }
         }
@@ -183,6 +185,22 @@ class SettingService {
 
     async getUpdateTime() {
         return await this._getSettingItem('updateTime');
+    }
+
+    async setFirstOpen(val) {
+        await this._setSettingItem('firstOpen', val);
+    }
+
+    async getFirstOpen() {
+        return await this._getSettingItem('firstOpen');
+    }
+
+    async setFirstOpenBookMode(val) {
+        await this._setSettingItem('firstOpenBookMode', val);
+    }
+
+    async getFirstOpenBookMode() {
+        return await this._getSettingItem('firstOpenBookMode');
     }
 
 }

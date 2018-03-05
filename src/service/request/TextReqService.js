@@ -76,7 +76,6 @@ class TextReqService {
         Promise
             .race([timeout, req])
             .then(res => {
-                console.log(res);
                 if (res.status === 200) {
                     successCallback(res);
                 } else {

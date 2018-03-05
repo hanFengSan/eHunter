@@ -44,6 +44,8 @@ import PageView from './PageView.vue';
 import Pagination from './widget/Pagination.vue';
 import AlbumService from 'src/service/AlbumService.js';
 import * as tags from '../assets/value/tags';
+import SettingService from '../service/SettingService';
+import InfoService from '../service/InfoService';
 // import Logger from '../utils/Logger';
 
 export default {
@@ -70,6 +72,7 @@ export default {
         this.appSize = this.getAppSize();
         window.addEventListener('resize', this.watchResize);
         document.addEventListener('keydown', this.watchKeyboard);
+        this.checkInstrcutions();
     },
 
     destroyed() {
@@ -223,6 +226,13 @@ export default {
 
         selectBookIndex(index) {
             this.setBookIndex(index);
+        },
+
+        async checkInstrcutions() {
+            if (await SettingService.getFirstOpenBookMode()) {
+                InfoService.showBookInstruction();
+                SettingService.setFirstOpenBookMode(false);
+            }
         }
     }
 };

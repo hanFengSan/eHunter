@@ -229,6 +229,11 @@ export default {
         en: 'Instructions & About',
         jp: '説明と概要'
     },
+    instructions: {
+        cn: '说明',
+        en: 'Instructions',
+        jp: '説明'
+    },
     later: {
         cn: '以后再说',
         en: 'LATER',

@@ -25,6 +25,18 @@ class InfoService {
         store.dispatch('addDialog', dialog);
     }
 
+    async showBookInstruction(isCompulsive) {
+        let dialog = new DialogBean(
+            isCompulsive ? tags.DIALOG_COMPULSIVE : tags.DIALOG_NORMAL,
+            store.getters.string.instructions,
+            store.getters.string.p_bookInstrction,
+            new DialogOperation(store.getters.string.confirm, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
+                return true;
+            })
+        );
+        store.dispatch('addDialog', dialog);
+    }
+
     async checkUpdate() {
         let message;
         let lastShowDialogTime = await SettingService.getUpdateTime();
