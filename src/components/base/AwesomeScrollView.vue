@@ -101,15 +101,7 @@ export default {
     position: relative;
     overflow-y: overlay;
     overflow-x: hidden;
-    .test {
-        background: red;
-        width: 50px;
-        height: 50px;
-        position: absolute;
-        right: 0;
-        top: 50%;
-    }
-
+    
     &::-webkit-scrollbar {
         display: none;
     }

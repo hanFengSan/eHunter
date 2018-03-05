@@ -13,7 +13,8 @@
         @topLeave="toggleTopBar(false)">
         <h1>{{ AlbumService.getTitle() }}</h1>
         <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
-        <div class="page-container" 
+        <div 
+            class="page-container" 
             ref="pageContainers" 
             v-for="(imgInfo, i) of volImgInfoList" 
             :key="imgInfo.pageUrl"
@@ -215,9 +216,6 @@ export default {
 <style lang="scss" scoped>
 @import '~style/_responsive';
 @import '~style/_variables';
-* div {
-    display: flex;
-}
 .album-scroll-view {
     position: relative;
     flex-direction: column;
@@ -232,8 +230,6 @@ export default {
         opacity: 0;
     }
     > .scroll-view {
-        flex-direction: column;
-        align-items: center;
         height: 100%;
         width: 100%;
         h1 {
@@ -244,16 +240,22 @@ export default {
             margin-top: 60px;
         }
         > .top-pagination {
-            margin-top: 20px;
+            margin-top: 15px;
         }
         > .bottom-pagination {
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         .page-container {
             transition: all 0.3s ease;
-            margin: 35px 0;
+            margin: 70px auto;
             height: 0;
             position: relative;
+            &:first-of-type {
+                margin-top: 35px;
+            }
+            &:last-of-type {
+                margin-bottom: 35px;
+            }
         }
     }
 }
