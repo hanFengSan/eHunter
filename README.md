@@ -23,6 +23,7 @@ Firefox版本: [地址](https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/)
 
 
 ## 项目结构
+由于v1.0升级到v2.0时，有些弃用的功能以及相关文件，比如订阅通知等，所以有些杂物并未投入使用，以下不会说明。
 ```
 |-eHunter
   |-build
@@ -32,23 +33,40 @@ Firefox版本: [地址](https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/)
   |-dist // release文件夹
   |-src
     |-assets // 资源文件夹
+    |-bean // bean类
     |-components // vue组件
+      |-widget // 按钮、分页组件、开关等小组件
+        |-AlbumBookView.vue // 书本模式组件
+        |-AlbumScrollView.vue // 滚动模式组件
+        |-ModalManager.vue // 弹窗管理组件
+        |-PageView.vue // 图片页组件， 装载于AlbumBookView和AlbumScrollView之中
+        |-ReaderView.vue // 阅读器组件，载入AlbumBookView、AlbumScrollView、ThumbScrollview和TopBar
+        |-ThumbScrollview.vue // 滚动缩略图栏组件
+        |-TopBar.vue // 顶栏组件
     |-service // 业务类
-      |-parser // 解析页面用的各种praser class
+      |-parser // 解析页面用的各种praser类
       |-request // 异步请求队列序列化/请求失败自动重试等功能的请求服务类
-      |-storage // 差不多是个model层吧...
-      |-type // 一些类型的服务类
+      |-storage
+        |-Base
+          |-Stroage.js // 继承于react-native-storage，使得支持chrome.storage. 目前弃用了chrome.storage作为底层，而是使用window.localStorage
+        |-AlbumCacheService.js // 实现画廊中图片地址、图片数量、图片高宽等的缓存，加速浏览。队列化存储，支持10个画廊的缓存。
+        |-LocalStorage.js // 封装Storage.js，使用window.localStorage为底层
+        |-SyncStorage.js // 封装Storage.js，使用chrome.storage.sync为底层, 可在chrome上实现云端同步数据
       |-api.js // 请求url的封装
-      |-NotificationService.js // 通知服务
+      |-InfoService.js // 消息服务类，实现弹窗用户引导等
       |-SettingServie.js // 设置服务类
-      |-PlatformService.js // 平台接口的隔离层, 用于屏蔽chrome和firefox的api上的差异
+      |-PlatformService.js // 平台接口的隔离层, 用于屏蔽各平台api上的差异
     |-store // vuex相关
-    |-style // sass的变量还有muse-ui的定制等
+    |-style // sass的变量以及markdown样式
     |-utils // 工具类
-    |-app.injuect.vue // 卷轴阅读的vue主组件
+        |-bezier-easing.js // 二次贝塞尔曲线生成，用于滚动模式的滚动
+        |-MdRenderer.js // md解析类
+        |-VueUtil.js // vue的一些常用操作封装
+    |-app.injuect.vue // vue主组件
     |-app.popup.vue // 弹出框的vue主组件
-    |-background.js // chrome的后台任务, 目前只用于通知服务
+    |-background.js // chrome的后台任务, 目前并未使用
     |-main.inject.js // webpack入口; vue注入前的前期处理
     |-main.popup.js // webpack入口
-    |-mainifest.json // chrome extension的文件/权限/说明用的清单
+    |-config.js // 定义版本和更新查询接口
+    |-mainifest.json // chrome&firefox extension的文件/权限/说明用的清单
 ```
