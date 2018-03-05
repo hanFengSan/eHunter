@@ -295,8 +295,8 @@ export default {
             SettingService.toggleThumbView(show);
         },
 
-        async changeTopBar() {
-            SettingService.setShowTopBar(!(await SettingService.getShowTopBar()));
+        changeTopBar() {
+            SettingService.setShowTopBar(!this.showTopBar);
         },
 
         closeEHunter() {
