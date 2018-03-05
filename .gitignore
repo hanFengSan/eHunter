@@ -9,3 +9,5 @@ test/e2e/reports
 web-ext-artifacts
 .idea
 dist.pem
+*.crx
+*.xpi
