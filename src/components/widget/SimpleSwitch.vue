@@ -41,7 +41,7 @@ export default {
 }
 .switch {
     width: 28px;
-    align-items: center;
+    // align-items: center;
     margin: auto 15px;
     position: relative;
     cursor: pointer;
@@ -63,7 +63,8 @@ export default {
         border-radius: 50%;
         transition: all 0.45s cubic-bezier(.23,1,.32,1);
         left: 0;
-        transform: translateX(-50%);
+        top: 50%;
+        transform: translate(-50%, -50%);
         box-shadow: 0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647);
         &.active {
             background: $switch_thumb_enabled_color;
