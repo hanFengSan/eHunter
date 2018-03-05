@@ -21,7 +21,6 @@ const actions = {
 const mutations = {
     [types.ADD_DIALOG](state, { dialogBean }) {
         state.dialogs.push(dialogBean);
-        Logger.logText('Modal', 'Add');
     },
     [types.REMOVE_DIALOG](state, { dialogBean }) {
         state.dialogs.splice(state.dialogs.indexOf(dialogBean), 1);

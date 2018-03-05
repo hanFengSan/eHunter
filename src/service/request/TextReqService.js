@@ -1,7 +1,7 @@
 // a good resolution for poor network
 
 class TextReqService {
-    constructor(url, rejectError = true) {
+    constructor(url, noCache = false, rejectError = true) {
         this.url = url;
         this.method = 'GET';
         this.credentials = 'include';
@@ -11,6 +11,7 @@ class TextReqService {
         this.retryInterval = 1; // secs
         this.enabledLog = true;
         this.fetchSetting = null;
+        this.noCache = noCache;
         this.rejectError = rejectError;
     }
 
@@ -62,6 +63,9 @@ class TextReqService {
     _request(successCallback, failureCallback) {
         this.curRetryTimes++;
         let url = this.url.includes('http') ? this.url : `${window.location.protocol}//${window.location.host}${this.url}`;
+        if (this.noCache) {
+            url = `${url}?_t=${new Date().getTime()}`;
+        }
         let timeout = new Promise((resolve, reject) => {
             setTimeout(reject, this.timeoutTime * 1000 * this.curRetryTimes, 'request timed out');
         });

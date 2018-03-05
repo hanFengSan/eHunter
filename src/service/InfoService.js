@@ -29,7 +29,10 @@ class InfoService {
         let message;
         let lastShowDialogTime = await SettingService.getUpdateTime();
         Promise
-            .race([new TextReqService(config.updateServer1, false).request(), new TextReqService(config.updateServer2, false).request()])
+            .race([
+                new TextReqService(config.updateServer1, true, false).request(),
+                new TextReqService(config.updateServer2, true, false).request()
+            ])
             .then(data => {
                 message = new ServerMessage(JSON.parse(data));
                 let isNewVersion = message.version !== config.version;
