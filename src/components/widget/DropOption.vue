@@ -93,7 +93,8 @@ div {
                 background: rgba(0, 0, 0, 0.1);
                 > span {
                     color: $accent_color;
-                    transform: translateX(5px);
+                    margin-left: 5px;
+                    margin-right: -5px;
                 }
             }
         }
