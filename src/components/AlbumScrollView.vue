@@ -9,8 +9,8 @@
         class="scroll-view" 
         v-if="imgInfoList.length > 0" 
         :on-scroll-stopped="onScrollStopped" 
-        @topIn="toggleTopBar(true)"
-        @topLeave="toggleTopBar(false)">
+        @topIn="changeTopBar(true)"
+        @topLeave="changeTopBar(false)">
         <h1>{{ AlbumService.getTitle() }}</h1>
         <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
         <div 
@@ -39,6 +39,7 @@ import Logger from '../utils/Logger.js';
 import Pagination from './widget/Pagination.vue';
 import PageView from './PageView.vue';
 import AlbumService from '../service/AlbumService';
+import SettingService from '../service/SettingService';
 import * as tags from '../assets/value/tags';
 
 export default {
@@ -205,6 +206,12 @@ export default {
                     }
                 }
                 Logger.logText('Album', 'preload volume');
+            }
+        },
+
+        async changeTopBar(val) {
+            if (await SettingService.getShowTopBar()) {
+                this.toggleTopBar(val);
             }
         }
     }

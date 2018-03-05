@@ -67,7 +67,7 @@ class NotificationService {
 
     _request() {
         (new ReqQueueService(this.requestList))
-        .setNumOfConcurrented(1)
+            .setNumOfConcurrented(1)
             .request()
             .then(map => {
                 NotiStorageService

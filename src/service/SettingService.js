@@ -27,7 +27,8 @@ class SettingService {
             lang: { eventName: 'setString', val: tags.LANG_EN },
             updateTime: { val: 0 }, // the time stamp of last showing a dialog of update
             firstOpen: { val: true }, // show instructions dialog for the users of first opening the eHunter
-            firstOpenBookMode: { val: true } // show instructions dialog for the users of first opening the book mode
+            firstOpenBookMode: { val: true }, // show instructions dialog for the users of first opening the book mode
+            showTopBar: { eventName: 'toggleTopBar', val: true }
         }
     }
 
@@ -203,6 +204,13 @@ class SettingService {
         return await this._getSettingItem('firstOpenBookMode');
     }
 
+    async setShowTopBar(val) {
+        await this._setSettingItem('showTopBar', val);
+    }
+
+    async getShowTopBar() {
+        return await this._getSettingItem('showTopBar');
+    }
 }
 
 let instance = new SettingService();
