@@ -5,7 +5,6 @@ import ImgUrlListParser from '../parser/ImgUrlListParser.js'
 import IntroHtmlParser from '../parser/IntroHtmlParser.js'
 import * as API from '../api.js'
 import storage from 'src/service/storage/LocalStorage'
-import Platform from 'src/service/PlatformService'
 import Logger from 'src/utils/Logger'
 import DateWrapper from '../../utils/DateWrapper'
 import * as tags from '../../assets/value/tags'
@@ -35,12 +34,12 @@ class AlbumCacheService {
 
     async _migrate() {
         // remove version < 2.0
-        await Platform.storage.local.get('cache', async(value) => {
-            if (typeof value['cache'] !== 'undefined') {
-                await Platform.storage.local.remove('cache', () => {});
-                await Platform.storage.local.remove('cacheVersion', () => {});
-            }
-        });
+        // await Platform.storage.local.get('cache', async(value) => {
+        //     if (typeof value['cache'] !== 'undefined') {
+        //         await Platform.storage.local.remove('cache', () => {});
+        //         await Platform.storage.local.remove('cacheVersion', () => {});
+        //     }
+        // });
         // remove old version >= 2.0
         let version = await storage.load({ key: this.storageVersionName });
         await storage.save({ key: this.storageVersionName, data: this.version });

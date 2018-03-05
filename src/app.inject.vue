@@ -49,6 +49,7 @@ $general_animtation_time: 0.2s;
 .app {
     display: flex;
     height: 100%;
+    text-align: initial; // overlay original style
     > .thumb-column {
         transition: all $change_mode_time ease;
         &.hide {
@@ -112,6 +113,7 @@ $general_animtation_time: 0.2s;
                 text-align: center;
                 background: rgba(0, 0, 0, 0.8);
                 box-shadow: 0 1px 6px rgba(0, 0, 0, 0.117647), 0 1px 4px rgba(0, 0, 0, 0.117647);
+                color: white;
             }
         }
         &.tips-down {
