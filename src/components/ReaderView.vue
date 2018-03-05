@@ -103,7 +103,15 @@ export default {
 
         async checkInstrcutions() {
             if (await SettingService.getFirstOpen()) {
-                InfoService.showInstruction();
+                // auto choose language
+                let lang = navigator.language.toLowerCase();
+                if (lang.includes('zh')) {
+                    await SettingService.setLang(tags.LANG_CN);
+                } else if (lang.includes('jp')) {
+                    await SettingService.setLang(tags.LANG_JP);
+                }
+                // show instructions
+                InfoService.showInstruction(true);
                 SettingService.setFirstOpen(false);
             }
         }

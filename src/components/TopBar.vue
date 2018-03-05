@@ -218,7 +218,7 @@ export default {
     methods: {
         ...mapActions(['toggleTopBar', 'addDialog']),
 
-        dropOptionChange(tag, index) {
+        async dropOptionChange(tag, index) {
             switch (tag) {
                 case 'width':
                     switch (this.widthList[index].val) {
@@ -257,7 +257,8 @@ export default {
                     SettingService.setBookDirection(this.directionList[index].val);
                     break;
                 case 'lang':
-                    SettingService.setLang(this.langList[index].val);
+                    await SettingService.setLang(this.langList[index].val);
+                    InfoService.showInstruction();
                     break;
             }
         },
