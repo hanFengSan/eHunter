@@ -36,7 +36,6 @@ import { mapGetters, mapActions } from 'vuex';
 import AwesomeScrollView from './base/AwesomeScrollView.vue';
 import TopBar from './TopBar.vue';
 import Logger from '../utils/Logger.js';
-import image from '../assets/img';
 import Pagination from './widget/Pagination.vue';
 import PageView from './PageView.vue';
 import AlbumService from '../service/AlbumService';
@@ -102,7 +101,6 @@ export default {
         },
 
         AlbumService: () => AlbumService,
-        image: () => image,
         curIndex() {
             return AlbumService.getRealCurIndex(this.centerIndex)
         }

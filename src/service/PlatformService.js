@@ -13,5 +13,28 @@ export default {
     },
     getExtension() {
         return chrome.extension;
+    },
+    fetch(url, option) {
+        /* eslint-disable camelcase */
+        if (typeof GM_info !== 'undefined' && GM_info.version) { // the ENV is Tampermonky
+            return new Promise((resolve, reject) => {
+                GM_xmlhttpRequest({
+                    method: option.method,
+                    url,
+                    onload: x => {
+                        let responseText = x.responseText;
+                        x.text = async function() {
+                            return responseText;
+                        }
+                        resolve(x);
+                    },
+                    onerror: e => {
+                        reject(`GM_xhr error, ${e.status}`);
+                    }
+                });
+            });
+        } else { // the ENV is Chrome or Firefox
+            return window.fetch(url, option);
+        }
     }
 };

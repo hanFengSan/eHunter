@@ -31,7 +31,6 @@ import AlbumScrollView from './AlbumScrollView.vue';
 import TopBar from './TopBar.vue';
 import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js';
 import AlbumService from '../service/AlbumService';
-import image from '../assets/img';
 import AlbumBookView from './AlbumBookView.vue';
 import * as tags from '../assets/value/tags';
 import SettingService from '../service/SettingService';
@@ -69,7 +68,6 @@ export default {
             return this.imgInfoList.length === 0;
         },
         AlbumService: () => AlbumService,
-        image: () => image,
         location() {
             switch (this.readingMode) {
                 case 0:

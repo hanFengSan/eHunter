@@ -1,4 +1,5 @@
 // a good resolution for poor network
+import PlatformService from '../PlatformService'
 
 class TextReqService {
     constructor(url, noCache = false, rejectError = true) {
@@ -69,7 +70,7 @@ class TextReqService {
         let timeout = new Promise((resolve, reject) => {
             setTimeout(reject, this.timeoutTime * 1000 * this.curRetryTimes, 'request timed out');
         });
-        let req = window.fetch(url, this.fetchSetting ? this.fetchSetting : {
+        let req = PlatformService.fetch(url, this.fetchSetting ? this.fetchSetting : {
             method: this.method,
             credentials: this.credentials
         });
