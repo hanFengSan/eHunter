@@ -79,6 +79,18 @@ class InfoService {
         );
         store.dispatch('addDialog', dialog);
     }
+
+    showReloadError(text) {
+        let dialog = new DialogBean(
+            tags.DIALOG_COMPULSIVE,
+            store.getters.string.loadingFailed,
+            text,
+            new DialogOperation(store.getters.string.reload, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
+                return true;
+            })
+        );
+        store.dispatch('addDialog', dialog);
+    }
 }
 
 let instance = new InfoService();

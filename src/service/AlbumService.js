@@ -28,6 +28,10 @@ class AlbumService {
         return this.introUrl;
     }
 
+    setIntroUrl(val) {
+        this.introUrl = val;
+    }
+
     getAlbumId() {
         if (!this.albumId) {
             this.albumId = this.imgHtmlParser.getAlbumId();

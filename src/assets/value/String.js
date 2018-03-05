@@ -238,5 +238,10 @@ export default {
         cn: '以后再说',
         en: 'LATER',
         jp: '後で'
+    },
+    changingToSmallFailed: {
+        cn: '无缝切换至`"Normal"`模式失败，可能是网络错误，可刷新重试或者返回前一页将预览图的大小模式切换为`"Normal"`。',
+        en: 'Changing to `"Normal"` mode failed, because of poor network. You can reload this page or go back to previous page and change the mode of thumbnails to `"Normal"`',
+        jp: 'ネットワークが不十分であるため、`「Normal」`モードに変更できませんでした。 このページをリロードするか、前のページに戻ってサムネイルのモードを`「Normal」`に変更することができます'
     }
 }

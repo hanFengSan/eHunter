@@ -6,8 +6,12 @@ import IntroHtmlParser from '../parser/IntroHtmlParser.js'
 import * as API from '../api.js'
 import storage from 'src/service/storage/LocalStorage'
 import Logger from 'src/utils/Logger'
-import DateWrapper from '../../utils/DateWrapper'
+import InfoService from '../InfoService'
+import store from '../../store/index.inject'
 import * as tags from '../../assets/value/tags'
+import AlbumService from '../AlbumService'
+import Utils from '../../utils/Utils'
+
 /*
 storage
   |-albumId
@@ -30,6 +34,8 @@ class AlbumCacheService {
         this.storageVersionName = 'AlbumCacheVersion';
         this._initStorage();
         this._migrate();
+        this._isNormalMode = false; // make sure in 'Normal' mode
+        this._isChangedMode = false;
     }
 
     async _migrate() {
@@ -87,13 +93,22 @@ class AlbumCacheService {
             try {
                 let text;
                 // compatible with large mode
-                if (document.cookie.includes('uconfig=dm_t-ts_l')) {
-                    document.cookie = 'uconfig=dm_t; path=/; domain=.exhentai.org';
+                try { // If in 'Normal' mode of thumbnails, this will be right
                     text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
-                    document.cookie = 'uconfig=dm_t-ts_l; path=/; domain=.exhentai.org; expires=' +
-                        new DateWrapper().addYears(10).toGMTString();
-                } else {
-                    text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
+                    new IntroHtmlParser(text).getThumbObjList(sumOfPage, albumId);
+                    this._isNormalMode = true;
+                } catch (e) { // In 'Large' mode
+                    // Send a request to change to 'Normal' mode
+                    try {
+                        introUrl = (await window.fetch(`${window.location.origin}${introUrl}?inline_set=ts_m`, { method: 'GET', credentials: 'include' })).url;
+                        text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
+                        AlbumService.setIntroUrl(introUrl);
+                        this._isNormalMode = true;
+                        this._isChangedMode = true;
+                    } catch (e) {
+                        InfoService.showReloadError(store.getters.string.changingToSmallFailed);
+                        Logger.logObj('AlbumCache', e);
+                    }
                 }
                 let introPage = new IntroHtmlParser(text);
                 let thumbs = introPage.getThumbObjList(sumOfPage, albumId);
@@ -114,10 +129,19 @@ class AlbumCacheService {
             Logger.logText('CacheService', 'read imgInfos from cache');
             return JSON.parse(JSON.stringify(album.imgInfos));
         } else {
+            while (!this._isNormalMode) {
+                await Utils.timeout(100);
+            }
+            if (this._isChangedMode) {
+                introUrl = AlbumService.getIntroUrl(); // after changine mode, the introUrl maybe changed.
+            }
             try {
                 let imgInfos = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
                 album.imgInfos = imgInfos;
                 await this._saveAlbum(albumId);
+                if (this._isChangedMode) {
+                    window.fetch(`${introUrl}?inline_set=ts_l`, { method: 'GET', credentials: 'include' }); // change back
+                }
                 return JSON.parse(JSON.stringify(album.imgInfos));
             } catch (e) {
                 console.error(e);
