@@ -3,6 +3,9 @@
     <!-- loading view -->
     <div class="loading-container" v-if="isloadingImgInfos">
         <span class="loading">Loading...</span>
+        <p class="tip">
+            {{ string .loadingTip }}
+        </p>
     </div>
     <!-- top bar view -->
     <top-bar class="top-bar" />
@@ -51,9 +54,9 @@ export default {
     },
 
     async created() {
+        this.checkInstrcutions();
         await this.initImgInfoList();
         this.setIndex({ val: AlbumService.getCurPageNum() - 1, updater: tags.READER_VIEW });
-        this.checkInstrcutions();
     },
 
     computed: {
@@ -137,13 +140,12 @@ div {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        color: $img_container_color;
+        color: $reader_view_loading_color;
         > .loading {
             display: block;
             font-size: 24px;
             font-weight: bolder;
             font-size: 4vw;
-            color: rgba(255,255,255,0.1);
         }
         > .tip {
             padding: 0;

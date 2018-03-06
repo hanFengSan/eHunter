@@ -92,7 +92,7 @@ div {
         min-width: 430px;
         min-height: 110px;
         max-width: 50%;
-        max-height: 80%;
+        max-height: 88%;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);

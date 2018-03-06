@@ -243,5 +243,10 @@ export default {
         cn: '无缝切换至`"Normal"`模式失败，可能是网络错误，可刷新重试或者返回前一页将预览图的大小模式切换为`"Normal"`。',
         en: 'Changing to `"Normal"` mode failed, because of poor network. You can reload this page or go back to previous page and change the mode of thumbnails to `"Normal"`',
         jp: 'ネットワークが不十分であるため、`「Normal」`モードに変更できませんでした。 このページをリロードするか、前のページに戻ってサムネイルのモードを`「Normal」`に変更することができます'
+    },
+    loadingTip: {
+        cn: '在前页采用Normal模式查看缩略图可加速加载',
+        en: 'You can use "Normal" mode of thumbnail in previous page to acclerate the load.',
+        jp: '前のページでサムネイルの「Normal」モードを使用して、読み込みを高速化できます。'
     }
 }
