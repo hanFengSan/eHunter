@@ -1,9 +1,9 @@
 // a parser for album's img page
 class ImgHtmlParser {
     constructor(html) {
-        this.htmlText = html;
+        this.htmlText = html.replace(/src=/g, 'x-src='); // avoid load assets
         this.html = document.createElement('html');
-        this.html.innerHTML = html;
+        this.html.innerHTML = this.htmlText;
         this.document = this.html.ownerDocument;
         this._initI2Element();
         this._initImgSizeInfo();
@@ -48,7 +48,7 @@ class ImgHtmlParser {
     }
 
     getImgUrl() {
-        this.htmlText.match('id="img" src="(.*?)"');
+        this.htmlText.match('id="img" x-src="(.*?)"');
         return RegExp.$1;
     }
 

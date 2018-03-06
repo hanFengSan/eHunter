@@ -36,7 +36,7 @@
                     <pop-slider 
                         :active="showLoadNumSlider" 
                         :min="1" 
-                        :max="100" 
+                        :max="10" 
                         :step="1" 
                         :init="loadNum" 
                         :close="() => closeDropOptionSlider('loadNum')" 

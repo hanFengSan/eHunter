@@ -2,7 +2,7 @@
 class IntroHtmlParser {
     constructor(html) {
         this.html = document.createElement('html');
-        this.html.innerHTML = html;
+        this.html.innerHTML = html.replace(/src=/g, 'x-src='); // avoid load assets
         this.document = this.html.ownerDocument;
     }
 
