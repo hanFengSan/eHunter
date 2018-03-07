@@ -47,7 +47,11 @@ class ImgUrlListParser {
                     imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl)).getImgUrls());
                     return imgUrls;
                 }, []);
-                resolve(result);
+                if (result.length !== 0) {
+                    resolve(result);
+                } else {
+                    reject(new Error('parsing img html failed. It may be in Large mode'))
+                }
             }, err => {
                 reject(err);
                 // TODO: show tip for this error

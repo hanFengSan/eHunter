@@ -86,6 +86,7 @@ class InfoService {
             store.getters.string.loadingFailed,
             text,
             new DialogOperation(store.getters.string.reload, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
+                window.location.reload();
                 return true;
             })
         );

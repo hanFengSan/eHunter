@@ -28,7 +28,8 @@ class SettingService {
             updateTime: { val: 0 }, // the time stamp of last showing a dialog of update
             firstOpen: { val: true }, // show instructions dialog for the users of first opening the eHunter
             firstOpenBookMode: { val: true }, // show instructions dialog for the users of first opening the book mode
-            showTopBar: { eventName: 'toggleTopBar', val: true }
+            showTopBar: { eventName: 'toggleTopBar', val: true },
+            isNormalMode: { val: true }
         }
     }
 
@@ -210,6 +211,14 @@ class SettingService {
 
     async getShowTopBar() {
         return await this._getSettingItem('showTopBar');
+    }
+
+    async setNormalMode(val) {
+        await this._setSettingItem('isNormalMode', val);
+    }
+
+    async getNormalMode() {
+        return await this._getSettingItem('isNormalMode');
     }
 }
 

@@ -7,6 +7,7 @@ import * as API from '../api.js'
 import storage from 'src/service/storage/LocalStorage'
 import Logger from 'src/utils/Logger'
 import InfoService from '../InfoService'
+import SettingService from '../SettingService'
 import store from '../../store/index.inject'
 import * as tags from '../../assets/value/tags'
 import AlbumService from '../AlbumService'
@@ -97,6 +98,7 @@ class AlbumCacheService {
                     text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
                     new IntroHtmlParser(text).getThumbObjList(sumOfPage, albumId);
                     this._isNormalMode = true;
+                    await SettingService.setNormalMode(true);
                 } catch (e) { // In 'Large' mode
                     // Send a request to change to 'Normal' mode
                     try {
@@ -104,7 +106,9 @@ class AlbumCacheService {
                         text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
                         AlbumService.setIntroUrl(introUrl);
                         this._isNormalMode = true;
+                        Logger.logText('Cache', 'switch to small');
                         this._isChangedMode = true;
+                        await SettingService.setNormalMode(false);
                     } catch (e) {
                         InfoService.showReloadError(store.getters.string.changingToSmallFailed);
                         Logger.logObj('AlbumCache', e);
@@ -129,25 +133,34 @@ class AlbumCacheService {
             Logger.logText('CacheService', 'read imgInfos from cache');
             return JSON.parse(JSON.stringify(album.imgInfos));
         } else {
-            while (!this._isNormalMode) {
-                await Utils.timeout(100);
-            }
-            if (this._isChangedMode) {
+            if (!await SettingService.getNormalMode()) {
+                while (!this._isNormalMode) {
+                    await Utils.timeout(100);
+                }
                 introUrl = AlbumService.getIntroUrl(); // after changine mode, the introUrl maybe changed.
             }
             try {
-                let imgInfos = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
-                album.imgInfos = imgInfos;
-                await this._saveAlbum(albumId);
-                if (this._isChangedMode) {
-                    window.fetch(`${introUrl}?inline_set=ts_l`, { method: 'GET', credentials: 'include' }); // change back
-                }
-                return JSON.parse(JSON.stringify(album.imgInfos));
+                return await this._getImgInfos(albumId, introUrl, sumOfPage);
             } catch (e) {
-                console.error(e);
-                // TODO: show tips for the error
+                Logger.logText('CacheService', 'loading ImgInfos failed. It\'s large.');
+                while (!this._isNormalMode) {
+                    await Utils.timeout(100);
+                    introUrl = AlbumService.getIntroUrl();
+                }
+                return await this._getImgInfos(albumId, introUrl, sumOfPage);
             }
         }
+    }
+
+    async _getImgInfos(albumId, introUrl, sumOfPage) {
+        let album = await this._getAlbum(albumId);
+        let imgInfos = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
+        album.imgInfos = imgInfos;
+        await this._saveAlbum(albumId);
+        if (this._isChangedMode) {
+            window.fetch(`${introUrl}?inline_set=ts_l`, { method: 'GET', credentials: 'include' }); // change back
+        }
+        return JSON.parse(JSON.stringify(album.imgInfos));
     }
 
     async getImgSrc(albumId, index, mode, sourceId) {

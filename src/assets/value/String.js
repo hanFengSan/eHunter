@@ -246,7 +246,7 @@ export default {
     },
     loadingTip: {
         cn: '在前页采用Normal模式查看缩略图可加速加载',
-        en: 'You can use "Normal" mode of thumbnail in previous page to acclerate the load.',
+        en: 'You can use "Normal" mode of thumbnail in previous page to accelerate the load.',
         jp: '前のページでサムネイルの「Normal」モードを使用して、読み込みを高速化できます。'
     }
 }
