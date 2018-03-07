@@ -14,6 +14,7 @@ It create a  new element in the Eh page, and inject Vue components.
 Chrome: [Web store](https://chrome.google.com/webstore/detail/ehunter-more-powerful-e-h/dnnicnedpmjkbkdeijccbjkkcpcbmdoo)
 Firefox: [Web store](https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/)
 Tampermonkey: [Greasy fork](https://greasyfork.org/zh-CN/scripts/39198-ehunter)
+
 You also can get it from the 'release' of this project.
 
 ## Run
