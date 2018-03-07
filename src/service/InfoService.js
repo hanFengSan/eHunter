@@ -9,10 +9,6 @@ import SettingService from '../service/SettingService'
 import Logger from '../utils/Logger'
 
 class InfoService {
-    constructor() {
-        this.checkUpdate();
-    }
-
     async showInstruction(isCompulsive) {
         let dialog = new DialogBean(
             isCompulsive ? tags.DIALOG_COMPULSIVE : tags.DIALOG_NORMAL,
@@ -91,6 +87,21 @@ class InfoService {
             })
         );
         store.dispatch('addDialog', dialog);
+    }
+
+    async checkNewVersion() {
+        if (await SettingService.getVersion() !== config.version) {
+            let dialog = new DialogBean(
+                tags.DIALOG_COMPULSIVE,
+                `${store.getters.string.newVersion} v${config.version}`,
+                store.getters.string.p_version,
+                new DialogOperation(store.getters.string.confirm, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
+                    return true;
+                })
+            );
+            store.dispatch('addDialog', dialog);
+            SettingService.setVersion(config.version);
+        }
     }
 }
 

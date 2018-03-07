@@ -1,6 +1,7 @@
 import storage from './storage/LocalStorage'
 import store from '../store/index.inject'
 import * as tags from '../assets/value/tags'
+import config from '../config'
 // import Logger from '../utils/Logger';
 
 class SettingService {
@@ -29,7 +30,8 @@ class SettingService {
             firstOpen: { val: true }, // show instructions dialog for the users of first opening the eHunter
             firstOpenBookMode: { val: true }, // show instructions dialog for the users of first opening the book mode
             showTopBar: { eventName: 'toggleTopBar', val: true },
-            isNormalMode: { val: true }
+            isNormalMode: { val: true },
+            version: { val: config.version } // for showing infos of update
         }
     }
 
@@ -219,6 +221,14 @@ class SettingService {
 
     async getNormalMode() {
         return await this._getSettingItem('isNormalMode');
+    }
+
+    async setVersion(val) {
+        await this._setSettingItem('version', val);
+    }
+
+    async getVersion() {
+        return await this._getSettingItem('version');
     }
 }
 

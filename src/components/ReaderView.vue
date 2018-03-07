@@ -36,8 +36,6 @@ import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js';
 import AlbumService from '../service/AlbumService';
 import AlbumBookView from './AlbumBookView.vue';
 import * as tags from '../assets/value/tags';
-import SettingService from '../service/SettingService';
-import InfoService from '../service/InfoService';
 // import Logger from '../utils/Logger';
 
 export default {
@@ -54,7 +52,6 @@ export default {
     },
 
     async created() {
-        this.checkInstrcutions();
         await this.initImgInfoList();
         this.setIndex({ val: AlbumService.getCurPageNum() - 1, updater: tags.READER_VIEW });
     },
@@ -101,21 +98,6 @@ export default {
             } else {
                 elem.mozRequestFullScreen ? elem.mozRequestFullScreen() : '';
                 elem.webkitRequestFullScreen ? elem.webkitRequestFullScreen() : '';
-            }
-        },
-
-        async checkInstrcutions() {
-            if (await SettingService.getFirstOpen()) {
-                // auto choose language
-                let lang = navigator.language.toLowerCase();
-                if (lang.includes('zh')) {
-                    await SettingService.setLang(tags.LANG_CN);
-                } else if (lang.includes('jp')) {
-                    await SettingService.setLang(tags.LANG_JP);
-                }
-                // show instructions
-                InfoService.showInstruction(true);
-                SettingService.setFirstOpen(false);
             }
         }
     }

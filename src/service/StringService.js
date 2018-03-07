@@ -1,6 +1,7 @@
 import string from '../assets/value/string'
 import instruction from '../assets/value/instruction'
 import bookInstrction from '../assets/value/bookInstrction'
+import version from '../assets/value/version'
 
 class StringService {
     constructor() {
@@ -22,6 +23,9 @@ class StringService {
         this.cn['p_bookInstrction'] = bookInstrction.cn;
         this.en['p_bookInstrction'] = bookInstrction.en;
         this.jp['p_bookInstrction'] = bookInstrction.jp;
+        this.cn['p_version'] = version.cn;
+        this.en['p_version'] = version.en;
+        this.jp['p_version'] = version.jp;
     }
 }
 

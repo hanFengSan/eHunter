@@ -11,18 +11,26 @@ import { mapGetters } from 'vuex';
 import ThumbScrollView from './components/ThumbScrollView.vue';
 import ReaderView from './components/ReaderView.vue';
 import ModalManager from './components/ModalManager.vue';
+import SettingService from './service/SettingService';
+import InfoService from './service/InfoService';
+import * as tags from './assets/value/tags';
 
 export default {
     name: 'InjectedApp',
-
-    data() {
-        return {};
-    },
 
     components: {
         ThumbScrollView,
         ReaderView,
         ModalManager
+    },
+
+    data() {
+        return {};
+    },
+
+    async created() {
+        await this.checkInstrcutions();
+        this.checkVersion();
     },
 
     computed: {
@@ -33,6 +41,28 @@ export default {
             } else {
                 return { 'margin-left': this.px(-this.thumbWidth) };
             }
+        }
+    },
+
+    methods: {
+        async checkInstrcutions() {
+            if (await SettingService.getFirstOpen()) {
+                // auto choose language
+                let lang = navigator.language.toLowerCase();
+                if (lang.includes('zh')) {
+                    await SettingService.setLang(tags.LANG_CN);
+                } else if (lang.includes('jp')) {
+                    await SettingService.setLang(tags.LANG_JP);
+                }
+                // show instructions
+                InfoService.showInstruction(true);
+                SettingService.setFirstOpen(false);
+            }
+        },
+
+        async checkVersion() {
+            InfoService.checkUpdate();
+            InfoService.checkNewVersion();
         }
     }
 };
