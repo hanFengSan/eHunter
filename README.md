@@ -18,7 +18,7 @@ Tampermonkey: [Greasy fork](https://greasyfork.org/zh-CN/scripts/39198-ehunter)
 You also can get it from the 'release' of this project.
 
 ## Run
-1. In a node environment, run `npm install`, and `npm run dev`, then you will in dev mode.
+1. In a Node environment, run `npm install`, and `npm run dev`, then you will in dev mode.
 2. In the top of `chrome://extensions`, open the develop mode, and select the `/dist`.
 3. run `npm run publish` to package a zip file in `/publish_output` for the web store of Chrome and Firefox.
 4. Tampermonkey: run `npm run publish`, add some required comments in the top of `/dist/inject.js`.
