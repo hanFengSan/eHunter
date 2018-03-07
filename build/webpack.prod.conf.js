@@ -35,7 +35,7 @@ module.exports = {
                 ],
                 query: {
                   cacheDirectory: true,
-                  presets: ['es2015', 'stage-1', 'react'],
+                  presets: ['es2016', 'stage-2'],
                   plugins: ['transform-runtime']
                 }
                 // exclude: /node_modules/

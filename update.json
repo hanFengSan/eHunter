@@ -1,9 +1,9 @@
 {
     "cn":{
-        "title":"新版本: v2.1",
-        "version":"2.1",
-        "text":"1. 修复一直loading的bug. 2. 增加更新订阅. 3. 记住顶栏设置",
-        "time":1520300353844,
+        "title":"新版本: v2.2.0",
+        "version":"2.2.0",
+        "text":"加快加载速度",
+        "time":1520518323711,
         "duration":86400000,
         "always":true,
         "operations":[
@@ -26,10 +26,10 @@
         ]
     },
     "en":{
-        "title":"New version: v2.1",
-        "version":"2.1",
-        "text":"Fix bugs and remember the setting of top bar",
-        "time":1520300353844,
+        "title":"New version: v2.2.0",
+        "version":"2.2.0",
+        "text":"Accelerate loading.",
+        "time":1520518323711,
         "duration":86400000,
         "always":true,
         "operations":[
@@ -52,10 +52,10 @@
         ]
     },
     "jp":{
-        "title":"新しいバージョン: v2.1",
-        "version":"2.1",
-        "text":"バグを修正し、トップバーの設定を覚えている",
-        "time":1520300353844,
+        "title":"新しいバージョン: v2.2.0",
+        "version":"2.2.0",
+        "text":"Accelerate loading.",
+        "time":1520518323711,
         "duration":86400000,
         "always":true,
         "operations":[
