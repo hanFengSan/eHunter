@@ -8,7 +8,7 @@ Provide a scroll mode and book mode, for a better reading experience.
 <img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg" style="width: 800px; display: block; padding: 10px;"/>
 
 ## Implementation
-It create a  new element in the Eh page, and inject Vue components.
+It creates a new element in the Eh page, and inject Vue components to provide a scroll mode and book mode.
 
 ## Install
 Chrome: [Web store](https://chrome.google.com/webstore/detail/ehunter-more-powerful-e-h/dnnicnedpmjkbkdeijccbjkkcpcbmdoo)
