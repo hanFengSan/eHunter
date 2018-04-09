@@ -5,17 +5,22 @@
   "author": "yakami <c360785655@gmail.com>",
   "private": true,
   "scripts": {
-    "dev": "gulp dev --gulpfile build/gulpfile.js",
-    "publish": "gulp publish --gulpfile build/gulpfile.js"
+    "dev": "webpack --config build/webpack.dev.conf.js",
+    "build": "webpack --config build/webpack.prod.conf.js",
+    "publish": "yarn run test2 && web-ext build -s dist -a publish_output --overwrite-dest"
   },
   "dependencies": {
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-syntax-async-generators": "^6.13.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-1": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.1",
     "del": "^2.2.2",
+    "generate-json-webpack-plugin": "^0.3.1",
     "gulp": "^3.9.1",
     "gulp-highlight": "^2.1.0",
     "gulp-util": "^3.0.8",
@@ -30,6 +35,7 @@
     "react-native-storage": "^0.2.2",
     "style-loader": "^0.13.2",
     "twemoji": "^2.5.1",
+    "uglifyjs-webpack-plugin": "^1.2.4",
     "vue": "^2.2.1",
     "vue-html": "^0.3.0",
     "vue-resource": "^1.0.3",
@@ -101,7 +107,7 @@
     "webpack-dev-middleware": "^1.8.3",
     "webpack-dev-server": "^2.2.0",
     "webpack-hot-middleware": "^2.12.2",
-    "webpack-merge": "^0.14.1"
+    "webpack-merge": "^4.1.2"
   },
   "engines": {
     "node": ">= 4.0.0",

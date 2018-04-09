@@ -31,7 +31,7 @@ export default {
 
     data() {
         return {
-            range: 3
+            pageRange: 3
         };
     },
 
@@ -39,12 +39,12 @@ export default {
         // get shown page array
         pages() {
             let list = [];
-            for (let i = 1; i <= this.range; i++) {
+            for (let i = 1; i <= this.pageRange; i++) {
                 if (this.curIndex - i > 0) {
                     list.push(this.curIndex - i);
                 }
             }
-            for (let i = 1; i <= this.range; i++) {
+            for (let i = 1; i <= this.pageRange; i++) {
                 if (this.curIndex + i < this.pageSum - 1) {
                     list.push(this.curIndex + i);
                 }
@@ -67,7 +67,7 @@ export default {
 
     methods: {
         showNum(val) {
-            if (Math.abs(val - this.curIndex) <= this.range) {
+            if (Math.abs(val - this.curIndex) <= this.pageRange) {
                 return val + 1;
             } else if (val === 0 || val === this.pageSum - 1) {
                 return val + 1;

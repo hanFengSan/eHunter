@@ -3,7 +3,7 @@
     <div :class="['screen', {'animation': showBookScreenAnimation, 'rtl': bookDirection===0 }]" 
         v-for="screen in activedScreens" 
         :style="getScreenStyle(screen)"
-        :key="screen">
+        :key="screenKey(screen)">
         <div 
             class="page-container" 
             v-for="page in screen"
@@ -233,6 +233,10 @@ export default {
                 InfoService.showBookInstruction();
                 SettingService.setFirstOpenBookMode(false);
             }
+        },
+
+        screenKey(screen) {
+            return screen.reduce((sum, i) => sum + i.id, '');
         }
     }
 };

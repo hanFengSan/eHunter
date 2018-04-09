@@ -1,9 +1,11 @@
-{
+let config = require('./config');
+
+module.exports = {
     "manifest_version": 2,
     "name": "eHunter - more powerful e-hentai/exhentai!",
     "short_name": "eHunter",
     "description": "more powerful e-hentai/eHentai/exhentai! scroll view and notification",
-    "version": "2.2.0",
+    "version": config.version,
     "content_security_policy": "script-src 'self'; object-src 'self'",
     "browser_action": {
         "default_popup": "popup.html",
@@ -54,4 +56,4 @@
     "background": {
         "scripts": ["background.js"]
     }
-}
+};

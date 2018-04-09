@@ -7,7 +7,7 @@
     </svg>
     <popover :active="active" :custom-style="{'margin-left': '7px', 'margin-top': '4px'}" :close="close">
         <div class="options no-select">
-            <div class="item" v-for="(item, index) in list" :key="item" @click="onClick(index)">
+            <div class="item" v-for="(item, index) in list" :key="item.name||item" @click="onClick(index)">
                 <span>{{ item.name || item }}</span>
             </div>
         </div>
