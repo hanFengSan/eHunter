@@ -35,7 +35,8 @@ module.exports = {
                 loader: 'babel-loader',
                 include: [
                     resolve('node_modules/react-native-storage'),
-                    resolve('src')
+                    resolve('src'),
+                    resolve('test')
                 ],
                 query: {
                     cacheDirectory: true,
@@ -69,6 +70,7 @@ module.exports = {
         ]
     },
     resolve: {
+        extensions: ['.js', '.vue', '.json'],
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
             'src': resolve('src'),
