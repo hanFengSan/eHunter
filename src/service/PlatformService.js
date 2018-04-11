@@ -1,5 +1,11 @@
 // a service for crossing platform
 /* eslint-disable no-undef */
+
+// hack for test
+if (typeof chrome === 'undefined') {
+    var chrome = { extension: null };
+}
+
 export default {
     storage: {
         get sync() {
@@ -16,7 +22,7 @@ export default {
     },
     fetch(url, option) {
         /* eslint-disable camelcase */
-        if (typeof GM_info !== 'undefined' && GM_info.version) { // the ENV is Tampermonky
+        if (typeof GM_info !== 'undefined' && GM_info.version) { // the ENV is Tampermonkey
             return new Promise((resolve, reject) => {
                 GM_xmlhttpRequest({
                     method: option.method,

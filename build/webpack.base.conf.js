@@ -37,12 +37,7 @@ module.exports = {
                     resolve('node_modules/react-native-storage'),
                     resolve('src'),
                     resolve('test')
-                ],
-                query: {
-                    cacheDirectory: true,
-                    presets: ['es2016', 'stage-2'],
-                    plugins: ['transform-runtime']
-                }
+                ]
             },
             {
                 test: /\.(png|jpg|gif|svg)$/,

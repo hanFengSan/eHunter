@@ -62,7 +62,7 @@ class ImgHtmlParser {
     }
 
     _initI2Element() {
-        this.i2 = this.document.getElementById('i2');
+        this.i2 = this.html.querySelector('#i2');
     }
 
     _initImgSizeInfo() {

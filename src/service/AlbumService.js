@@ -2,7 +2,7 @@ import ImgHtmlParser from './parser/ImgHtmlParser';
 import AlbumCacheService from './storage/AlbumCacheService';
 // import Logger from '../utils/Logger';
 
-class AlbumService {
+export class AlbumService {
     constructor(imgHtml) {
         this.imgHtmlParser = imgHtml ? new ImgHtmlParser(imgHtml) : {};
         this.cacheService = AlbumCacheService;
