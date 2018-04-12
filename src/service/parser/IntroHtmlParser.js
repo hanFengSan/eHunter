@@ -11,8 +11,9 @@ class IntroHtmlParser {
             item.children[0].getAttribute('style').match(/width:(.*?)px; height:(.*?)px;/g);
             const thumbHeight = Number(RegExp.$2);
             const thumbWidth = Number(RegExp.$1);
+            let pageUrl = item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '';
             return {
-                pageUrl: item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '',
+                pageUrl: process.env.NODE_ENV !== 'testing' ? pageUrl : 'https://e-hentai.org' + pageUrl,
                 src: '',
                 thumbHeight,
                 thumbWidth,

@@ -12,5 +12,5 @@ testsContext.keys().forEach(testsContext);
 // you want coverage for.
 // const srcContext = require.context('../../src', true, /\.(js|vue)$/);
 // const srcContext = require.context('../../src', true, /CircleIconButton\.(js|vue)$/);
-const srcContext = require.context('../../src', true, /AlbumService\.(js|vue)$/);
+const srcContext = require.context('../../src', true, /.+\.(js|vue)$/);
 srcContext.keys().forEach(srcContext);

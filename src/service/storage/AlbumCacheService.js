@@ -28,7 +28,7 @@ storage
         |-heightOfWidth // the ratio of height / width
  */
 
-class AlbumCacheService {
+export class AlbumCacheService {
     constructor() {
         this.version = '2.0';
         this.storageName = 'AlbumCache';

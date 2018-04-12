@@ -62,7 +62,7 @@ export class AlbumService {
     }
 
     async getImgInfo(index) {
-        return await this.getImgInfos()[index];
+        return (await this.getImgInfos())[index];
     }
 
     getImgSrc(index, mode) {

@@ -14,7 +14,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': '"testing"'
+      'process.env.NODE_ENV': '"testing"'
     })
   ]
 });

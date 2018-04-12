@@ -11,7 +11,7 @@ class ImgHtmlParser {
     }
 
     getTitle() {
-        return this.document.getElementsByTagName('h1')[0].textContent;
+        return this.html.querySelector('h1').textContent;
     }
 
     getCurPageNum() {
@@ -31,12 +31,13 @@ class ImgHtmlParser {
     }
 
     getIntroUrl() {
-        return this.document.getElementsByClassName('sb')[0].children[0].getAttribute('href')
-            .replace(/^.*?org/g, '').replace(/\?p=.*?$/g, '');
+        let url = this.html.querySelectorAll('.sb')[0].children[0].getAttribute('href')
+        .replace(/^.*?org/g, '').replace(/\?p=.*?$/g, '');
+        return process.env.NODE_ENV !== 'testing' ? url : 'https://e-hentai.org' + url;
     }
 
     getAlbumId() {
-        return this.getIntroUrl().split('/')[2];
+        return this.getIntroUrl().match(/(?<=g\/)\d+(?=\/)/)[0];
     }
 
     getImgId() {

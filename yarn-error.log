@@ -2,7 +2,7 @@ Arguments:
   /usr/local/Cellar/node/9.10.1/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js run test
 
 PATH: 
-  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+  /usr/local/Cellar/mysql/5.7.21/bin:/Users/mac/bin:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 Yarn version: 
   1.5.1
