@@ -15,10 +15,16 @@ module.exports = merge(baseWebpackConfig, {
             filename: 'popup.html',
             template: 'src/index.popup.html',
             inject: true,
-            excludeChunks: ['inject']
+            chunks: ['popup']
         }),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"development"'
+        }),
+        new webpack.BannerPlugin({
+            banner: require(resolve('src/manifest')).tampermonkey,
+            raw: true,
+            entryOnly: true,
+            include: /inject\.js/
         })
     ]
 })

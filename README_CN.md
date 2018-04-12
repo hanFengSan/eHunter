@@ -19,7 +19,7 @@ Firefox版本: [地址](https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/)
 1. `npm install`后, 再`npm run dev`就可以进入dev模式了(当然,我个人喜好用yarn).
 2. 在`chrome://extensions`页面顶部打开开发者模式, 选择项目的`/dist`文件夹就OK了.
 3. `npm run publish`可以直接生成chrome&firefox用的zip压缩文件到`publish_output`文件夹.
-4. 油猴的话, 直接把`npm run publish`后, `/dist/inject.js`的内容顶部加上油猴需要的相关注释信息就可以了.
+4. 油猴的话, `npm run build`后, `/dist/inject.js`就是目标文件.
 5. 运行`npm run test`执行单元测试.
 
 

@@ -21,7 +21,7 @@ You also can get it from the 'release' of this project.
 1. In a Node environment, run `npm install`, and `npm run dev`, then you will in dev mode.
 2. In the top of `chrome://extensions`, open the develop mode, and select the `/dist`.
 3. Run `npm run publish` to package a zip file in `/publish_output` for the web store of Chrome and Firefox.
-4. Tampermonkey: run `npm run publish`, add some required comments in the top of `/dist/inject.js`.
+4. Tampermonkey: run `npm run build`, and the `/dist/inject.js` is target, just use it.
 5. Run `npm run test` to test.
 
 ## Structure

@@ -81,12 +81,6 @@ module.exports = {
         new CopyWebpackPlugin([
             { from: resolve('src/assets/img'), to: resolve('dist/img') }
         ]),
-        new GenerateJsonPlugin('manifest.json', require(resolve('src/manifest')).chrome),
-        new webpack.BannerPlugin({
-            banner:  require(resolve('src/manifest')).tampermonkey,
-            raw: true,
-            entryOnly: true,
-            include: /inject\.js/
-        })
+        new GenerateJsonPlugin('manifest.json', require(resolve('src/manifest')).chrome)
     ]
 }
