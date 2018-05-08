@@ -37,7 +37,7 @@ class ImgHtmlParser {
     }
 
     getAlbumId() {
-        return this.getIntroUrl().match(/(?<=g\/)\d+(?=\/)/)[0];
+        return this.getIntroUrl().match(/g\/\d+(?=\/)/)[0].replace('g/', '');
     }
 
     getImgId() {
