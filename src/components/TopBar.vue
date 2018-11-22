@@ -92,6 +92,14 @@
                     <drop-option :list="langList" @change="(val) => dropOptionChange('lang', val)" :cur-val="string.lang"></drop-option>
                 </div>
                 <div class="item icon-margin">
+                    <a class="label icon tips tips-down clickable" :title-content="string.resetTip" @click="resetCache">
+                        <svg class="reset" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="item icon-margin">
                     <a class="label icon tips tips-down clickable" :title-content="string.infoTip" @click="showInfoDialog">
                         <svg class="info" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0 0h24v24H0z" fill="none"/>
@@ -314,6 +322,11 @@ export default {
 
         showInfoDialog() {
             InfoService.showInstruction();
+        },
+
+        resetCache() {
+            localStorage.clear();
+            window.location.reload();
         }
     }
 };
@@ -366,6 +379,10 @@ div {
                         fill: white;
                         height: 18px;
                         width: 18px;
+                        &.reset {
+                            height: 18px;
+                            width: 18px;
+                        }
                         &.info {
                             height: 20px;
                             width: 20px;

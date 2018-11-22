@@ -57,17 +57,11 @@ export class AlbumCacheService {
     }
 
     _initStorage() {
-        storage.sync[this.storageName] = (params) => {
-            let { resolve } = params;
-            resolve({
-                title: '',
-                thumbs: [],
-                imgInfos: []
-            });
-        };
         storage.sync[this.storageVersionName] = (params) => {
             let { resolve } = params;
-            return resolve(this.version);
+            if (resolve) {
+                return resolve(this.version);
+            }
         };
     }
 
@@ -75,14 +69,22 @@ export class AlbumCacheService {
         if (this._album) {
             return this._album;
         } else {
-            this._album = await storage.load({ key: this.storageName, id: albumId });
+            try {
+                this._album = await storage.load({ key: this.storageName, id: albumId });
+            } catch (e) {
+                this._album = {
+                    title: '',
+                    thumbs: [],
+                    imgInfos: []
+                };
+            }
             return this._album;
         }
     }
 
     async _saveAlbum(albumId) {
         // L.o('save', this._album);
-        await storage.save({ key: this.storageName, id: albumId, data: await this._getAlbum(albumId) });
+        await storage.save({ key: this.storageName, id: albumId, data: await this._getAlbum(albumId), expires: 1000 * 60 * 60 });
     }
 
     async getThumbs(albumId, introUrl, sumOfPage) {

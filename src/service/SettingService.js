@@ -55,11 +55,15 @@ class SettingService {
     _initStorage() {
         storage.sync[this.storageName] = (params) => {
             let { resolve } = params;
-            resolve(this._getDefaultSettings());
+            if (resolve) {
+                resolve(this._getDefaultSettings());
+            }
         };
         storage.sync[this.storageVersionName] = (params) => {
             let { resolve } = params;
-            return resolve(this.version);
+            if (resolve) {
+                return resolve(this.version);
+            }
         };
     }
 

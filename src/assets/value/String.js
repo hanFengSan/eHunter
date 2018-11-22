@@ -219,6 +219,11 @@ export default {
         en: 'Look the Instructions and About',
         jp: '指示と情報を見てください'
     },
+    resetTip: {
+        cn: '重置缓存和数据',
+        en: 'Reset cache and data',
+        jp: 'Reset cache and data'
+    },
     githubTip: {
         cn: '前往项目主页(Github)',
         en: 'Go to the project home page(Github)',
