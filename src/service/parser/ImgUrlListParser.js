@@ -7,7 +7,6 @@ class ImgUrlListParser {
         this.introUrl = introUrl;
         this.introHtmls = {};
         this.FirstPage = {};
-        this.ThumbSumPerPage = 40;
         this.sumOfIntroPage = this._getSumOfIntroPage(sumOfImgPage);
         this.introPageUrls = this._getIntroPageUrls();
     }
@@ -44,7 +43,7 @@ class ImgUrlListParser {
             .request()
             .then(map => {
                 let result = this.introPageUrls.reduce((imgUrls, introUrl) => {
-                    imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl)).getImgUrls());
+                    imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl), introUrl).getImgUrls());
                     return imgUrls;
                 }, []);
                 if (result.length !== 0) {

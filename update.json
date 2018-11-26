@@ -1,10 +1,10 @@
 {
     "cn":{
-        "title":"新版本: v2.2.3",
-        "version":"2.2.3",
-        "text":"修复bug",
-        "time":1525919615890,
-        "duration":86400000,
+        "title":"新版本: v2.2.4",
+        "version":"2.2.4",
+        "text":"支持更多缩略图",
+        "time":1543319008235,
+        "duration":604800000,
         "always":true,
         "operations":[
             {
@@ -26,11 +26,11 @@
         ]
     },
     "en":{
-        "title":"New version: v2.2.3",
+        "title":"New version: v2.2.4",
         "version":"2.2.3",
-        "text":"Fix bugs",
-        "time":1525919615890,
-        "duration":86400000,
+        "text":"Support more thumbs",
+        "time":1543319008235,
+        "duration":604800000,
         "always":true,
         "operations":[
             {
@@ -52,11 +52,11 @@
         ]
     },
     "jp":{
-        "title":"新しいバージョン: v2.2.3",
+        "title":"新しいバージョン: v2.2.4",
         "version":"2.2.3",
-        "text":"Fix bugs",
-        "time":1525919615890,
-        "duration":86400000,
+        "text":"Support more thumbs",
+        "time":1543319008235,
+        "duration":604800000,
         "always":true,
         "operations":[
             {

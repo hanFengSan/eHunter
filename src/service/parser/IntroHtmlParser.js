@@ -1,25 +1,30 @@
 // a parser for album's intro page
 class IntroHtmlParser {
-    constructor(html) {
+    constructor(html, reqUrl) {
         this.html = document.createElement('html');
+        this.reqUrl = reqUrl; // the request url. It's maybe different with introUrl in more thumbs mode
         this.html.innerHTML = html.replace(/src=/g, 'x-src='); // avoid load assets
         this.document = this.html.ownerDocument;
     }
 
     getImgUrls() {
-        return Array.prototype.slice.call(this.html.getElementsByClassName('gdtm'), 0).map(item => {
-            item.children[0].getAttribute('style').match(/width:(.*?)px; height:(.*?)px;/g);
-            const thumbHeight = Number(RegExp.$2);
-            const thumbWidth = Number(RegExp.$1);
-            let pageUrl = item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '';
-            return {
-                pageUrl: process.env.NODE_ENV !== 'testing' ? pageUrl : 'https://e-hentai.org' + pageUrl,
-                src: '',
-                thumbHeight,
-                thumbWidth,
-                heightOfWidth: thumbHeight / thumbWidth
-            };
-        })
+        if (this._isValidIntroPage()) {
+            return Array.prototype.slice.call(this.html.getElementsByClassName('gdtm'), 0).map(item => {
+                item.children[0].getAttribute('style').match(/width:(.*?)px; height:(.*?)px;/g);
+                const thumbHeight = Number(RegExp.$2);
+                const thumbWidth = Number(RegExp.$1);
+                let pageUrl = item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '';
+                return {
+                    pageUrl: process.env.NODE_ENV !== 'testing' ? pageUrl : 'https://e-hentai.org' + pageUrl,
+                    src: '',
+                    thumbHeight,
+                    thumbWidth,
+                    heightOfWidth: thumbHeight / thumbWidth
+                };
+            })
+        } else {
+            return [];
+        }
     }
 
     getThumbObjList(sumOfPage, albumId) {
@@ -55,6 +60,23 @@ class IntroHtmlParser {
             }
         }
         return imgList;
+    }
+
+    _getTruePageIndex() {
+        return Number(this.html.getElementsByClassName('ptds')[0].textContent) - 1;
+    }
+
+    _isValidIntroPage() {
+        // In more thumbs mode, it will have many repeated intro page requests because the error of count of intro pages.
+        // For the speed first, I don't fix the bug of the error, but discard the repeated intro page requests by validate
+        // index.
+        if (this.reqUrl && this.reqUrl.includes('?p=')) {
+            let reqIndex = Number(this.reqUrl.match(/\?p=[0-9]+/g)[0].replace('?p=', ''));
+            if (this._getTruePageIndex() !== reqIndex) {
+                return false;
+            }
+        }
+        return true;
     }
 
     _computeThumbList(imgList, sumOfPage) {
