@@ -1,14 +1,11 @@
 export default {
     cn: `
-可使用键盘的左右键翻页
-![image-keyboard_arrow](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/keyboard_arrow.jpg)
+支持\`A\`. \`D\`, \`Left(左)\`, \`Right(右)\`和\`Space(空格)\`键翻页.
 `,
     en: `
-You can use the keyboard's left and right keys to page
-![image-keyboard_arrow](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/keyboard_arrow.jpg)    
+You can use the keyboard's \`A\`, \`D\`, \`Left\`, \`Right\` and \`Space\` keys to page.
 `,
     jp: `
-キーボードの左右のキーを使用してページングすることができます
-![image-keyboard_arrow](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/keyboard_arrow.jpg)    
+You can use the keyboard's \`A\`, \`D\`, \`Left\`, \`Right\` and \`Space\` keys to page.
 `
 }

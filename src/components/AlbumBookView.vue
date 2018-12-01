@@ -193,13 +193,19 @@ export default {
         },
 
         watchKeyboard(e) {
+            if (e.metaKey || e.ctrlKey) {
+                return;
+            }
             switch (e.key) {
                 case 'ArrowLeft':
+                case 'a':
                     if (this.bookIndex > 0) {
                         this.setBookIndex(this.bookIndex - 1);
                     }
                     break;
                 case 'ArrowRight':
+                case 'd':
+                case ' ':
                     if (this.bookIndex < this.screens.length - 1) {
                         this.setBookIndex(this.bookIndex + 1);
                     }

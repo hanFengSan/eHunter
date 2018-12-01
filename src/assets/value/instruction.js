@@ -11,12 +11,13 @@ export default {
 2.在页面右上角点击打开eHunter
 ![image-open_ehunter](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/open_ehunter.jpg)
 
-3.在\`阅读模式\`为\`书本\`时, 可使用键盘的左右键翻页
-![image-keyboard_arrow](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/keyboard_arrow.jpg)
+3.\`滚动\`模式下, 支持\`A\`. \`D\`, \`Left(左)\`和\`Right(右)\`键翻页. 
 
-4.\`分卷页数\`对性能要求较高,请不要设置过高,可能会导致卡顿.
+4.\`书页\`模式下, 支持\`A\`. \`D\`, \`Left(左)\`, \`Right(右)\`和\`Space(空格)\`键翻页.
 
-5.在前页采用\`Normal\`模式查看缩略图可加速加载, 使用\`Large\`模式会慢一些.
+5.\`分卷页数\`对性能要求较高,请不要设置过高,可能会导致卡顿.
+
+6.在前页采用\`Normal\`模式查看缩略图可加速加载, 使用\`Large\`模式会慢一些.
 
 ### 反馈和建议
 * 可在[Github](https://github.com/hanFengSan/eHunter)上开issue给我.
@@ -39,12 +40,13 @@ export default {
 2.Click the button at the upper right corner of this page to open the eHunter
 ![image-open_ehunter](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/open_ehunter.jpg)
 
-3.When the \`Mode\` is \`Book\`, you can use the keyboard's left and right keys to page
-![image-keyboard_arrow](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/keyboard_arrow.jpg)
+3.When the \`Mode\` is \`Scroll\`, you can use the keyboard's \`A\`, \`D\`, \`Left\` and \`Right\` keys to page.
 
-4.This is a high performance requirements on \`Volume size\`. If too big, the program will be slow.
+4.When the \`Mode\` is \`Book\`, you can use the keyboard's \`A\`, \`D\`, \`Left\`, \`Right\` and \`Space\` keys to page.
 
-5.You can use \`Normal\` mode of thumbnail in previous page to accelerate the load. If it's \`Large\` mode, the loading will be slow a bit.
+5.This is a high performance requirements on \`Volume size\`. If too big, the program will be slow.
+
+6.You can use \`Normal\` mode of thumbnail in previous page to accelerate the load. If it's \`Large\` mode, the loading will be slow a bit.
 
 ### Feedback & Suggestion
 * Open issue on [Github](https://github.com/hanFengSan/eHunter) to me.
@@ -67,12 +69,13 @@ If you like this extension, I hope you can give a five-star rating in store. 8-)
 2.このページの右上隅にあるボタンをクリックしてeHunterを開きます
 ![image-open_ehunter](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/open_ehunter.jpg)
 
-3.\`モード\`が\`スクロール\`のときは、キーボードの左右のキーを使用してページングすることができます
-![image-keyboard_arrow](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/keyboard_arrow.jpg)
+3.When the \`Mode\` is \`Scroll\`, you can use the keyboard's \`A\`, \`D\`, \`Left\` and \`Right\` keys to page.
 
-4.これは\`ボリュームサイズ\`の高性能要件です。 大きすぎるとプログラムが遅くなります。
+4.When the \`Mode\` is \`Book\`, you can use the keyboard's \`A\`, \`D\`, \`Left\`, \`Right\` and \`Space\` keys to page.
 
-5.前のページのサムネイルの「Normal」モードを使用して負荷を高速化することができます。「Large」モードの場合は、読み込みが少し遅くなります。
+5.これは\`ボリュームサイズ\`の高性能要件です。 大きすぎるとプログラムが遅くなります。
+
+6.前のページのサムネイルの「Normal」モードを使用して負荷を高速化することができます。「Large」モードの場合は、読み込みが少し遅くなります。
 
 ### フィードバックと提案
 * 私にGITHUBのオープンな問題

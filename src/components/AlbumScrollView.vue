@@ -70,6 +70,11 @@ export default {
 
     created() {
         setTimeout(() => this.setIndex({ val: this.curIndex.val, updater: tags.SCROLL_VIEW_VOL }), 1000);
+        document.addEventListener('keydown', this.watchKeyboard);
+    },
+
+    destroyed() {
+        document.removeEventListener('keydown', this.watchKeyboard);
     },
 
     computed: {
@@ -212,6 +217,26 @@ export default {
         async changeTopBar(val) {
             if (await SettingService.getShowTopBar()) {
                 this.toggleTopBar(val);
+            }
+        },
+
+        watchKeyboard(e) {
+            if (e.metaKey || e.ctrlKey) {
+                return;
+            }
+            switch (e.key) {
+                case 'ArrowLeft':
+                case 'a':
+                    if (this.centerIndex.val !== 0) {
+                        this.setIndex({ val: this.centerIndex.val - 1, updater: tags.KEYBOARD });
+                    }
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    if (this.centerIndex.val !== AlbumService.getPageCount()) {
+                        this.setIndex({ val: this.centerIndex.val + 1, updater: tags.KEYBOARD });
+                    }
+                    break;
             }
         }
     }

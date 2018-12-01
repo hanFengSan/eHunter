@@ -1,12 +1,14 @@
 export default {
     cn: `
-* 支持更多缩略图, 比如10rows/40rows
-
+* 滚动模式下, 支持\`A\`和\`D\`键翻页.
+* 书页模式下, 支持\`A\`键. \`D\`以及\`Space(空格)\`键翻页.
 `,
     en: `
-* Support more thumbs, such as \`10rows\`, \`40rows\`.
+* Support the keyboard's \`A\` and \`D\` keys to page in Scroll mode.
+* Support the keyboard's \`A\`, \`D\` and \`Space\` keys to page in Book mode.
 `,
     jp: `
-* Support more thumbs, such as \`10rows\`, \`40rows\`.
+* Support the keyboard's \`A\` and \`D\` keys to page in Scroll mode.
+* Support the keyboard's \`A\`, \`D\` and \`Space\` keys to page in Book mode.
 `
 }

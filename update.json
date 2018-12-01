@@ -1,9 +1,9 @@
 {
     "cn":{
-        "title":"新版本: v2.2.4",
-        "version":"2.2.4",
-        "text":"支持更多缩略图",
-        "time":1543319008235,
+        "title":"新版本: v2.3.0",
+        "version":"2.3.0",
+        "text":"支持更多快捷键",
+        "time":1543726902266,
         "duration":604800000,
         "always":true,
         "operations":[
@@ -26,10 +26,10 @@
         ]
     },
     "en":{
-        "title":"New version: v2.2.4",
-        "version":"2.2.3",
-        "text":"Support more thumbs",
-        "time":1543319008235,
+        "title":"New version: v3.3.0",
+        "version":"2.3.0",
+        "text":"Support more shortcuts",
+        "time":1543726902266,
         "duration":604800000,
         "always":true,
         "operations":[
@@ -52,10 +52,10 @@
         ]
     },
     "jp":{
-        "title":"新しいバージョン: v2.2.4",
-        "version":"2.2.3",
-        "text":"Support more thumbs",
-        "time":1543319008235,
+        "title":"新しいバージョン: v2.3.0",
+        "version":"2.3.0",
+        "text":"Support more shortcuts",
+        "time":1543726902266,
         "duration":604800000,
         "always":true,
         "operations":[
