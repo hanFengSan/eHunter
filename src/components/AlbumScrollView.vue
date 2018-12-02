@@ -114,12 +114,13 @@ export default {
 
     watch: {
         centerIndex: {
-            handler: function(val, oldVal) {
+            handler: async function(val, oldVal) {
                 if (this.curIndex.updater !== tags.SCROLL_VIEW && this.$refs.pageContainers) {
                     // sync index
                     if (this.curIndex.val === this.volFirstIndex) {
                         this.$refs.scrollView.ScrollTo(0, 1000);
                     } else {
+                        await this.$nextTick();
                         this.$refs.scrollView.ScrollTo(
                             this.$refs.pageContainers[this.volIndex(this.curIndex.val)].offsetTop - 100,
                             1000
@@ -233,7 +234,7 @@ export default {
                     break;
                 case 'ArrowRight':
                 case 'd':
-                    if (this.centerIndex.val !== AlbumService.getPageCount()) {
+                    if (this.centerIndex.val !== AlbumService.getPageCount() - 1) {
                         this.setIndex({ val: this.centerIndex.val + 1, updater: tags.KEYBOARD });
                     }
                     break;
