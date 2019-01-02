@@ -234,7 +234,7 @@ $general_animtation_time: 0.2s;
 }
 
 body {
-    font-family: 'San Francisco', Arial, 'Hiragino Sans GB', 'Heiti SC', 'Microsoft YaHei', 'Droid Sans',
+    font-family: 'San Francisco', Arial, 'Hiragino Sans GB', 'Heiti SC', 'Microsoft YaHei', "微软雅黑", 'Droid Sans',
         'WenQuanYi Micro Hei', sans-serif;
 }
 </style>
