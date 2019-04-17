@@ -2,7 +2,7 @@
 import 'babel-polyfill';
 import Vue from 'vue'
 import VueResource from 'vue-resource'
-import App from './app.inject.vue'
+import App from '../core'
 import store from './store/index.inject'
 import VueUtil from './utils/VueUtil.js'
 import SettingService from './service/SettingService';
@@ -93,7 +93,7 @@ function createVueView() {
         .length > 0) {
         const app = new Vue({
                 store,
-                render: (h) => h(App)
+                render: (h) => h(App())
             })
             .$mount('#app');
     }

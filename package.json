@@ -1,6 +1,6 @@
 {
   "name": "ehunter",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "A Vue.js project",
   "author": "Alex Chen <c360785655@gmail.com>",
   "private": true,
@@ -108,9 +108,5 @@
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-server": "^2.9.1",
     "webpack-merge": "^4.1.2"
-  },
-  "engines": {
-    "node": ">= 4.0.0",
-    "npm": ">= 3.0.0"
   }
 }
