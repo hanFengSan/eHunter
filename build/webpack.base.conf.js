@@ -36,6 +36,7 @@ module.exports = {
                 include: [
                     resolve('node_modules/react-native-storage'),
                     resolve('src'),
+                    resolve('core'),
                     resolve('test')
                 ]
             },

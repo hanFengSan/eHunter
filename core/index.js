@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars,no-undef,indent */
-import 'babel-polyfill';
+import "@babel/polyfill";
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 import App from './app.vue'

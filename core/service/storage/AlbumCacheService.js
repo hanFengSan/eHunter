@@ -12,7 +12,6 @@ import store from '../../store/index.inject'
 import * as tags from '../../assets/value/tags'
 import AlbumService from '../AlbumService'
 import Utils from '../../utils/Utils'
-import Logger from '../../utils/Logger'
 
 /*
 storage
