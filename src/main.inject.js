@@ -1,15 +1,7 @@
 /* eslint-disable no-unused-vars,no-undef,indent */
-import 'babel-polyfill';
-import Vue from 'vue'
 import VueResource from 'vue-resource'
-import App from '../core'
-import store from '../core/store/index.inject'
-import VueUtil from './utils/VueUtil.js'
-import SettingService from '../core/service/SettingService';
+import core from '../core'
 import { setTimeout } from 'timers';
-
-Vue.use(VueResource);
-Vue.mixin(VueUtil);
 
 function isAlbumViewPage() {
     return document.location.pathname.includes('/s/');
@@ -57,7 +49,7 @@ function openEhunter() {
     window.setTimeout(() => {
         element.style.top = '-150px';
     }, 2000);
-    SettingService.toggleEHunter(true);
+    core.SettingService.toggleEHunter(true);
     window.setTimeout(() => {
         eHunter.toggleEHunterView(true);
     }, 300);
@@ -88,17 +80,6 @@ function createEHunterView() {
     }, 0);
 }
 
-function createVueView() {
-    if (document.getElementsByClassName('vue-container')
-        .length > 0) {
-        const app = new Vue({
-                store,
-                render: (h) => h(App)
-            })
-            .$mount('#app');
-    }
-}
-
 // some actions of eh will make some wired errors
 function blockEhActions() {
     var elt = document.createElement('script');
@@ -127,7 +108,7 @@ function blockEhActions() {
 async function init() {
     if (isAlbumViewPage()) {
         createEhunterSwitch();
-        if (await SettingService.getEHunterStatus()) {
+        if (await core.SettingService.getEHunterStatus()) {
             eHunter.toggleEHunterView(true);
         }
     }
@@ -142,8 +123,7 @@ let eHunter = {
         } else {
             blockEhActions();
             createEHunterView();
-            createVueView();
-            SettingService.initSettings();
+            core.createAppView('vue-container', '#app');
         }
     }
 }
