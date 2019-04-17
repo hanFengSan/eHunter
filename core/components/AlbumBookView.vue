@@ -13,7 +13,7 @@
                 v-if="page.type===tags.TYPE_NORMAL"
                 :index="index(0, page.imgInfo.pageUrl)"
                 :active="true"
-                :album-id="AlbumService.getAlbumId()"
+                :album-id="service.album.getAlbumId()"
                 :data="page.imgInfo">
             </page-view>
             <div class="page start-page" v-if="page.type===tags.TYPE_START">
@@ -21,7 +21,7 @@
                     EHUNTER
                 </div>
                 <h1>
-                    {{ AlbumService.getTitle() }}
+                    {{ service.album.getTitle() }}
                 </h1>
             </div>
             <div class="page end-page" v-if="page.type===tags.TYPE_END">
@@ -42,7 +42,6 @@
 import { mapGetters, mapActions } from 'vuex';
 import PageView from './PageView.vue';
 import Pagination from './widget/Pagination.vue';
-import AlbumService from '../service/AlbumService.js';
 import * as tags from '../assets/value/tags';
 import SettingService from '../service/SettingService';
 import InfoService from '../service/InfoService';
@@ -59,6 +58,8 @@ export default {
             type: Object
         }
     },
+
+    inject: ['service'],
 
     components: { PageView, Pagination },
 
@@ -91,7 +92,6 @@ export default {
             bookDirection: 'bookDirection',
             showBookPagination: 'showBookPagination'
         }),
-        AlbumService: () => AlbumService,
         tags: () => tags,
         screenSize() {
             let height = this.appSize.height - (this.showTopBar ? this.topBarHeight : 0);
@@ -236,7 +236,7 @@ export default {
 
         async checkInstrcutions() {
             if (await SettingService.getFirstOpenBookMode()) {
-                InfoService.showBookInstruction();
+                InfoService.showBookInstruction(true);
                 SettingService.setFirstOpenBookMode(false);
             }
         },

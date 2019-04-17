@@ -134,6 +134,8 @@ import InfoService from '../service/InfoService';
 export default {
     name: 'TopBar',
 
+    inject: ['config'],
+    
     components: { DropOption, PopSlider, SimpleSwitch, CircleIconButton },
 
     data() {
@@ -266,7 +268,7 @@ export default {
                     break;
                 case 'lang':
                     await SettingService.setLang(this.langList[index].val);
-                    InfoService.showInstruction();
+                    InfoService.showInstruction(this.config);
                     break;
             }
         },
@@ -321,7 +323,7 @@ export default {
         },
 
         showInfoDialog() {
-            InfoService.showInstruction();
+            InfoService.showInstruction(this.config);
         },
 
         resetCache() {

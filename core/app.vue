@@ -18,6 +18,8 @@ import * as tags from './assets/value/tags';
 export default {
     name: 'InjectedApp',
 
+    inject: ['config'],
+
     components: {
         ThumbScrollView,
         ReaderView,
@@ -55,14 +57,14 @@ export default {
                     await SettingService.setLang(tags.LANG_JP);
                 }
                 // show instructions
-                InfoService.showInstruction(true);
-                SettingService.setFirstOpen(false);
+                InfoService.showInstruction(this.config, true);
+                setTimeout(() => SettingService.setFirstOpen(false), 2000);
             }
         },
 
         async checkVersion() {
-            InfoService.checkUpdate();
-            InfoService.checkNewVersion();
+            InfoService.checkUpdate(this.config);
+            InfoService.checkNewVersion(this.config);
         }
     }
 };

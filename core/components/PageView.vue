@@ -1,6 +1,6 @@
 <template>
 <section class="page-view">
-    <div class="layer preview-layer" :style="AlbumService.getPreviewThumbnailStyle(index, imgInfo, thumb)"></div>
+    <div class="layer preview-layer" :style="service.album.getPreviewThumbnailStyle(index, imgInfo, thumb)"></div>
     <div class="layer loading-layer">
         <h6 class="index">{{ index + 1 }}</h6>
         <article class="loading-info-panel" v-if="active">
@@ -63,7 +63,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import AlbumService from '../service/AlbumService.js';
 import FlatButton from './widget/FlatButton.vue';
 import Logger from '../utils/Logger.js';
 import * as tags from '../assets/value/tags';
@@ -86,6 +85,8 @@ export default {
         }
     },
 
+    inject: ['service'],
+    
     components: { FlatButton },
 
     data() {
@@ -105,12 +106,11 @@ export default {
         if (this.active) {
             this.getImgSrc();
         }
-        this.thumb = await AlbumService.getThumb(this.index);
+        this.thumb = await this.service.album.getThumb(this.index);
     },
 
     computed: {
         ...mapGetters(['string']),
-        AlbumService: () => AlbumService,
         tags: () => tags,
         loadingInfo() {
             let reloadInfo = this.reloadTimes ? `[${this.string.reload}-${this.reloadTimes}] ` : '';
@@ -144,7 +144,7 @@ export default {
         async getImgSrc() {
             // avoid redundant getImgSrc(), overlap refreshing of 'origin'
             if (this.curLoadStatus !== tags.STATE_LOADING) {
-                let src = await AlbumService.getImgSrc(this.index, tags.MODE_FAST);
+                let src = await this.service.album.getImgSrc(this.index, tags.MODE_FAST);
                 if (this.imgInfo.src !== src) {
                     this.imgInfo.src = src;
                 }
@@ -158,7 +158,7 @@ export default {
             this.message = '';
             this.imgInfo.src = '';
             this.curLoadStatus = tags.STATE_LOADING;
-            let src = await AlbumService.getNewImgSrc(this.index, mode);
+            let src = await this.service.album.getNewImgSrc(this.index, mode);
             if (!(src instanceof Error)) {
                 this.imgInfo.src = src;
             } else {

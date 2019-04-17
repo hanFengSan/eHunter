@@ -1,5 +1,3 @@
-import config from '../../config'
-
 export default {
     cn: `
 1.Change language/切换语言/言語を変更
@@ -20,13 +18,13 @@ export default {
 6.在前页采用\`Normal\`模式查看缩略图可加速加载, 使用\`Large\`模式会慢一些.
 
 ### 反馈和建议
-* 可在[Github](https://github.com/hanFengSan/eHunter)上开issue给我.
+* 可在[Github]($$HOME_PAGE$$)上开issue给我.
 * 可发邮件到我邮箱: c360785655@gmail.com
 
 ### 关于
-* 版本: ${config.version}
+* 版本: $$VERSION$$
 * 作者: Alex Chen (hanFeng)
-* 项目开源地址: [Github](https://github.com/hanFengSan/eHunter)
+* 项目开源地址: [Github]($$HOME_PAGE$$)
 
 如果你喜欢此插件的话,希望能在应用商店上给个好评 8-)
 `,
@@ -49,13 +47,13 @@ export default {
 6.You can use \`Normal\` mode of thumbnail in previous page to accelerate the load. If it's \`Large\` mode, the loading will be slow a bit.
 
 ### Feedback & Suggestion
-* Open issue on [Github](https://github.com/hanFengSan/eHunter) to me.
+* Open issue on [Github]($$HOME_PAGE$$) to me.
 * Send email to c360785655@gmail.com
 
 ### About
-* Version: ${config.version}
+* Version: $$VERSION$$
 * Author: Alex Chen (hanFeng)
-* Home page of this project: [Github](https://github.com/hanFengSan/eHunter)
+* Home page of this project: [Github]($$HOME_PAGE$$)
 
 If you like this extension, I hope you can give a five-star rating in store. 8-)
 `,
@@ -78,13 +76,13 @@ If you like this extension, I hope you can give a five-star rating in store. 8-)
 6.前のページのサムネイルの「Normal」モードを使用して負荷を高速化することができます。「Large」モードの場合は、読み込みが少し遅くなります。
 
 ### フィードバックと提案
-* 私にGITHUBのオープンな問題
+* 私にGITHUBのオープンな問題 [Github]($$HOME_PAGE$$)
 * c360785655@gmail.comにメールを送信する
 
 ### 〜について
-* バージョン: ${config.version}
+* バージョン: $$VERSION$$
 * 著者: Alex Chen (hanFeng)
-* このプロジェクトのホームページ: [Github](https://github.com/hanFengSan/eHunter)
+* このプロジェクトのホームページ: [Github]($$HOME_PAGE$$)
 
 この拡張機能が気に入ったら、お店で5つ星の評価をつけてください。 8-)
 `

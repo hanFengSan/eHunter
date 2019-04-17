@@ -1,7 +1,7 @@
 <template>
 <div class="reader-view">
     <!-- loading view -->
-    <div class="loading-container" v-if="isloadingImgInfos">
+    <div class="loading-container" v-if="isLoadingImgInfos">
         <span class="loading">Loading...</span>
         <p class="tip">
             {{ string .loadingTip }}
@@ -20,10 +20,10 @@
         </div>
     </div>
     <transition name="slow-horizontal-fade">
-        <album-scroll-view class="content scroll-mode" v-if="!isloadingImgInfos&&readingMode===0" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
+        <album-scroll-view class="content scroll-mode" v-if="!isLoadingImgInfos&&readingMode===0" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
     </transition>
     <transition name="slow-vertical-fade">
-        <album-book-view class="content book-mode" v-if="!isloadingImgInfos&&readingMode===1" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
+        <album-book-view class="content book-mode" v-if="!isLoadingImgInfos&&readingMode===1" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
     </transition>
 </div>
 </template>
@@ -32,8 +32,6 @@
 import { mapGetters, mapActions } from 'vuex';
 import AlbumScrollView from './AlbumScrollView.vue';
 import TopBar from './TopBar.vue';
-import ImgHtmlParser from '../service/parser/ImgHtmlParser.js';
-import AlbumService from '../service/AlbumService';
 import AlbumBookView from './AlbumBookView.vue';
 import * as tags from '../assets/value/tags';
 // import Logger from '../utils/Logger';
@@ -41,11 +39,12 @@ import * as tags from '../assets/value/tags';
 export default {
     name: 'reader-view',
 
+    inject: ['service'],
+
     components: { AlbumScrollView, AlbumBookView, TopBar },
 
     data() {
         return {
-            parser: new ImgHtmlParser(document.documentElement.innerHTML),
             imgInfoList: [],
             pageUrlsObj: {} // hash, for fast get page index by pagUrl
         };
@@ -53,7 +52,7 @@ export default {
 
     async created() {
         await this.initImgInfoList();
-        this.setIndex({ val: AlbumService.getCurPageNum() - 1, updater: tags.READER_VIEW });
+        this.setIndex({ val: this.service.album.getCurPageNum() - 1, updater: tags.READER_VIEW });
     },
 
     computed: {
@@ -64,17 +63,16 @@ export default {
             bookScreenSize: 'bookScreenSize',
             string: 'string'
         }),
-        isloadingImgInfos() {
+        isLoadingImgInfos() {
             return this.imgInfoList.length === 0;
         },
-        AlbumService: () => AlbumService,
         location() {
             switch (this.readingMode) {
                 case 0:
-                    return `${this.curIndex.val + 1} / ${AlbumService.getPageCount()}`;
+                    return `${this.curIndex.val + 1} / ${this.service.album.getPageCount()}`;
                 case 1:
                     return `${this.bookIndex + 1} / 
-                    ${AlbumService.getBookScreenCount(this.bookScreenSize)}`;
+                    ${this.service.album.getBookScreenCount(this.bookScreenSize)}`;
             }
         }
     },
@@ -82,7 +80,7 @@ export default {
     methods: {
         ...mapActions(['setIndex']),
         async initImgInfoList() {
-            this.imgInfoList = await AlbumService.getImgInfos();
+            this.imgInfoList = await this.service.album.getImgInfos();
             // init pageUrlsObj
             for (let i = 0; i < this.imgInfoList.length; i++) {
                 this.pageUrlsObj[this.imgInfoList[i].pageUrl] = i;

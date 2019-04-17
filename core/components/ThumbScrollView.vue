@@ -17,7 +17,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import AlbumService from '../service/AlbumService.js';
 import AwesomeScrollView from './base/AwesomeScrollView.vue';
 import * as tags from '../assets/value/tags';
 // import Logger from '../utils/Logger';
@@ -25,6 +24,8 @@ import * as tags from '../assets/value/tags';
 export default {
     name: 'ThumbScrollView',
 
+    inject: ['service'],
+    
     data() {
         return {
             info: window.info,
@@ -54,9 +55,8 @@ export default {
             return (this.thumbs || []).slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
         },
 
-        AlbumService: () => AlbumService,
         curIndex() {
-            return AlbumService.getRealCurIndex(this.centerIndex)
+            return this.service.album.getRealCurIndex(this.centerIndex)
         }
     },
 
@@ -87,7 +87,7 @@ export default {
         },
 
         async initImgList() {
-            this.thumbs = await AlbumService.getThumbs();
+            this.thumbs = await this.service.album.getThumbs();
         },
 
         // get index of album for index of current volume

@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars,no-undef,indent */
 import VueResource from 'vue-resource'
 import core from '../core'
-import { setTimeout } from 'timers';
+import { setTimeout } from 'timers'
+import AlbumService from './service/AlbumService'
+import config from './config'
 
 function isAlbumViewPage() {
     return document.location.pathname.includes('/s/');
@@ -123,7 +125,11 @@ let eHunter = {
         } else {
             blockEhActions();
             createEHunterView();
-            core.createAppView('vue-container', '#app');
+            core.createAppView('vue-container', '#app',
+                core.launcher
+                .setAlbumService(AlbumService)
+                .setConfig(config)
+                .instance());
         }
     }
 }

@@ -1,7 +1,6 @@
 import storage from './storage/LocalStorage'
 import store from '../store/index.inject'
 import * as tags from '../assets/value/tags'
-import config from '../config'
 // import Logger from '../utils/Logger';
 
 class SettingService {
@@ -31,7 +30,7 @@ class SettingService {
             firstOpenBookMode: { val: true }, // show instructions dialog for the users of first opening the book mode
             showTopBar: { eventName: 'toggleTopBar', val: true },
             isNormalMode: { val: true },
-            version: { val: config.version } // for showing infos of update
+            version: { val: null } // for showing infos of update
         }
     }
 

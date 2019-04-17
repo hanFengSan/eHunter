@@ -3,21 +3,24 @@ import DialogBean from '../bean/DialogBean'
 import DialogOperation from '../bean/DialogOperation'
 import * as tags from '../assets/value/tags'
 import TextReqService from '../service/request/TextReqService'
-import config from '../config'
 import ServerMessage from '../bean/ServerMessage'
 import SettingService from '../service/SettingService'
 import Logger from '../utils/Logger'
+import Formatter from '../utils/formatter'
 
 class InfoService {
-    async showInstruction(isCompulsive) {
+    async showInstruction(config, isCompulsive) {
         let dialog = new DialogBean(
             isCompulsive ? tags.DIALOG_COMPULSIVE : tags.DIALOG_NORMAL,
             store.getters.string.instructionsAndAbouts,
-            store.getters.string.p_instruction,
+            Formatter.replaceKey(store.getters.string.p_instruction, {
+                HOME_PAGE: config.homePage,
+                VERSION: config.version
+            }),
             new DialogOperation(store.getters.string.confirm, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
                 return true;
             })
-        );
+        )
         store.dispatch('addDialog', dialog);
     }
 
@@ -33,7 +36,7 @@ class InfoService {
         store.dispatch('addDialog', dialog);
     }
 
-    async checkUpdate() {
+    async checkUpdate(config) {
         let message;
         let lastShowDialogTime = await SettingService.getUpdateTime();
         Promise
@@ -89,8 +92,9 @@ class InfoService {
         store.dispatch('addDialog', dialog);
     }
 
-    async checkNewVersion() {
-        if (await SettingService.getVersion() !== config.version) {
+    // if updated a new version, shows messages
+    async checkNewVersion(config) {
+        if (await SettingService.getVersion() !== config.version && !(await SettingService.getFirstOpen())) {
             let dialog = new DialogBean(
                 tags.DIALOG_COMPULSIVE,
                 `${store.getters.string.versionUpdate} v${config.version}`,
@@ -100,8 +104,8 @@ class InfoService {
                 })
             );
             store.dispatch('addDialog', dialog);
-            SettingService.setVersion(config.version);
         }
+        SettingService.setVersion(config.version);
     }
 }
 

@@ -11,7 +11,7 @@
         :on-scroll-stopped="onScrollStopped" 
         @topIn="changeTopBar(true)"
         @topLeave="changeTopBar(false)">
-        <h1>{{ AlbumService.getTitle() }}</h1>
+        <h1>{{ service.album.getTitle() }}</h1>
         <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
         <div 
             class="page-container" 
@@ -22,7 +22,7 @@
             <page-view
                 :index="index(i, imgInfo.pageUrl)"
                 :active="nearbyArray.indexOf(index(i)) > -1"
-                :album-id="AlbumService.getAlbumId()"
+                :album-id="service.album.getAlbumId()"
                 :data="imgInfo"
             ></page-view>
         </div>
@@ -38,7 +38,6 @@ import TopBar from './TopBar.vue';
 import Logger from '../utils/Logger.js';
 import Pagination from './widget/Pagination.vue';
 import PageView from './PageView.vue';
-import AlbumService from '../service/AlbumService';
 import SettingService from '../service/SettingService';
 import * as tags from '../assets/value/tags';
 
@@ -54,6 +53,8 @@ export default {
         }
     },
 
+    inject: ['service'],
+    
     data() {
         return {
             scrollTop: 0,
@@ -103,12 +104,11 @@ export default {
         },
 
         volumeSum() {
-            return Math.ceil(AlbumService.getPageCount() / this.volumeSize);
+            return Math.ceil(this.service.album.getPageCount() / this.volumeSize);
         },
 
-        AlbumService: () => AlbumService,
         curIndex() {
-            return AlbumService.getRealCurIndex(this.centerIndex)
+            return this.service.album.getRealCurIndex(this.centerIndex)
         }
     },
 
@@ -199,7 +199,7 @@ export default {
             if (this.preloadImgs.length === this.volumePreloadCount) {
                 this.preloadImgs = [];
             }
-            this.preloadImgs.push(await AlbumService.getImgSrc(index));
+            this.preloadImgs.push(await this.service.album.getImgSrc(index));
         },
 
         // preload next volume
@@ -207,7 +207,7 @@ export default {
             if (this.volumeSum > this.curVolume + 1) {
                 let volLastIndex = this.volFirstIndex + this.volumeSize - 1;
                 for (let i = 1; i <= this.volumePreloadCount; i++) {
-                    if (AlbumService.getPageCount() - 1 >= volLastIndex + i) {
+                    if (this.service.album.getPageCount() - 1 >= volLastIndex + i) {
                         this.preload(volLastIndex + i);
                     }
                 }
@@ -234,7 +234,7 @@ export default {
                     break;
                 case 'ArrowRight':
                 case 'd':
-                    if (this.centerIndex.val !== AlbumService.getPageCount() - 1) {
+                    if (this.centerIndex.val !== this.service.album.getPageCount() - 1) {
                         this.setIndex({ val: this.centerIndex.val + 1, updater: tags.KEYBOARD });
                     }
                     break;
