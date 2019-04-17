@@ -309,7 +309,7 @@ export default {
 
         closeEHunter() {
             SettingService.toggleEHunter(false);
-            eHunter.toggleEHunterView(false);
+            // eHunter.toggleEHunterView(false);
         },
 
         changeBookScreenAnimation(show) {

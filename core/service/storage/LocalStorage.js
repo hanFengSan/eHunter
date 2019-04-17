@@ -1,5 +1,5 @@
-import Storage from 'src/service/storage/base/Storage'
-import Platform from 'src/service/PlatformService'
+import Storage from './base/Storage'
+import Platform from '../PlatformService'
 
 var storage = new Storage({
     size: 10,

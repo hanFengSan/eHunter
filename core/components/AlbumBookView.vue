@@ -42,7 +42,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import PageView from './PageView.vue';
 import Pagination from './widget/Pagination.vue';
-import AlbumService from 'src/service/AlbumService.js';
+import AlbumService from '../service/AlbumService.js';
 import * as tags from '../assets/value/tags';
 import SettingService from '../service/SettingService';
 import InfoService from '../service/InfoService';

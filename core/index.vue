@@ -15,59 +15,57 @@ import SettingService from './service/SettingService';
 import InfoService from './service/InfoService';
 import * as tags from './assets/value/tags';
 
-export default function() {
-    return {
-        name: 'InjectedApp',
+export default {
+    name: 'InjectedApp',
 
-        components: {
-            ThumbScrollView,
-            ReaderView,
-            ModalManager
-        },
+    components: {
+        ThumbScrollView,
+        ReaderView,
+        ModalManager
+    },
 
-        data() {
-            return {};
-        },
+    data() {
+        return {};
+    },
 
-        async created() {
-            await this.checkInstrcutions();
-            this.checkVersion();
-        },
+    async created() {
+        await this.checkInstrcutions();
+        this.checkVersion();
+    },
 
-        computed: {
-            ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode']),
-            thumbStyle() {
-                if (this.readingMode === 0 && this.showThumbView) {
-                    return '';
-                } else {
-                    return { 'margin-left': this.px(-this.thumbWidth) };
-                }
-            }
-        },
-
-        methods: {
-            async checkInstrcutions() {
-                if (await SettingService.getFirstOpen()) {
-                    // auto choose language
-                    let lang = navigator.language.toLowerCase();
-                    if (lang.includes('zh')) {
-                        await SettingService.setLang(tags.LANG_CN);
-                    } else if (lang.includes('jp')) {
-                        await SettingService.setLang(tags.LANG_JP);
-                    }
-                    // show instructions
-                    InfoService.showInstruction(true);
-                    SettingService.setFirstOpen(false);
-                }
-            },
-
-            async checkVersion() {
-                InfoService.checkUpdate();
-                InfoService.checkNewVersion();
+    computed: {
+        ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode']),
+        thumbStyle() {
+            if (this.readingMode === 0 && this.showThumbView) {
+                return '';
+            } else {
+                return { 'margin-left': this.px(-this.thumbWidth) };
             }
         }
-    };
-}
+    },
+
+    methods: {
+        async checkInstrcutions() {
+            if (await SettingService.getFirstOpen()) {
+                // auto choose language
+                let lang = navigator.language.toLowerCase();
+                if (lang.includes('zh')) {
+                    await SettingService.setLang(tags.LANG_CN);
+                } else if (lang.includes('jp')) {
+                    await SettingService.setLang(tags.LANG_JP);
+                }
+                // show instructions
+                InfoService.showInstruction(true);
+                SettingService.setFirstOpen(false);
+            }
+        },
+
+        async checkVersion() {
+            InfoService.checkUpdate();
+            InfoService.checkNewVersion();
+        }
+    }
+};
 </script>
 
 <style lang="scss">

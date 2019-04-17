@@ -3,9 +3,9 @@ import 'babel-polyfill';
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 import App from '../core'
-import store from './store/index.inject'
+import store from '../core/store/index.inject'
 import VueUtil from './utils/VueUtil.js'
-import SettingService from './service/SettingService';
+import SettingService from '../core/service/SettingService';
 import { setTimeout } from 'timers';
 
 Vue.use(VueResource);
@@ -93,7 +93,7 @@ function createVueView() {
         .length > 0) {
         const app = new Vue({
                 store,
-                render: (h) => h(App())
+                render: (h) => h(App)
             })
             .$mount('#app');
     }

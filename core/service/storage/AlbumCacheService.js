@@ -4,7 +4,7 @@ import ImgHtmlParser from '../parser/ImgHtmlParser.js'
 import ImgUrlListParser from '../parser/ImgUrlListParser.js'
 import IntroHtmlParser from '../parser/IntroHtmlParser.js'
 import * as API from '../api.js'
-import storage from 'src/service/storage/LocalStorage'
+import storage from './LocalStorage'
 import Logger from 'src/utils/Logger'
 import InfoService from '../InfoService'
 import SettingService from '../SettingService'
@@ -12,6 +12,7 @@ import store from '../../store/index.inject'
 import * as tags from '../../assets/value/tags'
 import AlbumService from '../AlbumService'
 import Utils from '../../utils/Utils'
+import Logger from '../../utils/Logger'
 
 /*
 storage
@@ -171,7 +172,7 @@ export class AlbumCacheService {
             return album.imgInfos[index].src;
         }
         try {
-            let param = sourceId ? `?nl=${sourceId}` : ''; // change source 0f img
+            let param = sourceId ? `?nl=${sourceId}` : ''; // change source of img
             let req = new TextReqService(album.imgInfos[index].pageUrl + param);
             if (mode === tags.MODE_FAST) { // fast fetch
                 req.setTimeOutTime(3);

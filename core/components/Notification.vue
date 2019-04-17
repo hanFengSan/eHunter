@@ -123,11 +123,11 @@
 </template>
 
 <script>
-    import ColorService from 'src/service/type/TypeColorService'
-    import UpdateIntervalService from 'src/service/type/UpdateIntervalService'
-    import SubsStorageService from 'src/service/storage/SubsStorageService'
-    import NotiStorageService from 'src/service/storage/NotiStorageService'
-    import DateUtil from 'src/utils/DateUtil'
+    import ColorService from '../service/type/TypeColorService'
+    import UpdateIntervalService from '../service/type/UpdateIntervalService'
+    import SubsStorageService from '../service/storage/SubsStorageService'
+    import NotiStorageService from '../service/storage/NotiStorageService'
+    import DateUtil from '../utils/DateUtil'
 
     export default {
         name: 'Notification',

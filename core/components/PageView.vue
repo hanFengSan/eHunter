@@ -63,7 +63,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import AlbumService from 'src/service/AlbumService.js';
+import AlbumService from '../service/AlbumService.js';
 import FlatButton from './widget/FlatButton.vue';
 import Logger from '../utils/Logger.js';
 import * as tags from '../assets/value/tags';

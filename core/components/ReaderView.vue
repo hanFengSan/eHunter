@@ -32,7 +32,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import AlbumScrollView from './AlbumScrollView.vue';
 import TopBar from './TopBar.vue';
-import ImgHtmlParser from 'src/service/parser/ImgHtmlParser.js';
+import ImgHtmlParser from '../service/parser/ImgHtmlParser.js';
 import AlbumService from '../service/AlbumService';
 import AlbumBookView from './AlbumBookView.vue';
 import * as tags from '../assets/value/tags';
