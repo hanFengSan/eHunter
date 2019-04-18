@@ -96,8 +96,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "~style/_responsive";
-@import "~style/_variables";
+@import "../../style/_responsive";
+@import "../../style/_variables";
 
 $font_size: 14px;
 $item_size: 28px;

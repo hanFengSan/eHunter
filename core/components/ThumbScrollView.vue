@@ -7,7 +7,8 @@
             <!-- 160 is $thumb-view-height -->
             <div class="indicator" :style="{top: px(160*(curIndex.val - volFirstIndex))}"></div>
             <div class="thumb-container" @click="select(index(i))" v-for="(item, i) of volThumbs" :key="item.url+item.offset" ref="thumbContainers">
-                <div class="thumb" :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
+                <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.url}) no-repeat`}"></div>
+                <div class="thumb spirit-mode" v-else :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
                 <div class="hover-mask"></div>
                 <div class="index">{{ index(i) + 1 }}</div>
             </div>
@@ -104,8 +105,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~style/_responsive';
-@import '~style/_variables';
+@import '../style/_responsive';
+@import '../style/_variables';
 .thumb-content {
     position: relative;
     .thumb-scroll-view {
@@ -168,6 +169,7 @@ export default {
             position: relative;
             width: $thumb-view-width;
             padding: $thumb-view-margin 0;
+            margin: 0;
             height: $thumb-view-height;
             text-align: center;
             display: flex;
@@ -180,6 +182,9 @@ export default {
                 // 1/1.44 is the default scale of ehentai's thumb. 100px width per one thumb in img.
                 height: $thumb-width * 144 / 100;
                 transition: all 0.5s ease;
+                &.img-mode {
+                    background-size: 'contain';
+                }
             }
             > .loc {
                 display: block;

@@ -36,8 +36,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "~style/_responsive";
-@import "~style/_variables";
+@import "../../style/_responsive";
+@import "../../style/_variables";
 
 .circle-icon-button {
     height: 26px;

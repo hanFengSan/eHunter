@@ -126,7 +126,6 @@ import PopSlider from './widget/PopSlider.vue';
 import SimpleSwitch from './widget/SimpleSwitch.vue';
 import CircleIconButton from './widget/CircleIconButton.vue';
 import SettingService from '../service/SettingService.js';
-// import eHunter from '../main.inject';
 import * as tags from '../assets/value/tags';
 import InfoService from '../service/InfoService';
 // import Logger from '../utils/Logger';
@@ -134,7 +133,7 @@ import InfoService from '../service/InfoService';
 export default {
     name: 'TopBar',
 
-    inject: ['config'],
+    inject: ['config', 'service'],
     
     components: { DropOption, PopSlider, SimpleSwitch, CircleIconButton },
 
@@ -311,7 +310,7 @@ export default {
 
         closeEHunter() {
             SettingService.toggleEHunter(false);
-            // eHunter.toggleEHunterView(false);
+            this.service.eHunter.showEHunterView(false);
         },
 
         changeBookScreenAnimation(show) {
@@ -335,13 +334,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~style/_responsive';
-@import '~style/_variables';
+@import '../style/_responsive';
+@import '../style/_variables';
+
 div {
     display: flex;
 }
 .top-bar {
     width: 100%;
+    padding: 0;
+    margin: 0;
+    background: transparent;
     position: relative;
     > .float-content {
         position: absolute;

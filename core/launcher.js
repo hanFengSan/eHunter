@@ -8,6 +8,10 @@ export default {
         service.album = obj;
         return this;
     },
+    setEHunterService(obj) {
+        service.eHunter = obj;
+        return this;
+    },
     setConfig(obj) {
         config = obj;
         return this;

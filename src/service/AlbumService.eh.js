@@ -1,9 +1,11 @@
-import ImgHtmlParser from './parser/ImgHtmlParser';
-import AlbumCacheService from './storage/AlbumCacheService';
+import ImgHtmlParser from './parser/ImgHtmlParser.eh.js'
+import AlbumCacheService from './storage/AlbumCacheService.eh.js'
+import BaseAlbumService from 'core/service/BaseAlbumService'
 // import Logger from '../utils/Logger';
 
-export class AlbumService {
+export class EHAlbumService extends BaseAlbumService {
     constructor(imgHtml) {
+        super();
         this.imgHtmlParser = imgHtml ? new ImgHtmlParser(imgHtml) : {};
         this.cacheService = AlbumCacheService;
         this.thumbs = [];
@@ -46,7 +48,7 @@ export class AlbumService {
         return this.curPageNum;
     }
 
-    getTitle() {
+    async getTitle() {
         if (!this.title) {
             this.title = this.imgHtmlParser.getTitle();
         }
@@ -123,8 +125,8 @@ export class AlbumService {
     */
     getPreviewThumbnailStyle(index, imgInfo, thumb) {
         const indexInThumbSprite = index % 20;
-        const sumOfThumbInSprite = (this.getPageCount() - (index + 1)) >= this.getPageCount() % 20
-                                    ? 20 : (this.getPageCount() % 20);
+        const sumOfThumbInSprite = (this.getPageCount() - (index + 1)) >= this.getPageCount() % 20 ?
+            20 : (this.getPageCount() % 20);
         let percentage;
         if (imgInfo.heightOfWidth >= 1.43) {
             percentage = 1 / (sumOfThumbInSprite * (1 - (1 / imgInfo.heightOfWidth) * (imgInfo.thumbHeight / (sumOfThumbInSprite * 100))));
@@ -145,7 +147,15 @@ export class AlbumService {
         index = index > this.getPageCount() - 1 ? this.getPageCount() - 1 : index;
         return { val: index, updater: curIndex.updater };
     }
+
+    supportOriginImg() {
+        return true;
+    }
+
+    supportImgChangeSource() {
+        return true;
+    }
 }
 
-let instance = new AlbumService(document.location.pathname.includes('/s/') ? document.documentElement.innerHTML : null);
+let instance = new EHAlbumService(document.location.pathname.includes('/s/') ? document.documentElement.innerHTML : null);
 export default instance;

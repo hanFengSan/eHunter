@@ -1,16 +1,16 @@
 // a singleton service for caching img url
 import TextReqService from '../request/TextReqService.js'
-import ImgHtmlParser from '../parser/ImgHtmlParser.js'
-import ImgUrlListParser from '../parser/ImgUrlListParser.js'
-import IntroHtmlParser from '../parser/IntroHtmlParser.js'
-import * as API from '../api.js'
+import ImgHtmlParser from '../parser/ImgHtmlParser.eh.js'
+import ImgUrlListParser from '../parser/ImgUrlListParser.eh.js'
+import IntroHtmlParser from '../parser/IntroHtmlParser.eh.js'
+import * as API from '../api.eh.js'
 import storage from 'core/service/storage/LocalStorage'
 import Logger from 'core/utils/Logger'
 import InfoService from 'core/service/InfoService'
 import SettingService from 'core/service/SettingService'
 import store from 'core/store/index.inject'
 import * as tags from '../../assets/value/tags'
-import AlbumService from '../AlbumService'
+import AlbumService from '../AlbumService.eh.js'
 import Utils from 'core/utils/Utils'
 
 /*

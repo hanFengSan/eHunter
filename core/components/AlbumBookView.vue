@@ -21,7 +21,7 @@
                     EHUNTER
                 </div>
                 <h1>
-                    {{ service.album.getTitle() }}
+                    {{ title }}
                 </h1>
             </div>
             <div class="page end-page" v-if="page.type===tags.TYPE_END">
@@ -65,15 +65,17 @@ export default {
 
     data() {
         return {
-            appSize: { height: 0, width: 0 }
+            appSize: { height: 0, width: 0 },
+            title: ''
         };
     },
 
-    created() {
+    async created() {
         this.appSize = this.getAppSize();
         window.addEventListener('resize', this.watchResize);
         document.addEventListener('keydown', this.watchKeyboard);
         this.checkInstrcutions();
+        this.title = await this.service.album.getTitle();
     },
 
     destroyed() {
@@ -249,8 +251,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~style/_responsive';
-@import '~style/_variables';
+@import '../style/_responsive';
+@import '../style/_variables';
 div {
     display: flex;
 }

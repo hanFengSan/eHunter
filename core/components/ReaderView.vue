@@ -103,8 +103,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~style/_responsive';
-@import '~style/_variables';
+@import '../style/_responsive';
+@import '../style/_variables';
 
 div {
     display: flex;
@@ -176,20 +176,11 @@ div {
     }
 
     > .content {
-        // align-self: stretch;
         position: absolute;
         left: 0;
         top: 0;
         height: 100%;
         width: 100%;
-    }
-
-    > .book-mode {
-        // height: 100%;
-    }
-
-    > .scroll-mode {
-        // height: 100%;
     }
 }
 </style>

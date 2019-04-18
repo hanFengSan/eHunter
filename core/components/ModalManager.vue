@@ -42,8 +42,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~style/_responsive';
-@import '~style/_variables';
+@import '../style/_responsive';
+@import '../style/_variables';
 
 .modal-manager {
     .dialog {

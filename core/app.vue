@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div class="app normalize">
     <thumb-scroll-view class="thumb-column" :style="thumbStyle"></thumb-scroll-view>
     <reader-view class="reader-column"></reader-view>
     <modal-manager class="modal"></modal-manager>
@@ -71,14 +71,17 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~style/_responsive';
-@import '~style/_variables';
-@import '~style/_markdown';
+@import './style/_responsive';
+@import './style/_variables';
+@import './style/_markdown';
+@import './style/_normalize';
 
 $change_mode_time: 0.8s;
 $general_animtation_time: 0.2s;
 
 .app {
+    font-family: PingFang SC, Microsoft YaHei, 微软雅黑, Arial, Hiragino Sans GB, Heiti SC, Droid Sans,
+        WenQuanYi Micro Hei, sans-serif !important;
     display: flex;
     height: 100%;
     text-align: initial; // overlay original style
@@ -233,10 +236,5 @@ $general_animtation_time: 0.2s;
         opacity: 0;
         transform: translateY(10%);
     }
-}
-
-body {
-    font-family: 'San Francisco', Arial, 'Hiragino Sans GB', 'Heiti SC', 'Microsoft YaHei', '微软雅黑', 'Droid Sans',
-        'WenQuanYi Micro Hei', sans-serif;
 }
 </style>

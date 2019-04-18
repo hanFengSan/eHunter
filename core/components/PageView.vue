@@ -14,6 +14,7 @@
                             :label="string.originImg" 
                             mode="inline" 
                             type="positive"
+                            v-if="service.album.supportOriginImg()"
                             @click="getNewImgSrc(tags.MODE_ORIGIN)">
                         </flat-button>
                         <flat-button 
@@ -30,26 +31,13 @@
                             :label="string.refreshByOtherSource" 
                             mode="inline" 
                             type="positive"
+                            v-if="service.album.supportImgChangeSource()"
                             @click="getNewImgSrc(tags.MODE_CHANGE_SOURCE)">
                         </flat-button>
                     </span>
                 </p>
             </transition>
         </article>
-        <div class="loading-console-panel" v-if="active&&curLoadStatus!=tags.STATE_LOADED"> 
-            <div class="tips tips-left" :title-content="string.originImgTip">
-                <svg class="btn" viewBox="0 0 24 24" width="24" @click="getNewImgSrc(tags.MODE_ORIGIN)" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
-                    <path d="M0 0h24v24H0z" fill="none"/>
-                </svg>
-            </div>
-            <div class="tips tips-left" :title-content="string.refresh">
-                <svg class="btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="getNewImgSrc()">
-                    <path d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
-                </svg>
-            </div>
-        </div>
     </div>
     <div class="layer img-layer">
         <img class="album-item" 
@@ -194,8 +182,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~style/_responsive';
-@import '~style/_variables';
+@import '../style/_responsive';
+@import '../style/_variables';
 
 div,
 span {

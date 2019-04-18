@@ -11,7 +11,7 @@
         :on-scroll-stopped="onScrollStopped" 
         @topIn="changeTopBar(true)"
         @topLeave="changeTopBar(false)">
-        <h1>{{ service.album.getTitle() }}</h1>
+        <h1>{{ title }}</h1>
         <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
         <div 
             class="page-container" 
@@ -58,7 +58,8 @@ export default {
     data() {
         return {
             scrollTop: 0,
-            preloadImgs: []
+            preloadImgs: [],
+            title: ''
         };
     },
 
@@ -69,9 +70,10 @@ export default {
         PageView
     },
 
-    created() {
-        setTimeout(() => this.setIndex({ val: this.curIndex.val, updater: tags.SCROLL_VIEW_VOL }), 1000);
+    async created() {
+        setTimeout(() => this.setIndex({ val: this.curIndex.val, updater: tags.SCROLL_VIEW_VOL }), 200);
         document.addEventListener('keydown', this.watchKeyboard);
+        this.title = await this.service.album.getTitle();
     },
 
     destroyed() {
@@ -245,8 +247,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~style/_responsive';
-@import '~style/_variables';
+@import '../style/_responsive';
+@import '../style/_variables';
 .album-scroll-view {
     position: relative;
     flex-direction: column;

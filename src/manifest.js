@@ -26,14 +26,16 @@ module.exports.chrome = {
     'incognito': 'spanning',
     'permissions': [
         'activeTab',
-        'https://exhentai.org/',
-        'https://e-hentai.org/',
         'https://alexskye.info/',
+        'https://alexskye.xyz/',
         'https://www.alexskye.info/',
         'http://alexskye.info/',
+        'https://exhentai.org/',
         'http://www.alexskye.info/',
         'http://githubusercontent.com/',
         'https://githubusercontent.com/',
+        'https://nhentai.net/',
+        'https://e-hentai.org/',
         'https://raw.githubusercontent.com/',
         'http://raw.githubusercontent.com/',
         'storage',
@@ -50,6 +52,7 @@ module.exports.chrome = {
                 '*://exhentai.org/*',
                 '*://hanfengsan.org/*',
                 '*://e-hentai.org/*',
+                '*://nhentai.net/*',
                 '*://mingzuozhibiba.cn/*'
             ],
             'js': [
