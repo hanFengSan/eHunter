@@ -10,15 +10,13 @@ function resolve(dir) {
 
 module.exports = merge(baseWebpackConfig, {
     watch: true,
+    mode: 'development',
     plugins: [
         new HtmlWebpackPlugin({
             filename: 'popup.html',
             template: 'src/index.popup.html',
             inject: true,
             chunks: ['popup']
-        }),
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"development"'
         }),
         new webpack.BannerPlugin({
             banner: require(resolve('src/manifest')).tampermonkey,

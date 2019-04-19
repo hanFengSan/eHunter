@@ -1,5 +1,5 @@
 import storage from './storage/LocalStorage'
-import store from '../store/index.inject'
+import store from '../store'
 import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 

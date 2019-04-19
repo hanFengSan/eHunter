@@ -18,8 +18,7 @@ const getters = {
 // actions
 const actions = {
     setString({ commit }, langCode) {
-        // Logger.logText('String', lang);
-        commit(types.SET_STRING, { langCode })
+        commit(types.SET_STRING, { langCode });
     }
 }
 

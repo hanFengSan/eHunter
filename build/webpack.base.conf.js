@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const GenerateJsonPlugin = require('generate-json-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir)
@@ -19,16 +20,9 @@ module.exports = {
         filename: '[name].js'
     },
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.vue$/,
-                loader: 'vue-loader',
-                options: {
-                    loaders: {
-                        'scss': 'vue-style-loader!css-loader!sass-loader',
-                        'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
-                    }
-                }
+                use: 'vue-loader'
             },
             {
                 test: /\.js$/,
@@ -41,6 +35,14 @@ module.exports = {
                 ]
             },
             {
+                test: /\.tsx?$/,
+                loader: 'ts-loader',
+                exclude: /node_modules/,
+                options: {
+                    appendTsSuffixTo: [/\.vue$/],
+                }
+            },
+            {
                 test: /\.(png|jpg|gif|svg)$/,
                 loader: 'file-loader',
                 options: {
@@ -48,16 +50,34 @@ module.exports = {
                 }
             },
             {
-                test: /\.json$/,
-                loader: 'json-loader'
+                test: /\.less$/,
+                use: [
+                    'vue-style-loader',
+                    'css-loader',
+                    'less-loader'
+                ]
             },
             {
-                test: /\.less$/,
-                loader: 'style-loader!css-loader!less-loader'
+                test: /\.scss$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader'
+                ]
             },
             {
                 test: /\.css$/,
-                loader: 'css-loader'
+                use: [{
+                        loader: 'vue-style-loader'
+                    },
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                            localIdentName: '[local]_[hash:base64:8]'
+                        }
+                    }
+                ]
             },
             {
                 test: /\.html$/,
@@ -66,7 +86,7 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.js', '.vue', '.json'],
+        extensions: ['.ts', '.js', '.vue', '.json'],
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
             'src': resolve('src'),
@@ -77,8 +97,10 @@ module.exports = {
         }
     },
     plugins: [
-        new CleanWebpackPlugin(['dist/*.*'], {
-            root: resolve('')
+        new VueLoaderPlugin(),
+        new CleanWebpackPlugin({
+            verbose: true,
+            cleanOnceBeforeBuildPatterns: ['*']
         }),
         new CopyWebpackPlugin([
             { from: resolve('src/assets/img'), to: resolve('dist/img') }

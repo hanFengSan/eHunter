@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars,no-undef,indent */
-import VueResource from 'vue-resource'
 import core from '../core'
 import { setTimeout } from 'timers'
 import AlbumService from './service/AlbumService.eh.js'

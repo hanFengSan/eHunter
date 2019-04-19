@@ -1,14 +1,12 @@
 /* eslint-disable no-unused-vars,no-undef,indent */
 import "@babel/polyfill";
 import Vue from 'vue'
-import VueResource from 'vue-resource'
 import launcher from './launcher'
-import store from './store/index.inject'
+import store from './store'
 import VueUtil from './utils/VueUtil.js'
 import SettingService from './service/SettingService'
 import { setTimeout } from 'timers'
 
-Vue.use(VueResource);
 Vue.mixin(VueUtil);
 
 function createAppView(containerClass, containerId, vueInstance) {
