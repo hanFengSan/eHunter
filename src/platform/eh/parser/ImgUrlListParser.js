@@ -1,6 +1,6 @@
 // get img page urls from album intro page
-import ReqQueueService from 'src/service/request/ReqQueueService.js'
-import IntroHtmlParser from './IntroHtmlParser.eh.js'
+import ReqQueueService from '../../base/request/ReqQueueService'
+import IntroHtmlParser from './IntroHtmlParser'
 
 class ImgUrlListParser {
     constructor(introUrl, sumOfImgPage) {

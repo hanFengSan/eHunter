@@ -1,11 +1,11 @@
-import EHApp from './app.eh.js'
-import NHApp from './app.nh.js'
+import EHPlatform from './platform/eh'
+import NHPlatform from './platform/nh'
 
 switch (window.location.host) {
     case 'exhentai.org':
     case 'e-hentai.org':
-        new EHApp().init();
+        new EHPlatform().init();
     break;
     case 'nhentai.net':
-        new NHApp().init();
+        new NHPlatform().init();
 }

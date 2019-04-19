@@ -1,11 +1,9 @@
-import ImgHtmlParser from './parser/ImgHtmlParser.eh.js'
-import AlbumCacheService from './storage/AlbumCacheService.eh.js'
-import BaseAlbumService from 'core/service/BaseAlbumService'
+import ImgHtmlParser from '../parser/ImgHtmlParser'
+import AlbumCacheService from './AlbumCacheService'
 // import Logger from '../utils/Logger';
 
-export class EHAlbumService extends BaseAlbumService {
+export class EHAlbumService {
     constructor(imgHtml) {
-        super();
         this.imgHtmlParser = imgHtml ? new ImgHtmlParser(imgHtml) : {};
         this.cacheService = AlbumCacheService;
         this.thumbs = [];

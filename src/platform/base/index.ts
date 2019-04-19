@@ -1,13 +1,16 @@
-/* eslint-disable no-unused-vars,no-undef,indent */
-import core from '../core'
-import { setTimeout } from 'timers'
-import AlbumService from './service/AlbumService.nh.js'
-import config from './config'
-import BaseApp from './app.base.js'
+import core from '../../../core'
 
-export default class NHApp extends BaseApp {
-    isAlbumViewPage() {
-        return window.location.pathname.split('/').length === 5;
+export abstract class BasePlatform {
+    abstract isAlbumViewPage(): boolean;
+
+    // add ehunter switch etc.
+    async init(): Promise<void> {
+        if (this.isAlbumViewPage()) {
+            this.createEhunterSwitch();
+            if (await core.SettingService.getEHunterStatus()) {
+                this.toggleEHunterView(true);
+            }
+        }
     }
 
     createEhunterSwitch() {
@@ -47,20 +50,24 @@ export default class NHApp extends BaseApp {
 
     // when user click the ehunter switch
     openEhunterBySwitch() {
-        var element = document.querySelector('#switch');
-        element.style.top = '-50px';
-        window.setTimeout(() => {
-            element.style.top = '-150px';
-        }, 2000);
-        core.SettingService.toggleEHunter(true);
-        window.setTimeout(() => {
-            this.toggleEHunterView(true);
-        }, 300);
+        var element = <HTMLElement>document.querySelector('#switch');
+        if (element) {
+            element.style.top = '-50px';
+            window.setTimeout(() => {
+                if (element) {
+                    element.style.top = '-150px';
+                }
+            }, 2000);
+            core.SettingService.toggleEHunter(true);
+            window.setTimeout(() => {
+                this.toggleEHunterView(true);
+            }, 300);
+        }
     }
 
     createEHunterContainer() {
         document.body.style.overflow = 'hidden';
-        let element = document.createElement('div');
+        let element = <HTMLElement>document.createElement('div');
         element.style.position = 'fixed';
         element.style.height = '100%';
         element.style.width = '100%';
@@ -69,7 +76,7 @@ export default class NHApp extends BaseApp {
         element.style.zIndex = '10';
         element.style.top = '-100%';
         element.style.left = '0px';
-        element.classList = 'vue-container';
+        element.classList.add('vue-container');
         let i1 = document.getElementById('i1');
 
         let vue = document.createElement('div');
@@ -83,50 +90,23 @@ export default class NHApp extends BaseApp {
         }, 0);
     }
 
-    // some actions of eh will make some wired errors
-    blockEhActions() {
-        var elt = document.createElement('script');
-        elt.innerHTML = `
-            console._clear = console.clear;
-            console.clear = function () {}
-        `;
-        document.body.appendChild(elt);
-    }
-
-    // add ehunter switch etc.
-    async init() {
-        if (this.isAlbumViewPage()) {
-            this.createEhunterSwitch();
-            if (await core.SettingService.getEHunterStatus()) {
-                this.toggleEHunterView(true);
-            }
-        }
-    }
-
-    toggleEHunterView(val) {
+    toggleEHunterView(open: boolean): void {
         if (document.getElementsByClassName('vue-container').length > 0) {
-            this.showEHunterView(val);
+            this.showEHunterView(open);
         } else {
             this.initEHunter();
         }
     }
 
-    showEHunterView(val) {
-        document.body.style.overflow = val ? 'hidden' : '';
-        document.getElementsByClassName('vue-container')[0].style.top = val ? '0' : '-100%';
+    showEHunterView(show: boolean): void {
+        document.body.style.overflow = show ? 'hidden' : '';
+        (<HTMLElement>document.getElementsByClassName('vue-container')[0]).style.top = show ? '0' : '-100%';
     }
 
-    initEHunter() {
-        this.blockEhActions();
+    blockHostActions(): void { }
+
+    initEHunter(): void {
+        this.blockHostActions();
         this.createEHunterContainer();
-        core.createAppView('vue-container', '#app',
-            core.launcher
-            .setAlbumService(AlbumService)
-            .setEHunterService({
-                showEHunterView: this.showEHunterView
-            })
-            .setConfig(config)
-            .instance());
     }
-
 }

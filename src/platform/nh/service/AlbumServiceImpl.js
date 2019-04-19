@@ -1,12 +1,10 @@
-import ImgHtmlParser from './parser/ImgHtmlParser.nh.js'
-import IntroHtmlParser from './parser/IntroHtmlParser.nh.js'
-import TextReqService from './request/TextReqService'
-import BaseAlbumService from 'core/service/BaseAlbumService'
+import ImgHtmlParser from '../parser/ImgHtmlParser'
+import IntroHtmlParser from '../parser/IntroHtmlParser'
+import TextReqService from '../../base/request/TextReqService'
 // import Logger from '../utils/Logger';
 
-export class NHAlbumService extends BaseAlbumService {
+export class NHAlbumService  {
     constructor(imgHtml) {
-        super();
         this.imgHtmlParser = imgHtml ? new ImgHtmlParser(imgHtml) : {};
         this.thumbs = [];
     }
