@@ -39,7 +39,7 @@ module.exports = {
                 loader: 'ts-loader',
                 exclude: /node_modules/,
                 options: {
-                    appendTsSuffixTo: [/\.vue$/],
+                    appendTsSuffixTo: [/\.vue$/]
                 }
             },
             {
@@ -98,10 +98,10 @@ module.exports = {
     },
     plugins: [
         new VueLoaderPlugin(),
-        new CleanWebpackPlugin({
-            verbose: true,
-            cleanOnceBeforeBuildPatterns: ['*']
-        }),
+        // new CleanWebpackPlugin({
+        //     verbose: true,
+        //     cleanOnceBeforeBuildPatterns: ['*']
+        // }),
         new CopyWebpackPlugin([
             { from: resolve('src/assets/img'), to: resolve('dist/img') }
         ]),

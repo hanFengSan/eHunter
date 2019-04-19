@@ -12,5 +12,10 @@
     "include": [
         "./core/**/*",
         "./src/**/*"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+        "src": "src",
+        "core": "core"
+    }
 }

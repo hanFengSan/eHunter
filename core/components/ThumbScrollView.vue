@@ -6,9 +6,9 @@
             </div>
             <!-- 160 is $thumb-view-height -->
             <div class="indicator" :style="{top: px(160*(curIndex.val - volFirstIndex))}"></div>
-            <div class="thumb-container" @click="select(index(i))" v-for="(item, i) of volThumbs" :key="item.url+item.offset" ref="thumbContainers">
-                <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.url}) no-repeat`}"></div>
-                <div class="thumb spirit-mode" v-else :style="{background: `transparent url(${item.url}) -${item.offset}px 0 no-repeat`}"></div>
+            <div class="thumb-container" @click="select(index(i))" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
+                <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
+                <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`}"></div>
                 <div class="hover-mask"></div>
                 <div class="index">{{ index(i) + 1 }}</div>
             </div>

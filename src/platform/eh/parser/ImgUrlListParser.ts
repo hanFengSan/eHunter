@@ -1,12 +1,15 @@
 // get img page urls from album intro page
 import ReqQueueService from '../../base/request/ReqQueueService'
 import IntroHtmlParser from './IntroHtmlParser'
+import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
 
 class ImgUrlListParser {
+    private introUrl: string;
+    private sumOfIntroPage: number;
+    private introPageUrls: string[];
+
     constructor(introUrl, sumOfImgPage) {
         this.introUrl = introUrl;
-        this.introHtmls = {};
-        this.FirstPage = {};
         this.sumOfIntroPage = this._getSumOfIntroPage(sumOfImgPage);
         this.introPageUrls = this._getIntroPageUrls();
     }
@@ -17,7 +20,7 @@ class ImgUrlListParser {
         });
     }
 
-    _getSumOfIntroPage(sumOfImgPage) {
+    _getSumOfIntroPage(sumOfImgPage): number {
         // 40 is the thumb sum per intro page when small thumb model
         if (sumOfImgPage < 40) {
             return 1;
@@ -30,8 +33,8 @@ class ImgUrlListParser {
         }
     }
 
-    _getIntroPageUrls() {
-        let urls = [];
+    _getIntroPageUrls(): string[] {
+        let urls: string[] = [];
         for (let i = 0; i < this.sumOfIntroPage; i++) {
             urls.push(`${this.introUrl}?p=${i}`);
         }
@@ -45,7 +48,7 @@ class ImgUrlListParser {
                 let result = this.introPageUrls.reduce((imgUrls, introUrl) => {
                     imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl), introUrl).getImgUrls());
                     return imgUrls;
-                }, []);
+                }, <Array<ImgPageInfo>>[]);
                 if (result.length !== 0) {
                     resolve(result);
                 } else {

@@ -1,7 +1,7 @@
 // a singleton service for caching img url
 import TextReqService from '../../base/request/TextReqService'
-import ImgHtmlParser from '../parser/ImgHtmlParser'
-import ImgUrlListParser from '../parser/ImgUrlListParser'
+import ImgHtmlParser from '../parser/ImgHtmlParser.ts'
+import ImgUrlListParser from '../parser/ImgUrlListParser.ts'
 import IntroHtmlParser from '../parser/IntroHtmlParser'
 import * as API from '../api.js'
 import storage from 'core/service/storage/LocalStorage'

@@ -1,5 +1,5 @@
-import ImgHtmlParser from '../parser/ImgHtmlParser'
-import IntroHtmlParser from '../parser/IntroHtmlParser'
+import ImgHtmlParser from '../parser/ImgHtmlParser.ts'
+import IntroHtmlParser from '../parser/IntroHtmlParser.ts'
 import TextReqService from '../../base/request/TextReqService'
 // import Logger from '../utils/Logger';
 
@@ -72,7 +72,7 @@ export class NHAlbumService  {
 
     async getImgInfos() {
         if (!this._imgInfos) {
-            this._imgInfos = (await this._getIntroParser()).getImgUrls();
+            this._imgInfos = (await this._getIntroParser()).getImgPageInfos();
         }
         return this._imgInfos;
     }
@@ -82,7 +82,7 @@ export class NHAlbumService  {
     }
 
     async getImgSrc(index, mode) {
-        return (await this.getImgInfo(index)).imgUrl;
+        return (await this.getImgInfo(index)).src;
     }
 
     async getNewImgSrc(index, mode) {
@@ -91,7 +91,7 @@ export class NHAlbumService  {
 
     async getThumbs(cache = true) {
         if (!cache || this.thumbs.length === 0) {
-            this.thumbs = (await this._getIntroParser()).getThumbObjList();
+            this.thumbs = (await this._getIntroParser()).getThumbInfos();
         }
         return this.thumbs;
     }
@@ -102,7 +102,7 @@ export class NHAlbumService  {
 
     getPreviewThumbnailStyle(index, imgInfo, thumb) {
         return {
-            'background-image': `url(${thumb.url})`,
+            'background-image': `url(${thumb.src})`,
             'background-position': `0% 0%`,
             'background-size': 'cover'
         };

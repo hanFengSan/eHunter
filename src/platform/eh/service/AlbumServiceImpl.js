@@ -1,4 +1,4 @@
-import ImgHtmlParser from '../parser/ImgHtmlParser'
+import ImgHtmlParser from '../parser/ImgHtmlParser.ts'
 import AlbumCacheService from './AlbumCacheService'
 // import Logger from '../utils/Logger';
 
@@ -133,7 +133,7 @@ export class EHAlbumService {
         }
         let offsetPercentage = indexInThumbSprite * percentage;
         return {
-            'background-image': `url(${thumb.url})`,
+            'background-image': `url(${thumb.src})`,
             'background-position': `${offsetPercentage * 100}% 0`,
             'background-size': imgInfo.heightOfWidth >= 1.43 ? 'cover' : `${sumOfThumbInSprite * 100}%`
         };
