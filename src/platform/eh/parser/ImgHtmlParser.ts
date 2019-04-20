@@ -1,5 +1,5 @@
 // a parser for album's img page
-class ImgHtmlParser {
+export class ImgHtmlParser {
     private htmlText: string;
     private html: HTMLElement;
     private document: Document | null;
@@ -80,5 +80,3 @@ class ImgHtmlParser {
         return RegExp.$1;
     }
 }
-
-export default ImgHtmlParser;

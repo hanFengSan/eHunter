@@ -13,8 +13,6 @@ export interface IndexInfo {
 }
 
 export abstract class AlbumService {
-    protected sumOfPage: number | undefined;
-
     abstract async getPageCount(): Promise<number>;
     abstract async getCurPageNum(): Promise<number>;
     abstract async getTitle(): Promise<string>;

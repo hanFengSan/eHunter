@@ -2,7 +2,7 @@ import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
 import { ThumbInfo, ThumbMode } from '../../../../core/bean/ThumbInfo'
 
 // a parser for album's intro page
-class IntroHtmlParser {
+export class IntroHtmlParser {
     private html: HTMLElement;
     private reqUrl: string;
 
@@ -107,5 +107,3 @@ class IntroHtmlParser {
         return thumbObjList;
     }
 }
-
-export default IntroHtmlParser;

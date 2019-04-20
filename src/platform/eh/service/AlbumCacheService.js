@@ -1,16 +1,15 @@
 // a singleton service for caching img url
-import TextReqService from '../../base/request/TextReqService'
-import ImgHtmlParser from '../parser/ImgHtmlParser.ts'
-import ImgUrlListParser from '../parser/ImgUrlListParser.ts'
-import IntroHtmlParser from '../parser/IntroHtmlParser'
-import * as API from '../api.js'
+import { TextReq } from '../../base/request/TextReq.ts'
+import { ImgHtmlParser } from '../parser/ImgHtmlParser.ts'
+import { ImgUrlListParser } from '../parser/ImgUrlListParser.ts'
+import { IntroHtmlParser } from '../parser/IntroHtmlParser'
+import * as API from '../api.ts'
 import storage from 'core/service/storage/LocalStorage'
 import Logger from 'core/utils/Logger'
 import InfoService from 'core/service/InfoService'
 import SettingService from 'core/service/SettingService'
 import store from 'core/store'
 import * as tags from '../../../assets/value/tags'
-import AlbumService from './AlbumServiceImpl'
 import Utils from 'core/utils/Utils'
 
 /*
@@ -29,7 +28,7 @@ storage
  */
 
 export class AlbumCacheService {
-    constructor() {
+    constructor(albumService) {
         this.version = '2.0';
         this.storageName = 'AlbumCache';
         this.storageVersionName = 'AlbumCacheVersion';
@@ -37,6 +36,7 @@ export class AlbumCacheService {
         this._migrate();
         this._isNormalMode = false; // make sure in 'Normal' mode
         this._isChangedMode = false;
+        this.albumService = albumService;
     }
 
     async _migrate() {
@@ -97,7 +97,7 @@ export class AlbumCacheService {
                 let text;
                 // compatible with large mode
                 try { // If in 'Normal' mode of thumbnails, this will be right
-                    text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
+                    text = await new TextReq(API.getIntroHtml(introUrl, 1)).request();
                     new IntroHtmlParser(text).getThumbObjList(sumOfPage, albumId);
                     this._isNormalMode = true;
                     await SettingService.setNormalMode(true);
@@ -105,8 +105,8 @@ export class AlbumCacheService {
                     // Send a request to change to 'Normal' mode
                     try {
                         introUrl = (await window.fetch(`${window.location.origin}${introUrl}?inline_set=ts_m`, { method: 'GET', credentials: 'include' })).url;
-                        text = await new TextReqService(API.getIntroHtml(introUrl, 1)).request();
-                        AlbumService.setIntroUrl(introUrl);
+                        text = await new TextReq(API.getIntroHtml(introUrl, 1)).request();
+                        this.albumService.setIntroUrl(introUrl);
                         this._isNormalMode = true;
                         Logger.logText('Cache', 'switch to small');
                         this._isChangedMode = true;
@@ -139,7 +139,7 @@ export class AlbumCacheService {
                 while (!this._isNormalMode) {
                     await Utils.timeout(100);
                 }
-                introUrl = AlbumService.getIntroUrl(); // after changine mode, the introUrl maybe changed.
+                introUrl = this.albumService.getIntroUrl(); // after changine mode, the introUrl maybe changed.
             }
             try {
                 return await this._getImgInfos(albumId, introUrl, sumOfPage);
@@ -147,7 +147,7 @@ export class AlbumCacheService {
                 Logger.logText('CacheService', 'loading ImgInfos failed. It\'s large.');
                 while (!this._isNormalMode) {
                     await Utils.timeout(100);
-                    introUrl = AlbumService.getIntroUrl();
+                    introUrl = this.albumService.getIntroUrl();
                 }
                 return await this._getImgInfos(albumId, introUrl, sumOfPage);
             }
@@ -172,7 +172,7 @@ export class AlbumCacheService {
         }
         try {
             let param = sourceId ? `?nl=${sourceId}` : ''; // change source 0f img
-            let req = new TextReqService(album.imgInfos[index].pageUrl + param);
+            let req = new TextReq(album.imgInfos[index].pageUrl + param);
             if (mode === tags.MODE_FAST) { // fast fetch
                 req.setTimeOutTime(3);
             }
@@ -209,6 +209,3 @@ export class AlbumCacheService {
         return await this.getImgSrc(albumId, index, mode);
     }
 }
-
-let instance = new AlbumCacheService();
-export default instance;

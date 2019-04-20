@@ -1,5 +1,5 @@
 // a parser for album's img page
-class ImgHtmlParser {
+export class ImgHtmlParser {
     private htmlText: string;
     private html: HTMLElement;
     
@@ -38,5 +38,3 @@ class ImgHtmlParser {
         return this.html.querySelector('#image-container')!.querySelector('.fit-horizontal')!.getAttribute('x-src')!;
     }
 }
-
-export default ImgHtmlParser;

@@ -1,17 +1,21 @@
 // a good resolution for poor network
-import PlatformService from '../PlatformService'
+import PlatformService from '../service/PlatformService'
 
-class TextReqService {
-    constructor(url, noCache = false, rejectError = true) {
+export class TextReq {
+    private url: string;
+    private method = 'GET';
+    private credentials = 'include';
+    private retryTimes = 3;
+    private timeoutTime = 15; // secs
+    private curRetryTimes = 0;
+    private retryInterval = 3; // secs
+    private enabledLog = true;
+    private fetchSetting = null;
+    private noCache = false;
+    private rejectError = true;
+
+    constructor(url: string, noCache = false, rejectError = true) {
         this.url = url;
-        this.method = 'GET';
-        this.credentials = 'include';
-        this.retryTimes = 3;
-        this.timeoutTime = 15; // secs
-        this.curRetryTimes = 0;
-        this.retryInterval = 3; // secs
-        this.enabledLog = true;
-        this.fetchSetting = null;
         this.noCache = noCache;
         this.rejectError = rejectError;
     }
@@ -21,29 +25,29 @@ class TextReqService {
         return this;
     }
 
-    setCredentials(credential) {
+    setCredentials(credential: string) {
         this.credentials = credential;
         return this;
     }
 
-    setFetchSetting(setting) {
+    setFetchSetting(setting: any) {
         this.fetchSetting = setting;
         return this;
     }
 
-    setRetryTimes(times) {
+    setRetryTimes(times: number) {
         this.retryTimes = times;
     }
 
-    setRetryInterval(secs) {
+    setRetryInterval(secs: number) {
         this.retryInterval = secs;
     }
 
-    setTimeOutTime(secs) {
+    setTimeOutTime(secs: number) {
         this.timeoutTime = secs;
     }
 
-    request() {
+    request(): Promise<string> {
         return new Promise((resolve, reject) => {
             this._request(res => {
                 res.text().then(text => resolve(text));
@@ -57,8 +61,8 @@ class TextReqService {
         });
     }
 
-    _printErrorLog(err) {
-        console.error(`TextReqService: request error in ${this.url}, retry:(${this.curRetryTimes}/${this.retryTimes}), error: ${err}`);
+    private printErrorLog(err) {
+        console.error(`TextReq: request error in ${this.url}, retry:(${this.curRetryTimes}/${this.retryTimes}), error: ${err}`);
     }
 
     _request(successCallback, failureCallback) {
@@ -84,7 +88,7 @@ class TextReqService {
                 }
             })
             .catch(err => {
-                this._printErrorLog(err);
+                this.printErrorLog(err);
                 if (this.curRetryTimes < this.retryTimes) {
                     setTimeout(() => {
                         this._request(successCallback, failureCallback);
@@ -95,5 +99,3 @@ class TextReqService {
             });
     }
 }
-
-export default TextReqService;

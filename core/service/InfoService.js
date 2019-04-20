@@ -2,7 +2,7 @@ import store from '../store'
 import DialogBean from '../bean/DialogBean.ts'
 import { DialogOperation, DOClick } from '../bean/DialogOperation'
 import * as tags from '../assets/value/tags'
-import TextReqService from '../service/request/TextReqService'
+import { TextReq } from '../service/request/TextReq.ts'
 import ServerMessage from '../bean/ServerMessage.ts'
 import SettingService from '../service/SettingService'
 import Logger from '../utils/Logger'
@@ -41,8 +41,8 @@ class InfoService {
         let lastShowDialogTime = await SettingService.getUpdateTime();
         Promise
             .race([
-                new TextReqService(config.updateServer1, true, false).request(),
-                new TextReqService(config.updateServer2, true, false).request()
+                new TextReq(config.updateServer1, true, false).request(),
+                new TextReq(config.updateServer2, true, false).request()
             ])
             .then(data => {
                 message = new ServerMessage(JSON.parse(data));

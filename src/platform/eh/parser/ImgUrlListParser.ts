@@ -1,9 +1,9 @@
 // get img page urls from album intro page
-import ReqQueueService from '../../base/request/ReqQueueService'
-import IntroHtmlParser from './IntroHtmlParser'
+import { ReqQueue } from '../../base/request/ReqQueue'
+import { IntroHtmlParser } from './IntroHtmlParser'
 import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
 
-class ImgUrlListParser {
+export class ImgUrlListParser {
     private introUrl: string;
     private sumOfIntroPage: number;
     private introPageUrls: string[];
@@ -42,7 +42,7 @@ class ImgUrlListParser {
     }
 
     _request(resolve, reject) {
-        new ReqQueueService(this.introPageUrls)
+        new ReqQueue(this.introPageUrls)
             .request()
             .then(map => {
                 let result = this.introPageUrls.reduce((imgUrls, introUrl) => {
@@ -60,5 +60,3 @@ class ImgUrlListParser {
             });
     }
 }
-
-export default ImgUrlListParser;

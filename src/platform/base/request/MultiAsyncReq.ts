@@ -1,14 +1,18 @@
 //  a service for sync multi asynchronous text requests
-import TextReqService from './TextReqService.js'
+import { TextReq } from './TextReq'
 
-class MultiAsyncReqService {
+export class MultiAsyncReq {
+    private urls: Array<string> = [];
+    private resultMap: Map<string, string> = new Map();
+    private fetchSetting = null;
+    private gen;
+
     constructor(urls) {
         this.urls = urls;
-        this.resultMap = new Map();
         this.fetchSetting = null;
     }
 
-    request() {
+    request(): Promise<Map<string, string>> {
         return new Promise((resolve, reject) => {
             this._initGenerator(resolve, reject);
             this._request();
@@ -38,7 +42,7 @@ class MultiAsyncReqService {
 
     _request() {
         for (let url of this.urls) {
-            (new TextReqService(url))
+            (new TextReq(url))
                 .setFetchSetting(this.fetchSetting)
                 .request()
                 .then(html => this.gen.next({ url: url, html: html },
@@ -47,5 +51,3 @@ class MultiAsyncReqService {
     }
 
 }
-
-export default MultiAsyncReqService;

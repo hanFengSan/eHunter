@@ -1,24 +1,32 @@
-import ImgHtmlParser from '../parser/ImgHtmlParser.ts'
-import AlbumCacheService from './AlbumCacheService'
+import { ImgHtmlParser } from '../parser/ImgHtmlParser'
+import { AlbumCacheService } from './AlbumCacheService'
+import { AlbumService } from '../../../../core/service/AlbumService';
+import { ThumbInfo } from '../../../../core/bean/ThumbInfo';
+import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo';
 // import Logger from '../utils/Logger';
 
-export class EHAlbumService {
-    constructor(imgHtml) {
-        this.imgHtmlParser = imgHtml ? new ImgHtmlParser(imgHtml) : {};
-        this.cacheService = AlbumCacheService;
-        this.thumbs = [];
+export class AlbumServiceImpl extends AlbumService {
+    protected imgHtmlParser: ImgHtmlParser;
+    protected cacheService: any;
+    protected thumbInfos: Array<ThumbInfo> = [];
+    protected sumOfPage: number | undefined;
+    protected introUrl: string = '';
+    protected albumId: string = '';
+    protected curPageNum: number | undefined;
+    protected title: string = '';
+    protected imgPageInfos: Array<ImgPageInfo> = [];
+
+    constructor(imgHtml: string) {
+        super();
+        this.imgHtmlParser = new ImgHtmlParser(imgHtml);
+        this.cacheService = new AlbumCacheService(this);
     }
 
-    getPageCount() {
+    async getPageCount(): Promise<number> {
         if (!this.sumOfPage) {
             this.sumOfPage = this.imgHtmlParser.getPageCount();
         }
         return this.sumOfPage;
-    }
-
-    getBookScreenCount(screenSize) {
-        // 2 is start page and end page
-        return Math.ceil((this.getPageCount() + 2) / screenSize);
     }
 
     getIntroUrl() {
@@ -32,21 +40,21 @@ export class EHAlbumService {
         this.introUrl = val;
     }
 
-    getAlbumId() {
+    async getAlbumId(): Promise<string> {
         if (!this.albumId) {
             this.albumId = this.imgHtmlParser.getAlbumId();
         }
         return this.albumId;
     }
 
-    getCurPageNum() {
+    async getCurPageNum(): Promise<number> {
         if (!this.curPageNum) {
             this.curPageNum = this.imgHtmlParser.getCurPageNum();
         }
         return this.curPageNum;
     }
 
-    async getTitle() {
+    async getTitle(): Promise<string> {
         if (!this.title) {
             this.title = this.imgHtmlParser.getTitle();
         }
@@ -57,12 +65,12 @@ export class EHAlbumService {
         return this.cacheService;
     }
 
-    getImgInfos() {
-        return this.cacheService.getImgInfos(this.getAlbumId(), this.getIntroUrl(), this.getPageCount());
+    async getImgPageInfos(): Promise<Array<ImgPageInfo>> {
+        return this.cacheService.getImgInfos(await this.getAlbumId(), await this.getIntroUrl(), await this.getPageCount());
     }
 
-    async getImgInfo(index) {
-        return (await this.getImgInfos())[index];
+    async getImgPageInfo(index: number): Promise<ImgPageInfo> {
+        return (await this.getImgPageInfos())[index];
     }
 
     getImgSrc(index, mode) {
@@ -73,15 +81,15 @@ export class EHAlbumService {
         return this.cacheService.getNewImgSrc(this.getAlbumId(), index, mode);
     }
 
-    getThumbs(cache = true) {
-        if (!cache || this.thumbs.length === 0) {
-            this.thumbs = this.cacheService.getThumbs(this.getAlbumId(), this.getIntroUrl(), this.getPageCount());
+    async getThumbInfos(cache = true): Promise<Array<ThumbInfo>> {
+        if (!cache || this.thumbInfos.length === 0) {
+            this.thumbInfos = this.cacheService.getThumbs(await this.getAlbumId(), await this.getIntroUrl(), await this.getPageCount());
         }
-        return this.thumbs;
+        return this.thumbInfos;
     }
 
-    async getThumb(index) {
-        return (await this.getThumbs())[index];
+    async getThumbInfo(index): Promise<ThumbInfo> {
+        return (await this.getThumbInfos())[index];
     }
 
     /* Calculate thumbnail size and return style
@@ -121,29 +129,22 @@ export class EHAlbumService {
     So:
     formula_2: p = 1 / (sum - 1).
     */
-    getPreviewThumbnailStyle(index, imgInfo, thumb) {
+    async getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo) {
         const indexInThumbSprite = index % 20;
-        const sumOfThumbInSprite = (this.getPageCount() - (index + 1)) >= this.getPageCount() % 20 ?
-            20 : (this.getPageCount() % 20);
+        const sumOfThumbInSprite = (await this.getPageCount() - (index + 1)) >= await this.getPageCount() % 20 ?
+            20 : (await this.getPageCount() % 20);
         let percentage;
-        if (imgInfo.heightOfWidth >= 1.43) {
-            percentage = 1 / (sumOfThumbInSprite * (1 - (1 / imgInfo.heightOfWidth) * (imgInfo.thumbHeight / (sumOfThumbInSprite * 100))));
+        if (imgPageInfo.heightOfWidth >= 1.43) {
+            percentage = 1 / (sumOfThumbInSprite * (1 - (1 / imgPageInfo.heightOfWidth) * (imgPageInfo.thumbHeight! / (sumOfThumbInSprite * 100))));
         } else {
             percentage = 1 / (sumOfThumbInSprite - 1);
         }
         let offsetPercentage = indexInThumbSprite * percentage;
         return {
-            'background-image': `url(${thumb.src})`,
+            'background-image': `url(${thumbInfo.src})`,
             'background-position': `${offsetPercentage * 100}% 0`,
-            'background-size': imgInfo.heightOfWidth >= 1.43 ? 'cover' : `${sumOfThumbInSprite * 100}%`
+            'background-size': imgPageInfo.heightOfWidth >= 1.43 ? 'cover' : `${sumOfThumbInSprite * 100}%`
         };
-    }
-
-    // avoiding the overflow of index
-    getRealCurIndex(curIndex) {
-        let index = curIndex.val;
-        index = index > this.getPageCount() - 1 ? this.getPageCount() - 1 : index;
-        return { val: index, updater: curIndex.updater };
     }
 
     supportOriginImg() {
@@ -154,6 +155,3 @@ export class EHAlbumService {
         return true;
     }
 }
-
-let instance = new EHAlbumService(document.location.pathname.includes('/s/') ? document.documentElement.innerHTML : null);
-export default instance;

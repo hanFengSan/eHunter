@@ -1,15 +1,17 @@
 // a service for limiting num of async requests, avoiding too many concurrent requests
-import MultiAsyncReqService from './MultiAsyncReqService.js'
+import { MultiAsyncReq } from './MultiAsyncReq'
 
-class ReqQueueService {
+export class ReqQueue {
+    private urls: Array<string> = [];
+    private maxConcurrentedNum = 5;
+    private resultMap: Map<string, string> = new Map();
+    private fetchSetting = null;
+
     constructor(urls) {
         this.urls = urls;
-        this.maxConcurrentedNum = 5;
-        this.resultMap = new Map();
-        this.fetchSetting = null;
     }
 
-    setNumOfConcurrented(num) {
+    setNumOfConcurrented(num: number) {
         this.maxConcurrentedNum = num;
         return this;
     }
@@ -19,7 +21,7 @@ class ReqQueueService {
         return this;
     }
 
-    request() {
+    request(): Promise<Map<string, string>> {
         return new Promise((resolve, reject) => {
             let reqList = this._splitReqs();
             this._request(reqList, resolve, reject);
@@ -30,7 +32,7 @@ class ReqQueueService {
         if (this.urls.length < this.maxConcurrentedNum) {
             return [this.urls];
         }
-        let results = [];
+        let results: Array<string> = [];
         let urls = JSON.parse(JSON.stringify(this.urls));
         while (true) {
             let list = urls.splice(0, this.maxConcurrentedNum);
@@ -42,16 +44,16 @@ class ReqQueueService {
         }
     }
 
-    _addMap(destMap, srcMap) {
-        for (let item of srcMap) {
-            destMap.set(item[0], item[1]);
-        }
+    _addMap(destMap: Map<string, string>, srcMap: Map<string, string>): Map<string, string> {
+        srcMap.forEach((val, key) => {
+            destMap.set(key, val);
+        });
         return destMap;
     }
 
     _request(reqList, resolve, reject) {
         if (reqList.length > 0) {
-            (new MultiAsyncReqService(reqList[0]))
+            (new MultiAsyncReq(reqList[0]))
                 .setFetchSetting(this.fetchSetting)
                 .request()
                 .then(map => {
@@ -59,10 +61,8 @@ class ReqQueueService {
                     reqList.splice(0, 1);
                     this._request(reqList, resolve, reject);
                 }, err => { reject(err) });
-        } else {
+            } else {
             resolve(this.resultMap);
         }
     }
 }
-
-export default ReqQueueService;

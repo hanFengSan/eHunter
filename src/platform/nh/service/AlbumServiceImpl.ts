@@ -1,6 +1,6 @@
-import ImgHtmlParser from '../parser/ImgHtmlParser'
-import IntroHtmlParser from '../parser/IntroHtmlParser'
-import TextReqService from '../../base/request/TextReqService'
+import { ImgHtmlParser } from '../parser/ImgHtmlParser'
+import { IntroHtmlParser } from '../parser/IntroHtmlParser'
+import { TextReq } from '../../base/request/TextReq'
 import { ThumbInfo } from '../../../../core/bean/ThumbInfo';
 import { AlbumService, PreviewThumbnailStyle, IndexInfo } from '../../../../core/service/AlbumService';
 import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo';
@@ -23,7 +23,7 @@ export class AlbumServiceImpl extends AlbumService {
     protected title: string = '';
     protected imgPageInfos: Array<ImgPageInfo> = [];
 
-    constructor(imgHtml) {
+    constructor(imgHtml: string) {
         super();
         this.imgHtmlParser = new ImgHtmlParser(imgHtml);
     }
@@ -38,7 +38,7 @@ export class AlbumServiceImpl extends AlbumService {
                 }
                 if (this.initIntroParserStatus === 'ready') {
                     this.initIntroParserStatus = 'pending';
-                    let text = await new TextReqService(this.getIntroUrl()).request();
+                    let text = await new TextReq(this.getIntroUrl()).request();
                     this.introParser = new IntroHtmlParser(text);
                     this.introParserResolves.forEach(fn => fn(this.introParser!));
                     this.initIntroParserStatus = 'done';
