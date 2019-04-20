@@ -27,20 +27,17 @@ export default {
 
     inject: ['service'],
     
-    data() {
-        return {
-            info: window.info,
-            imgList: [], // origin img list
-            thumbs: []
-        };
+    props: {
+        thumbInfos: {
+            type: Array
+        },
+        pageCount: {
+            type: Number
+        }
     },
 
     components: {
         AwesomeScrollView
-    },
-
-    created() {
-        this.initImgList();
     },
 
     computed: {
@@ -53,11 +50,11 @@ export default {
 
         // the thumbs of current volume
         volThumbs() {
-            return (this.thumbs || []).slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
+            return this.thumbInfos.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
         },
 
         curIndex() {
-            return this.service.album.getRealCurIndex(this.centerIndex)
+            return this.service.album.getRealCurIndexInfo(this.pageCount, this.centerIndex)
         }
     },
 
@@ -85,10 +82,6 @@ export default {
 
         select(index) {
             this.setIndex({ val: index, updater: tags.THUMB_VIEW });
-        },
-
-        async initImgList() {
-            this.thumbs = await this.service.album.getThumbs();
         },
 
         // get index of album for index of current volume

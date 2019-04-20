@@ -1,7 +1,19 @@
 <template>
-  <div class="app normalize">
-    <thumb-scroll-view class="thumb-column" :style="thumbStyle"></thumb-scroll-view>
-    <reader-view class="reader-column"></reader-view>
+  <div class="app normalize" v-if="isDone">
+    <thumb-scroll-view
+        class="thumb-column"
+        :style="thumbStyle"
+        :thumbInfos="thumbInfos"
+        :pageCount="pageCount">
+    </thumb-scroll-view>
+    <reader-view
+        class="reader-column"
+        :pageCount="pageCount"
+        :curPageNum="curPageNum"
+        :title="title"
+        :imgPageInfos="imgPageInfos"
+        :albumId="albumId">
+    </reader-view>
     <modal-manager class="modal"></modal-manager>
   </div>
 </template>
@@ -18,7 +30,7 @@ import * as tags from './assets/value/tags';
 export default {
     name: 'InjectedApp',
 
-    inject: ['config'],
+    inject: ['config', 'service'],
 
     components: {
         ThumbScrollView,
@@ -27,11 +39,36 @@ export default {
     },
 
     data() {
-        return {};
+        return {
+            pageCount: 0,
+            curPageNum: 0,
+            title: '',
+            imgPageInfos: [],
+            thumbInfos: [],
+            albumId: '',
+            isDone: false
+        };
     },
 
+
     async created() {
-        await this.checkInstrcutions();
+        Promise.all(
+            [this.service.album.getPageCount(),
+            this.service.album.getCurPageNum(),
+            this.service.album.getTitle(),
+            this.service.album.getImgPageInfos(),
+            this.service.album.getThumbInfos(),
+            this.service.album.getAlbumId()]
+            ).then(async values => {
+                this.pageCount = values[0];
+                this.curPageNum = values[1];
+                this.title = values[2];
+                this.imgPageInfos = values[3];
+                this.thumbInfos = values[4];
+                this.albumId = values[5];
+                this.isDone = true;
+            });
+        await this.checkInstructions();
         this.checkVersion();
     },
 
@@ -47,7 +84,7 @@ export default {
     },
 
     methods: {
-        async checkInstrcutions() {
+        async checkInstructions() {
             if (await SettingService.getFirstOpen()) {
                 // auto choose language
                 let lang = navigator.language.toLowerCase();

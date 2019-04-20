@@ -1,6 +1,6 @@
 <template>
 <section class="page-view">
-    <div class="layer preview-layer" :style="service.album.getPreviewThumbnailStyle(index, imgInfo, thumb)"></div>
+    <div class="layer preview-layer" :style="previewStyle"></div>
     <div class="layer loading-layer">
         <h6 class="index">{{ index + 1 }}</h6>
         <article class="loading-info-panel" v-if="active">
@@ -42,7 +42,7 @@
     <div class="layer img-layer">
         <img class="album-item" 
             v-if="active" 
-            :src="imgInfo.src" 
+            :src="imgPageInfo.src" 
             @load="loaded()"
             @error="failLoad($event)">
     </div>
@@ -79,22 +79,24 @@ export default {
 
     data() {
         return {
-            imgInfo: {},
-            thumb: {},
+            imgPageInfo: {},
             reloadTimes: 0,
             message: '',
-            curLoadStatus: null
+            curLoadStatus: null,
+            previewStyle: {}
         };
     },
 
     async created() {
-        this.imgInfo = JSON.parse(JSON.stringify(this.data));
-        this.imgInfo.isFirstLoad = true;
+        this.imgPageInfo = JSON.parse(JSON.stringify(this.data));
+        this.imgPageInfo.isFirstLoad = true;
         this.curLoadStatus = tags.STATE_WAITING;
         if (this.active) {
             this.getImgSrc();
         }
-        this.thumb = await this.service.album.getThumb(this.index);
+        this.service.album.getThumbInfo(this.index).then(async thumbInfo => {
+            this.previewStyle = await this.service.album.getPreviewThumbnailStyle(this.index, this.imgPageInfo, thumbInfo);
+        });
     },
 
     computed: {
@@ -133,8 +135,8 @@ export default {
             // avoid redundant getImgSrc(), overlap refreshing of 'origin'
             if (this.curLoadStatus !== tags.STATE_LOADING) {
                 let src = await this.service.album.getImgSrc(this.index, tags.MODE_FAST);
-                if (this.imgInfo.src !== src) {
-                    this.imgInfo.src = src;
+                if (this.imgPageInfo.src !== src) {
+                    this.imgPageInfo.src = src;
                 }
                 this.curLoadStatus = tags.STATE_LOADING;
             }
@@ -144,11 +146,11 @@ export default {
         async getNewImgSrc(mode) {
             this.reloadTimes++;
             this.message = '';
-            this.imgInfo.src = '';
+            this.imgPageInfo.src = '';
             this.curLoadStatus = tags.STATE_LOADING;
             let src = await this.service.album.getNewImgSrc(this.index, mode);
             if (!(src instanceof Error)) {
-                this.imgInfo.src = src;
+                this.imgPageInfo.src = src;
             } else {
                 switch (src.message) {
                     case tags.ERROR_NO_ORIGIN:
@@ -162,12 +164,12 @@ export default {
 
         failLoad(e) {
             e.preventDefault();
-            if (this.imgInfo.src) {
+            if (this.imgPageInfo.src) {
                 this.curLoadStatus = tags.STATE_ERRORED;
                 Logger.logText('LOADING', 'loading image failed');
-                if (this.imgInfo.isFirstLoad) {
+                if (this.imgPageInfo.isFirstLoad) {
                     // auto request src when first loading is failed
-                    this.imgInfo.isFirstLoad = false;
+                    this.imgPageInfo.isFirstLoad = false;
                     Logger.logText('LOADING', 'reloading image');
                     this.getNewImgSrc(tags.MODE_FAST);
                 }

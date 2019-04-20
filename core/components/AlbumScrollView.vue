@@ -1,34 +1,46 @@
 <template>
-<div class="album-scroll-view">
+  <div class="album-scroll-view">
     <div class="preload">
-        <img :src="src" width="100" height="144" v-for="src of preloadImgs" :key="src">
+      <img :src="src" width="100" height="144" v-for="src of preloadImgs" :key="src">
     </div>
     <!-- scroll view -->
     <awesome-scroll-view
-        ref="scrollView" 
-        class="scroll-view" 
-        v-if="imgInfoList.length > 0" 
-        :on-scroll-stopped="onScrollStopped" 
+        ref="scrollView"
+        class="scroll-view"
+        v-if="imgPageInfos.length > 0"
+        :on-scroll-stopped="onScrollStopped"
         @topIn="changeTopBar(true)"
         @topLeave="changeTopBar(false)">
         <h1>{{ title }}</h1>
-        <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
-        <div 
-            class="page-container" 
-            ref="pageContainers" 
-            v-for="(imgInfo, i) of volImgInfoList" 
-            :key="imgInfo.pageUrl"
-            :style="{'width':`${widthScale}%`,'padding-bottom':`${widthScale*imgInfo.heightOfWidth}%`}">
+        <pagination
+            v-if="volumeSum != 1"
+            class="top-pagination"
+            :cur-index="curVolume"
+            :page-sum="volumeSum"
+            @change="selectVol"
+        />
+        <div
+            class="page-container"
+            ref="pageContainers"
+            v-for="(imgPageInfo, i) of volImgPageInfos"
+            :key="imgPageInfo.id"
+            :style="{'width':`${widthScale}%`,'padding-bottom':`${widthScale * imgPageInfo.heightOfWidth}%`}">
             <page-view
-                :index="index(i, imgInfo.pageUrl)"
+                :index="imgPageInfo.index"
                 :active="nearbyArray.indexOf(index(i)) > -1"
-                :album-id="service.album.getAlbumId()"
-                :data="imgInfo"
-            ></page-view>
+                :albumId="albumId"
+                :data="imgPageInfo">
+            </page-view>
         </div>
-        <pagination v-if="volumeSum != 1" class="bottom-pagination" :cur-index="curVolume" :page-sum="volumeSum" @change="selectVol"/>
+        <pagination
+            v-if="volumeSum != 1"
+            class="bottom-pagination"
+            :curIndex="curVolume"
+            :pageSum="volumeSum"
+            @change="selectVol"
+        />
     </awesome-scroll-view>
-</div>
+  </div>
 </template>
 
 <script>
@@ -45,21 +57,29 @@ export default {
     name: 'AlbumScrollView',
 
     props: {
-        imgInfoList: {
+        pageCount: {
+            type: Number
+        },
+        curPageNum: {
+            type: Number
+        },
+        title: {
+            type: String
+        },
+        imgPageInfos: {
             type: Array
         },
-        pageUrlsObj: {
-            type: Object
+        albumId: {
+            type: String
         }
     },
 
     inject: ['service'],
-    
+
     data() {
         return {
             scrollTop: 0,
-            preloadImgs: [],
-            title: ''
+            preloadImgs: []
         };
     },
 
@@ -73,7 +93,6 @@ export default {
     async created() {
         setTimeout(() => this.setIndex({ val: this.curIndex.val, updater: tags.SCROLL_VIEW_VOL }), 200);
         document.addEventListener('keydown', this.watchKeyboard);
-        this.title = await this.service.album.getTitle();
     },
 
     destroyed() {
@@ -97,20 +116,20 @@ export default {
             let _start = curIndex - this.loadNum;
             let start = _start >= 0 ? _start : 0;
             let _end = curIndex + this.loadNum;
-            let end = _end >= this.imgInfoList.length - 1 ? this.imgInfoList.length - 1 : _end;
+            let end = _end >= this.imgPageInfos.length - 1 ? this.imgPageInfos.length - 1 : _end;
             return this.range(start, end - start + 1);
         },
 
-        volImgInfoList() {
-            return this.imgInfoList.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
+        volImgPageInfos() {
+            return this.imgPageInfos.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
         },
 
         volumeSum() {
-            return Math.ceil(this.service.album.getPageCount() / this.volumeSize);
+            return Math.ceil(this.pageCount / this.volumeSize);
         },
 
         curIndex() {
-            return this.service.album.getRealCurIndex(this.centerIndex)
+            return this.service.album.getRealCurIndexInfo(this.pageCount, this.centerIndex);
         }
     },
 
@@ -176,13 +195,8 @@ export default {
         },
 
         // get index of album for index of current volume
-        index(i, pageUrl) {
-            if (pageUrl) {
-                // fix errors in delay methods
-                return this.pageUrlsObj[pageUrl];
-            } else {
-                return this.volFirstIndex + i;
-            }
+        index(i) {
+            return this.volFirstIndex + i;
         },
 
         // get index of current volume for index of album
@@ -209,7 +223,7 @@ export default {
             if (this.volumeSum > this.curVolume + 1) {
                 let volLastIndex = this.volFirstIndex + this.volumeSize - 1;
                 for (let i = 1; i <= this.volumePreloadCount; i++) {
-                    if (this.service.album.getPageCount() - 1 >= volLastIndex + i) {
+                    if (this.pageCount - 1 >= volLastIndex + i) {
                         this.preload(volLastIndex + i);
                     }
                 }
@@ -236,7 +250,7 @@ export default {
                     break;
                 case 'ArrowRight':
                 case 'd':
-                    if (this.centerIndex.val !== this.service.album.getPageCount() - 1) {
+                    if (this.centerIndex.val !== this.pageCount - 1) {
                         this.setIndex({ val: this.centerIndex.val + 1, updater: tags.KEYBOARD });
                     }
                     break;

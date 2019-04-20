@@ -1,7 +1,7 @@
 <template>
 <div class="reader-view">
     <!-- loading view -->
-    <div class="loading-container" v-if="isLoadingImgInfos">
+    <div class="loading-container" v-if="false">
         <span class="loading">Loading...</span>
         <p class="tip">
             {{ string .loadingTip }}
@@ -20,10 +20,26 @@
         </div>
     </div>
     <transition name="slow-horizontal-fade">
-        <album-scroll-view class="content scroll-mode" v-if="!isLoadingImgInfos&&readingMode===0" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-scroll-view>
+        <album-scroll-view
+            class="content scroll-mode"
+            v-if="readingMode === 0"
+            :pageCount="pageCount"
+            :curPageNum="curPageNum"
+            :title="title"
+            :imgPageInfos="imgPageInfos"
+            :albumId="albumId">
+        </album-scroll-view>
     </transition>
     <transition name="slow-vertical-fade">
-        <album-book-view class="content book-mode" v-if="!isLoadingImgInfos&&readingMode===1" :img-info-list="imgInfoList" :page-urls-obj="pageUrlsObj"></album-book-view>
+        <album-book-view
+            class="content book-mode"
+            v-if="readingMode === 1"
+            :pageCount="pageCount"
+            :curPageNum="curPageNum"
+            :title="title"
+            :imgPageInfos="imgPageInfos"
+            :albumId="albumId">
+        </album-book-view>
     </transition>
 </div>
 </template>
@@ -41,18 +57,28 @@ export default {
 
     inject: ['service'],
 
-    components: { AlbumScrollView, AlbumBookView, TopBar },
-
-    data() {
-        return {
-            imgInfoList: [],
-            pageUrlsObj: {} // hash, for fast get page index by pagUrl
-        };
+    props: {
+        pageCount: {
+            type: Number
+        },
+        curPageNum: {
+            type: Number
+        },
+        title: {
+            type: String
+        },
+        imgPageInfos: {
+            type: Array
+        },
+        albumId: {
+            type: String
+        }
     },
 
+    components: { AlbumScrollView, AlbumBookView, TopBar },
+
     async created() {
-        await this.initImgInfoList();
-        this.setIndex({ val: this.service.album.getCurPageNum() - 1, updater: tags.READER_VIEW });
+        this.setIndex({ val: this.curPageNum - 1, updater: tags.READER_VIEW });
     },
 
     computed: {
@@ -63,30 +89,20 @@ export default {
             bookScreenSize: 'bookScreenSize',
             string: 'string'
         }),
-        isLoadingImgInfos() {
-            return this.imgInfoList.length === 0;
-        },
         location() {
+            let bookScreenCount = this.service.album.getBookScreenCount(this.pageCount, this.bookScreenSize);
             switch (this.readingMode) {
                 case 0:
-                    return `${this.curIndex.val + 1} / ${this.service.album.getPageCount()}`;
+                    return `${this.curIndex.val + 1} / ${this.pageCount}`;
                 case 1:
                     return `${this.bookIndex + 1} / 
-                    ${this.service.album.getBookScreenCount(this.bookScreenSize)}`;
+                    ${bookScreenCount}`;
             }
         }
     },
 
     methods: {
         ...mapActions(['setIndex']),
-        async initImgInfoList() {
-            this.imgInfoList = await this.service.album.getImgInfos();
-            // init pageUrlsObj
-            for (let i = 0; i < this.imgInfoList.length; i++) {
-                this.pageUrlsObj[this.imgInfoList[i].pageUrl] = i;
-            }
-        },
-
         fullscreen() {
             // hack for crossing chrome and firefox
             const elem = document.querySelector('.vue-container');

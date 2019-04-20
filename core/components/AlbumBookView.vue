@@ -1,7 +1,7 @@
 <template>
 <section class="album-book-view">
     <div :class="['screen', {'animation': showBookScreenAnimation, 'rtl': bookDirection===0 }]" 
-        v-for="screen in activedScreens" 
+        v-for="screen in activeScreens" 
         :style="getScreenStyle(screen)"
         :key="screenKey(screen)">
         <div 
@@ -11,10 +11,10 @@
             :key="page.id">
             <page-view
                 v-if="page.type===tags.TYPE_NORMAL"
-                :index="index(0, page.imgInfo.pageUrl)"
+                :index="page.imgPageInfo.index"
                 :active="true"
-                :album-id="service.album.getAlbumId()"
-                :data="page.imgInfo">
+                :albumId="albumId"
+                :data="page.imgPageInfo">
             </page-view>
             <div class="page start-page" v-if="page.type===tags.TYPE_START">
                 <div :class="['ehunter-tag', { 'left': bookDirection===1 }]">
@@ -51,11 +51,20 @@ export default {
     name: 'AlbumBookView',
 
     props: {
-        imgInfoList: {
+        pageCount: {
+            type: Number
+        },
+        curPageNum: {
+            type: Number
+        },
+        title: {
+            type: String
+        },
+        imgPageInfos: {
             type: Array
         },
-        pageUrlsObj: {
-            type: Object
+        albumId: {
+            type: String
         }
     },
 
@@ -65,8 +74,7 @@ export default {
 
     data() {
         return {
-            appSize: { height: 0, width: 0 },
-            title: ''
+            appSize: { height: 0, width: 0 }
         };
     },
 
@@ -74,8 +82,7 @@ export default {
         this.appSize = this.getAppSize();
         window.addEventListener('resize', this.watchResize);
         document.addEventListener('keydown', this.watchKeyboard);
-        this.checkInstrcutions();
-        this.title = await this.service.album.getTitle();
+        this.checkInstructions();
     },
 
     destroyed() {
@@ -105,15 +112,15 @@ export default {
         },
         pages() {
             return [
-                { id: tags.ID_START, type: tags.TYPE_START, imgInfo: { heightOfWidth: 1.45 } },
-                ...this.imgInfoList.map(i => {
+                { id: tags.ID_START, type: tags.TYPE_START, imgPageInfo: { heightOfWidth: 1.45 } },
+                ...this.imgPageInfos.map(i => {
                     return {
-                        id: i.pageUrl,
+                        id: i.id,
                         type: tags.TYPE_NORMAL,
-                        imgInfo: i
+                        imgPageInfo: i
                     };
                 }),
-                { id: tags.ID_END, type: tags.TYPE_END, imgInfo: { heightOfWidth: 1.45 } }
+                { id: tags.ID_END, type: tags.TYPE_END, imgPageInfo: { heightOfWidth: 1.45 } }
             ];
         },
         screens() {
@@ -124,7 +131,7 @@ export default {
             }
             return pageList;
         },
-        activedScreens() {
+        activeScreens() {
             let begin = this.bookIndex - this.bookLoadNum;
             return this.screens.slice(begin >= 0 ? begin : 0, this.bookIndex + this.bookLoadNum);
         },
@@ -133,10 +140,10 @@ export default {
             let pageSizes = [];
             for (let pages of this.screens) {
                 let maxPageRatio = pages.reduce((max, i) => {
-                    max = i.imgInfo.heightOfWidth > max ? i.imgInfo.heightOfWidth : max;
+                    max = i.imgPageInfo.heightOfWidth > max ? i.imgPageInfo.heightOfWidth : max;
                     return max;
                 }, 0);
-                let pagesRatio = maxPageRatio / pages.length; // assume the all the widths of each page are 1
+                let pagesRatio = maxPageRatio / pages.length; // assume all the widths of each page are 1
                 let width;
                 if (pagesRatio >= this.screenSize.screenRatio) {
                     width = this.screenSize.height / maxPageRatio;
@@ -146,7 +153,7 @@ export default {
                 pages.forEach(page => {
                     pageSizes.push({
                         id: page.id,
-                        height: width * page.imgInfo.heightOfWidth,
+                        height: width * page.imgPageInfo.heightOfWidth,
                         width
                     });
                 });
@@ -158,13 +165,8 @@ export default {
     methods: {
         ...mapActions(['setBookIndex']),
         // get index of album for index of current volume
-        index(i, pageUrl) {
-            if (pageUrl) {
-                // fix errors in delay methods
-                return this.pageUrlsObj[pageUrl];
-            } else {
-                return this.volFirstIndex + i;
-            }
+        index(i) {
+            return this.volFirstIndex + i;
         },
 
         getScreenIndexByPageIndex(pageIndex) {
@@ -236,7 +238,7 @@ export default {
             this.setBookIndex(index);
         },
 
-        async checkInstrcutions() {
+        async checkInstructions() {
             if (await SettingService.getFirstOpenBookMode()) {
                 InfoService.showBookInstruction(true);
                 SettingService.setFirstOpenBookMode(false);

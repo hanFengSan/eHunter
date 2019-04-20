@@ -4,14 +4,12 @@ import { ThumbInfo, ThumbMode } from '../../../../core/bean/ThumbInfo'
 // a parser for album's intro page
 class IntroHtmlParser {
     private html: HTMLElement;
-    private reqUrl: string;
     private imgPageInfos: Array<ImgPageInfo> = [];
     private thumbInfos: Array<ThumbInfo> = [];
 
 
-    constructor(html, reqUrl) {
+    constructor(html) {
         this.html = document.createElement('html');
-        this.reqUrl = reqUrl;
         this.html.innerHTML = html.replace(/src=/g, 'x-src='); // avoid load assets
         this.parseData();
     }
@@ -29,6 +27,7 @@ class IntroHtmlParser {
             const imgSrc = thumbSrc.replace('t.', 'i.').replace('t.', '.');
             this.imgPageInfos.push({
                 id: pageUrl,
+                index: this.imgPageInfos.length, // set id to index
                 pageUrl,
                 thumbHeight,
                 thumbWidth,
