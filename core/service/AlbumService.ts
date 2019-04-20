@@ -26,6 +26,7 @@ export abstract class AlbumService {
     abstract async getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo): Promise<PreviewThumbnailStyle>;
     abstract supportOriginImg(): boolean;
     abstract supportImgChangeSource(): boolean;
+    abstract supportThumbView(): boolean;
 
     getBookScreenCount(pageCount: number, screenSize: number): number {
         // 2 is start page and end page

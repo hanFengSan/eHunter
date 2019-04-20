@@ -49,6 +49,10 @@ export class ImgUrlListParser {
                     imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl), introUrl).getImgUrls());
                     return imgUrls;
                 }, <Array<ImgPageInfo>>[]);
+                let index = 0;
+                result.forEach(i => {
+                    i.index = index++
+                });
                 if (result.length !== 0) {
                     resolve(result);
                 } else {

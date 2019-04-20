@@ -44,8 +44,7 @@ export abstract class BasePlatform {
         ring.style.boxShadow = '0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647)';
         container.appendChild(ring);
 
-        let i1 = document.getElementById('i1');
-        document.body.insertBefore(container, i1);
+        document.body.appendChild(container);
     }
 
     // when user click the ehunter switch
@@ -77,13 +76,11 @@ export abstract class BasePlatform {
         element.style.top = '-100%';
         element.style.left = '0px';
         element.classList.add('vue-container');
-        let i1 = document.getElementById('i1');
 
         let vue = document.createElement('div');
         vue.setAttribute('id', 'app');
         element.appendChild(vue);
-
-        document.body.insertBefore(element, i1);
+        document.body.appendChild(element);
 
         setTimeout(() => {
             element.style.top = '0';

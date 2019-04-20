@@ -56,7 +56,7 @@
                         @change="(val) => dropOptionSliderChange('volSize', val)">
                     </pop-slider>
                 </div>
-                <div class="item" v-if="readingMode===0">
+                <div class="item" v-if="readingMode===0 && service.album.supportThumbView()">
                     <span class="label tips tips-down" :title-content="string.thumbViewTip">{{ string.thumbView }}:</span>
                     <div class="bar-switch">
                         <simple-switch :active="showThumbView" @change="changeThumbView"></simple-switch>

@@ -15,7 +15,6 @@ export class IntroHtmlParser {
 
     getImgUrls(): Array<ImgPageInfo> {
         if (this._isValidIntroPage()) {
-            let index = 0;
             return Array.prototype.slice.call(this.html.getElementsByClassName('gdtm'), 0).map(item => {
                 item.children[0].getAttribute('style').match(/width:(.*?)px; height:(.*?)px;/g);
                 const thumbHeight = Number(RegExp.$2);
@@ -23,7 +22,7 @@ export class IntroHtmlParser {
                 let pageUrl = item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '';
                 return {
                     id: pageUrl,
-                    index: index++,
+                    index: 0,
                     pageUrl: process.env.NODE_ENV !== 'testing' ? pageUrl : 'https://e-hentai.org' + pageUrl,
                     src: '',
                     thumbHeight,

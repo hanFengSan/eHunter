@@ -31,7 +31,7 @@ class SettingService {
             firstOpenBookMode: { val: true }, // show instructions dialog for the users of first opening the book mode
             showTopBar: { eventName: 'toggleTopBar', val: true },
             isNormalMode: { val: true },
-            version: { val: null } // for showing infos of update
+            version: { val: '' } // for showing infos of update
         }
     }
 
@@ -227,11 +227,11 @@ class SettingService {
         return await this._getSettingItem('isNormalMode');
     }
 
-    async setVersion(val) {
+    async setVersion(val: string): Promise<void> {
         await this._setSettingItem('version', val);
     }
 
-    async getVersion() {
+    async getVersion(): Promise<string> {
         return await this._getSettingItem('version');
     }
 }

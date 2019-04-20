@@ -147,11 +147,15 @@ export class AlbumServiceImpl extends AlbumService {
         };
     }
 
-    supportOriginImg() {
+    supportOriginImg(): boolean {
         return true;
     }
 
-    supportImgChangeSource() {
+    supportImgChangeSource(): boolean {
+        return true;
+    }
+
+    supportThumbView(): boolean {
         return true;
     }
 }

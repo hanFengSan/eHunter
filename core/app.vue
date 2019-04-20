@@ -26,6 +26,7 @@ import ModalManager from './components/ModalManager.vue';
 import SettingService from './service/SettingService.ts';
 import InfoService from './service/InfoService.ts';
 import * as tags from './assets/value/tags';
+import Utils from './utils/Utils.ts';
 
 export default {
     name: 'InjectedApp',
@@ -46,7 +47,8 @@ export default {
             imgPageInfos: [],
             thumbInfos: [],
             albumId: '',
-            isDone: false
+            isDone: false,
+            supportThumbView: false
         };
     },
 
@@ -66,6 +68,7 @@ export default {
                 this.imgPageInfos = values[3];
                 this.thumbInfos = values[4];
                 this.albumId = values[5];
+                this.supportThumbView = this.service.album.supportThumbView();
                 this.isDone = true;
             });
         await this.checkInstructions();
@@ -75,7 +78,7 @@ export default {
     computed: {
         ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode']),
         thumbStyle() {
-            if (this.readingMode === 0 && this.showThumbView) {
+            if (this.readingMode === 0 && this.showThumbView && this.supportThumbView) {
                 return '';
             } else {
                 return { 'margin-left': this.px(-this.thumbWidth) };
@@ -100,6 +103,7 @@ export default {
         },
 
         async checkVersion() {
+            await Utils.timeout(5000); // avoid the reloading of storage update
             InfoService.checkUpdate(this.config);
             InfoService.checkNewVersion(this.config);
         }

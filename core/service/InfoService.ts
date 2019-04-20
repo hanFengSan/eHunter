@@ -94,18 +94,18 @@ class InfoService {
 
     // if updated a new version, shows messages
     async checkNewVersion(config): Promise<void> {
-        if (await SettingService.getVersion() !== config.version && !(await SettingService.getFirstOpen())) {
+        if (await SettingService.getVersion() !== config.version) {
             let dialog = new DialogBean(
                 tags.DIALOG_COMPULSIVE,
                 `${store.getters.string.versionUpdate} v${config.version}`,
                 store.getters.string.p_version,
                 new DialogOperation(store.getters.string.confirm, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
+                    SettingService.setVersion(config.version);
                     return true;
                 })
             );
             store.dispatch('addDialog', dialog);
         }
-        SettingService.setVersion(config.version);
     }
 }
 

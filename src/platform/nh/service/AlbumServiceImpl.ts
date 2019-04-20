@@ -1,9 +1,9 @@
 import { ImgHtmlParser } from '../parser/ImgHtmlParser'
 import { IntroHtmlParser } from '../parser/IntroHtmlParser'
 import { TextReq } from '../../base/request/TextReq'
-import { ThumbInfo } from '../../../../core/bean/ThumbInfo';
-import { AlbumService, PreviewThumbnailStyle, IndexInfo } from '../../../../core/service/AlbumService';
-import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo';
+import { ThumbInfo } from '../../../../core/bean/ThumbInfo'
+import { AlbumService, PreviewThumbnailStyle, IndexInfo } from '../../../../core/service/AlbumService'
+import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
 // import Logger from '../utils/Logger';
 
 interface IntroParserResolve {
@@ -128,5 +128,9 @@ export class AlbumServiceImpl extends AlbumService {
 
     supportImgChangeSource() {
         return false;
+    }
+
+    supportThumbView(): boolean {
+        return true;
     }
 }
