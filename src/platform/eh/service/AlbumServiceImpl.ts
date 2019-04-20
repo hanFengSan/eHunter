@@ -1,8 +1,8 @@
 import { ImgHtmlParser } from '../parser/ImgHtmlParser'
 import { AlbumCacheService } from './AlbumCacheService'
-import { AlbumService } from '../../../../core/service/AlbumService';
-import { ThumbInfo } from '../../../../core/bean/ThumbInfo';
-import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo';
+import { AlbumService } from '../../../../core/service/AlbumService'
+import { ThumbInfo } from '../../../../core/bean/ThumbInfo'
+import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
 // import Logger from '../utils/Logger';
 
 export class AlbumServiceImpl extends AlbumService {
@@ -66,7 +66,7 @@ export class AlbumServiceImpl extends AlbumService {
     }
 
     async getImgPageInfos(): Promise<Array<ImgPageInfo>> {
-        return this.cacheService.getImgInfos(await this.getAlbumId(), await this.getIntroUrl(), await this.getPageCount());
+        return this.cacheService.getImgPageInfos(await this.getAlbumId(), await this.getIntroUrl(), await this.getPageCount());
     }
 
     async getImgPageInfo(index: number): Promise<ImgPageInfo> {
@@ -83,7 +83,7 @@ export class AlbumServiceImpl extends AlbumService {
 
     async getThumbInfos(cache = true): Promise<Array<ThumbInfo>> {
         if (!cache || this.thumbInfos.length === 0) {
-            this.thumbInfos = this.cacheService.getThumbs(await this.getAlbumId(), await this.getIntroUrl(), await this.getPageCount());
+            this.thumbInfos = this.cacheService.getThumbInfos(await this.getAlbumId(), await this.getIntroUrl(), await this.getPageCount());
         }
         return this.thumbInfos;
     }

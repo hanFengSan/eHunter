@@ -6,7 +6,7 @@ module.exports.chrome = {
     'short_name': 'eHunter',
     'description': 'More powerful e-hentai/eHentai/exhentai! Scroll and Book view',
     'version': config.version,
-    'content_security_policy': 'script-src \'self\'; object-src \'self\'',
+    'content_security_policy': 'script-src \'self\' \'unsafe-eval\'; object-src \'self\'',
     'browser_action': {
         'default_popup': 'popup.html',
         'default_title': 'eHunter',

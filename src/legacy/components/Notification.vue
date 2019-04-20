@@ -15,14 +15,14 @@
                 <path d="M0 0h24v24H0z" fill="none"/>
             </svg>
             <div>
-                <div class="msg-item" v-for="item of msg.list" @click="open(item)">
+                <div class="msg-item" v-for="(item, index) of msg.list" :key="index" @click="open(item)">
                     <div class="avatar" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name[0].toUpperCase() }}</div>
                     <div class="msg-content">
                         <a class="msg-link" :href="item.url" :title="`${item.name}更新了${item.updatedNum}项`" @click.stop="" target="_blank">{{ `${item.name }更新了${item.updatedNum}项` }}</a>
                         <span class="time">{{ DateUtil.getIntervalFromNow(item.time) }}</span>
                     </div>
                     <div class="diff-list" v-show="item.open">
-                        <div class="diff-item" v-for="(title, index) of item.diffs">
+                        <div class="diff-item" v-for="(title, index) of item.diffs" :key="index">
                             <span>{{ `${index + 1}.  ${title}` }}</span>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
             <div class="tag-list-container">
                 <mu-sub-header>标签订阅列表</mu-sub-header>
                 <div class="subscribed-tag-list">
-                    <div class="item" v-for="(item, index) of tag.subscribedTagList">
+                    <div class="item" v-for="(item, index) of tag.subscribedTagList" :key="index">
                         <span class="tag" @click="openTagPopup(index)" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name }}</span>
                     </div>
                 </div>
@@ -63,11 +63,11 @@
                             </tr>
                             <tr>
                                 <td>作用网站:</td>
-                                <td><span v-for="site of tag.subscribedTagList[tag.curTagIndex].site">{{ site }}&nbsp;&nbsp;</span></td>
+                                <td><span v-for="(site, index) of tag.subscribedTagList[tag.curTagIndex].site" :key="index">{{ site }}&nbsp;&nbsp;</span></td>
                             </tr>
                             <tr>
                                 <td>类型:</td>
-                                <td><span v-for="type of tag.subscribedTagList[tag.curTagIndex].type">{{ type }}&nbsp;&nbsp;</span></td>
+                                <td><span v-for="(type, index) of tag.subscribedTagList[tag.curTagIndex].type" :key="index">{{ type }}&nbsp;&nbsp;</span></td>
                             </tr>
                             <tr>
                                 <td>检查间隔:</td>
@@ -75,7 +75,7 @@
                             </tr>
                             <tr>
                                 <td>语言类型:</td>
-                                <td><span v-for="lang of tag.subscribedTagList[tag.curTagIndex].lang">{{ lang }}&nbsp;&nbsp;</span></td>
+                                <td><span v-for="(lang, index) of tag.subscribedTagList[tag.curTagIndex].lang" :key="index">{{ lang }}&nbsp;&nbsp;</span></td>
                             </tr>
                         </table>
                     </div>
@@ -92,23 +92,23 @@
                 </div>
                 <div class="lang-selector">
                     <mu-select-field label="作用网站" hintText="需确保网站可访问" v-model="tag.site" :maxHeight="150">
-                        <mu-menu-item v-for="item, index in tag.sites" :title="item" :value="index"/>
+                        <mu-menu-item v-for="(item, index) in tag.sites" :title="item" :key="index" :value="index"/>
                     </mu-select-field>
                 </div>
                 <div class="type-selector">
                     <mu-select-field multiple label="画册类型" hintText="默认全类型订阅" v-model="tag.type" :maxHeight="150">
-                        <mu-menu-item v-for="item, index in tag.types" :title="item" :value="index"/>
+                        <mu-menu-item v-for="(item, index) in tag.types" :title="item" :key="index" :value="index"/>
                     </mu-select-field>
                 </div>
                 <div class="lang-selector">
                     <mu-select-field label="语言类型" hintText="默认不限语言" v-model="tag.lang" :maxHeight="150">
-                        <mu-menu-item v-for="item, index in tag.langs" :title="item" :value="index"/>
+                        <mu-menu-item v-for="(item, index) in tag.langs" :title="item" :key="index" :value="index"/>
                     </mu-select-field>
                 </div>
    
                 <div class="time-selector">
                     <mu-select-field label="检查间隔" v-model="tag.time" :maxHeight="150">
-                        <mu-menu-item v-for="item, index in tag.times" :title="item" :value="index"/>
+                        <mu-menu-item v-for="(item, index) in tag.times" :title="item" :key="index" :value="index"/>
                     </mu-select-field>
                 </div>
                 <div class="add">
@@ -123,11 +123,11 @@
 </template>
 
 <script>
-    import ColorService from 'src/service/type/TypeColorService'
-    import UpdateIntervalService from 'src/service/type/UpdateIntervalService'
-    import SubsStorageService from 'src/service/storage/SubsStorageService'
-    import NotiStorageService from 'src/service/storage/NotiStorageService'
-    import DateUtil from 'src/utils/DateUtil'
+    import ColorService from '../service/type/TypeColorService'
+    import UpdateIntervalService from '../service/type/UpdateIntervalService'
+    import SubsStorageService from '../service/storage/SubsStorageService'
+    import NotiStorageService from '../service/storage/NotiStorageService'
+    import DateUtil from '../utils/DateUtil'
 
     export default {
         name: 'Notification',
@@ -265,8 +265,8 @@
 </script>
 
 <style lang="scss">
-    @import "~style/_responsive";
-    @import "~style/_variables";
+    @import "../style/_responsive";
+    @import "../style/_variables";
 
     .notification {
         z-index: 200;

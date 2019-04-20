@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import App from './app.popup.vue'
+import App from './legacy/app.popup.vue'
 import MuseUI from 'muse-ui'
-import 'src/style/muse-ui/index.less'
+import './legacy/style/muse-ui/index.less'
 
 Vue.use(MuseUI)
 

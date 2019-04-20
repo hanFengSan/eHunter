@@ -14,7 +14,7 @@ module.exports = merge(baseWebpackConfig, {
     plugins: [
         new HtmlWebpackPlugin({
             filename: 'popup.html',
-            template: 'src/index.popup.html',
+            template: 'src/legacy/index.popup.html',
             inject: true,
             chunks: ['popup']
         }),

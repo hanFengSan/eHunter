@@ -36,7 +36,7 @@ export class IntroHtmlParser {
         }
     }
 
-    getThumbObjList(sumOfPage, albumId) {
+    getThumbObjList(sumOfPage, albumId): Array<ThumbInfo> {
         return this._computeThumbList(this._getThumbImgList(albumId, sumOfPage), sumOfPage);
     }
 

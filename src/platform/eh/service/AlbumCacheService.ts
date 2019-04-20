@@ -1,41 +1,42 @@
 // a singleton service for caching img url
-import { TextReq } from '../../base/request/TextReq.ts'
-import { ImgHtmlParser } from '../parser/ImgHtmlParser.ts'
-import { ImgUrlListParser } from '../parser/ImgUrlListParser.ts'
+import { TextReq } from '../../base/request/TextReq'
+import { ImgHtmlParser } from '../parser/ImgHtmlParser'
+import { ImgUrlListParser } from '../parser/ImgUrlListParser'
 import { IntroHtmlParser } from '../parser/IntroHtmlParser'
-import * as API from '../api.ts'
-import storage from 'core/service/storage/LocalStorage'
-import Logger from 'core/utils/Logger'
-import InfoService from 'core/service/InfoService'
-import SettingService from 'core/service/SettingService.ts'
-import store from 'core/store'
-import * as tags from '../../../assets/value/tags'
-import Utils from 'core/utils/Utils'
+import * as API from '../api'
+import storage from '../../../../core/service/storage/LocalStorage'
+import Logger from '../../../../core/utils/Logger'
+import InfoService from '../../../../core/service/InfoService'
+import SettingService from '../../../../core/service/SettingService'
+import store from '../../../../core/store'
+import * as tags from '../../../../core/assets/value/tags'
+import Utils from '../../../../core/utils/Utils'
+import { AlbumServiceImpl } from './AlbumServiceImpl';
+import { ThumbInfo } from '../../../../core/bean/ThumbInfo';
+import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo';
 
 /*
 storage
-  |-albumId
-    |-title :string
-    |-thumbs :array
-        |-Object
-          |-url
-          |-offset // the relative location
-    |-imgInfos :array
-      |-Object
-        |-pageUrl // eh page url
-        |-src // img src url
-        |-heightOfWidth // the ratio of height / width
+  |-key: (albumId: string); value: AlbumCache
  */
+interface AlbumCache {
+    title: string;
+    thumbInfos: Array<ThumbInfo>;
+    imgPageInfos: Array<ImgPageInfo>;
+}
 
 export class AlbumCacheService {
+    private version = '2.2';
+    private storageName = 'AlbumCache';
+    private storageVersionName = 'AlbumCacheVersion';
+    private _isNormalMode = false; // make sure in 'Normal' mode
+    private _isChangedMode = false;
+    private albumService: AlbumServiceImpl;
+    private _album: AlbumCache | undefined;
+
     constructor(albumService) {
-        this.version = '2.1';
-        this.storageName = 'AlbumCache';
-        this.storageVersionName = 'AlbumCacheVersion';
         this._initStorage();
         this._migrate();
-        this._isNormalMode = false; // make sure in 'Normal' mode
-        this._isChangedMode = false;
         this.albumService = albumService;
     }
 
@@ -65,7 +66,7 @@ export class AlbumCacheService {
         };
     }
 
-    async _getAlbum(albumId) {
+    async _getAlbum(albumId: string): Promise<AlbumCache> {
         if (this._album) {
             return this._album;
         } else {
@@ -74,31 +75,32 @@ export class AlbumCacheService {
             } catch (e) {
                 this._album = {
                     title: '',
-                    thumbs: [],
-                    imgInfos: []
+                    thumbInfos: [],
+                    imgPageInfos: []
                 };
             }
-            return this._album;
+            return this._album!;
         }
     }
 
-    async _saveAlbum(albumId) {
+    async _saveAlbum(albumId: string): Promise<void> {
         // L.o('save', this._album);
         await storage.save({ key: this.storageName, id: albumId, data: await this._getAlbum(albumId), expires: 1000 * 60 * 60 });
     }
 
-    async getThumbs(albumId, introUrl, sumOfPage) {
+    async getThumbInfos(albumId: string, introUrl, sumOfPage): Promise<Array<ThumbInfo>> {
         let album = await this._getAlbum(albumId);
-        if (album.thumbs.length > 0) {
-            Logger.logText('CacheService', 'read thumbs from cache');
-            return JSON.parse(JSON.stringify(album.thumbs));
+        if (album.thumbInfos.length > 0) {
+            Logger.logText('CacheService', 'read thumbInfos from cache');
+            return JSON.parse(JSON.stringify(album.thumbInfos));
         } else {
             try {
                 let text;
+                let reqUrl = API.getIntroHtml(introUrl, 1);
                 // compatible with large mode
                 try { // If in 'Normal' mode of thumbnails, this will be right
-                    text = await new TextReq(API.getIntroHtml(introUrl, 1)).request();
-                    new IntroHtmlParser(text).getThumbObjList(sumOfPage, albumId);
+                    text = await new TextReq(reqUrl).request();
+                    new IntroHtmlParser(text, reqUrl).getThumbObjList(sumOfPage, albumId);
                     this._isNormalMode = true;
                     await SettingService.setNormalMode(true);
                 } catch (e) { // In 'Large' mode
@@ -116,24 +118,25 @@ export class AlbumCacheService {
                         Logger.logObj('AlbumCache', e);
                     }
                 }
-                let introPage = new IntroHtmlParser(text);
-                let thumbs = introPage.getThumbObjList(sumOfPage, albumId);
-                album.thumbs = thumbs;
-                this._album.thumbs = thumbs; // wired
+                let introPage = new IntroHtmlParser(text, reqUrl);
+                let thumbInfos = introPage.getThumbObjList(sumOfPage, albumId);
+                album.thumbInfos = thumbInfos;
+                this._album!.thumbInfos = thumbInfos; // wired
                 await this._saveAlbum(albumId);
-                return JSON.parse(JSON.stringify(album.thumbs));
+                return JSON.parse(JSON.stringify(album.thumbInfos));
             } catch (e) {
-                console.error(e);
                 // TODO: show tips for the error
+                console.error(e);
+                return [];
             }
         }
     }
 
-    async getImgInfos(albumId, introUrl, sumOfPage) {
+    async getImgPageInfos(albumId: string, introUrl: string, sumOfPage: number): Promise<Array<ImgPageInfo>> {
         let album = await this._getAlbum(albumId);
-        if (album.imgInfos.length > 0) {
-            Logger.logText('CacheService', 'read imgInfos from cache');
-            return JSON.parse(JSON.stringify(album.imgInfos));
+        if (album.imgPageInfos.length > 0) {
+            Logger.logText('CacheService', 'read imgPageInfos from cache');
+            return JSON.parse(JSON.stringify(album.imgPageInfos));
         } else {
             if (!await SettingService.getNormalMode()) {
                 while (!this._isNormalMode) {
@@ -142,37 +145,37 @@ export class AlbumCacheService {
                 introUrl = this.albumService.getIntroUrl(); // after changine mode, the introUrl maybe changed.
             }
             try {
-                return await this._getImgInfos(albumId, introUrl, sumOfPage);
+                return await this._getImgPageInfos(albumId, introUrl, sumOfPage);
             } catch (e) {
-                Logger.logText('CacheService', 'loading ImgInfos failed. It\'s large.');
+                Logger.logText('CacheService', 'loading ImgPageInfos failed. It\'s large.');
                 while (!this._isNormalMode) {
                     await Utils.timeout(100);
                     introUrl = this.albumService.getIntroUrl();
                 }
-                return await this._getImgInfos(albumId, introUrl, sumOfPage);
+                return await this._getImgPageInfos(albumId, introUrl, sumOfPage);
             }
         }
     }
 
-    async _getImgInfos(albumId, introUrl, sumOfPage) {
+    async _getImgPageInfos(albumId: string, introUrl: string, sumOfPage: number): Promise<Array<ImgPageInfo>> {
         let album = await this._getAlbum(albumId);
-        let imgInfos = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
-        album.imgInfos = imgInfos;
+        let imgPageInfos = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
+        this._album!.imgPageInfos = imgPageInfos;
         await this._saveAlbum(albumId);
         if (this._isChangedMode) {
             window.fetch(`${introUrl}?inline_set=ts_l`, { method: 'GET', credentials: 'include' }); // change back
         }
-        return JSON.parse(JSON.stringify(album.imgInfos));
+        return JSON.parse(JSON.stringify(album.imgPageInfos));
     }
 
-    async getImgSrc(albumId, index, mode, sourceId) {
+    async getImgSrc(albumId, index, mode, sourceId?): Promise<string | Error> {
         let album = await this._getAlbum(albumId);
-        if (album.imgInfos[index].src) {
-            return album.imgInfos[index].src;
+        if (album.imgPageInfos[index].src) {
+            return album.imgPageInfos[index].src;
         }
         try {
             let param = sourceId ? `?nl=${sourceId}` : ''; // change source 0f img
-            let req = new TextReq(album.imgInfos[index].pageUrl + param);
+            let req = new TextReq(album.imgPageInfos[index].pageUrl + param);
             if (mode === tags.MODE_FAST) { // fast fetch
                 req.setTimeOutTime(3);
             }
@@ -181,7 +184,7 @@ export class AlbumCacheService {
             switch (mode) {
                 case tags.MODE_ORIGIN: // if want to load original img
                     try {
-                        album.imgInfos[index].src = parser.getOriginalImgUrl();
+                        album.imgPageInfos[index].src = parser.getOriginalImgUrl();
                     } catch (e) {
                         return Error(tags.ERROR_NO_ORIGIN);
                     }
@@ -192,19 +195,20 @@ export class AlbumCacheService {
                     }
                     break;
                 default:
-                    album.imgInfos[index].src = parser.getImgUrl();
+                    album.imgPageInfos[index].src = parser.getImgUrl();
             }
             await this._saveAlbum(albumId);
-            return album.imgInfos[index].src;
+            return album.imgPageInfos[index].src;
         } catch (e) {
             console.error(e);
+            return '';
             // TODO: show tips for the error
         }
     }
 
-    async getNewImgSrc(albumId, index, mode) {
+    async getNewImgSrc(albumId: string, index: number, mode): Promise<string | Error> {
         let album = await this._getAlbum(albumId);
-        album.imgInfos[index].src = null;
+        album.imgPageInfos[index].src = '';
         await this._saveAlbum(albumId);
         return await this.getImgSrc(albumId, index, mode);
     }

@@ -14,7 +14,7 @@ export class ImgUrlListParser {
         this.introPageUrls = this._getIntroPageUrls();
     }
 
-    request() {
+    request(): Promise<Array<ImgPageInfo>> {
         return new Promise((resolve, reject) => {
             this._request(resolve, reject);
         });

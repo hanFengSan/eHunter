@@ -8,7 +8,7 @@
 // awesome scroll view for chrome(-webkit)
 // @author: Alex chen
 // @created: 2017-03-11
-import BezierEasing from 'src/utils/bezier-easing.js';
+import BezierEasing from '../../utils/bezier-easing.js';
 
 export default {
     name: 'AwesomeScrollView',

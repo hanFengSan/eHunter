@@ -13,7 +13,7 @@ module.exports = {
     entry: {
         popup: resolve('src/main.popup.js'),
         inject: resolve('src/main.inject.js'),
-        background: resolve('src/background.js')
+        background: resolve('src/legacy/background.js')
     },
     output: {
         path: resolve('dist'),
@@ -90,10 +90,7 @@ module.exports = {
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
             'src': resolve('src'),
-            'core': resolve('core'),
-            'assets': resolve('src/assets'),
-            'components': resolve('src/components'),
-            'style': resolve('src/style'),
+            'core': resolve('core')
         }
     },
     plugins: [
