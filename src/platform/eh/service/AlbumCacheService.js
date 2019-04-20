@@ -7,7 +7,7 @@ import * as API from '../api.ts'
 import storage from 'core/service/storage/LocalStorage'
 import Logger from 'core/utils/Logger'
 import InfoService from 'core/service/InfoService'
-import SettingService from 'core/service/SettingService'
+import SettingService from 'core/service/SettingService.ts'
 import store from 'core/store'
 import * as tags from '../../../assets/value/tags'
 import Utils from 'core/utils/Utils'
@@ -29,7 +29,7 @@ storage
 
 export class AlbumCacheService {
     constructor(albumService) {
-        this.version = '2.0';
+        this.version = '2.1';
         this.storageName = 'AlbumCache';
         this.storageVersionName = 'AlbumCacheVersion';
         this._initStorage();

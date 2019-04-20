@@ -1,7 +1,7 @@
 import Storage from './base/Storage'
 import Platform from '../PlatformService'
 
-var storage = new Storage({
+let storage = new Storage({
     size: 10,
     storageBackend: Platform.storage.local,
     defaultExpires: null,

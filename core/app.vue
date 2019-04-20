@@ -23,8 +23,8 @@ import { mapGetters } from 'vuex';
 import ThumbScrollView from './components/ThumbScrollView.vue';
 import ReaderView from './components/ReaderView.vue';
 import ModalManager from './components/ModalManager.vue';
-import SettingService from './service/SettingService';
-import InfoService from './service/InfoService';
+import SettingService from './service/SettingService.ts';
+import InfoService from './service/InfoService.ts';
 import * as tags from './assets/value/tags';
 
 export default {

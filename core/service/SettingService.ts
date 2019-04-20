@@ -4,10 +4,11 @@ import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {
+    version = '2.1';
+    storageName = 'Settings';
+    storageVersionName = 'SettingsVersion';
+
     constructor() {
-        this.version = '2.0';
-        this.storageName = 'Settings';
-        this.storageVersionName = 'SettingsVersion';
         this._initStorage();
         this._migrate();
     }

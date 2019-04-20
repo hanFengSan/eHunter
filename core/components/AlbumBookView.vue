@@ -43,8 +43,8 @@ import { mapGetters, mapActions } from 'vuex';
 import PageView from './PageView.vue';
 import Pagination from './widget/Pagination.vue';
 import * as tags from '../assets/value/tags';
-import SettingService from '../service/SettingService';
-import InfoService from '../service/InfoService';
+import SettingService from '../service/SettingService.ts';
+import InfoService from '../service/InfoService.ts';
 // import Logger from '../utils/Logger';
 
 export default {

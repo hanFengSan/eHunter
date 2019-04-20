@@ -50,7 +50,7 @@ import TopBar from './TopBar.vue';
 import Logger from '../utils/Logger.js';
 import Pagination from './widget/Pagination.vue';
 import PageView from './PageView.vue';
-import SettingService from '../service/SettingService';
+import SettingService from '../service/SettingService.ts';
 import * as tags from '../assets/value/tags';
 
 export default {

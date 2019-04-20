@@ -1,9 +1,9 @@
 import store from '../store'
-import DialogBean from '../bean/DialogBean.ts'
+import DialogBean from '../bean/DialogBean'
 import { DialogOperation, DOClick } from '../bean/DialogOperation'
 import * as tags from '../assets/value/tags'
-import { TextReq } from '../service/request/TextReq.ts'
-import ServerMessage from '../bean/ServerMessage.ts'
+import { TextReq } from '../service/request/TextReq'
+import ServerMessage from '../bean/ServerMessage'
 import SettingService from '../service/SettingService'
 import Logger from '../utils/Logger'
 import Formatter from '../utils/formatter'
@@ -24,11 +24,11 @@ class InfoService {
         store.dispatch('addDialog', dialog);
     }
 
-    async showBookInstruction(isCompulsive) {
+    async showBookInstruction(isCompulsive): Promise<void> {
         let dialog = new DialogBean(
             isCompulsive ? tags.DIALOG_COMPULSIVE : tags.DIALOG_NORMAL,
             store.getters.string.instructions,
-            store.getters.string.p_bookInstrction,
+            store.getters.string.p_bookInstruction,
             new DialogOperation(store.getters.string.confirm, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
                 return true;
             })
@@ -36,7 +36,7 @@ class InfoService {
         store.dispatch('addDialog', dialog);
     }
 
-    async checkUpdate(config) {
+    async checkUpdate(config): Promise<void> {
         let message;
         let lastShowDialogTime = await SettingService.getUpdateTime();
         Promise
@@ -59,8 +59,8 @@ class InfoService {
             });
     }
 
-    showUpdateInfo(message) {
-        let operations = [];
+    showUpdateInfo(message): void {
+        let operations: Array<DialogOperation> = [];
         operations.push(new DialogOperation(store.getters.string.later, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
             return true;
         }));
@@ -79,7 +79,7 @@ class InfoService {
         store.dispatch('addDialog', dialog);
     }
 
-    showReloadError(text) {
+    showReloadError(text): void {
         let dialog = new DialogBean(
             tags.DIALOG_COMPULSIVE,
             store.getters.string.loadingFailed,
@@ -93,7 +93,7 @@ class InfoService {
     }
 
     // if updated a new version, shows messages
-    async checkNewVersion(config) {
+    async checkNewVersion(config): Promise<void> {
         if (await SettingService.getVersion() !== config.version && !(await SettingService.getFirstOpen())) {
             let dialog = new DialogBean(
                 tags.DIALOG_COMPULSIVE,

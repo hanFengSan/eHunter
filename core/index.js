@@ -4,7 +4,7 @@ import Vue from 'vue'
 import launcher from './launcher'
 import store from './store'
 import VueUtil from './utils/VueUtil.js'
-import SettingService from './service/SettingService'
+import SettingService from './service/SettingService.ts'
 import { setTimeout } from 'timers'
 
 Vue.mixin(VueUtil);

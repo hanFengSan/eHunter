@@ -125,9 +125,9 @@ import DropOption from './widget/DropOption.vue';
 import PopSlider from './widget/PopSlider.vue';
 import SimpleSwitch from './widget/SimpleSwitch.vue';
 import CircleIconButton from './widget/CircleIconButton.vue';
-import SettingService from '../service/SettingService.js';
+import SettingService from '../service/SettingService.ts';
 import * as tags from '../assets/value/tags';
-import InfoService from '../service/InfoService';
+import InfoService from '../service/InfoService.ts';
 // import Logger from '../utils/Logger';
 
 export default {
