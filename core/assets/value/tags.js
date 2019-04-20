@@ -23,7 +23,7 @@ export const LANG_JP = 'LANG_JP';
 
 export const STATE_WAITING = 'STATE_WAITING';
 export const STATE_LOADING = 'STATE_LOADING';
-export const STATE_ERRORED = 'STATE_ERRORED';
+export const STATE_ERROR = 'STATE_ERROR';
 export const STATE_LOADED = 'STATE_LOADED';
 
 export const DIALOG_NORMAL = 'DIALOG_NORMAL';

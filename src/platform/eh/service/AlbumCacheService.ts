@@ -201,7 +201,7 @@ export class AlbumCacheService {
             return album.imgPageInfos[index].src;
         } catch (e) {
             console.error(e);
-            return '';
+            return new Error(tags.STATE_ERROR);
             // TODO: show tips for the error
         }
     }

@@ -109,7 +109,7 @@ export default {
                 return reloadInfo + this.message;
             }
             switch (this.curLoadStatus) {
-                case tags.STATE_ERRORED:
+                case tags.STATE_ERROR:
                     return reloadInfo + this.string.loadingImgFailed;
                 case tags.STATE_LOADED:
                     return reloadInfo + this.string.imgLoaded;
@@ -168,7 +168,7 @@ export default {
         failLoad(e) {
             e.preventDefault();
             if (this.imgPageInfo.src) {
-                this.curLoadStatus = tags.STATE_ERRORED;
+                this.curLoadStatus = tags.STATE_ERROR;
                 Logger.logText('LOADING', 'loading image failed');
                 if (this.imgPageInfo.isFirstLoad) {
                     // auto request src when first loading is failed
