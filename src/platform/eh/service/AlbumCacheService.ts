@@ -11,9 +11,9 @@ import SettingService from '../../../../core/service/SettingService'
 import store from '../../../../core/store'
 import * as tags from '../../../../core/assets/value/tags'
 import Utils from '../../../../core/utils/Utils'
-import { AlbumServiceImpl } from './AlbumServiceImpl';
-import { ThumbInfo } from '../../../../core/bean/ThumbInfo';
-import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo';
+import { AlbumServiceImpl } from './AlbumServiceImpl'
+import { ThumbInfo } from '../../../../core/bean/ThumbInfo'
+import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
 
 /*
 storage

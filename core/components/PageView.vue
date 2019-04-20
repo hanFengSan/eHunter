@@ -54,6 +54,7 @@ import { mapGetters } from 'vuex';
 import FlatButton from './widget/FlatButton.vue';
 import Logger from '../utils/Logger.js';
 import * as tags from '../assets/value/tags';
+import Utils from '../utils/Utils.ts';
 
 export default {
     name: 'PageView',
@@ -150,6 +151,8 @@ export default {
             this.curLoadStatus = tags.STATE_LOADING;
             let src = await this.service.album.getNewImgSrc(this.index, mode);
             if (!(src instanceof Error)) {
+                await this.$nextTick();
+                await Utils.timeout(300);
                 this.imgPageInfo.src = src;
             } else {
                 switch (src.message) {
