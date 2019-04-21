@@ -1,6 +1,17 @@
 <template>
     <nav class="top-bar">
-        <div class="float-content" :style="topBarStyle">
+        <div class="float-content" :style="floatBtnStyle">
+            <transition name="slow-horizontal-fade">
+                <circle-icon-button 
+                    v-if="showTopBar"
+                    ref="topBarButton" 
+                    class="button tips tips-left tips-down" 
+                    icon="expand"
+                    :title-content="string.toggleMoreSettings"
+                    :rotate="showMoreSettings"
+                    @click="toggleMoreSettings">
+                </circle-icon-button>
+            </transition>
             <circle-icon-button 
                 ref="topBarButton" 
                 class="button tips tips-left tips-down" 
@@ -11,7 +22,7 @@
             </circle-icon-button>
             <circle-icon-button class="button tips tips-left tips-down" :title-content="string.closeEHunter" icon="close" @click="closeEHunter"></circle-icon-button>
         </div>
-        <div :class="['inner-content', { hide: !showTopBar }]" :style="topBarStyle">
+        <div :class="['inner-content', { hide: !showTopBar, 'more-settings': showMoreSettings }]" :style="topBarStyle">
             <template v-if="readSettings">
                 <div class="item">
                     <span class="label tips tips-down tips-right" :title-content="string.readingModeTip">{{ string.readingMode }}:</span>
@@ -172,10 +183,18 @@ export default {
             'showBookPagination',
             'bookScreenSize',
             'bookDirection',
-            'string'
+            'string',
+            'showMoreSettings'
         ]),
+        floatBtnStyle() {
+            return { 
+                height: this.px(this.topBarHeight)
+            };
+        },
         topBarStyle() {
-            return { height: this.px(this.topBarHeight) };
+            return { 
+                height: this.showMoreSettings? this.px(this.topBarHeight * 2) : this.px(this.topBarHeight)
+            };
         },
         readingModeList() {
             return [{ name: this.string.scrollMode, val: 0 }, { name: this.string.bookMode, val: 1 }];
@@ -340,6 +359,10 @@ export default {
         resetCache() {
             localStorage.clear();
             window.location.reload();
+        },
+
+        toggleMoreSettings(show) {
+            SettingService.setShowMoreSettings(!this.showMoreSettings);
         }
     }
 };
@@ -378,6 +401,7 @@ div {
         > .item {
             margin-left: 18px;
             position: relative;
+            height: 40px;
             &.less-margin {
                 margin-left: 10px;
             }
@@ -417,6 +441,11 @@ div {
         }
         &.hide {
             transform: translateY(-100%);
+        }
+        &.more-settings {
+            flex-wrap: wrap;
+            align-content: flex-start;
+            padding-right: 120px;
         }
     }
 }

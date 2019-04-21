@@ -204,6 +204,11 @@ export default {
         en: 'Show/hide top bar',
         jp: 'トップバーの表示/非表示'
     },
+    toggleMoreSettings: {
+        cn: '显示/隐藏更多设置',
+        en: 'Show/hide more settings',
+        jp: '他の設定を表示/隠す'
+    },
     confirm: {
         cn: '确定',
         en: 'CONFIRM',

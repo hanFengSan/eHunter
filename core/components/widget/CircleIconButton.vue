@@ -9,6 +9,9 @@
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
             <path d="M0 0h24v24H0z" fill="none"/>
         </template>
+        <template v-if="icon === 'expand'">
+            <path fill="none" d="M0 0h24v24H0V0z"/><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/>
+        </template>
     </svg>
 </div>
 </template>
@@ -18,7 +21,7 @@ export default {
     name: 'CircleIconButton',
 
     props: {
-        icon: {  // [menu, close]
+        icon: {  // [menu, close, expand]
             type: String
         },
         rotate: {

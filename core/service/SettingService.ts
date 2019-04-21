@@ -4,7 +4,7 @@ import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {
-    version = '2.1';
+    version = '2.2';
     storageName = 'Settings';
     storageVersionName = 'SettingsVersion';
 
@@ -31,7 +31,8 @@ class SettingService {
             firstOpenBookMode: { val: true }, // show instructions dialog for the users of first opening the book mode
             showTopBar: { eventName: 'toggleTopBar', val: true },
             isNormalMode: { val: true },
-            version: { val: '' } // for showing infos of update
+            version: { val: '' }, // for showing infos of update
+            showMoreSettings: { eventName: 'toggleMoreSettings', val: false }
         }
     }
 
@@ -233,6 +234,14 @@ class SettingService {
 
     async getVersion(): Promise<string> {
         return await this._getSettingItem('version');
+    }
+
+    async getShowMoreSettings(): Promise<string> {
+        return await this._getSettingItem('showMoreSettings');
+    }
+
+    async setShowMoreSettings(show: boolean): Promise<void> {
+        await this._setSettingItem('showMoreSettings', show);
     }
 }
 
