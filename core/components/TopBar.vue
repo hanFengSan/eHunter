@@ -183,9 +183,16 @@ export default {
         widthList() {
             return [
                 { name: '40%', val: 40 },
+                { name: '50%', val: 50 },
+                { name: '55%', val: 55 },
+                { name: '60%', val: 60 },
+                { name: '65%', val: 65 },
                 { name: '70%', val: 70 },
+                { name: '75%', val: 75 },
                 { name: '80%', val: 80 },
+                { name: '85%', val: 85 },
                 { name: '90%', val: 90 },
+                { name: '95%', val: 95 },
                 { name: '100%', val: 100 },
                 { name: this.string.custom, val: -1 }
             ];
@@ -197,6 +204,11 @@ export default {
                 { name: '3P', val: 3 },
                 { name: '5P', val: 5 },
                 { name: '10P', val: 10 },
+                { name: '20P', val: 20 },
+                { name: '30P', val: 30 },
+                { name: '40P', val: 40 },
+                { name: '50P', val: 50 },
+                { name: '100P', val: 100 },
                 { name: this.string.custom, val: -1 }
             ];
         },

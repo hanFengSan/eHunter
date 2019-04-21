@@ -6,7 +6,7 @@
         :key="screenKey(screen)">
         <div 
             class="page-container" 
-            v-for="page in screen"
+            v-for="(page, i) in screen"
             :style="getPageStyle(page)"
             :key="page.id">
             <page-view
@@ -14,6 +14,7 @@
                 :index="page.imgPageInfo.index"
                 :active="true"
                 :albumId="albumId"
+                :onClick="getPageClickAction(i)"
                 :data="page.imgPageInfo">
             </page-view>
             <div class="page start-page" v-if="page.type===tags.TYPE_START">
@@ -203,20 +204,38 @@ export default {
             switch (e.key) {
                 case 'ArrowLeft':
                 case 'a':
-                    if (this.bookIndex > 0) {
-                        this.setBookIndex(this.bookIndex - 1);
-                    }
+                    this.prevPage();
                     break;
                 case 'ArrowRight':
                 case 'd':
                 case ' ':
-                    if (this.bookIndex < this.screens.length - 1) {
-                        this.setBookIndex(this.bookIndex + 1);
-                    }
+                    this.nextPage();
                     break;
             }
         },
 
+        prevPage() {
+            if (this.bookIndex > 0) {
+                this.setBookIndex(this.bookIndex - 1);
+            }
+        },
+
+        nextPage() {
+            if (this.bookIndex < this.screens.length - 1) {
+                this.setBookIndex(this.bookIndex + 1);
+            }
+        },
+
+        getPageClickAction(index) {
+            if (this.bookScreenSize === 1) {
+                return this.nextPage.bind(this);
+            } else if (index === 0) {
+                return this.prevPage.bind(this);
+            } else if (index === this.bookScreenSize - 1) {
+                return this.nextPage.bind(this);
+            }
+        },
+    
         getAppSize() {
             if (!this.vueContainer) {
                 this.vueContainer = document.querySelector('.vue-container');

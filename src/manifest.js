@@ -27,7 +27,6 @@ module.exports.chrome = {
     'permissions': [
         'activeTab',
         'https://alexskye.info/',
-        'https://alexskye.xyz/',
         'https://www.alexskye.info/',
         'http://alexskye.info/',
         'https://exhentai.org/',

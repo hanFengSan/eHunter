@@ -1,11 +1,11 @@
 <template>
-<section class="page-view">
+<section class="page-view" @click="onClickBg()">
     <div class="layer preview-layer" :style="previewStyle"></div>
     <div class="layer loading-layer">
         <h6 class="index">{{ index + 1 }}</h6>
         <article class="loading-info-panel" v-if="active">
             <transition name="slide-fade">
-                <p class="loading-info" v-if="curLoadStatus!=tags.STATE_LOADED">
+                <p class="loading-info" v-if="curLoadStatus!=tags.STATE_LOADED" @click.stop="() => {}">
                     <span class="text">{{ loadingInfo }}</span>
                     <span class="operation">
                         <flat-button 
@@ -71,6 +71,9 @@ export default {
         },
         albumId: {
             type: String
+        },
+        onClick: {
+            type: Function
         }
     },
 
@@ -181,6 +184,12 @@ export default {
 
         loaded() {
             this.curLoadStatus = tags.STATE_LOADED;
+        },
+
+        onClickBg() {
+            if (this.onClick) {
+                this.onClick();
+            }
         }
     }
 };
@@ -248,6 +257,7 @@ span {
             font-size: 14px;
             z-index: 1;
             .loading-info {
+                padding: 20px;
                 display: flex;
                 align-items: center;
                 flex-direction: column;
@@ -256,29 +266,6 @@ span {
                     > .no-margin {
                         margin-left: 0;
                     }
-                }
-            }
-        }
-        > .loading-console-panel {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            z-index: 1;
-            display: flex;
-            flex-direction: row;
-            .btn {
-                height: 20px;
-                width: 20px;
-                display: block;
-                margin: 0 auto;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                fill: $page_view_loading_btn_color;
-                &:hover {
-                    fill: $page_view_loading_btn_hovered_color;
-                }
-                &:active {
-                    fill: $page_view_loading_btn_actived_color;
                 }
             }
         }
