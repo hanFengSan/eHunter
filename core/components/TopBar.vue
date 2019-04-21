@@ -93,6 +93,25 @@
                         <simple-switch :active="reverseFlip" @change="changeReverseFlip"></simple-switch>
                     </div>
                 </div>
+                <div class="item" v-if="readingMode===1 && showMoreSettings">
+                    <span class="label tips tips-down" :title-content="string.autoFlipTip">{{ string.autoFlip }}:</span>
+                    <div class="bar-switch">
+                        <simple-switch :active="autoFlip" @change="changeAutoFlip"></simple-switch>
+                    </div>
+                </div>
+                <div class="item" v-if="readingMode===1 && showMoreSettings">
+                    <span class="label tips tips-down" :title-content="string.autoFlipFrequencyTip">{{ string.autoFlipFrequency }}:</span>
+                    <drop-option :list="autoFlipFrequencyList" @change="(val) => dropOptionChange('autoFlipFrequency', val)" :cur-val="autoFlipFrequency + 's'"></drop-option>
+                    <pop-slider 
+                        :active="showAutoFlipFrequencySlider" 
+                        :min="1" 
+                        :max="240"
+                        :step="1" 
+                        :init="autoFlipFrequency" 
+                        :close="() => closeDropOptionSlider('autoFlipFrequency')" 
+                        @change="(val) => dropOptionSliderChange('autoFlipFrequency', val)">
+                    </pop-slider>
+                </div>
                 <div class="item less-margin">
                     <span class="label icon tips tips-down" title-content="Change language/切换语言/言語を変更">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -157,6 +176,8 @@ export default {
             showLoadNumSlider: false,
             // volSize
             showVolSizeSlider: false,
+            // autoFlipFrequency
+            showAutoFlipFrequencySlider: false,
             // language
             langList: [
                 { name: 'English', val: tags.LANG_EN },
@@ -185,7 +206,9 @@ export default {
             'bookDirection',
             'string',
             'showMoreSettings',
-            'reverseFlip'
+            'reverseFlip',
+            'autoFlip',
+            'autoFlipFrequency'
         ]),
         floatBtnStyle() {
             return { 
@@ -253,11 +276,29 @@ export default {
         },
         directionList() {
             return [{ name: this.string.rtl, sname: 'RTL', val: 0 }, { name: this.string.ltr, sname: 'LTR', val: 1 }];
+        },
+        autoFlipFrequencyList() {
+            return [
+                { name: '3 sec', val: 3 },
+                { name: '5 sec', val: 5 },
+                { name: '8 sec', val: 8 },
+                { name: '10 sec', val: 10 },
+                { name: '15 sec', val: 15 },
+                { name: '20 sec', val: 20 },
+                { name: '30 sec', val: 30 },
+                { name: '45 sec', val: 45 },
+                { name: '1 min', val: 60 },
+                { name: '1 min 30s', val: 90 },
+                { name: '2 min', val: 120 },
+                { name: '3 min', val: 180 },
+                { name: '5 min', val: 300 },
+                { name: this.string.custom, val: -1 }
+            ]
         }
     },
 
     methods: {
-        ...mapActions(['toggleTopBar', 'addDialog']),
+        ...mapActions(['toggleTopBar', 'addDialog', 'setAutoFlip']),
 
         async dropOptionChange(tag, index) {
             switch (tag) {
@@ -301,6 +342,14 @@ export default {
                     await SettingService.setLang(this.langList[index].val);
                     InfoService.showInstruction(this.config);
                     break;
+                case 'autoFlipFrequency':
+                    switch (this.autoFlipFrequencyList[index].val) {
+                        case -1:
+                            this.showAutoFlipFrequencySlider = true;
+                            break;
+                        default:
+                            SettingService.setAutoFlipFrequency(this.autoFlipFrequencyList[index].val);
+                    }
             }
         },
 
@@ -315,6 +364,9 @@ export default {
                 case 'volSize':
                     SettingService.setVolumeSize(val);
                     break;
+                case 'autoFlipFrequency':
+                    SettingService.setAutoFlipFrequency(val);
+                    break;
             }
         },
 
@@ -328,6 +380,9 @@ export default {
                     break;
                 case 'volSize':
                     this.showVolSizeSlider = false;
+                    break;
+                case 'autoFlipFrequency':
+                    this.showAutoFlipFrequencySlider = false;
                     break;
             }
         },
@@ -368,6 +423,10 @@ export default {
 
         changeReverseFlip() {
             SettingService.setReverseFlip(!this.reverseFlip);
+        },
+
+        changeAutoFlip() {
+            this.setAutoFlip(!this.autoFlip);
         }
     }
 };

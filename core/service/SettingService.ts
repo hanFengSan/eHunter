@@ -4,7 +4,7 @@ import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {
-    version = '2.3';
+    version = '2.4';
     storageName = 'Settings';
     storageVersionName = 'SettingsVersion';
 
@@ -34,6 +34,7 @@ class SettingService {
             version: { val: '' }, // for showing infos of update
             showMoreSettings: { eventName: 'toggleMoreSettings', val: false },
             reverseFlip: { eventName: 'setReverseFlip', val: false },
+            autoFlipFrequency: { eventName: 'setAutoFlipFrequency', val: 10 }
         }
     }
 
@@ -237,7 +238,7 @@ class SettingService {
         return await this._getSettingItem('version');
     }
 
-    async getShowMoreSettings(): Promise<string> {
+    async getShowMoreSettings(): Promise<boolean> {
         return await this._getSettingItem('showMoreSettings');
     }
 
@@ -245,12 +246,20 @@ class SettingService {
         await this._setSettingItem('showMoreSettings', show);
     }
 
-    async getReverseFlip(): Promise<string> {
+    async getReverseFlip(): Promise<boolean> {
         return await this._getSettingItem('reverseFlip');
     }
 
     async setReverseFlip(val: boolean): Promise<void> {
         await this._setSettingItem('reverseFlip', val);
+    }
+
+    async getAutoFlipFrequency(): Promise<number> {
+        return await this._getSettingItem('autoFlipFrequency');
+    }
+
+    async setAutoFlipFrequency(val: number): Promise<void> {
+        await this._setSettingItem('autoFlipFrequency', val);
     }
 }
 

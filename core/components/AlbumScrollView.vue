@@ -107,7 +107,9 @@ export default {
             volumeSize: 'volumeSize',
             volFirstIndex: 'volFirstIndex',
             curVolume: 'curVolume',
-            volumePreloadCount: 'volumePreloadCount'
+            volumePreloadCount: 'volumePreloadCount',
+            showMoreSettings: 'showMoreSettings',
+            showTopBar: 'showTopBar'
         }),
 
         // return a indexes array. the index is index of page, determining the show of pages.
@@ -253,6 +255,12 @@ export default {
                     if (this.centerIndex.val !== this.pageCount - 1) {
                         this.setIndex({ val: this.centerIndex.val + 1, updater: tags.KEYBOARD });
                     }
+                    break;
+                case 'Shift':
+                    SettingService.setShowMoreSettings(!this.showMoreSettings);
+                    break;
+                case 'Escape':
+                    this.toggleTopBar(!this.showTopBar);
                     break;
             }
         }

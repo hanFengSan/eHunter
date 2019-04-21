@@ -75,7 +75,8 @@ export default {
 
     data() {
         return {
-            appSize: { height: 0, width: 0 }
+            appSize: { height: 0, width: 0 },
+            autoFlipTimer: undefined
         };
     },
 
@@ -86,9 +87,13 @@ export default {
         this.checkInstructions();
     },
 
-    destroyed() {
+    beforeDestroy() {
         window.removeEventListener('resize', this.watchResize);
         document.removeEventListener('keydown', this.watchKeyboard);
+        if (this.autoFlip) {
+            this.stopAutoFlip();
+            this.setAutoFlip(false);
+        }
     },
 
     computed: {
@@ -101,7 +106,10 @@ export default {
             showBookScreenAnimation: 'showBookScreenAnimation',
             bookDirection: 'bookDirection',
             showBookPagination: 'showBookPagination',
-            reverseFlip: 'reverseFlip'
+            reverseFlip: 'reverseFlip',
+            autoFlip: 'autoFlip',
+            autoFlipFrequency: 'autoFlipFrequency',
+            showMoreSettings: 'showMoreSettings'
         }),
         tags: () => tags,
         screenSize() {
@@ -164,8 +172,23 @@ export default {
         }
     },
 
+    watch: {
+        autoFlip() {
+            if (this.autoFlip) {
+                this.restartAutoFlip();
+            } else {
+                this.stopAutoFlip();
+            }
+        },
+        autoFlipFrequency() {
+            if (this.autoFlip) {
+                this.restartAutoFlip();
+            }
+        }
+    },
+
     methods: {
-        ...mapActions(['setBookIndex']),
+        ...mapActions(['setBookIndex', 'setAutoFlip']),
         // get index of album for index of current volume
         index(i) {
             return this.volFirstIndex + i;
@@ -212,6 +235,12 @@ export default {
                 case ' ':
                     this.nextPage();
                     break;
+                case 'Shift':
+                    SettingService.setShowMoreSettings(!this.showMoreSettings);
+                    break;
+                case 'Escape':
+                    SettingService.setShowTopBar(!this.showTopBar);
+                    break;
             }
         },
 
@@ -221,9 +250,13 @@ export default {
             }
         },
 
-        nextPage() {
+        nextPage(isAuto = false) {
             if (this.bookIndex < this.screens.length - 1) {
                 this.setBookIndex(this.bookIndex + 1);
+            }
+            // restart auto flip
+            if (!isAuto && this.autoFlip) {
+                this.restartAutoFlip();
             }
         },
 
@@ -258,6 +291,9 @@ export default {
 
         selectBookIndex(index) {
             this.setBookIndex(index);
+            if (this.autoFlip) {
+                this.restartAutoFlip();
+            }
         },
 
         async checkInstructions() {
@@ -269,6 +305,23 @@ export default {
 
         screenKey(screen) {
             return screen.reduce((sum, i) => sum + i.id, '');
+        },
+
+        // auto page turning
+        restartAutoFlip() {
+            if (this.autoFlipTimer) {
+                this.stopAutoFlip();
+            }
+            this.autoFlipTimer = window.setInterval(() => {
+                this.nextPage(true);
+            }, this.autoFlipFrequency * 1000);
+        },
+
+        // stop auto page turning
+        stopAutoFlip() {
+            if (this.autoFlipTimer) {
+                window.clearInterval(this.autoFlipTimer);
+            }
         }
     }
 };

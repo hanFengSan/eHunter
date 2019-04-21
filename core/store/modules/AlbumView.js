@@ -26,7 +26,9 @@ const state = {
         showBookScreenAnimation: false, // show/hide sliding animation when changing location
         showBookPagination: true, // show/hide bottom floating pagination bar
         direction: 0, // 0: RTL, 1: LTR
-        reverseFlip: false // reverse the page flipping direction
+        reverseFlip: false, // reverse the page flipping direction
+        autoFlip: false,
+        autoFlipFrequency: 10
     },
     showMoreSettings: false
 }
@@ -69,7 +71,9 @@ const getters = {
     showBookPagination: state => state.book.showBookPagination,
     bookDirection: state => state.book.direction,
     showMoreSettings: state => state.showMoreSettings,
-    reverseFlip: state => state.book.reverseFlip
+    reverseFlip: state => state.book.reverseFlip,
+    autoFlip: state => state.book.autoFlip,
+    autoFlipFrequency: state => state.book.autoFlipFrequency
 }
 
 // actions
@@ -91,6 +95,8 @@ const actions = {
     setBookScreenSize: ({ commit }, num) => commit(types.SET_BOOK_SCREEN_SIZE, { num }),
     toggleMoreSettings: ( { commit }, show) => commit(types.TOGGLE_MORE_SETTINGS, { show }),
     setReverseFlip: ( { commit }, val) => commit(types.SET_REVERSE_FLIP, { val }),
+    setAutoFlip: ( { commit }, val) => commit(types.SET_AUTO_FLIP, { val }),
+    setAutoFlipFrequency: ( { commit }, val) => commit(types.SET_AUTO_FLIP_FREQUENCY, { val }),
 }
 
 // mutations
@@ -156,6 +162,12 @@ const mutations = {
     },
     [types.SET_REVERSE_FLIP](state, { val }) {
         state.book.reverseFlip = val;
+    },
+    [types.SET_AUTO_FLIP](state, { val }) {
+        state.book.autoFlip = val;
+    },
+    [types.SET_AUTO_FLIP_FREQUENCY](state, { val }) {
+        state.book.autoFlipFrequency = val;
     }
 }
 

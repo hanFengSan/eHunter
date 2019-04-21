@@ -129,6 +129,26 @@ export default {
         en: 'Reverse page turning direction',
         jp: 'ページめくり方向を逆にする'
     },
+    autoFlip: {
+        cn: '自动翻页',
+        en: 'Auto',
+        jp: '自動ページめくり'
+    },
+    autoFlipTip: {
+        cn: '自动翻页',
+        en: 'Automatic page turning',
+        jp: '自動ページめくり'
+    },
+    autoFlipFrequency: {
+        cn: '翻页频率',
+        en: 'Frequency',
+        jp: '頻度'
+    },
+    autoFlipFrequencyTip: {
+        cn: '自动翻页的频率',
+        en: 'Automatic page turning frequency',
+        jp: '自動ページめくり頻度'
+    },
     refresh: {
         cn: '刷新',
         en: 'Refresh',
@@ -210,14 +230,14 @@ export default {
         jp: 'eHunter閉じる'
     },
     toggleTopBar: {
-        cn: '显示/隐藏顶栏',
-        en: 'Show/hide top bar',
-        jp: 'トップバーの表示/非表示'
+        cn: '显示/隐藏顶栏 [Esc]',
+        en: 'Show/hide top bar [Esc]',
+        jp: 'トップバーの表示/非表示 [Esc]'
     },
     toggleMoreSettings: {
-        cn: '显示/隐藏更多设置',
-        en: 'Show/hide more settings',
-        jp: '他の設定を表示/隠す'
+        cn: '显示/隐藏更多设置 [Shift]',
+        en: 'Show/hide more settings [Shift]',
+        jp: '他の設定を表示/隠す [Shift]'
     },
     confirm: {
         cn: '确定',

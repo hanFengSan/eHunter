@@ -63,5 +63,6 @@ export default {
     color: black;
     box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    z-index: 1;
 }
 </style>
