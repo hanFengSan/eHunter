@@ -4,7 +4,7 @@ import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {
-    version = '2.4';
+    version = '2.5';
     storageName = 'Settings';
     storageVersionName = 'SettingsVersion';
 
@@ -34,7 +34,8 @@ class SettingService {
             version: { val: '' }, // for showing infos of update
             showMoreSettings: { eventName: 'toggleMoreSettings', val: false },
             reverseFlip: { eventName: 'setReverseFlip', val: false },
-            autoFlipFrequency: { eventName: 'setAutoFlipFrequency', val: 10 }
+            autoFlipFrequency: { eventName: 'setAutoFlipFrequency', val: 10 },
+            showThumbViewInBook: { eventName: 'toggleThumbViewInBook', val: false }
         }
     }
 
@@ -260,6 +261,14 @@ class SettingService {
 
     async setAutoFlipFrequency(val: number): Promise<void> {
         await this._setSettingItem('autoFlipFrequency', val);
+    }
+
+    async getShowThumbViewInBook(): Promise<boolean> {
+        return await this._getSettingItem('autoFlipFrequency');
+    }
+
+    async setShowThumbViewInBook(val: boolean): Promise<void> {
+        await this._setSettingItem('showThumbViewInBook', val);
     }
 }
 

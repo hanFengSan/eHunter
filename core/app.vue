@@ -1,6 +1,7 @@
 <template>
   <div class="app normalize" v-if="isDone">
     <thumb-scroll-view
+        v-if="supportThumbView"
         class="thumb-column"
         :style="thumbStyle"
         :thumbInfos="thumbInfos"
@@ -76,13 +77,16 @@ export default {
     },
 
     computed: {
-        ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode']),
+        ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode', 'showThumbViewInBook']),
         thumbStyle() {
-            if (this.readingMode === 0 && this.showThumbView && this.supportThumbView) {
-                return '';
-            } else {
-                return { 'margin-left': this.px(-this.thumbWidth) };
+            if (this.supportThumbView) {
+                if (this.readingMode === 0 && this.showThumbView) {
+                    return '';
+                } else if (this.readingMode === 1 && this.showThumbViewInBook) {
+                    return '';
+                }
             }
+            return { 'margin-left': this.px(-this.thumbWidth) };
         }
     },
 

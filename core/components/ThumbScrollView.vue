@@ -44,13 +44,30 @@ export default {
         ...mapGetters({
             centerIndex: 'curIndex',
             volumeSize: 'volumeSize',
-            volFirstIndex: 'volFirstIndex',
-            readingMode: 'readingMode'
+            _volFirstIndex: 'volFirstIndex',
+            readingMode: 'readingMode',
+            showThumbViewInBook: 'showThumbViewInBook'
         }),
+
+        volFirstIndex() {
+            if (this.readingMode === 0) {
+                return this._volFirstIndex;
+            }
+            // let book mode compatible with volume, using one volume
+            if (this.readingMode === 1 && this.showThumbViewInBook) {
+                return 0;
+            }
+        },
 
         // the thumbs of current volume
         volThumbs() {
-            return this.thumbInfos.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
+            if (this.readingMode === 0) {
+                return this.thumbInfos.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
+            }
+            // let book mode compatible with volume, using one volume
+            if (this.readingMode === 1 && this.showThumbViewInBook) {
+                return this.thumbInfos;
+            }
         },
 
         curIndex() {
@@ -62,7 +79,7 @@ export default {
         centerIndex: {
             handler: function(val, oldVal) {
                 // sync pagination
-                if (this.readingMode === 0 && this.curIndex.updater !== tags.THUMB_VIEW) {
+                if (this.curIndex.updater !== tags.THUMB_VIEW) {
                     if (this.curIndex.val !== this.volFirstIndex && this.$refs.thumbContainers) {
                         // sort again, because if changing volume size, it may be out-of-order
                         let cons = this.$refs.thumbContainers.sort((a, b) => a.offsetTop - b.offsetTop);

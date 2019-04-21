@@ -28,7 +28,8 @@ const state = {
         direction: 0, // 0: RTL, 1: LTR
         reverseFlip: false, // reverse the page flipping direction
         autoFlip: false,
-        autoFlipFrequency: 10
+        autoFlipFrequency: 10,
+        showThumbViewInBook: false
     },
     showMoreSettings: false
 }
@@ -73,7 +74,8 @@ const getters = {
     showMoreSettings: state => state.showMoreSettings,
     reverseFlip: state => state.book.reverseFlip,
     autoFlip: state => state.book.autoFlip,
-    autoFlipFrequency: state => state.book.autoFlipFrequency
+    autoFlipFrequency: state => state.book.autoFlipFrequency,
+    showThumbViewInBook: state => state.book.showThumbViewInBook
 }
 
 // actions
@@ -97,6 +99,7 @@ const actions = {
     setReverseFlip: ( { commit }, val) => commit(types.SET_REVERSE_FLIP, { val }),
     setAutoFlip: ( { commit }, val) => commit(types.SET_AUTO_FLIP, { val }),
     setAutoFlipFrequency: ( { commit }, val) => commit(types.SET_AUTO_FLIP_FREQUENCY, { val }),
+    toggleThumbViewInBook: ( { commit }, val) => commit(types.TOGGLE_THUMB_VIEW_IN_BOOK, { val })
 }
 
 // mutations
@@ -168,6 +171,9 @@ const mutations = {
     },
     [types.SET_AUTO_FLIP_FREQUENCY](state, { val }) {
         state.book.autoFlipFrequency = val;
+    },
+    [types.TOGGLE_THUMB_VIEW_IN_BOOK](state, { val }) {
+        state.book.showThumbViewInBook = val;
     }
 }
 

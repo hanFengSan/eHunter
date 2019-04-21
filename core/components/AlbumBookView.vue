@@ -109,15 +109,18 @@ export default {
             reverseFlip: 'reverseFlip',
             autoFlip: 'autoFlip',
             autoFlipFrequency: 'autoFlipFrequency',
-            showMoreSettings: 'showMoreSettings'
+            showMoreSettings: 'showMoreSettings',
+            showThumbViewInBook: 'showThumbViewInBook',
+            thumbWidth: 'thumbWidth'
         }),
         tags: () => tags,
         screenSize() {
             let height = this.appSize.height - (this.showTopBar ? this.topBarHeight : 0);
+            let width = this.appSize.width - (this.showThumbViewInBook ? this.thumbWidth : 0);
             return {
                 height,
-                width: this.appSize.width,
-                screenRatio: height / this.appSize.width
+                width,
+                screenRatio: height / width
             };
         },
         pages() {

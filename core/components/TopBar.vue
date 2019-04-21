@@ -112,6 +112,12 @@
                         @change="(val) => dropOptionSliderChange('autoFlipFrequency', val)">
                     </pop-slider>
                 </div>
+                <div class="item" v-if="readingMode===1 && showMoreSettings">
+                    <span class="label tips tips-down" :title-content="string.thumbViewTip">{{ string.thumbView }}:</span>
+                    <div class="bar-switch">
+                        <simple-switch :active="showThumbViewInBook" @change="changeThumbViewInBook"></simple-switch>
+                    </div>
+                </div>
                 <div class="item less-margin">
                     <span class="label icon tips tips-down" title-content="Change language/切换语言/言語を変更">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -208,7 +214,8 @@ export default {
             'showMoreSettings',
             'reverseFlip',
             'autoFlip',
-            'autoFlipFrequency'
+            'autoFlipFrequency',
+            'showThumbViewInBook'
         ]),
         floatBtnStyle() {
             return { 
@@ -427,6 +434,10 @@ export default {
 
         changeAutoFlip() {
             this.setAutoFlip(!this.autoFlip);
+        },
+
+        changeThumbViewInBook() {
+            SettingService.setShowThumbViewInBook(!this.showThumbViewInBook);
         }
     }
 };

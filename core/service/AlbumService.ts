@@ -35,7 +35,7 @@ export abstract class AlbumService {
 
     getRealCurIndexInfo(pageCount: number, curIndex: IndexInfo): IndexInfo {
         let index = curIndex.val;
-        index = index > pageCount ? pageCount - 1 : index;
+        index = index >= pageCount ? pageCount - 1 : index;
         return { val: index, updater: curIndex.updater };
     }
 }
