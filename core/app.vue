@@ -118,6 +118,7 @@ export default {
 @import './style/_normalize';
 
 $change_mode_time: 0.8s;
+$fast_change_mode_time: 0.4s;
 $general_animtation_time: 0.2s;
 
 .app {
@@ -245,6 +246,16 @@ $general_animtation_time: 0.2s;
     }
     .slow-horizontal-fade-enter,
     .slow-horizontal-fade-leave-active {
+        transform: translateX(20%);
+        opacity: 0;
+    }
+
+    .fast-horizontal-fade-enter-active,
+    .fast-horizontal-fade-leave-active {
+        transition: all $fast_change_mode_time ease;
+    }
+    .fast-horizontal-fade-enter,
+    .fast-horizontal-fade-leave-active {
         transform: translateX(20%);
         opacity: 0;
     }

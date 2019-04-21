@@ -1,7 +1,7 @@
 <template>
     <nav class="top-bar">
         <div class="float-content" :style="floatBtnStyle">
-            <transition name="slow-horizontal-fade">
+            <transition name="fast-horizontal-fade">
                 <circle-icon-button 
                     v-if="showTopBar"
                     ref="topBarButton" 
