@@ -87,12 +87,12 @@
                         <simple-switch :active="showBookPagination" @change="changeBookPagination"></simple-switch>
                     </div>
                 </div>
-                <!-- <div class="item" v-if="readingMode===1">
-                    <span class="label tips tips-down" :title-content="string.bookAnimationTip">{{ string.bookAnimation }}:</span>
+                <div class="item" v-if="readingMode===1 && showMoreSettings">
+                    <span class="label tips tips-down" :title-content="string.reverseFlipTip">{{ string.reverseFlip }}:</span>
                     <div class="bar-switch">
-                        <simple-switch :active="showBookScreenAnimation" @change="changeBookScreenAnimation"></simple-switch>
+                        <simple-switch :active="reverseFlip" @change="changeReverseFlip"></simple-switch>
                     </div>
-                </div> -->
+                </div>
                 <div class="item less-margin">
                     <span class="label icon tips tips-down" title-content="Change language/切换语言/言語を変更">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -184,7 +184,8 @@ export default {
             'bookScreenSize',
             'bookDirection',
             'string',
-            'showMoreSettings'
+            'showMoreSettings',
+            'reverseFlip'
         ]),
         floatBtnStyle() {
             return { 
@@ -363,6 +364,10 @@ export default {
 
         toggleMoreSettings(show) {
             SettingService.setShowMoreSettings(!this.showMoreSettings);
+        },
+
+        changeReverseFlip() {
+            SettingService.setReverseFlip(!this.reverseFlip);
         }
     }
 };

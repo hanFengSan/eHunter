@@ -4,7 +4,7 @@ import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {
-    version = '2.2';
+    version = '2.3';
     storageName = 'Settings';
     storageVersionName = 'SettingsVersion';
 
@@ -32,7 +32,8 @@ class SettingService {
             showTopBar: { eventName: 'toggleTopBar', val: true },
             isNormalMode: { val: true },
             version: { val: '' }, // for showing infos of update
-            showMoreSettings: { eventName: 'toggleMoreSettings', val: false }
+            showMoreSettings: { eventName: 'toggleMoreSettings', val: false },
+            reverseFlip: { eventName: 'setReverseFlip', val: false },
         }
     }
 
@@ -242,6 +243,14 @@ class SettingService {
 
     async setShowMoreSettings(show: boolean): Promise<void> {
         await this._setSettingItem('showMoreSettings', show);
+    }
+
+    async getReverseFlip(): Promise<string> {
+        return await this._getSettingItem('reverseFlip');
+    }
+
+    async setReverseFlip(val: boolean): Promise<void> {
+        await this._setSettingItem('reverseFlip', val);
     }
 }
 

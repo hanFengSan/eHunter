@@ -25,7 +25,8 @@ const state = {
         screenSize: 2,  // the page quantity per screen
         showBookScreenAnimation: false, // show/hide sliding animation when changing location
         showBookPagination: true, // show/hide bottom floating pagination bar
-        direction: 0 // 0: RTL, 1: LTR
+        direction: 0, // 0: RTL, 1: LTR
+        reverseFlip: false // reverse the page flipping direction
     },
     showMoreSettings: false
 }
@@ -67,7 +68,8 @@ const getters = {
     showBookScreenAnimation: state => state.book.showBookScreenAnimation,
     showBookPagination: state => state.book.showBookPagination,
     bookDirection: state => state.book.direction,
-    showMoreSettings: state => state.showMoreSettings
+    showMoreSettings: state => state.showMoreSettings,
+    reverseFlip: state => state.book.reverseFlip
 }
 
 // actions
@@ -87,7 +89,8 @@ const actions = {
     setBookPagination: ({ commit }, show) => commit(types.SET_BOOK_PAGINATION, { show }),
     setBookDirection: ({ commit }, mode) => commit(types.SET_BOOK_DIRECTION, { mode }),
     setBookScreenSize: ({ commit }, num) => commit(types.SET_BOOK_SCREEN_SIZE, { num }),
-    toggleMoreSettings: ( { commit }, show) => commit(types.TOGGLE_MORE_SETTINGS, { show })
+    toggleMoreSettings: ( { commit }, show) => commit(types.TOGGLE_MORE_SETTINGS, { show }),
+    setReverseFlip: ( { commit }, val) => commit(types.SET_REVERSE_FLIP, { val }),
 }
 
 // mutations
@@ -150,6 +153,9 @@ const mutations = {
     },
     [types.TOGGLE_MORE_SETTINGS](state, { show }) {
         state.showMoreSettings = show;
+    },
+    [types.SET_REVERSE_FLIP](state, { val }) {
+        state.book.reverseFlip = val;
     }
 }
 

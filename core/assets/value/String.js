@@ -119,6 +119,16 @@ export default {
         en: 'show/hide the sliding animation when changing location(Beta)',
         jp: '場所を変更するときのスライドアニメーションの表示/非表示(测试中)'
     },
+    reverseFlip: {
+        cn: '反转翻页',
+        en: 'Reverse flip',
+        jp: '反転フリップ'
+    },
+    reverseFlipTip: {
+        cn: '反转翻页方向',
+        en: 'Reverse page turning direction',
+        jp: 'ページめくり方向を逆にする'
+    },
     refresh: {
         cn: '刷新',
         en: 'Refresh',

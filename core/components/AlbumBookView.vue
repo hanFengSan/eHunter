@@ -17,7 +17,7 @@
                 :onClick="getPageClickAction(i)"
                 :data="page.imgPageInfo">
             </page-view>
-            <div class="page start-page" v-if="page.type===tags.TYPE_START">
+            <div class="page start-page" v-if="page.type===tags.TYPE_START" @click="getPageClickAction(i)()">
                 <div :class="['ehunter-tag', { 'left': bookDirection===1 }]">
                     EHUNTER
                 </div>
@@ -25,7 +25,7 @@
                     {{ title }}
                 </h1>
             </div>
-            <div class="page end-page" v-if="page.type===tags.TYPE_END">
+            <div class="page end-page" v-if="page.type===tags.TYPE_END" @click="getPageClickAction(i)()">
                 <div :class="['ehunter-tag', { 'left': bookDirection===0 }]">
                     EHUNTER
                 </div>
@@ -100,7 +100,8 @@ export default {
             bookLoadNum: 'bookLoadNum',
             showBookScreenAnimation: 'showBookScreenAnimation',
             bookDirection: 'bookDirection',
-            showBookPagination: 'showBookPagination'
+            showBookPagination: 'showBookPagination',
+            reverseFlip: 'reverseFlip'
         }),
         tags: () => tags,
         screenSize() {
@@ -230,9 +231,11 @@ export default {
             if (this.bookScreenSize === 1) {
                 return this.nextPage.bind(this);
             } else if (index === 0) {
-                return this.prevPage.bind(this);
+                return this.reverseFlip ? this.nextPage.bind(this) : this.prevPage.bind(this);
             } else if (index === this.bookScreenSize - 1) {
-                return this.nextPage.bind(this);
+                return this.reverseFlip ? this.prevPage.bind(this) : this.nextPage.bind(this);
+            } else {
+                return () => {};
             }
         },
     
