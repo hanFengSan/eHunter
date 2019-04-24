@@ -34,10 +34,10 @@
         "ts-loader": "^5.3.3",
         "twemoji": "^12.0.1",
         "typescript": "^3.4.3",
-        "uglifyjs-webpack-plugin": "^2.1.2",
+        "uglifyjs-webpack-plugin": "^1.2.4",
         "vue": "^2.6.10",
         "vuex": "^3.1.0",
-        "web-ext": "^3.0.0"
+        "web-ext": "^1.8.1"
     },
     "devDependencies": {
         "@babel/core": "^7.4.3",

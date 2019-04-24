@@ -23,7 +23,7 @@ export class IntroHtmlParser {
                 return {
                     id: pageUrl,
                     index: 0,
-                    pageUrl: process.env.NODE_ENV !== 'testing' ? pageUrl : 'https://e-hentai.org' + pageUrl,
+                    pageUrl,
                     src: '',
                     thumbHeight,
                     thumbWidth,

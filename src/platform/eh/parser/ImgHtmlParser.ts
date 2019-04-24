@@ -51,7 +51,7 @@ export class ImgHtmlParser {
     getIntroUrl(): string {
         let url = this.html!.querySelectorAll('.sb')![0].children![0].getAttribute('href')!
             .replace(/^.*?org/g, '').replace(/\?p=.*?$/g, '');
-        return process.env.NODE_ENV !== 'testing' ? url : 'https://e-hentai.org' + url;
+        return url;
     }
 
     getAlbumId(): string {

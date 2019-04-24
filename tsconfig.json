@@ -7,7 +7,11 @@
         "noImplicitAny": false,
         "module": "es2015",
         "moduleResolution": "node",
-        "target": "es5"
+        "target": "es5",
+        "lib": [
+            "es2015",
+            "DOM"
+        ]
     },
     "include": [
         "./core/**/*",
