@@ -9,14 +9,14 @@ import { setTimeout } from 'timers'
 
 Vue.mixin(VueUtil);
 
-function createAppView(containerClass, containerId, vueInstance) {
+function createAppView(containerClass, vueRootId, vueInstance) {
     if (document.getElementsByClassName(containerClass)
         .length > 0) {
         let app = new Vue({
                 store,
                 render: (h) => h(vueInstance)
             })
-            .$mount(containerId);
+            .$mount(vueRootId);
         SettingService.initSettings();
         return app;
     }

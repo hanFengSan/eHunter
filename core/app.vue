@@ -1,20 +1,39 @@
 <template>
-  <div class="app normalize" v-if="isDone">
-    <thumb-scroll-view
-        v-if="supportThumbView"
-        class="thumb-column"
-        :style="thumbStyle"
-        :thumbInfos="thumbInfos"
-        :pageCount="pageCount">
-    </thumb-scroll-view>
-    <reader-view
-        class="reader-column"
-        :pageCount="pageCount"
-        :curPageNum="curPageNum"
-        :title="title"
-        :imgPageInfos="imgPageInfos"
-        :albumId="albumId">
-    </reader-view>
+  <div class="app normalize">
+    <transition name="loading-horizontal-fade" v-if="!disableLoading">
+      <loading-view v-if="!isDone && !isFailed" class="loading-view"></loading-view>
+    </transition>
+    <transition name="slow-horizontal-fade">
+      <div class="failed-view" v-if="isFailed">
+        <h4>{{ string.loadingFailedAndRefresh }}</h4>
+        <article>
+          <p>{{ string.failedMsg }}: {{ failedMsg }}</p>
+          <p>{{ string.version}}: {{ config.version }}</p>
+          <p>{{ string.ContractAuthor}}: Create issue on {{ config.homePage }} or email {{ config.email }}</p>
+        </article>
+      </div>
+    </transition>
+    <template v-if="isDone">
+      <transition name="slow-horizontal-fade">
+        <thumb-scroll-view
+          v-if="supportThumbView"
+          class="thumb-column"
+          :style="thumbStyle"
+          :thumbInfos="thumbInfos"
+          :pageCount="pageCount"
+        ></thumb-scroll-view>
+      </transition>
+      <transition name="slow-horizontal-fade">
+        <reader-view
+          class="reader-column"
+          :pageCount="pageCount"
+          :curPageNum="curPageNum"
+          :title="title"
+          :imgPageInfos="imgPageInfos"
+          :albumId="albumId"
+        ></reader-view>
+      </transition>
+    </template>
     <modal-manager class="modal"></modal-manager>
   </div>
 </template>
@@ -23,6 +42,7 @@
 import { mapGetters } from 'vuex';
 import ThumbScrollView from './components/ThumbScrollView.vue';
 import ReaderView from './components/ReaderView.vue';
+import LoadingView from './components/LoadingView.vue';
 import ModalManager from './components/ModalManager.vue';
 import SettingService from './service/SettingService.ts';
 import InfoService from './service/InfoService.ts';
@@ -32,12 +52,13 @@ import Utils from './utils/Utils.ts';
 export default {
     name: 'InjectedApp',
 
-    inject: ['config', 'service'],
+    inject: ['config', 'service', 'disableLoading'],
 
     components: {
         ThumbScrollView,
         ReaderView,
-        ModalManager
+        ModalManager,
+        LoadingView
     },
 
     data() {
@@ -49,20 +70,22 @@ export default {
             thumbInfos: [],
             albumId: '',
             isDone: false,
+            isFailed: false,
+            failedMsg: '',
             supportThumbView: false
         };
     },
 
-
     async created() {
-        Promise.all(
-            [this.service.album.getPageCount(),
+        Promise.all([
+            this.service.album.getPageCount(),
             this.service.album.getCurPageNum(),
             this.service.album.getTitle(),
             this.service.album.getImgPageInfos(),
             this.service.album.getThumbInfos(),
-            this.service.album.getAlbumId()]
-            ).then(async values => {
+            this.service.album.getAlbumId()
+        ]).then(
+            async values => {
                 this.pageCount = values[0];
                 this.curPageNum = values[1];
                 this.title = values[2];
@@ -71,13 +94,19 @@ export default {
                 this.albumId = values[5];
                 this.supportThumbView = this.service.album.supportThumbView();
                 this.isDone = true;
-            });
+            },
+            reason => {
+                console.error('[Ehunter init error]', reason);
+                this.failedMsg = reason;
+                this.isFailed = true;
+            }
+        );
         await this.checkInstructions();
         this.checkVersion();
     },
 
     computed: {
-        ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode', 'showThumbViewInBook']),
+        ...mapGetters(['showThumbView', 'thumbWidth', 'readingMode', 'showThumbViewInBook', 'string']),
         thumbStyle() {
             if (this.supportThumbView) {
                 if (this.readingMode === 0 && this.showThumbView) {
@@ -131,6 +160,36 @@ $general_animtation_time: 0.2s;
     display: flex;
     height: 100%;
     text-align: initial; // overlay original style
+    > .loading-view {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 1;
+    }
+
+    > .failed-view {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        > h4 {
+            color: #ffffff;
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 20px;
+        }
+        > article {
+            > p {
+                font-size: 12px;
+                color: #eeeeee;
+                font-size: 12px;
+            }
+        }
+    }
+
     > .thumb-column {
         transition: all $change_mode_time ease;
         &.hide {
@@ -250,6 +309,16 @@ $general_animtation_time: 0.2s;
     }
     .slow-horizontal-fade-enter,
     .slow-horizontal-fade-leave-active {
+        transform: translateX(20%);
+        opacity: 0;
+    }
+
+    .loading-horizontal-fade-enter-active,
+    .loading-horizontal-fade-leave-active {
+        transition: all 0.5s ease;
+    }
+    .loading-horizontal-fade-enter,
+    .loading-horizontal-fade-leave-active {
         transform: translateX(20%);
         opacity: 0;
     }

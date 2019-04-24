@@ -293,5 +293,25 @@ export default {
         cn: '版本更新说明',
         en: 'The update of this version',
         jp: 'このバージョンの更新'
+    },
+    loadingFailedAndRefresh: {
+        cn: '加载错误, 刷新重试',
+        en: 'Loading failed, please refresh to retry',
+        jp: '読み込みに失敗しました。もう一度試してください'
+    },
+    failedMsg: {
+        cn: '错误信息',
+        en: 'Error message',
+        jp: 'エラーメッセージ'
+    },
+    version: {
+        cn: '版本',
+        en: 'Version',
+        jp: 'Version'
+    },
+    ContractAuthor: {
+        cn: '联系作者',
+        en: 'Contact author',
+        jp: '作者に連絡する'
     }
 }

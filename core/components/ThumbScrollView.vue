@@ -7,8 +7,10 @@
             <!-- 160 is $thumb-view-height -->
             <div class="indicator" :style="{top: px(160*(curIndex.val - volFirstIndex))}"></div>
             <div class="thumb-container" @click="select(index(i))" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
-                <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
-                <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`}"></div>
+                <template v-if="(readingMode === 0 && showThumbView) || (readingMode ===1 && showThumbViewInBook)">
+                    <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
+                    <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
+                </template>
                 <div class="hover-mask"></div>
                 <div class="index">{{ index(i) + 1 }}</div>
             </div>
@@ -46,7 +48,9 @@ export default {
             volumeSize: 'volumeSize',
             _volFirstIndex: 'volFirstIndex',
             readingMode: 'readingMode',
-            showThumbViewInBook: 'showThumbViewInBook'
+            showThumbView: 'showThumbView',
+            showThumbViewInBook: 'showThumbViewInBook',
+            readingMode: 'readingMode'
         }),
 
         volFirstIndex() {
@@ -54,7 +58,7 @@ export default {
                 return this._volFirstIndex;
             }
             // let book mode compatible with volume, using one volume
-            if (this.readingMode === 1 && this.showThumbViewInBook) {
+            if (this.readingMode === 1) {
                 return 0;
             }
         },
@@ -65,7 +69,7 @@ export default {
                 return this.thumbInfos.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
             }
             // let book mode compatible with volume, using one volume
-            if (this.readingMode === 1 && this.showThumbViewInBook) {
+            if (this.readingMode === 1) {
                 return this.thumbInfos;
             }
         },
@@ -84,7 +88,9 @@ export default {
                         // sort again, because if changing volume size, it may be out-of-order
                         let cons = this.$refs.thumbContainers.sort((a, b) => a.offsetTop - b.offsetTop);
                         // Logger.logText('Thumb', this.curIndex.val);
-                        this.$refs.scrollView.ScrollTo(cons[this.volIndex(this.curIndex.val)].offsetTop, 1000);
+                        if (cons[this.volIndex(this.curIndex.val)]) {
+                            this.$refs.scrollView.ScrollTo(cons[this.volIndex(this.curIndex.val)].offsetTop, 1000);
+                        }
                     } else {
                         this.$refs.scrollView.ScrollTo(0, 1000); // if is page 1, scroll to top, cuz of having a header
                     }
@@ -192,9 +198,6 @@ export default {
                 // 1/1.44 is the default scale of ehentai's thumb. 100px width per one thumb in img.
                 height: $thumb-width * 144 / 100;
                 transition: all 0.5s ease;
-                &.img-mode {
-                    background-size: 'contain';
-                }
             }
             > .loc {
                 display: block;

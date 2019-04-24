@@ -2,6 +2,7 @@ import app from './App.vue'
 
 let service = {}
 let config = {}
+let disableLoading = false;
 
 export default {
     setAlbumService(obj) {
@@ -16,12 +17,17 @@ export default {
         config = obj;
         return this;
     },
+    disableLoading(disable) {
+        disableLoading = disable;
+        return this;
+    },
     instance() {
         return {
             components: { app },
             provide: {
                 service,
-                config
+                config,
+                disableLoading
             },
             data() {
                 return {}

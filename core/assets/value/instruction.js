@@ -17,6 +17,14 @@ export default {
 
 6.在前页采用\`Normal\`模式查看缩略图可加速加载, 使用\`Large\`模式会慢一些.
 
+7.有更多想要的功能, 可以反馈给我, 如果该功能可以有的话, 我有空的时候会支持的.
+
+### eHunter-local
+eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](https://github.com/hanFengSan/eHunter_local)
+
+[Github下载](https://github.com/hanFengSan/eHunter_local/releases) [百度网盘](https://pan.baidu.com/s/1wEnBe9uGoBKzNd4DCfbuAg) 提取码: czft
+
+
 ### 反馈和建议
 * 可在[Github]($$HOME_PAGE$$)上开issue给我.
 * 可发邮件到我邮箱: c360785655@gmail.com
@@ -46,8 +54,15 @@ export default {
 
 6.You can use \`Normal\` mode of thumbnail in previous page to accelerate the load. If it's \`Large\` mode, the loading will be slow a bit.
 
+7.If you want EHunter to support more features, you can give me feedback.
+
+### eHunter-local
+The eHunter-local is local version of eHunter, supporting Windows and MacOS. [Home Page](https://github.com/hanFengSan/eHunter_local)
+
+[Github releases](https://github.com/hanFengSan/eHunter_local/releases)
+
 ### Feedback & Suggestion
-* Open issue on [Github]($$HOME_PAGE$$) to me.
+* Create issue on [Github]($$HOME_PAGE$$) to me.
 * Send email to c360785655@gmail.com
 
 ### About
@@ -74,6 +89,13 @@ If you like this extension, I hope you can give a five-star rating in store. 8-)
 5.これは\`ボリュームサイズ\`の高性能要件です。 大きすぎるとプログラムが遅くなります。
 
 6.前のページのサムネイルの「Normal」モードを使用して負荷を高速化することができます。「Large」モードの場合は、読み込みが少し遅くなります。
+
+7.あなたがEHunterにもっと多くの機能をサポートさせたいならば、あなたは私にフィードバックを与えることができます。
+
+### eHunter-local
+eHunter-localはeHunterのローカル版で、WindowsとMacOSをサポートしています。[Home Page](https://github.com/hanFengSan/eHunter_local)
+
+[Github releases](https://github.com/hanFengSan/eHunter_local/releases)
 
 ### フィードバックと提案
 * 私にGITHUBのオープンな問題 [Github]($$HOME_PAGE$$)
