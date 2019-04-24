@@ -3,9 +3,9 @@
 Provide a scroll mode and book mode, for a better reading experience.
 
 # Preview
-![avatar](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_4.jpg)
+![avatar](https://github.com/hanFengSan/eHunter/blob/master/github_image/github_preview_4.png?raw=true)
 
-![avatar](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_5.jpg)
+![avatar](https://github.com/hanFengSan/eHunter/blob/master/github_image/github_preview_5.png?raw=true)
 
 ![avatar](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg)
 
