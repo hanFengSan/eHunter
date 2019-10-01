@@ -2,11 +2,11 @@
     <div class="popup-container">
         <h1>EHUNTER</h1>
         <mu-tabs :value="activeTab" @change="handleTabChange">
-            <mu-tab :value="read.name" title="Reading"/>
-            <mu-tab :value="notification.name" title="通知"/>
+            <mu-tab :value="read.name" :title="['READING', '阅读漫画'][lang]"/>
+            <mu-tab :value="notification.name" :title="['SUBSCRIPTION','标签订阅'][lang]"/>
         </mu-tabs>
         <div class="read" v-if="activeTab === read.name">
-            <span>For the best reading experience!</span>
+            <span>{{['Read a gallery to use eHunter','打在网站阅读漫画,体验eHunter'][lang]}}</span>
         </div>
         <div v-if="activeTab === notification.name" class="notification">
             <notification></notification>
@@ -16,12 +16,14 @@
 
 <script>
 import Notification from './components/Notification.vue';
+import lang from './utils/lang';
 
 export default {
     name: 'PopupApp',
 
     data() {
         return {
+          lang,
             activeTab: '',
             read: {
                 name: Symbol(),
@@ -89,6 +91,7 @@ body {
             position: fixed;
             top: 50%;
             left: 50%;
+            white-space: nowrap;
             font-size: 16px;
             transform: translate(-50%, -50%);
         }

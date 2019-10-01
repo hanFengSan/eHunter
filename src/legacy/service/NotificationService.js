@@ -1,15 +1,55 @@
 // a background service for notifying tag's update
-import SubsStorageService from './storage/SubsStorageService'
-import NotiStorageService from './storage/NotiStorageService'
+import SubsStorage from './storage/SubsStorage'
+import NotiStorage from './storage/NotiStorage'
 import ReqQueueService from './request/ReqQueueService'
 import SearchHtmlParser from './parser/SearchHtmlParser'
+import Utils from '../utils/Utils'
+import lang from '../utils/lang'
 
 class NotificationService {
     constructor() {
         this.time = 0; // record the duration of running
-        this.subscribedTagList = [];
-        this.requestList = [];
-        this.notiList = []; // gather together notifications to show
+    }
+
+    static getTagUrl(item) {
+      let url = '';
+      if (item.site.length > 0) {
+          switch (item.site[0]) {
+              case 'e-hentai':
+                  url += 'https://e-hentai.org/';
+                  break;
+              case 'exhentai':
+                  url += 'https://exhentai.org/';
+                  break;
+          }
+      }
+      let category = 1023;
+      const value = {
+        'Misc': 1,
+        'Doujinshi': 2,
+        'Manga': 4,
+        'Artist CG': 8,
+        'Game CG': 16,
+        'Image Set': 32,
+        'Cosplay': 64,
+        'Asian Porn': 128,
+        'Non-H': 256,
+        'Western': 512,
+        'none': 0,
+      }
+      item.type.forEach(i => {
+        category = category - value[i];
+      });
+      url += `?${category === 1023 ? '' : 'f_cats=' + category + '&'}`;
+      const tags = item.name.replace(/，/g, ',').split(',').map(i => i.trim());
+      url = tags.reduce((sum, i) => {
+        return sum + encodeURIComponent(`"${i}$"`) + '+'
+      }, url + 'f_search=')
+      if (item.lang.length > 0) {
+          url += encodeURIComponent(`language:"${item.lang[0]}$"`);
+      }
+      url = url.replace(/\+$/g, '')
+      return url;
     }
 
     log(msg) {
@@ -19,125 +59,78 @@ class NotificationService {
     run() {
         /* eslint-disable no-undef */
         this.log('NotiService run');
-        window.setInterval(() => {
-            this.time += 10;
-            this._syncSubs()
-                .then(() => {
-                    this._initRequestUrl();
-                    this._request();
-                    this.log('tags, requestUrl');
-                });
+        window.setInterval(async () => {
+            console.log('run');
+            this.time += 10; // 叠加时间
+            const tags = await this.getCheckedTags(); // 获取需要更新的tag
+            const urls = tags.map(item => NotificationService.getTagUrl(item)); // 获取对应需要请求的url
+            const htmlMaps = await this.getUrlHtmls(urls); // 获取url对应的html
+            const notifications = [];
+            for (let tag of tags) {
+              const url = urls[tags.indexOf(tag)];
+              const html = htmlMaps.get(url);
+              const msg = await this.compare(tag, url, html);
+              if (msg) {
+                notifications.push(msg);
+              }
+            }
+            this.notify(notifications);
         }, 10 * 60 * 1000); // 10 mins
+        // }, 10 * 1000); // debug: 5s
     }
 
-    async _syncSubs() {
-        let instance = await SubsStorageService.instance;
-        this.subscribedTagList = (await instance.getNewSubsList()).list.filter(item => this.time % item.time === 0);
+    async getCheckedTags() {
+        return (await SubsStorage.getSubsList()).filter(item => this.time % item.time === 0); // 获取需要检查的tag
     }
 
-    _initRequestUrl() {
-        this.requestList = this.subscribedTagList.map(item => {
-            let url = '';
-            if (item.site.length > 0) {
-                switch (item.site[0]) {
-                    case 'e-hentai':
-                        url += 'https://e-hentai.org/';
-                        break;
-                    case 'exhentai':
-                        url += 'https://exhentai.org/';
-                        break;
-                }
-            }
-            if (item.type.length > 0) {
-                url += item.type.reduce((sum, val) => {
-                    val = val.replace(' ', '').toLowerCase();
-                    return `${sum}f_${val}=1&`;
-                }, '?');
-            } else {
-                url += '?f_doujinshi=1&f_manga=1&f_artistcg=1&f_gamecg=1&f_western=1&f_non-h=1&f_imageset=1&f_cosplay=1&f_asianporn=1&f_misc=1&';
-            }
-            url += `f_search="${item.name}$"+`;
-            if (item.lang.length > 0) {
-                url += `language:"${item.lang[0]}$"+`;
-            }
-            url += '&f_apply=Apply+Filter';
-            return encodeURI(url);
-        });
+    async getUrlHtmls(urls) {
+      return await (new ReqQueueService(urls)).setNumOfConcurrented(1).request();
     }
 
-    _request() {
-        (new ReqQueueService(this.requestList))
-            .setNumOfConcurrented(1)
-            .request()
-            .then(map => {
-                NotiStorageService
-                    .instance
-                    .then(notiStorage => {
-                        this.requestList.forEach(url => this._compare(notiStorage, url, map.get(url)));
-                        this._noti();
-                    });
-            }, err => console.error(err));
-    }
-
-    _compare(notiStorage, url, html) {
-        const tag = this.subscribedTagList[this.requestList.indexOf(url)];
-        let oldResults = notiStorage.getResultsByName(tag.name);
-        let newResults = new SearchHtmlParser(html).getResultTitles();
+    async compare(tag, url, html) {
+        const oldResults = await NotiStorage.getResultsByName(tag.name);
+        const newResults = new SearchHtmlParser(html).getResults();
         let diffs = [];
-        // get new items
-        if (oldResults.length > 0) {
-            newResults.forEach(i => {
-                if (oldResults.indexOf(i) === -1) {
-                    diffs.push(i);
-                }
-            })
+        if (oldResults.length === 0) {
+          diffs = newResults;
         } else {
-            diffs = newResults;
+          for (let item of newResults) {
+            if (item.title !== oldResults[0].title) {
+              diffs.push(item);
+            } else {
+              break;
+            }
+          }
         }
-        // restore new results
         if (diffs.length > 0) {
-            NotiStorageService
-                .instance
-                .then(instance => {
-                    instance.putItem(tag.name, newResults);
-                })
-        }
-        // create notification
-        if (diffs.length > 0 && oldResults.length !== 0) {
-            this.notiList.push({
-                name: tag.name,
-                message: `更新数量: ${diffs.length >= 25 ? '>=25' : diffs.length}`,
-                time: new Date().getTime(),
-                updatedNum: diffs.length >= 25 ? '>=25' : diffs.length,
-                url,
-                diffs,
-                type: tag.type
-            });
+          await NotiStorage.putItem(tag.name, newResults);
+          if (oldResults.length > 0) {
+            return {
+              name: tag.name,
+              message: [`${tag.name} Updated: ${diffs.length >= 25 ? '>=25' : diffs.length} items`,`${tag.name}更新了${diffs.length >= 25 ? '>=25' : diffs.length}项`][lang],
+              time: new Date().getTime(),
+              updatedNum: diffs.length >= 25 ? '>=25' : diffs.length,
+              url,
+              diffs,
+              type: tag.type
+            };
+          }
         }
     }
 
-    _noti() {
-        if (this.notiList.length > 0) {
-            chrome.notifications.create('EHUNTER_UPDATED_NOTI', {
-                type: 'list',
-                title: 'TAG更新通知',
-                iconUrl: './img/ehunter_icon.png',
-                message: `共有${this.notiList.length}个TAG有更新, 详细内容请在通知中心中查看`,
-                items: this.notiList.map(i => {
-                    return {
-                        title: i.name,
-                        message: i.message
-                    }
-                })
-            }, () => {
-                NotiStorageService
-                    .instance
-                    .then(notiStorage => {
-                        this.notiList.forEach(i => notiStorage.pushMsg(i));
-                        this.notiList = [];
-                    });
-            });
-        }
+    async notify(notifications) {
+      if (notifications.length === 0) return;
+      for (let item of notifications) {
+        await Utils.sleep(100);
+        chrome.notifications.create('EHUNTER_UPDATED_NOTI_' + item.time, {
+          type: 'basic',
+          title: ['TAG Update Notification','标签更新通知'][lang],
+          iconUrl: './img/ehunter_icon.png',
+          message: item.message,
+        }, () => {
+          NotiStorage.pushMsg(item);
+        });
+      }
     }
 }
 

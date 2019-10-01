@@ -2,28 +2,29 @@
     <div class="notification">
         <footer>
             <mu-tabs :value="activeTab" @change="handleTabChange">
-                <mu-tab :value="msg.name" title="标签动态"/>
-                <mu-tab :value="tag.name" title="标签订阅"/>
+                <mu-tab :value="msg.name" :title="['Activities','标签动态'][lang]"/>
+                <mu-tab :value="tag.name" :title="['Subscribe', '标签订阅'][lang]"/>
             </mu-tabs>
         </footer>
 
         <!-- msg tab -->
         <div class="msg" v-if="activeTab === msg.name">
-            <mu-sub-header>历史消息列表</mu-sub-header>
+            <mu-sub-header>{{ ['Notifications','历史消息列表'][lang] }}</mu-sub-header>
             <svg class="clear-all-btn" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="clearMsg()">
                 <path d="M5 13h14v-2H5v2zm-2 4h14v-2H3v2zM7 7v2h14V7H7z"/>
                 <path d="M0 0h24v24H0z" fill="none"/>
             </svg>
             <div>
                 <div class="msg-item" v-for="(item, index) of msg.list" :key="index" @click="open(item)">
-                    <div class="avatar" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name[0].toUpperCase() }}</div>
+                    <div class="avatar" :style="{'background': GalleryType.getTypeColor(item.type[0])}">{{ item.name[0].toUpperCase() }}</div>
                     <div class="msg-content">
-                        <a class="msg-link" :href="item.url" :title="`${item.name}更新了${item.updatedNum}项`" @click.stop="" target="_blank">{{ `${item.name }更新了${item.updatedNum}项` }}</a>
+                        <a v-if="lang==0" class="msg-link" :href="item.url" :title="`${item.name}: updated ${item.updatedNum} items`" @click.stop="" target="_blank">{{ `${item.name}: updated ${item.updatedNum} items` }}</a>
+                        <a v-if="lang==1" class="msg-link" :href="item.url" :title="`${item.name}更新了${item.updatedNum}项`" @click.stop="" target="_blank">{{ `${item.name}更新了${item.updatedNum}项` }}</a>
                         <span class="time">{{ DateUtil.getIntervalFromNow(item.time) }}</span>
                     </div>
                     <div class="diff-list" v-show="item.open">
-                        <div class="diff-item" v-for="(title, index) of item.diffs" :key="index">
-                            <span>{{ `${index + 1}.  ${title}` }}</span>
+                        <div class="diff-item" v-for="(notification, index) of item.diffs" :key="index">
+                            <span :title="notification.title">{{ `${index + 1}.  ${notification.title}` }}</span>
                         </div>
                     </div>
                 </div>
@@ -34,16 +35,16 @@
         <div class="tag" v-if="activeTab === tag.name">
             <!--subscribed tag list -->
             <div class="tag-list-container">
-                <mu-sub-header>标签订阅列表</mu-sub-header>
+                <mu-sub-header>{{['Tag Subscription List', '标签订阅列表'][lang]}}</mu-sub-header>
                 <div class="subscribed-tag-list">
                     <div class="item" v-for="(item, index) of tag.subscribedTagList" :key="index">
-                        <span class="tag" @click="openTagPopup(index)" :style="{'background': ColorService.getColorByType(item.type[0])}">{{ item.name }}</span>
+                        <span class="tag" @click="openTagPopup(index)" :style="{'background': GalleryType.getTypeColor(item.type[0])}">{{ item.name }}</span>
                     </div>
                 </div>
                 <!-- popup of tag info -->
                 <mu-popup position="bottom" popupClass="tag-popup" :open="tag.popup" @close="closeTagPopup()">
                     <header>
-                        标签详情
+                        {{['Tag Details', '标签详情'][lang]}}
                         <div class="panel">
                             <svg class="delete-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="deleteTag(tag.curTagIndex)">
                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
@@ -58,61 +59,64 @@
                     <div class="tag-detail">
                         <table v-if="tag.curTagIndex!==-1">
                             <tr>
-                                <td>标签名称:</td>
+                                <td>{{['Tag Name', '标签名称'][lang]}}:</td>
                                 <td>{{ tag.subscribedTagList[tag.curTagIndex].name }}</td>
                             </tr>
                             <tr>
-                                <td>作用网站:</td>
+                                <td>{{['Target', '目标网站'][lang]}}:</td>
                                 <td><span v-for="(site, index) of tag.subscribedTagList[tag.curTagIndex].site" :key="index">{{ site }}&nbsp;&nbsp;</span></td>
                             </tr>
                             <tr>
-                                <td>类型:</td>
+                                <td>{{['Type', '画册类型'][lang]}}:</td>
                                 <td><span v-for="(type, index) of tag.subscribedTagList[tag.curTagIndex].type" :key="index">{{ type }}&nbsp;&nbsp;</span></td>
                             </tr>
                             <tr>
-                                <td>检查间隔:</td>
-                                <td>{{ UpdateIntervalService.getTextByVal(tag.subscribedTagList[tag.curTagIndex].time) }}</td>
+                                <td>{{['Interval', '检查间隔'][lang]}}:</td>
+                                <td>{{ UpdateInterval.getText(tag.subscribedTagList[tag.curTagIndex].time)[lang] }}</td>
                             </tr>
                             <tr>
-                                <td>语言类型:</td>
+                                <td>{{['Lang', '画册语言'][lang]}}:</td>
                                 <td><span v-for="(lang, index) of tag.subscribedTagList[tag.curTagIndex].lang" :key="index">{{ lang }}&nbsp;&nbsp;</span></td>
                             </tr>
                         </table>
+                        <div class="tag-test-btn">
+                          <mu-flat-button :label="['TEST TAG', '测试标签'][lang]" @click="testTag(tag.subscribedTagList[tag.curTagIndex])" primary/>
+                        </div>
                     </div>
                 </mu-popup>
                 <div class="add-tag-button">
-                    <mu-flat-button :label="tag.isEdited?'收起订阅栏':'添加订阅'" @click="tag.isEdited=!tag.isEdited" primary/>
+                    <mu-flat-button :label="tag.isEdited?['CANCEL','收起订阅栏'][lang]:['ADD','添加订阅'][lang]" @click="tag.isEdited=!tag.isEdited" primary/>
                 </div>
             </div>
 
             <!-- add new tag-->
             <div class="new-tag-container" :class="{'show':tag.isEdited, 'hide':!tag.isEdited}">
                 <div class="tag-input">
-                    <mu-text-field hintText="请输入标签名称" v-model="tag.tagName" label="标签名称"/>
+                    <mu-text-field :hintText="['Tag(s), split by comma', '多标签则逗号间隔'][lang]" v-model="tag.tagName" :label="['Tag(s)', '标签名称'][lang]"/>
                 </div>
                 <div class="lang-selector">
-                    <mu-select-field label="作用网站" hintText="需确保网站可访问" v-model="tag.site" :maxHeight="150">
+                    <mu-select-field :label="['Target', '作用网站'][lang]" :hintText="['must be accessible', '需确保网站可访问'][lang]" v-model="tag.site" :maxHeight="150">
                         <mu-menu-item v-for="(item, index) in tag.sites" :title="item" :key="index" :value="index"/>
                     </mu-select-field>
                 </div>
                 <div class="type-selector">
-                    <mu-select-field multiple label="画册类型" hintText="默认全类型订阅" v-model="tag.type" :maxHeight="150">
+                    <mu-select-field multiple :label="['Type(Optional)', '画册类型(可选)'][lang]" :hintText="['Default all types', '默认全类型'][lang]" v-model="tag.type" :maxHeight="150">
                         <mu-menu-item v-for="(item, index) in tag.types" :title="item" :key="index" :value="index"/>
                     </mu-select-field>
                 </div>
                 <div class="lang-selector">
-                    <mu-select-field label="语言类型" hintText="默认不限语言" v-model="tag.lang" :maxHeight="150">
+                    <mu-select-field :label="['Lang(Optional)', '语言类型(可选)'][lang]" :hintText="['Default all langs','默认不限语言'][lang]" v-model="tag.lang" :maxHeight="150">
                         <mu-menu-item v-for="(item, index) in tag.langs" :title="item" :key="index" :value="index"/>
                     </mu-select-field>
                 </div>
    
                 <div class="time-selector">
-                    <mu-select-field label="检查间隔" v-model="tag.time" :maxHeight="150">
+                    <mu-select-field :label="['Interval of inspection','检查间隔'][lang]" v-model="tag.time" :maxHeight="150">
                         <mu-menu-item v-for="(item, index) in tag.times" :title="item" :key="index" :value="index"/>
                     </mu-select-field>
                 </div>
                 <div class="add">
-                    <mu-flat-button @click="addTag()" label="添加" primary/>
+                    <mu-flat-button @click="addTag()" :label="['CONFIRM','添加'][lang]" primary/>
                 </div>
             </div>
 
@@ -123,17 +127,20 @@
 </template>
 
 <script>
-    import ColorService from '../service/type/TypeColorService'
-    import UpdateIntervalService from '../service/type/UpdateIntervalService'
-    import SubsStorageService from '../service/storage/SubsStorageService'
-    import NotiStorageService from '../service/storage/NotiStorageService'
+    import GalleryType from '../service/type/GalleryType'
+    import UpdateInterval from '../service/type/UpdateInterval'
+    import SubsStorage from '../service/storage/SubsStorage'
+    import NotiStorage from '../service/storage/NotiStorage'
+    import NotificationService from '../service/NotificationService'
     import DateUtil from '../utils/DateUtil'
+    import lang from '../utils/lang'
 
     export default {
         name: 'Notification',
 
         data () {
             return {
+                lang,
                 activeTab: '',
                 toast: { msg: '', show: false },
                 msg: {
@@ -148,36 +155,28 @@
                     time: 1,
                     lang: '',
                     sites: ['e-hentai', 'exhentai'],
-                    times: UpdateIntervalService.getTypes(),
-                    types: ColorService.getTypes(),
+                    times: UpdateInterval.getTypes(),
+                    types: GalleryType.getTypes(),
                     langs: ['Chinese', 'English', 'Spanish'],
                     isEdited: false,
                     popup: false,
                     curTagIndex: -1,
                     subscribedTagList: []
                 },
-                ColorService: ColorService,
-                UpdateIntervalService: UpdateIntervalService,
+                GalleryType,
+                UpdateInterval,
                 DateUtil: DateUtil
             }
         },
 
-        created() {
+        async created() {
             this.activeTab = this.msg.name;
-            SubsStorageService
-                .instance
-                .then(instance => {
-                    this.tag.subscribedTagList = instance.getSubsList();
-                });
-            NotiStorageService
-                .instance
-                .then(instance => {
-                    let list = instance.getMsgList().reverse();
-                    list.forEach((item) => {
-                        item.open = false;
-                        this.msg.list.push(item);
-                    });
-                })
+            this.tag.subscribedTagList = await SubsStorage.getSubsList();
+            let list = (await NotiStorage.getMsgList()).reverse();
+            list.forEach((item) => {
+                item.open = false;
+                this.msg.list.push(item);
+            });
         },
 
         methods: {
@@ -191,17 +190,12 @@
             closeTagPopup() {
                 this.tag.popup = false;
             },
-            deleteTag(index) {
-                SubsStorageService
-                    .instance
-                    .then(instance => {
-                        instance.delSubsItemByName(this.tag.subscribedTagList[index].name, () => {
-                            this.tag.subscribedTagList.splice(index, 1);
-                            this.tag.popup = false;
-                            this.tag.curTagIndex = -1;
-                            this.showToast('删除成功');
-                        });
-                    });
+            async deleteTag(index) {
+                await SubsStorage.delSubsItemByName(this.tag.subscribedTagList[index].name);
+                this.tag.subscribedTagList.splice(index, 1);
+                this.tag.popup = false;
+                this.tag.curTagIndex = -1;
+                this.showToast(['Deleted', '已删除'][this.lang]);
             },
             showToast(msg) {
                 this.toast.msg = msg;
@@ -213,17 +207,17 @@
                 this.toast.show = false;
                 if (this.toastTimer) clearTimeout(this.toastTimer);
             },
-            addTag() {
+            async addTag() {
                 if (this.tag.tagName === '') {
-                    this.showToast('请输入标签名称');
+                    this.showToast(['Please input a tag','请输入标签名称'][this.lang]);
                     return;
                 }
                 if (this.tag.site === '') {
-                    this.showToast('请选择作用网站');
+                    this.showToast(['Please choose a target','请选择目标网站'][this.lang]);
                     return;
                 }
                 if (this.tag.subscribedTagList.find(i => i.name === this.tag.tagName)) {
-                    this.showToast('已存在此标签');
+                    this.showToast(['this tag already exists','该标签已存在'][this.lang]);
                     return;
                 }
                 let newItem = {
@@ -232,7 +226,7 @@
                     type: this.tag.type.map((i) => {
                         return this.tag.types[i]
                     }),
-                    time: UpdateIntervalService.getValByText(this.tag.times[this.tag.time]),
+                    time: UpdateInterval.getVal(this.tag.times[this.tag.time]),
                     lang: this.tag.lang !== '' ? [this.tag.langs[this.tag.lang]] : []
                 };
                 this.tag.subscribedTagList.push(newItem);
@@ -240,25 +234,20 @@
                 this.tag.type = [];
                 this.tag.lang = '';
                 this.tag.site = '';
-                SubsStorageService
-                    .instance
-                    .then(instance => {
-                        instance.addSubsItem(newItem, () => this.showToast('添加成功'));
-                    });
+                await SubsStorage.addSubsItem(newItem);
+                this.showToast(['Done','添加成功'][this.lang]);
             },
-            clearMsg() {
-                NotiStorageService
-                    .instance
-                    .then(instance => {
-                        this.msg.list = instance.clearMsg(() => {
-                            this.msg.list = [];
-                            this.showToast('已清空历史消息');
-                        });
-                    })
+            async clearMsg() {
+                await NotiStorage.clearMsg();
+                this.showToast(['Cleared','清除成功'][this.lang]);
+                this.msg.list = [];
             },
             open(msgItem) {
                 msgItem.open = !msgItem.open;
                 console.log(msgItem.open);
+            },
+            testTag(tag) {
+              window.open(NotificationService.getTagUrl(tag));
             }
         }
     }
@@ -515,7 +504,6 @@
                     width: 18 / 16 * 1em;
                     cursor: pointer;
                 }
-
             }
         }
         table {
@@ -533,6 +521,13 @@
                         color: $popup_secondary_text_color;
                     }
                 }
+            }
+        }
+        .tag-detail {
+            .tag-test-btn {
+              display: flex;
+              justify-content: center;
+              align-items: center;
             }
         }
     }

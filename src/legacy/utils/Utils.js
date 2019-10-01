@@ -1,5 +1,5 @@
 export default {
-    timeout(ms) {
+    sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 };
