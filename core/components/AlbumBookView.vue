@@ -84,12 +84,14 @@ export default {
         this.appSize = this.getAppSize();
         window.addEventListener('resize', this.watchResize);
         document.addEventListener('keydown', this.watchKeyboard);
+        document.addEventListener('wheel', this.watchWheel);
         this.checkInstructions();
     },
 
     beforeDestroy() {
         window.removeEventListener('resize', this.watchResize);
         document.removeEventListener('keydown', this.watchKeyboard);
+        document.removeEventListener('wheel', this.watchWheel);
         if (this.autoFlip) {
             this.stopAutoFlip();
             this.setAutoFlip(false);
@@ -244,6 +246,17 @@ export default {
                 case 'Escape':
                     SettingService.setShowTopBar(!this.showTopBar);
                     break;
+            }
+        },
+
+        watchWheel(e) {
+            if (e.metaKey || e.ctrlKey) {
+                return;
+            }
+            if (e.wheelDelta > 0) {
+                this.prevPage();
+            } else if (e.wheelDelta < 0) {
+                this.nextPage();
             }
         },
 
