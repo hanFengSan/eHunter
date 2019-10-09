@@ -36,7 +36,7 @@ class SearchHtmlParser {
         case 'Compact':
           items = [...this.html.querySelectorAll('.glink')];
           return items.map(i => ({
-            title: i.textContent + '_test',
+            title: i.textContent,
             url: i.parentElement.getAttribute('href'),
           }));
         case 'Extended':

@@ -4,6 +4,7 @@ class SubsStorage extends BaseStorage {
     constructor() {
       super();
       this.name = 'subsV2';
+      this.storageType = 'sync';
       this.default = {};
     }
 
