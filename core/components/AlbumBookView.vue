@@ -250,13 +250,20 @@ export default {
         },
 
         watchWheel(e) {
-            if (e.metaKey || e.ctrlKey) {
+            if (e.metaKey || e.ctrlKey || e.wheelDeltaY === 0) {
                 return;
             }
-            if (e.wheelDelta > 0) {
-                this.prevPage();
-            } else if (e.wheelDelta < 0) {
-                this.nextPage();
+            const wheelDeltaKey = e.wheelDeltaY > 0 ? '_wheelDeltaYUp' : '_wheelDeltaYDown';
+            const wheelDeltaTimerKey = e.wheelDeltaY > 0 ? '_wheelDeltaYUpTimer' : '_wheelDeltaYDownTimer';
+            const action = e.wheelDeltaY > 0 ? this.prevPage : this.nextPage;
+            this[wheelDeltaKey] += Math.abs(e.wheelDeltaY);
+            window.clearTimeout(this[wheelDeltaTimerKey]);
+            this[wheelDeltaTimerKey] = window.setTimeout(() => {
+                this[wheelDeltaKey] = 0;
+            }, 100);
+            if (this[wheelDeltaKey] > 50) {
+                this[wheelDeltaKey] = 0;
+                action();
             }
         },
 
