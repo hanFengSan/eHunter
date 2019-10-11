@@ -106,14 +106,6 @@ export default {
     data() {
         return {
             readSettings: false,
-            // width
-            showWidthSlider: false,
-            // loadNum
-            showLoadNumSlider: false,
-            // volSize
-            showVolSizeSlider: false,
-            // autoFlipFrequency
-            showAutoFlipFrequencySlider: false,
             // language
             langList: [
                 { name: 'English', val: tags.LANG_EN },
@@ -410,81 +402,6 @@ export default {
             autoFlipFrequencyConfig,
             thumbViewInBookConfig
           ];
-        },
-        readingModeList() {
-            return [{ name: this.string.scrollMode, val: 0 }, { name: this.string.bookMode, val: 1 }];
-        },
-        widthList() {
-            return [
-                { name: '40%', val: 40 },
-                { name: '50%', val: 50 },
-                { name: '55%', val: 55 },
-                { name: '60%', val: 60 },
-                { name: '65%', val: 65 },
-                { name: '70%', val: 70 },
-                { name: '75%', val: 75 },
-                { name: '80%', val: 80 },
-                { name: '85%', val: 85 },
-                { name: '90%', val: 90 },
-                { name: '95%', val: 95 },
-                { name: '100%', val: 100 },
-                { name: this.string.custom, val: -1 }
-            ];
-        },
-        loadNumList() {
-            return [
-                { name: '1P', val: 1 },
-                { name: '2P', val: 2 },
-                { name: '3P', val: 3 },
-                { name: '5P', val: 5 },
-                { name: '10P', val: 10 },
-                { name: '20P', val: 20 },
-                { name: '30P', val: 30 },
-                { name: '40P', val: 40 },
-                { name: '50P', val: 50 },
-                { name: '100P', val: 100 },
-                { name: this.string.custom, val: -1 }
-            ];
-        },
-        volSizeList() {
-            return [
-                { name: '10P', val: 10 },
-                { name: '20P', val: 20 },
-                { name: '30P', val: 30 },
-                { name: '50P', val: 50 },
-                { name: '100P', val: 100 },
-                { name: this.string.custom, val: -1 }
-            ];
-        },
-        screenSizeList() {
-            return [
-                { name: '1P', val: 1 },
-                { name: '2P', val: 2 },
-                { name: '3P', val: 3 },
-                { name: '4P', val: 4 },
-                { name: '5P', val: 5 }
-            ];
-        },
-        directionList() {
-            return [{ name: this.string.rtl, sname: 'RTL', val: 0 }, { name: this.string.ltr, sname: 'LTR', val: 1 }];
-        },
-        autoFlipFrequencyList() {
-            return [
-                { name: '3 sec', val: 3 },
-                { name: '5 sec', val: 5 },
-                { name: '8 sec', val: 8 },
-                { name: '10 sec', val: 10 },
-                { name: '15 sec', val: 15 },
-                { name: '20 sec', val: 20 },
-                { name: '30 sec', val: 30 },
-                { name: '45 sec', val: 45 },
-                { name: '1 min', val: 60 },
-                { name: '1 min 30s', val: 90 },
-                { name: '2 min', val: 120 },
-                { name: '3 min', val: 180 },
-                { name: '5 min', val: 300 },
-                { name: this.string.custom, val: -1 }
-            ]
         }
     },
 
@@ -493,93 +410,10 @@ export default {
 
         async dropOptionChange(tag, index) {
             switch (tag) {
-                case 'width':
-                    switch (this.widthList[index].val) {
-                        case -1:
-                            this.showWidthSlider = true;
-                            break;
-                        default:
-                            SettingService.setAlbumWidth(this.widthList[index].val);
-                    }
-                    break;
-                case 'loadNum':
-                    switch (this.loadNumList[index].val) {
-                        case -1:
-                            this.showLoadNumSlider = true;
-                            break;
-                        default:
-                            SettingService.setLoadNum(this.loadNumList[index].val);
-                    }
-                    break;
-                case 'volSize':
-                    switch (this.volSizeList[index].val) {
-                        case -1:
-                            this.showVolSizeSlider = true;
-                            break;
-                        default:
-                            SettingService.setVolumeSize(this.volSizeList[index].val);
-                    }
-                    break;
-                case 'readingMode':
-                    SettingService.setReadingMode(this.readingModeList[index].val);
-                    break;
-                case 'screenSize':
-                    SettingService.setBookScreenSize(this.screenSizeList[index].val);
-                    break;
-                case 'direction':
-                    SettingService.setBookDirection(this.directionList[index].val);
-                    break;
                 case 'lang':
                     await SettingService.setLang(this.langList[index].val);
                     InfoService.showInstruction(this.config);
-                    break;
-                case 'autoFlipFrequency':
-                    switch (this.autoFlipFrequencyList[index].val) {
-                        case -1:
-                            this.showAutoFlipFrequencySlider = true;
-                            break;
-                        default:
-                            SettingService.setAutoFlipFrequency(this.autoFlipFrequencyList[index].val);
-                    }
             }
-        },
-
-        dropOptionSliderChange(tag, val) {
-            switch (tag) {
-                case 'width':
-                    SettingService.setAlbumWidth(val);
-                    break;
-                case 'loadNum':
-                    SettingService.setLoadNum(val);
-                    break;
-                case 'volSize':
-                    SettingService.setVolumeSize(val);
-                    break;
-                case 'autoFlipFrequency':
-                    SettingService.setAutoFlipFrequency(val);
-                    break;
-            }
-        },
-
-        closeDropOptionSlider(tag) {
-            switch (tag) {
-                case 'width':
-                    this.showWidthSlider = false;
-                    break;
-                case 'loadNum':
-                    this.showLoadNumSlider = false;
-                    break;
-                case 'volSize':
-                    this.showVolSizeSlider = false;
-                    break;
-                case 'autoFlipFrequency':
-                    this.showAutoFlipFrequencySlider = false;
-                    break;
-            }
-        },
-
-        changeThumbView(show) {
-            SettingService.toggleThumbView(show);
         },
 
         changeTopBar() {
@@ -589,14 +423,6 @@ export default {
         closeEHunter() {
             SettingService.toggleEHunter(false);
             this.service.eHunter.showEHunterView(false);
-        },
-
-        changeBookScreenAnimation(show) {
-            SettingService.setBookScreenAnimation(show);
-        },
-
-        changeBookPagination(show) {
-            SettingService.setBookPagination(show);
         },
 
         showInfoDialog() {
@@ -610,18 +436,6 @@ export default {
 
         toggleMoreSettings(show) {
             SettingService.setShowMoreSettings(!this.showMoreSettings);
-        },
-
-        changeReverseFlip() {
-            SettingService.setReverseFlip(!this.reverseFlip);
-        },
-
-        changeAutoFlip() {
-            this.setAutoFlip(!this.autoFlip);
-        },
-
-        changeThumbViewInBook() {
-            SettingService.setShowThumbViewInBook(!this.showThumbViewInBook);
         }
     }
 };
