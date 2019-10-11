@@ -1,9 +1,9 @@
 {
     "cn":{
-        "title":"新版本: v2.4.0",
-        "version":"2.4.0",
-        "text":"1.支持nhentai\n2.eHunter-local发布! 支持Windows和MacOS, [Github下载](https://github.com/hanFengSan/eHunter_local/releases) [百度网盘](https://pan.baidu.com/s/1wEnBe9uGoBKzNd4DCfbuAg) 提取码: czft\n3.支持定时翻页\n4.优化鼠标和触屏支持\n5.书页模式支持缩略图",
-        "time":1543811938814,
+        "title":"新版本: v2.5.0",
+        "version":"2.5.0",
+        "text":"## 滚轮翻页\n在`书页模式`下可以使用鼠标滚轮翻页, 且在设置中可调整滚动灵敏度和滚动翻页方向.\n使用Mac触控板的用户, 请在设置中把`滚动方向`打开, 从而翻转方向, 达到最佳体验.\n\n## 更新订阅\n在chrome应用商店下载的用户, 可以使用新版本的标签更新订阅功能. 新版本修复了订阅, 且实现了多标签混合订阅和测试标签订阅功能.",
+        "time":1501308609984,
         "duration":604800000,
         "always":true,
         "operations":[
@@ -26,10 +26,10 @@
         ]
     },
     "en":{
-        "title":"New version: v2.4.0",
-        "version":"2.4.0",
-        "text":"1.Support nhentai\n2.eHunter-local released! It supports Windows and MacOS. [Github Releases](https://github.com/hanFengSan/eHunter_local/releases)3.Support automatic page turning\n4.Optimize the support for Touch Screen and Mouse\n5.Support thumbnail view in \"Book\" mode",
-        "time":1543811938814,
+        "title":"New version: v2.5.0",
+        "version":"2.5.0",
+        "text":"## Flip by mouse wheel\nIn `Book mode`, you can use mouse wheel to flip pages, and can customize the sensitivity and direction.\nIf you are using touchpad of Mac, please open the switch of `Wheel Direction` in settings to have a best experience.\n\n## Update subscription (Chrome extension)\nIf you are using eHunter by Chrome extension, you can use the new version of update subscription system of tag.\nIn new version, you can subscribe multiple tags once to get more accurate results, and you also can click `TEST TAG` button to test subscription.",
+        "time":1571388659984,
         "duration":604800000,
         "always":true,
         "operations":[
@@ -52,10 +52,10 @@
         ]
     },
     "jp":{
-        "title":"新しいバージョン: v2.4.0",
-        "version":"2.4.0",
-        "text":"1.Support nhentai\n2.eHunter-local released! It supports Windows and MacOS. [Github Releases](https://github.com/hanFengSan/eHunter_local/releases)3.Support automatic page turning\n4.Optimize the support for Touch Screen and Mouse\n5.Support thumbnail view in \"Book\" mode",
-        "time":1543811938814,
+        "title":"新しいバージョン: v2.5.0",
+        "version":"2.5.0",
+        "text":"## Flip by mouse wheel\nIn `Book mode`, you can use mouse wheel to flip pages, and can customize the sensitivity and direction.\nIf you are using touchpad of Mac, please open the switch of `Wheel Direction` in settings to have a best experience.\n\n## Update subscription (Chrome extension)\nIf you are using eHunter by Chrome extension, you can use the new version of update subscription system of tag.\nIn new version, you can subscribe multiple tags once to get more accurate results, and you also can click `TEST TAG` button to test subscription.",
+        "time":1571388659984,
         "duration":604800000,
         "always":true,
         "operations":[
