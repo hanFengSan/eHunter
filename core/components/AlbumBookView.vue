@@ -261,7 +261,7 @@ export default {
             this[wheelDeltaTimerKey] = window.setTimeout(() => {
                 this[wheelDeltaKey] = 0;
             }, 100);
-            if (this[wheelDeltaKey] > 50) {
+            if (this[wheelDeltaKey] > 100) {
                 this[wheelDeltaKey] = 0;
                 action();
             }

@@ -24,100 +24,30 @@
         </div>
         <div :class="['inner-content', { hide: !showTopBar, 'more-settings': showMoreSettings }]" :style="topBarStyle">
             <template v-if="readSettings">
-                <div class="item">
-                    <span class="label tips tips-down tips-right" :title-content="string.readingModeTip">{{ string.readingMode }}:</span>
-                    <drop-option :list="readingModeList" @change="(val) => dropOptionChange('readingMode', val)" :cur-val="readingModeList[readingMode].name"></drop-option>
-                </div>
-                <div class="item" v-if="readingMode===0">
-                    <span class="label tips tips-down" :title-content="string.widthScaleTip">{{ string.widthScale }}:</span>
-                    <drop-option :list="widthList" @change="(val) => dropOptionChange('width', val)" :cur-val="albumWidth + '%'"></drop-option>
-                    <pop-slider 
-                        :active="showWidthSlider" 
-                        :min="30" 
-                        :max="100" 
-                        :step="1" 
-                        :init="albumWidth" 
-                        :close="() => closeDropOptionSlider('width')" 
-                        @change="(val) => dropOptionSliderChange('width', val)">
-                    </pop-slider>
-                </div>
-                <div class="item">
-                    <span class="label tips tips-down" :title-content="string.loadNumTip">{{ string.loadNum }}:</span>
-                    <drop-option :list="loadNumList" @change="(val) => dropOptionChange('loadNum', val)" :cur-val="loadNum + 'P'"></drop-option>
-                    <pop-slider 
-                        :active="showLoadNumSlider" 
-                        :min="1" 
-                        :max="10" 
-                        :step="1" 
-                        :init="loadNum" 
-                        :close="() => closeDropOptionSlider('loadNum')" 
-                        @change="(val) => dropOptionSliderChange('loadNum', val)">
-                    </pop-slider>
-                </div>
-                <div class="item" v-if="readingMode===0">
-                    <span class="label tips tips-down" :title-content="string.volSizeTip">{{ string.volSize }}:</span>
-                    <drop-option :list="volSizeList" @change="(val) => dropOptionChange('volSize', val)" :cur-val="volumeSize + 'P'"></drop-option>
-                    <pop-slider 
-                        :active="showVolSizeSlider" 
-                        :min="1" 
-                        :max="200" 
-                        :step="1" 
-                        :init="volumeSize" 
-                        :close="() => closeDropOptionSlider('volSize')" 
-                        @change="(val) => dropOptionSliderChange('volSize', val)">
-                    </pop-slider>
-                </div>
-                <div class="item" v-if="readingMode===0 && service.album.supportThumbView()">
-                    <span class="label tips tips-down" :title-content="string.thumbViewTip">{{ string.thumbView }}:</span>
-                    <div class="bar-switch">
-                        <simple-switch :active="showThumbView" @change="changeThumbView"></simple-switch>
-                    </div>
-                </div>
-                <div class="item" v-if="readingMode===1">
-                    <span class="label tips tips-down" :title-content="string.screenSizeTip">{{ string.screenSize }}:</span>
-                    <drop-option :list="screenSizeList" @change="(val) => dropOptionChange('screenSize', val)" :cur-val="bookScreenSize + 'P'"></drop-option>
-                </div>
-                <div class="item" v-if="readingMode===1">
-                    <span class="label tips tips-down" :title-content="string.bookDirectionTip">{{ string.bookDirection }}:</span>
-                    <drop-option :list="directionList" @change="(val) => dropOptionChange('direction', val)" :cur-val="directionList[bookDirection].sname"></drop-option>
-                </div>
-                <div class="item" v-if="readingMode===1">
-                    <span class="label tips tips-down" :title-content="string.paginationTip">{{ string.pagination }}:</span>
-                    <div class="bar-switch">
-                        <simple-switch :active="showBookPagination" @change="changeBookPagination"></simple-switch>
-                    </div>
-                </div>
-                <div class="item" v-if="readingMode===1 && showMoreSettings">
-                    <span class="label tips tips-down" :title-content="string.reverseFlipTip">{{ string.reverseFlip }}:</span>
-                    <div class="bar-switch">
-                        <simple-switch :active="reverseFlip" @change="changeReverseFlip"></simple-switch>
-                    </div>
-                </div>
-                <div class="item" v-if="readingMode===1 && showMoreSettings">
-                    <span class="label tips tips-down" :title-content="string.autoFlipTip">{{ string.autoFlip }}:</span>
-                    <div class="bar-switch">
-                        <simple-switch :active="autoFlip" @change="changeAutoFlip"></simple-switch>
-                    </div>
-                </div>
-                <div class="item" v-if="readingMode===1 && showMoreSettings">
-                    <span class="label tips tips-down" :title-content="string.autoFlipFrequencyTip">{{ string.autoFlipFrequency }}:</span>
-                    <drop-option :list="autoFlipFrequencyList" @change="(val) => dropOptionChange('autoFlipFrequency', val)" :cur-val="autoFlipFrequency + 's'"></drop-option>
-                    <pop-slider 
-                        :active="showAutoFlipFrequencySlider" 
-                        :min="1" 
-                        :max="240"
-                        :step="1" 
-                        :init="autoFlipFrequency" 
-                        :close="() => closeDropOptionSlider('autoFlipFrequency')" 
-                        @change="(val) => dropOptionSliderChange('autoFlipFrequency', val)">
-                    </pop-slider>
-                </div>
-                <div class="item" v-if="readingMode===1 && showMoreSettings">
-                    <span class="label tips tips-down" :title-content="string.thumbViewTip">{{ string.thumbView }}:</span>
-                    <div class="bar-switch">
-                        <simple-switch :active="showThumbViewInBook" @change="changeThumbViewInBook"></simple-switch>
-                    </div>
-                </div>
+                <template v-for="item of configuration">
+                  <div class="item" v-if="item.show" :key="item.title">
+                      <span class="label tips tips-down tips-right" :title-content="item.tip">{{ item.title }}:</span>
+                      <drop-option
+                        v-if="item.type==='SELECT'||item.type==='SLIDER_SELECT'"
+                        :list="item.list"
+                        @change="item.select"
+                        :cur-val="item.curValTitle">
+                      </drop-option>
+                      <pop-slider
+                          v-if="item.type==='SLIDER_SELECT'"
+                          :active="item.slider.active"
+                          :min="item.slider.min"
+                          :max="item.slider.max"
+                          :step="item.slider.step"
+                          :init="item.slider.init"
+                          :close="item.slider.close"
+                          @change="item.slider.change">
+                      </pop-slider>
+                      <div v-if="item.type==='SWITCH'" class="bar-switch">
+                        <simple-switch :active="item.curVal" @change="item.change"></simple-switch>
+                      </div>
+                  </div>
+                </template>
                 <div class="item less-margin">
                     <span class="label icon tips tips-down" title-content="Change language/切换语言/言語を変更">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -189,7 +119,8 @@ export default {
                 { name: 'English', val: tags.LANG_EN },
                 { name: '简体中文', val: tags.LANG_CN },
                 { name: '日本語', val: tags.LANG_JP }
-            ]
+            ],
+            configurationBoard: {},
         };
     },
 
@@ -226,6 +157,259 @@ export default {
             return { 
                 height: this.showMoreSettings? this.px(this.topBarHeight * 2) : this.px(this.topBarHeight)
             };
+        },
+        configuration() {
+          const addReactiveVal = (name, val) => {
+            if (!this.configurationBoard.hasOwnProperty(name)) {
+              this.$set(this.configurationBoard, name, val);
+            }
+          };
+          // select template
+          const getSelect = (title, tip, show, curVal, list, change) => {
+            const baseConfig = { title, tip, show, type: 'SELECT', list, change};
+            const item = baseConfig.list.find(i => i.val === curVal);
+            return {
+              ...baseConfig,
+              curValTitle: item.sname || item.name,
+              select: (index) => {
+                change(baseConfig.list[index].val);
+              }
+            }
+          }
+          // slider + select template
+          const getSliderSelect = (id, title, tip, show, curValTitle, list, sliderMin, sliderMax, sliderStep, curVal, change) => {
+            const sliderValName = `show${id}Name`;
+            addReactiveVal(sliderValName, false);
+            const baseConfig = {
+              title,
+              tip,
+              show,
+              type: 'SLIDER_SELECT',
+              curValTitle,
+              list,
+              slider: {
+                active: this.configurationBoard[sliderValName],
+                min: sliderMin,
+                max: sliderMax,
+                step: sliderStep,
+                init: curVal,
+                close: () => this.configurationBoard[sliderValName] = false,
+                change
+              }
+            };
+            return {
+              ...baseConfig,
+              select: (index) => {
+                const val = baseConfig.list[index].val;
+                if (val == -1) {
+                  this.configurationBoard[sliderValName] = true;
+                } else {
+                  change(val);
+                }
+              }
+            }
+          }
+          // ReadingMode
+          const readingModeConfig = getSelect(
+            this.string.readingMode,
+            this.string.readingModeTip,
+            true,
+            this.readingMode,
+            [{ name: this.string.scrollMode, val: 0 }, { name: this.string.bookMode, val: 1 }],
+            (val) => SettingService.setReadingMode(val)
+          );
+          // loadNum
+          const loadNumConfig = getSliderSelect(
+            'LoadNum',
+            this.string.loadNum,
+            this.string.loadNumTip,
+            true,
+            this.loadNum + 'P',
+            [
+              { name: '1P', val: 1 },
+              { name: '2P', val: 2 },
+              { name: '3P', val: 3 },
+              { name: '5P', val: 5 },
+              { name: '10P', val: 10 },
+              { name: '20P', val: 20 },
+              { name: '30P', val: 30 },
+              { name: '40P', val: 40 },
+              { name: '50P', val: 50 },
+              { name: '100P', val: 100 },
+              { name: this.string.custom, val: -1 }
+            ],
+            1,
+            100,
+            1,
+            this.loadNum,
+            (val) => SettingService.setLoadNum(val)
+          );
+          // width
+          const widthConfig = getSliderSelect(
+            'Width',
+            this.string.widthScale,
+            this.string.widthScaleTip,
+            this.readingMode === 0,
+            this.albumWidth + '%',
+            [
+              { name: '40%', val: 40 },
+              { name: '50%', val: 50 },
+              { name: '55%', val: 55 },
+              { name: '60%', val: 60 },
+              { name: '65%', val: 65 },
+              { name: '70%', val: 70 },
+              { name: '75%', val: 75 },
+              { name: '80%', val: 80 },
+              { name: '85%', val: 85 },
+              { name: '90%', val: 90 },
+              { name: '95%', val: 95 },
+              { name: '100%', val: 100 },
+              { name: this.string.custom, val: -1 }
+            ],
+            30,
+            100,
+            1,
+            this.albumWidth,
+            (val) => SettingService.setAlbumWidth(val)
+          );
+          // volSize
+          const volSizeConfig = getSliderSelect(
+            'VolSize',
+            this.string.volSize,
+            this.string.volSizeTip,
+            true,
+            this.volumeSize + 'P',
+            [
+              { name: '10P', val: 10 },
+              { name: '20P', val: 20 },
+              { name: '30P', val: 30 },
+              { name: '50P', val: 50 },
+              { name: '100P', val: 100 },
+              { name: this.string.custom, val: -1 }
+            ],
+            1,
+            200,
+            1,
+            this.volSize,
+            (val) => SettingService.setVolumeSize(val)
+          );
+          // thumbView
+          const thumbViewConfig = {
+            title: this.string.thumbView,
+            tip: this.string.thumbViewTip,
+            show: this.readingMode===0 && this.service.album.supportThumbView(),
+            type: 'SWITCH',
+            curVal: this.showThumbView,
+            change: (val) => SettingService.toggleThumbView(val)
+          };
+          // screenSize
+          const screenSizeConfig = getSliderSelect(
+            'ScreenSize',
+            this.string.screenSize,
+            this.string.screenSizeTip,
+            this.readingMode === 1,
+            this.bookScreenSize + 'P',
+            [
+              { name: '1P', val: 1 },
+              { name: '2P', val: 2 },
+              { name: '3P', val: 3 },
+              { name: '4P', val: 4 },
+              { name: '5P', val: 5 }
+            ],
+            1,
+            10,
+            1,
+            this.screenSize,
+            (val) => SettingService.setBookScreenSize(val)
+          );
+          // bookDirection
+          const bookDirectionConfig = getSelect(
+            this.string.bookDirection,
+            this.string.bookDirectionTip,
+            this.readingMode === 1,
+            this.bookDirection,
+            [{ name: this.string.rtl, sname: 'RTL', val: 0 }, { name: this.string.ltr, sname: 'LTR', val: 1 }],
+            (val) => SettingService.setBookDirection(val)
+          );
+          // pagination
+          const paginationConfig = {
+            title: this.string.pagination,
+            tip: this.string.paginationTip,
+            show: this.readingMode === 1,
+            type: 'SWITCH',
+            curVal: this.showBookPagination,
+            change: (val) => SettingService.setBookPagination(val)
+          };
+          // reverseFlip
+          const reverseFlipConfig = {
+            title: this.string.reverseFlip,
+            tip: this.string.reverseFlipTip,
+            show: this.readingMode === 1 && this.showMoreSettings,
+            type: 'SWITCH',
+            curVal: this.reverseFlip,
+            change: (val) => SettingService.setReverseFlip(val)
+          };
+          // autoFlip
+          const autoFlipConfig = {
+            title: this.string.autoFlip,
+            tip: this.string.autoFlipTip,
+            show: this.readingMode === 1 && this.showMoreSettings,
+            type: 'SWITCH',
+            curVal: this.autoFlip,
+            change: (val) => this.setAutoFlip(val)
+          };
+          // autoFlipFrequency
+          const autoFlipFrequencyConfig = getSliderSelect(
+            'AutoFlipFrequency',
+            this.string.autoFlipFrequency,
+            this.string.autoFlipFrequencyTip,
+            this.readingMode === 1 && this.showMoreSettings,
+            this.autoFlipFrequency + 's',
+            [
+              { name: '3 sec', val: 3 },
+              { name: '5 sec', val: 5 },
+              { name: '8 sec', val: 8 },
+              { name: '10 sec', val: 10 },
+              { name: '15 sec', val: 15 },
+              { name: '20 sec', val: 20 },
+              { name: '30 sec', val: 30 },
+              { name: '45 sec', val: 45 },
+              { name: '1 min', val: 60 },
+              { name: '1 min 30s', val: 90 },
+              { name: '2 min', val: 120 },
+              { name: '3 min', val: 180 },
+              { name: '5 min', val: 300 },
+              { name: this.string.custom, val: -1 }
+            ],
+            1,
+            240,
+            1,
+            this.autoFlipFrequency,
+            (val) => SettingService.setAutoFlipFrequency(val)
+          );
+          // thumbViewInBook
+          const thumbViewInBookConfig = {
+            title: this.string.thumbView,
+            tip: this.string.thumbViewTip,
+            show: this.readingMode === 1 && this.showMoreSettings,
+            type: 'SWITCH',
+            curVal: this.showThumbViewInBook,
+            change: (val) => SettingService.setShowThumbViewInBook(val)
+          };
+          return [
+            readingModeConfig,
+            widthConfig,
+            loadNumConfig,
+            volSizeConfig,
+            thumbViewConfig,
+            screenSizeConfig,
+            bookDirectionConfig,
+            paginationConfig,
+            reverseFlipConfig,
+            autoFlipConfig,
+            autoFlipFrequencyConfig,
+            thumbViewInBookConfig
+          ];
         },
         readingModeList() {
             return [{ name: this.string.scrollMode, val: 0 }, { name: this.string.bookMode, val: 1 }];
