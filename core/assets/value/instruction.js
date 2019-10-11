@@ -11,7 +11,7 @@ export default {
 
 3.\`滚动\`模式下, 支持\`A\`. \`D\`, \`Left(左)\`和\`Right(右)\`键翻页. 
 
-4.\`书页\`模式下, 支持\`A\`. \`D\`, \`Left(左)\`, \`Right(右)\`和\`Space(空格)\`键翻页.
+4.\`书页\`模式下, 支持\`A\`. \`D\`, \`Left(左)\`, \`Right(右)\`和\`Space(空格)\`键翻页. 你也可以用鼠标滚轮翻页.
 
 5.\`分卷页数\`对性能要求较高,请不要设置过高,可能会导致卡顿.
 
@@ -48,7 +48,7 @@ eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](ht
 
 3.When the \`Mode\` is \`Scroll\`, you can use the keyboard's \`A\`, \`D\`, \`Left\` and \`Right\` keys to page.
 
-4.When the \`Mode\` is \`Book\`, you can use the keyboard's \`A\`, \`D\`, \`Left\`, \`Right\` and \`Space\` keys to page.
+4.When the \`Mode\` is \`Book\`, you can use the keyboard's \`A\`, \`D\`, \`Left\`, \`Right\` and \`Space\` keys to page. You also can use mouse wheel to page.
 
 5.This is a high performance requirements on \`Volume size\`. If too big, the program will be slow.
 
@@ -84,7 +84,7 @@ If you like this extension, I hope you can give a five-star rating in store. 8-)
 
 3.When the \`Mode\` is \`Scroll\`, you can use the keyboard's \`A\`, \`D\`, \`Left\` and \`Right\` keys to page.
 
-4.When the \`Mode\` is \`Book\`, you can use the keyboard's \`A\`, \`D\`, \`Left\`, \`Right\` and \`Space\` keys to page.
+4.When the \`Mode\` is \`Book\`, you can use the keyboard's \`A\`, \`D\`, \`Left\`, \`Right\` and \`Space\` keys to page. マウスホイールを使用してページを移動することもできます。
 
 5.これは\`ボリュームサイズ\`の高性能要件です。 大きすぎるとプログラムが遅くなります。
 
