@@ -34,7 +34,7 @@ module.exports = merge(baseWebpackConfig, {
         }),
         new webpack.BannerPlugin({
             banner: require(resolve('src/manifest')).tampermonkey,
-            raw: true,
+            raw: false,
             entryOnly: true,
             include: /inject\.js/
         })
