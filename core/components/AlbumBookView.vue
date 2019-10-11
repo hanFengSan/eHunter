@@ -113,7 +113,9 @@ export default {
             autoFlipFrequency: 'autoFlipFrequency',
             showMoreSettings: 'showMoreSettings',
             showThumbViewInBook: 'showThumbViewInBook',
-            thumbWidth: 'thumbWidth'
+            thumbWidth: 'thumbWidth',
+            wheelDirection: 'wheelDirection',
+            wheelSensitivity: 'wheelSensitivity'
         }),
         tags: () => tags,
         screenSize() {
@@ -255,13 +257,16 @@ export default {
             }
             const wheelDeltaKey = e.wheelDeltaY > 0 ? '_wheelDeltaYUp' : '_wheelDeltaYDown';
             const wheelDeltaTimerKey = e.wheelDeltaY > 0 ? '_wheelDeltaYUpTimer' : '_wheelDeltaYDownTimer';
-            const action = e.wheelDeltaY > 0 ? this.prevPage : this.nextPage;
+            let action = e.wheelDeltaY > 0 ? this.prevPage : this.nextPage;
+            if (this.wheelDirection) {
+                action = e.wheelDeltaY > 0 ? this.nextPage : this.prevPage;
+            }
             this[wheelDeltaKey] += Math.abs(e.wheelDeltaY);
             window.clearTimeout(this[wheelDeltaTimerKey]);
             this[wheelDeltaTimerKey] = window.setTimeout(() => {
                 this[wheelDeltaKey] = 0;
             }, 100);
-            if (this[wheelDeltaKey] > 100) {
+            if (this[wheelDeltaKey] > this.wheelSensitivity) {
                 this[wheelDeltaKey] = 0;
                 action();
             }

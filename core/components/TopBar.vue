@@ -138,7 +138,9 @@ export default {
             'reverseFlip',
             'autoFlip',
             'autoFlipFrequency',
-            'showThumbViewInBook'
+            'showThumbViewInBook',
+            'wheelSensitivity',
+            'wheelDirection'
         ]),
         floatBtnStyle() {
             return { 
@@ -388,6 +390,42 @@ export default {
             curVal: this.showThumbViewInBook,
             change: (val) => SettingService.setShowThumbViewInBook(val)
           };
+          // wheelSensitivity
+          const wheelSensitivityConfig = getSliderSelect(
+            'WheelSensitivity',
+            this.string.wheelSensitivity,
+            this.string.wheelSensitivityTip,
+            this.readingMode === 1 && this.showMoreSettings,
+            this.wheelSensitivity,
+            [
+              { name: '10', val: 10 },
+              { name: '30', val: 30 },
+              { name: '50', val: 50 },
+              { name: '80', val: 80 },
+              { name: '100', val: 100 },
+              { name: '120', val: 120 },
+              { name: '150', val: 150 },
+              { name: '170', val: 170 },
+              { name: '200', val: 200 },
+              { name: '220', val: 220 },
+              { name: '250', val: 250 },
+              { name: this.string.custom, val: -1 }
+            ],
+            1,
+            240,
+            1,
+            this.wheelSensitivity,
+            (val) => SettingService.setWheelSensitivity(val)
+          );
+          // wheelDirection
+          const wheelDirectionConfig = {
+            title: this.string.wheelDirection,
+            tip: this.string.wheelDirectionTip,
+            show: this.readingMode === 1 && this.showMoreSettings,
+            type: 'SWITCH',
+            curVal: this.wheelDirection,
+            change: (val) => SettingService.setWheelDirection(val)
+          }
           return [
             readingModeConfig,
             widthConfig,
@@ -400,7 +438,9 @@ export default {
             reverseFlipConfig,
             autoFlipConfig,
             autoFlipFrequencyConfig,
-            thumbViewInBookConfig
+            thumbViewInBookConfig,
+            wheelDirectionConfig,
+            wheelSensitivityConfig
           ];
         }
     },

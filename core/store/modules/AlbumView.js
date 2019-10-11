@@ -29,7 +29,9 @@ const state = {
         reverseFlip: false, // reverse the page flipping direction
         autoFlip: false,
         autoFlipFrequency: 10,
-        showThumbViewInBook: false
+        showThumbViewInBook: false,
+        wheelSensitivity: 100,
+        wheelDirection: false
     },
     showMoreSettings: false
 }
@@ -75,7 +77,9 @@ const getters = {
     reverseFlip: state => state.book.reverseFlip,
     autoFlip: state => state.book.autoFlip,
     autoFlipFrequency: state => state.book.autoFlipFrequency,
-    showThumbViewInBook: state => state.book.showThumbViewInBook
+    showThumbViewInBook: state => state.book.showThumbViewInBook,
+    wheelSensitivity: state => state.book.wheelSensitivity,
+    wheelDirection: state => state.book.wheelDirection
 }
 
 // actions
@@ -99,7 +103,9 @@ const actions = {
     setReverseFlip: ( { commit }, val) => commit(types.SET_REVERSE_FLIP, { val }),
     setAutoFlip: ( { commit }, val) => commit(types.SET_AUTO_FLIP, { val }),
     setAutoFlipFrequency: ( { commit }, val) => commit(types.SET_AUTO_FLIP_FREQUENCY, { val }),
-    toggleThumbViewInBook: ( { commit }, val) => commit(types.TOGGLE_THUMB_VIEW_IN_BOOK, { val })
+    toggleThumbViewInBook: ( { commit }, val) => commit(types.TOGGLE_THUMB_VIEW_IN_BOOK, { val }),
+    setWheelSensitivity: ( { commit }, val) => commit(types.SET_WHEEL_SENSITIVITY, { val }),
+    setWheelDirection: ( { commit }, val) => commit(types.SET_WHEEL_DIRECTION, { val })
 }
 
 // mutations
@@ -174,6 +180,12 @@ const mutations = {
     },
     [types.TOGGLE_THUMB_VIEW_IN_BOOK](state, { val }) {
         state.book.showThumbViewInBook = val;
+    },
+    [types.SET_WHEEL_SENSITIVITY](state, { val }) {
+      state.book.wheelSensitivity = val;
+    },
+    [types.SET_WHEEL_DIRECTION](state, { val }) {
+      state.book.wheelDirection = val;
     }
 }
 

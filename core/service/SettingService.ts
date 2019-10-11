@@ -4,7 +4,7 @@ import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {
-    version = '2.5';
+    version = '2.7';
     storageName = 'Settings';
     storageVersionName = 'SettingsVersion';
 
@@ -35,7 +35,9 @@ class SettingService {
             showMoreSettings: { eventName: 'toggleMoreSettings', val: false },
             reverseFlip: { eventName: 'setReverseFlip', val: false },
             autoFlipFrequency: { eventName: 'setAutoFlipFrequency', val: 10 },
-            showThumbViewInBook: { eventName: 'toggleThumbViewInBook', val: false }
+            showThumbViewInBook: { eventName: 'toggleThumbViewInBook', val: false },
+            wheelSensitivity: { eventName: 'setWheelSensitivity', val: 100 },
+            wheelDirection: { eventName: 'setWheelDirection', val: false }
         }
     }
 
@@ -269,6 +271,14 @@ class SettingService {
 
     async setShowThumbViewInBook(val: boolean): Promise<void> {
         await this._setSettingItem('showThumbViewInBook', val);
+    }
+
+    async setWheelSensitivity(val: number): Promise<void> {
+      await this._setSettingItem('wheelSensitivity', val);
+    }
+
+    async setWheelDirection(val: boolean): Promise<void> {
+      await this._setSettingItem('wheelDirection', val);
     }
 }
 
