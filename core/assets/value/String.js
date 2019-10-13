@@ -333,5 +333,15 @@ export default {
         cn: '反转滚轮翻页方向',
         en: 'Reverse Wheel Direction to flip',
         jp: 'リバースホイール方向'
+    },
+    tips: {
+      cn: '提示',
+      en: 'TIPS',
+      jp: 'ヒント'
+    },
+    numberInputTip: {
+      cn: '最小值为`{{min}}`, 最大值为`{{max}}`',
+      en: 'The minimum is `{{min}}` and the maximum is `{{max}}`',
+      jp: '最小は`{{min}}`, 最大は`{{max}}`です'
     }
 }

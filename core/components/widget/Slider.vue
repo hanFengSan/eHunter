@@ -38,6 +38,12 @@ export default {
         }
     },
 
+    watch: {
+      init() {
+        this.val = this.init;
+      }
+    },
+
     methods: {
         getWidthRatio() {
             return this.$refs.slider.offsetWidth / (this.max - this.min);

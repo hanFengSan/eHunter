@@ -41,6 +41,7 @@
                           :step="item.slider.step"
                           :init="item.slider.init"
                           :close="item.slider.close"
+                          :is-float="item.slider.isFloat"
                           @change="item.slider.change">
                       </pop-slider>
                       <div v-if="item.type==='SWITCH'" class="bar-switch">
@@ -171,7 +172,7 @@ export default {
             }
           }
           // slider + select template
-          const getSliderSelect = (id, title, tip, show, curValTitle, list, sliderMin, sliderMax, sliderStep, curVal, change) => {
+          const getSliderSelect = (id, title, tip, show, curValTitle, list, sliderMin, sliderMax, sliderStep, isFloat, curVal, change) => {
             const sliderValName = `show${id}Name`;
             addReactiveVal(sliderValName, false);
             const baseConfig = {
@@ -187,6 +188,7 @@ export default {
                 max: sliderMax,
                 step: sliderStep,
                 init: curVal,
+                isFloat,
                 close: () => this.configurationBoard[sliderValName] = false,
                 change
               }
@@ -235,6 +237,7 @@ export default {
             1,
             100,
             1,
+            false,
             this.loadNum,
             (val) => SettingService.setLoadNum(val)
           );
@@ -263,6 +266,7 @@ export default {
             30,
             100,
             1,
+            true,
             this.albumWidth,
             (val) => SettingService.setAlbumWidth(val)
           );
@@ -284,6 +288,7 @@ export default {
             1,
             200,
             1,
+            false,
             this.volSize,
             (val) => SettingService.setVolumeSize(val)
           );
@@ -313,6 +318,7 @@ export default {
             1,
             10,
             1,
+            false,
             this.screenSize,
             (val) => SettingService.setBookScreenSize(val)
           );
@@ -378,6 +384,7 @@ export default {
             1,
             240,
             1,
+            false,
             this.autoFlipFrequency,
             (val) => SettingService.setAutoFlipFrequency(val)
           );
@@ -414,6 +421,7 @@ export default {
             1,
             240,
             1,
+            false,
             this.wheelSensitivity,
             (val) => SettingService.setWheelSensitivity(val)
           );

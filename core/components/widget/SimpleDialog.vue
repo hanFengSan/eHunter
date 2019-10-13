@@ -1,5 +1,5 @@
 <template>
-<div class="simple-dialog">
+<div class="simple-dialog" @click="stopClickEvent">
     <div class="background" @click="close"></div>
     <article>
         <h4>{{ data.title }}</h4>
@@ -64,6 +64,10 @@ export default {
             if (this.data.type === tags.DIALOG_NORMAL) {
                 this.$emit('close');
             }
+        },
+        stopClickEvent(e) {
+          e.preventDefault();
+          e.stopPropagation();
         }
     }
 };
