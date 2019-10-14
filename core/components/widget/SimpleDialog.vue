@@ -1,5 +1,5 @@
 <template>
-<div class="simple-dialog" @click="stopClickEvent">
+<div ref="dialog" class="simple-dialog" @click.stop="" @wheel.stop="">
     <div class="background" @click="close"></div>
     <article>
         <h4>{{ data.title }}</h4>
@@ -34,6 +34,16 @@ export default {
         }
     },
 
+    mounted() {
+      setTimeout(() => {
+        document.addEventListener('keydown', this.enter);
+      }, 500);
+    },
+
+    beforeDestroy() {
+      document.removeEventListener('keydown', this.enter);
+    },
+  
     components: { FlatButton },
 
     data() {
@@ -41,7 +51,7 @@ export default {
             MdRenderer
         };
     },
-
+  
     methods: {
         getType(tag) {
             switch (tag) {
@@ -65,9 +75,11 @@ export default {
                 this.$emit('close');
             }
         },
-        stopClickEvent(e) {
-          e.preventDefault();
-          e.stopPropagation();
+        enter(e) {
+          if (e.key === 'Enter' && this.data.operations.length === 1) {
+            this.data.operations[0].onClick();
+            this.$emit('close');
+          }
         }
     }
 };

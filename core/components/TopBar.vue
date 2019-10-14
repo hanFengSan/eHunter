@@ -275,7 +275,7 @@ export default {
             'VolSize',
             this.string.volSize,
             this.string.volSizeTip,
-            true,
+            this.readingMode===0,
             this.volumeSize + 'P',
             [
               { name: '10P', val: 10 },
