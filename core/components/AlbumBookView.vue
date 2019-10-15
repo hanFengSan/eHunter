@@ -115,7 +115,8 @@ export default {
             showThumbViewInBook: 'showThumbViewInBook',
             thumbWidth: 'thumbWidth',
             wheelDirection: 'wheelDirection',
-            wheelSensitivity: 'wheelSensitivity'
+            wheelSensitivity: 'wheelSensitivity',
+            oddEven: 'oddEven'
         }),
         tags: () => tags,
         screenSize() {
@@ -128,8 +129,7 @@ export default {
             };
         },
         pages() {
-            return [
-                { id: tags.ID_START, type: tags.TYPE_START, imgPageInfo: { heightOfWidth: 1.45 } },
+            let result = [
                 ...this.imgPageInfos.map(i => {
                     return {
                         id: i.id,
@@ -139,6 +139,10 @@ export default {
                 }),
                 { id: tags.ID_END, type: tags.TYPE_END, imgPageInfo: { heightOfWidth: 1.45 } }
             ];
+            if (!this.oddEven) {
+              result.unshift({ id: tags.ID_START, type: tags.TYPE_START, imgPageInfo: { heightOfWidth: 1.45 } });
+            }
+            return result;
         },
         screens() {
             let _pages = this.pages.concat();

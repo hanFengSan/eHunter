@@ -32,7 +32,8 @@ const state = {
         autoFlipFrequency: 10,
         showThumbViewInBook: false,
         wheelSensitivity: 100,
-        wheelDirection: false
+        wheelDirection: false,
+        oddEven: false
     },
     showMoreSettings: false
 }
@@ -81,7 +82,8 @@ const getters = {
     showThumbViewInBook: state => state.book.showThumbViewInBook,
     wheelSensitivity: state => state.book.wheelSensitivity,
     wheelDirection: state => state.book.wheelDirection,
-    scrolledPageMargin: state => state.album.scrolledPageMargin
+    scrolledPageMargin: state => state.album.scrolledPageMargin,
+    oddEven: state => state.book.oddEven
 }
 
 // actions
@@ -108,7 +110,8 @@ const actions = {
     toggleThumbViewInBook: ( { commit }, val) => commit(types.TOGGLE_THUMB_VIEW_IN_BOOK, { val }),
     setWheelSensitivity: ( { commit }, val) => commit(types.SET_WHEEL_SENSITIVITY, { val }),
     setWheelDirection: ( { commit }, val) => commit(types.SET_WHEEL_DIRECTION, { val }),
-    setScrolledPageMargin: ( { commit }, val) => commit(types.SET_SCROLLED_PAGE_MARGIN, { val })
+    setScrolledPageMargin: ( { commit }, val) => commit(types.SET_SCROLLED_PAGE_MARGIN, { val }),
+    setOddEven: ( { commit }, val) => commit(types.SET_ODD_EVEN, { val })
 }
 
 // mutations
@@ -192,6 +195,9 @@ const mutations = {
     },
     [types.SET_SCROLLED_PAGE_MARGIN](state, { val }) {
       state.album.scrolledPageMargin = val;
+    },
+    [types.SET_ODD_EVEN](state, { val }) {
+      state.book.oddEven = val;
     }
 }
 

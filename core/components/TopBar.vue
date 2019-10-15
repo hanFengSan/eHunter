@@ -142,7 +142,8 @@ export default {
             'showThumbViewInBook',
             'wheelSensitivity',
             'wheelDirection',
-            'scrolledPageMargin'
+            'scrolledPageMargin',
+            'oddEven'
         ]),
         floatBtnStyle() {
             return { 
@@ -457,6 +458,15 @@ export default {
             curVal: this.scrolledPageMargin,
             change: (val) => SettingService.setScrolledPageMargin(val)
           });
+          // oddEven
+          const oddEvenConfig = {
+            title: this.string.oddEven,
+            tip: this.string.oddEvenTip,
+            show: this.readingMode === 1 && this.showMoreSettings,
+            type: 'SWITCH',
+            curVal: this.oddEven,
+            change: (val) => this.setOddEven(val)
+          };
           return [
             readingModeConfig,
             widthConfig,
@@ -466,6 +476,7 @@ export default {
             screenSizeConfig,
             bookDirectionConfig,
             paginationConfig,
+            oddEvenConfig,
             reverseFlipConfig,
             autoFlipConfig,
             autoFlipFrequencyConfig,
@@ -478,7 +489,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(['toggleTopBar', 'addDialog', 'setAutoFlip']),
+        ...mapActions(['toggleTopBar', 'addDialog', 'setAutoFlip', 'setOddEven']),
 
         async dropOptionChange(tag, index) {
             switch (tag) {

@@ -353,5 +353,15 @@ export default {
       cn: '页间隔',
       en: 'Page spacing',
       jp: 'ページ間隔'
+    },
+    oddEven: {
+      cn: '奇偶切换',
+      en: 'Odd/Even',
+      jp: '奇/偶'
+    },
+    oddEvenTip: {
+      cn: '切换奇偶页拼接',
+      en: 'Switching odd or even page stitching',
+      jp: '奇数または偶数ページステッチの切り替え' 
     }
 }
