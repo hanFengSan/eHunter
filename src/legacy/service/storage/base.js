@@ -18,6 +18,19 @@ export default class BaseStorage {
     });  
   }
 
+  getByName(name, type) {
+    return new Promise((resolve, reject) => {
+      chrome.storage[type || this.storageType].get(name, async res => {
+        let data = res[name];
+        resolve(data);
+      });
+    });  
+  }
+
+  delByName(name, type) {
+    chrome.storage[type || this.storageType].remove(name);
+  }
+
   save(data) {
     return new Promise((resolve, reject) => {
       chrome.storage[this.storageType].set({ [this.name]: data }, () => resolve());

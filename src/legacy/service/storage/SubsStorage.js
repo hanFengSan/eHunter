@@ -8,7 +8,29 @@ class SubsStorage extends BaseStorage {
       this.default = {};
     }
 
+    async migrateOldData() {
+      try {
+        const oldData = await this.getByName('subs', 'local');
+        if (oldData && oldData.list && oldData.list.length > 0) {
+          const newData = await this.get();
+          if (newData.list && newData.list.length > 0) {
+            for (let item of oldData.list) {
+              if (!newData.list.find(i => i.name === item.name)) {
+                newData.list.push(item);
+              }
+            }
+          } else {
+            newData.list = oldData.list;
+          }
+          await this.save(newData);
+          this.delByName('subs', 'local');
+        }
+      } catch(e) {
+      }
+    }
+
     async getSubsList() {
+        await this.migrateOldData();
         const subs = await this.get();
         return JSON.parse(JSON.stringify(subs.list || []));
     }
