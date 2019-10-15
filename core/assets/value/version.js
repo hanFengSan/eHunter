@@ -34,7 +34,7 @@ eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](ht
 
 * In \`Scroll\` mode, you can change the space between pages.
 
-* Support manually change the value of configuration.
+* Support manually changing the value of configuration.
 
 ### 2.5.0 Updates
 
@@ -60,7 +60,7 @@ The eHunter-local is local version of eHunter, supporting Windows and MacOS. [Ho
 
 * In \`Scroll\` mode, you can change the space between pages.
 
-* Support manually change the value of configuration.
+* Support manually changing the value of configuration.
 
 ### 2.5.0 Updates
 
