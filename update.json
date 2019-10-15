@@ -1,9 +1,9 @@
 {
     "cn":{
-        "title":"新版本: v2.5.0",
-        "version":"2.5.0",
-        "text":"#### 1. 滚轮翻页\n在`书页模式`下可以使用鼠标滚轮翻页, 且在设置中可调整滚动灵敏度和滚动翻页方向.\n使用Mac触控板的用户, 请在设置中把`滚动方向`打开, 从而翻转方向, 达到最佳体验.\n\n\n#### 2. 更新订阅\n在chrome应用商店下载的用户, 可以使用新版本的标签更新订阅功能. 新版本修复了订阅, 且实现了多标签混合订阅和测试标签订阅功能.",
-        "time":1571392593426,
+        "title":"新版本: v2.6.0",
+        "version":"2.6.0",
+        "text":"1.`书页模式`下支持奇偶页切换\n\n2.支持回车关闭弹窗\n\n3.迁移老的订阅数据\n\n4.`滚动模式`下支持调整页间距\n\n5.支持手动修改配置值\n\n### 2.5.0 更新信息\n\n#### 1. 滚轮翻页\n在`书页模式`下可以使用鼠标滚轮翻页, 且在设置中可调整滚动灵敏度和滚动翻页方向.\n使用Mac触控板的用户, 请在设置中把`滚动方向`打开, 从而翻转方向, 达到最佳体验.\n\n\n#### 2. 更新订阅\n在chrome应用商店下载的用户, 可以使用新版本的标签更新订阅功能. 新版本修复了订阅, 且实现了多标签混合订阅和测试标签订阅功能.",
+        "time":1571736652834,
         "duration":604800000,
         "always":true,
         "operations":[
@@ -26,10 +26,10 @@
         ]
     },
     "en":{
-        "title":"New version: v2.5.0",
-        "version":"2.5.0",
-        "text":"#### 1. Flip by mouse wheel\nIn `Book mode`, you can use mouse wheel to flip pages, and can customize the sensitivity and direction.\n\nIf you are using touchpad of Mac, please open the switch of `Wheel Direction` in settings to have a best experience.\n\n\n#### 2. Update subscription (Chrome extension)\nIf you are using eHunter by Chrome extension, you can use the new version of update subscription system of tag.\n\nIn new version, you can subscribe multiple tags once to get more accurate results, and you also can click `TEST TAG` button to test subscription.",
-        "time":1571392593426,
+        "title":"New version: v2.6.0",
+        "version":"2.6.0",
+        "text":"1.In `Book` mode, you can switch the `Odd/Even` to see the big image that crossing screens.\n\n2.Support using `Enter` key to close dialog.\n\n3.Migrate the old data of subscription.\n\n4.In `Scroll` mode, you can change the space between pages.\n\n5.Support manually change the value of configuration.\n\n### 2.5.0 Updates #### 1. Flip by mouse wheel\nIn `Book mode`, you can use mouse wheel to flip pages, and can customize the sensitivity and direction.\n\nIf you are using touchpad of Mac, please open the switch of `Wheel Direction` in settings to have a best experience.\n\n\n#### 2. Update subscription (Chrome extension)\nIf you are using eHunter by Chrome extension, you can use the new version of update subscription system of tag.\n\nIn new version, you can subscribe multiple tags once to get more accurate results, and you also can click `TEST TAG` button to test subscription.",
+        "time":1571736652834,
         "duration":604800000,
         "always":true,
         "operations":[
@@ -52,10 +52,10 @@
         ]
     },
     "jp":{
-        "title":"新しいバージョン: v2.5.0",
-        "version":"2.5.0",
-        "text":"#### Flip by mouse wheel\nIn `Book mode`, you can use mouse wheel to flip pages, and can customize the sensitivity and direction.\n\nIf you are using touchpad of Mac, please open the switch of `Wheel Direction` in settings to have a best experience.\n\n#### Update subscription (Chrome extension)\nIf you are using eHunter by Chrome extension, you can use the new version of update subscription system of tag.\n\nIn new version, you can subscribe multiple tags once to get more accurate results, and you also can click `TEST TAG` button to test subscription.",
-        "time":1571392593426,
+        "title":"新しいバージョン: v2.6.0",
+        "version":"2.6.0",
+        "text":"1.In `Book` mode, you can switch the `Odd/Even` to see the big image that crossing screens.\n\n2.Support using `Enter` key to close dialog.\n\n3.Migrate the old data of subscription.\n\n4.In `Scroll` mode, you can change the space between pages.\n\n5.Support manually change the value of configuration.\n\n### 2.5.0 Updates #### Flip by mouse wheel\nIn `Book mode`, you can use mouse wheel to flip pages, and can customize the sensitivity and direction.\n\nIf you are using touchpad of Mac, please open the switch of `Wheel Direction` in settings to have a best experience.\n\n#### Update subscription (Chrome extension)\nIf you are using eHunter by Chrome extension, you can use the new version of update subscription system of tag.\n\nIn new version, you can subscribe multiple tags once to get more accurate results, and you also can click `TEST TAG` button to test subscription.",
+        "time":1571736652834,
         "duration":604800000,
         "always":true,
         "operations":[
