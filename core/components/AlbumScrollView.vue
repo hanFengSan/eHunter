@@ -24,7 +24,7 @@
             ref="pageContainers"
             v-for="(imgPageInfo, i) of volImgPageInfos"
             :key="imgPageInfo.id"
-            :style="{'width':`${widthScale}%`,'padding-bottom':`${widthScale * imgPageInfo.heightOfWidth}%`}">
+            :style="{'width':`${widthScale}%`,'padding-bottom':`${widthScale * imgPageInfo.heightOfWidth}%`,'margin': `${scrolledPageMargin}px auto`}">
             <page-view
                 :index="imgPageInfo.index"
                 :active="nearbyArray.indexOf(index(i)) > -1"
@@ -109,7 +109,8 @@ export default {
             curVolume: 'curVolume',
             volumePreloadCount: 'volumePreloadCount',
             showMoreSettings: 'showMoreSettings',
-            showTopBar: 'showTopBar'
+            showTopBar: 'showTopBar',
+            scrolledPageMargin: 'scrolledPageMargin'
         }),
 
         // return a indexes array. the index is index of page, determining the show of pages.
@@ -296,13 +297,14 @@ export default {
         }
         > .top-pagination {
             margin-top: 15px;
+            margin-bottom: 15px;
         }
         > .bottom-pagination {
+            margin-top: 15px;
             margin-bottom: 30px;
         }
         .page-container {
             transition: all 0.3s ease;
-            margin: 70px auto;
             height: 0;
             position: relative;
             &:first-of-type {

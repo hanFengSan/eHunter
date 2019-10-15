@@ -141,7 +141,8 @@ export default {
             'autoFlipFrequency',
             'showThumbViewInBook',
             'wheelSensitivity',
-            'wheelDirection'
+            'wheelDirection',
+            'scrolledPageMargin'
         ]),
         floatBtnStyle() {
             return { 
@@ -160,7 +161,7 @@ export default {
             }
           };
           // select template
-          const getSelect = (title, tip, show, curVal, list, change) => {
+          const getSelect = ({title, tip, show, curVal, list, change}) => {
             const baseConfig = { title, tip, show, type: 'SELECT', list, change};
             const item = baseConfig.list.find(i => i.val === curVal);
             return {
@@ -172,7 +173,7 @@ export default {
             }
           }
           // slider + select template
-          const getSliderSelect = (id, title, tip, show, curValTitle, list, sliderMin, sliderMax, sliderStep, isFloat, curVal, change) => {
+          const getSliderSelect = ({id, title, tip, show, curValTitle, list, sliderMin, sliderMax, sliderStep, isFloat, curVal, change}) => {
             const sliderValName = `show${id}Name`;
             addReactiveVal(sliderValName, false);
             const baseConfig = {
@@ -206,22 +207,22 @@ export default {
             }
           }
           // ReadingMode
-          const readingModeConfig = getSelect(
-            this.string.readingMode,
-            this.string.readingModeTip,
-            true,
-            this.readingMode,
-            [{ name: this.string.scrollMode, val: 0 }, { name: this.string.bookMode, val: 1 }],
-            (val) => SettingService.setReadingMode(val)
-          );
+          const readingModeConfig = getSelect({
+            title: this.string.readingMode,
+            tip: this.string.readingModeTip,
+            show: true,
+            curVal: this.readingMode,
+            list: [{ name: this.string.scrollMode, val: 0 }, { name: this.string.bookMode, val: 1 }],
+            change: (val) => SettingService.setReadingMode(val)
+          });
           // loadNum
-          const loadNumConfig = getSliderSelect(
-            'LoadNum',
-            this.string.loadNum,
-            this.string.loadNumTip,
-            true,
-            this.loadNum + 'P',
-            [
+          const loadNumConfig = getSliderSelect({
+            id: 'LoadNum',
+            title: this.string.loadNum,
+            tip: this.string.loadNumTip,
+            show: true,
+            curValTitle: this.loadNum + 'P',
+            list: [
               { name: '1P', val: 1 },
               { name: '2P', val: 2 },
               { name: '3P', val: 3 },
@@ -234,21 +235,21 @@ export default {
               { name: '100P', val: 100 },
               { name: this.string.custom, val: -1 }
             ],
-            1,
-            100,
-            1,
-            false,
-            this.loadNum,
-            (val) => SettingService.setLoadNum(val)
-          );
+            sliderMin: 1,
+            sliderMax: 100,
+            sliderStep: 1,
+            isFloat: false,
+            curVal: this.loadNum,
+            change: (val) => SettingService.setLoadNum(val)
+          });
           // width
-          const widthConfig = getSliderSelect(
-            'Width',
-            this.string.widthScale,
-            this.string.widthScaleTip,
-            this.readingMode === 0,
-            this.albumWidth + '%',
-            [
+          const widthConfig = getSliderSelect({
+            id: 'Width',
+            title: this.string.widthScale,
+            tip: this.string.widthScaleTip,
+            show: this.readingMode === 0,
+            curValTitle: this.albumWidth + '%',
+            list: [
               { name: '40%', val: 40 },
               { name: '50%', val: 50 },
               { name: '55%', val: 55 },
@@ -263,21 +264,21 @@ export default {
               { name: '100%', val: 100 },
               { name: this.string.custom, val: -1 }
             ],
-            30,
-            100,
-            1,
-            true,
-            this.albumWidth,
-            (val) => SettingService.setAlbumWidth(val)
-          );
+            sliderMin: 30,
+            sliderMax: 100,
+            sliderStep: 1,
+            isFloat: true,
+            curVal: this.albumWidth,
+            change: (val) => SettingService.setAlbumWidth(val)
+          });
           // volSize
-          const volSizeConfig = getSliderSelect(
-            'VolSize',
-            this.string.volSize,
-            this.string.volSizeTip,
-            this.readingMode===0,
-            this.volumeSize + 'P',
-            [
+          const volSizeConfig = getSliderSelect({
+            id: 'VolSize',
+            title: this.string.volSize,
+            tip: this.string.volSizeTip,
+            show: this.readingMode===0,
+            curValTitle: this.volumeSize + 'P',
+            list: [
               { name: '10P', val: 10 },
               { name: '20P', val: 20 },
               { name: '30P', val: 30 },
@@ -285,13 +286,13 @@ export default {
               { name: '100P', val: 100 },
               { name: this.string.custom, val: -1 }
             ],
-            1,
-            200,
-            1,
-            false,
-            this.volSize,
-            (val) => SettingService.setVolumeSize(val)
-          );
+            sliderMin: 1,
+            sliderMax: 200,
+            sliderStep: 1,
+            isFloat: false,
+            curVal: this.volumeSize,
+            change: (val) => SettingService.setVolumeSize(val)
+          });
           // thumbView
           const thumbViewConfig = {
             title: this.string.thumbView,
@@ -302,35 +303,35 @@ export default {
             change: (val) => SettingService.toggleThumbView(val)
           };
           // screenSize
-          const screenSizeConfig = getSliderSelect(
-            'ScreenSize',
-            this.string.screenSize,
-            this.string.screenSizeTip,
-            this.readingMode === 1,
-            this.bookScreenSize + 'P',
-            [
+          const screenSizeConfig = getSliderSelect({
+            id: 'ScreenSize',
+            title: this.string.screenSize,
+            tip: this.string.screenSizeTip,
+            show: this.readingMode === 1,
+            curValTitle: this.bookScreenSize + 'P',
+            list: [
               { name: '1P', val: 1 },
               { name: '2P', val: 2 },
               { name: '3P', val: 3 },
               { name: '4P', val: 4 },
               { name: '5P', val: 5 }
             ],
-            1,
-            10,
-            1,
-            false,
-            this.screenSize,
-            (val) => SettingService.setBookScreenSize(val)
-          );
+            sliderMin: 1,
+            sliderMax: 10,
+            sliderStep: 1,
+            isFloat: false,
+            curVal: this.screenSize,
+            change: (val) => SettingService.setBookScreenSize(val)
+          });
           // bookDirection
-          const bookDirectionConfig = getSelect(
-            this.string.bookDirection,
-            this.string.bookDirectionTip,
-            this.readingMode === 1,
-            this.bookDirection,
-            [{ name: this.string.rtl, sname: 'RTL', val: 0 }, { name: this.string.ltr, sname: 'LTR', val: 1 }],
-            (val) => SettingService.setBookDirection(val)
-          );
+          const bookDirectionConfig = getSelect({
+            title: this.string.bookDirection,
+            tip: this.string.bookDirectionTip,
+            show: this.readingMode === 1,
+            curVal: this.bookDirection,
+            list: [{ name: this.string.rtl, sname: 'RTL', val: 0 }, { name: this.string.ltr, sname: 'LTR', val: 1 }],
+            change: (val) => SettingService.setBookDirection(val)
+          });
           // pagination
           const paginationConfig = {
             title: this.string.pagination,
@@ -359,13 +360,13 @@ export default {
             change: (val) => this.setAutoFlip(val)
           };
           // autoFlipFrequency
-          const autoFlipFrequencyConfig = getSliderSelect(
-            'AutoFlipFrequency',
-            this.string.autoFlipFrequency,
-            this.string.autoFlipFrequencyTip,
-            this.readingMode === 1 && this.showMoreSettings,
-            this.autoFlipFrequency + 's',
-            [
+          const autoFlipFrequencyConfig = getSliderSelect({
+            id: 'AutoFlipFrequency',
+            title: this.string.autoFlipFrequency,
+            tip: this.string.autoFlipFrequencyTip,
+            show: this.readingMode === 1 && this.showMoreSettings,
+            curValTitle: this.autoFlipFrequency + 's',
+            list: [
               { name: '3 sec', val: 3 },
               { name: '5 sec', val: 5 },
               { name: '8 sec', val: 8 },
@@ -381,13 +382,13 @@ export default {
               { name: '5 min', val: 300 },
               { name: this.string.custom, val: -1 }
             ],
-            1,
-            240,
-            1,
-            false,
-            this.autoFlipFrequency,
-            (val) => SettingService.setAutoFlipFrequency(val)
-          );
+            sliderMin: 1,
+            sliderMax: 240,
+            sliderStep: 1,
+            isFloat: false,
+            curVal: this.autoFlipFrequency,
+            change: (val) => SettingService.setAutoFlipFrequency(val)
+          });
           // thumbViewInBook
           const thumbViewInBookConfig = {
             title: this.string.thumbView,
@@ -398,13 +399,13 @@ export default {
             change: (val) => SettingService.setShowThumbViewInBook(val)
           };
           // wheelSensitivity
-          const wheelSensitivityConfig = getSliderSelect(
-            'WheelSensitivity',
-            this.string.wheelSensitivity,
-            this.string.wheelSensitivityTip,
-            this.readingMode === 1 && this.showMoreSettings,
-            this.wheelSensitivity,
-            [
+          const wheelSensitivityConfig = getSliderSelect({
+            id: 'WheelSensitivity',
+            title: this.string.wheelSensitivity,
+            tip: this.string.wheelSensitivityTip,
+            show: this.readingMode === 1 && this.showMoreSettings,
+            curValTitle: this.wheelSensitivity,
+            list: [
               { name: '10', val: 10 },
               { name: '30', val: 30 },
               { name: '50', val: 50 },
@@ -418,13 +419,13 @@ export default {
               { name: '250', val: 250 },
               { name: this.string.custom, val: -1 }
             ],
-            1,
-            240,
-            1,
-            false,
-            this.wheelSensitivity,
-            (val) => SettingService.setWheelSensitivity(val)
-          );
+            sliderMin: 1,
+            sliderMax: 240,
+            sliderStep: 1,
+            isFloat: false,
+            curVal: this.wheelSensitivity,
+            change: (val) => SettingService.setWheelSensitivity(val)
+          });
           // wheelDirection
           const wheelDirectionConfig = {
             title: this.string.wheelDirection,
@@ -433,7 +434,29 @@ export default {
             type: 'SWITCH',
             curVal: this.wheelDirection,
             change: (val) => SettingService.setWheelDirection(val)
-          }
+          };
+          // scrolledPageMargin
+          const scrolledPageMarginConfig = getSliderSelect({
+            id: 'ScrolledPageMargin',
+            title: this.string.pageMargin,
+            tip: this.string.pageMarginTip,
+            show: this.readingMode === 0 && this.showMoreSettings,
+            curValTitle: this.scrolledPageMargin + 'px',
+            list: [
+              { name: '0px', val: 0 },
+              { name: '30px', val: 30 },
+              { name: '70px', val: 70 },
+              { name: '100px', val: 100 },
+              { name: '150px', val: 150 },
+              { name: this.string.custom, val: -1 }
+            ],
+            sliderMin: 0,
+            sliderMax: 300,
+            sliderStep: 1,
+            isFloat: true,
+            curVal: this.scrolledPageMargin,
+            change: (val) => SettingService.setScrolledPageMargin(val)
+          });
           return [
             readingModeConfig,
             widthConfig,
@@ -448,7 +471,8 @@ export default {
             autoFlipFrequencyConfig,
             thumbViewInBookConfig,
             wheelDirectionConfig,
-            wheelSensitivityConfig
+            wheelSensitivityConfig,
+            scrolledPageMarginConfig
           ];
         }
     },

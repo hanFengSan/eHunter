@@ -4,7 +4,7 @@ import * as tags from '../assets/value/tags'
 // import Logger from '../utils/Logger';
 
 class SettingService {
-    version = '2.7';
+    version = '2.8';
     storageName = 'Settings';
     storageVersionName = 'SettingsVersion';
 
@@ -37,7 +37,8 @@ class SettingService {
             autoFlipFrequency: { eventName: 'setAutoFlipFrequency', val: 10 },
             showThumbViewInBook: { eventName: 'toggleThumbViewInBook', val: false },
             wheelSensitivity: { eventName: 'setWheelSensitivity', val: 100 },
-            wheelDirection: { eventName: 'setWheelDirection', val: false }
+            wheelDirection: { eventName: 'setWheelDirection', val: false },
+            scrolledPageMargin: { eventName: 'setScrolledPageMargin', val: 70 }
         }
     }
 
@@ -53,9 +54,15 @@ class SettingService {
         let version = await storage.load({ key: this.storageVersionName });
         await storage.save({ key: this.storageVersionName, data: this.version });
         if (version !== this.version) {
-            await storage.remove({ key: this.storageName });
-            window.location.reload(); // TODO: need a notification
-        }
+          let settings = await storage.load({ key: this.storageName });
+          let newSettings = this._getDefaultSettings();
+          for (let key in newSettings) {
+            if (!settings.hasOwnProperty(key)) {
+              settings[key] = newSettings[key];
+            }
+          }
+          await storage.save({ key: this.storageName, data: settings });
+      }
     }
 
     _initStorage() {
@@ -279,6 +286,10 @@ class SettingService {
 
     async setWheelDirection(val: boolean): Promise<void> {
       await this._setSettingItem('wheelDirection', val);
+    }
+
+    async setScrolledPageMargin(val: number): Promise<void> {
+      await this._setSettingItem('scrolledPageMargin', val);
     }
 }
 

@@ -18,7 +18,8 @@ const state = {
         width: 80, // percent, the scale of img
         toggleSyncScroll: true, // unused
         showTopBar: true,
-        loadNum: 3 // the sum of pages per loading
+        loadNum: 3, // the sum of pages per loading
+        scrolledPageMargin: 70
     },
     book: {
         bookIndex: 0, // index of screens
@@ -79,7 +80,8 @@ const getters = {
     autoFlipFrequency: state => state.book.autoFlipFrequency,
     showThumbViewInBook: state => state.book.showThumbViewInBook,
     wheelSensitivity: state => state.book.wheelSensitivity,
-    wheelDirection: state => state.book.wheelDirection
+    wheelDirection: state => state.book.wheelDirection,
+    scrolledPageMargin: state => state.album.scrolledPageMargin
 }
 
 // actions
@@ -105,7 +107,8 @@ const actions = {
     setAutoFlipFrequency: ( { commit }, val) => commit(types.SET_AUTO_FLIP_FREQUENCY, { val }),
     toggleThumbViewInBook: ( { commit }, val) => commit(types.TOGGLE_THUMB_VIEW_IN_BOOK, { val }),
     setWheelSensitivity: ( { commit }, val) => commit(types.SET_WHEEL_SENSITIVITY, { val }),
-    setWheelDirection: ( { commit }, val) => commit(types.SET_WHEEL_DIRECTION, { val })
+    setWheelDirection: ( { commit }, val) => commit(types.SET_WHEEL_DIRECTION, { val }),
+    setScrolledPageMargin: ( { commit }, val) => commit(types.SET_SCROLLED_PAGE_MARGIN, { val })
 }
 
 // mutations
@@ -186,6 +189,9 @@ const mutations = {
     },
     [types.SET_WHEEL_DIRECTION](state, { val }) {
       state.book.wheelDirection = val;
+    },
+    [types.SET_SCROLLED_PAGE_MARGIN](state, { val }) {
+      state.album.scrolledPageMargin = val;
     }
 }
 

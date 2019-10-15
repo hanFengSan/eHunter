@@ -343,5 +343,15 @@ export default {
       cn: '最小值为`{{min}}`, 最大值为`{{max}}`',
       en: 'The minimum is `{{min}}` and the maximum is `{{max}}`',
       jp: '最小は`{{min}}`, 最大は`{{max}}`です'
+    },
+    pageMargin: {
+      cn: '页间隔',
+      en: 'Page spacing',
+      jp: 'ページ間隔'
+    },
+    pageMarginTip: {
+      cn: '页间隔',
+      en: 'Page spacing',
+      jp: 'ページ間隔'
     }
 }

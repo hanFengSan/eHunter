@@ -51,6 +51,7 @@ export default {
           'addDialog'
         ]),
         handleClick() {
+            this.handleInput();
             this.close();
         },
 
@@ -58,26 +59,30 @@ export default {
             this.$emit('change', val);
         },
 
+        handleInput() {
+          this.$refs.inputElem.blur();
+          if (!this.isFloat) {
+            this.value = Math.floor(this.value);
+          }
+          if (this.value < this.min || this.value > this.max) {
+              this.value = this.init;
+              let dialog = new DialogBean(
+                  tags.DIALOG_COMPULSIVE,
+                  this.string.tips,
+                  this.string.numberInputTip.replace('{{min}}', this.min).replace('{{max}}', this.max),
+                  new DialogOperation(this.string.confirm, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
+                      return true;
+                  })
+              );
+              this.addDialog(dialog);
+          } else {
+              this.$emit('change', this.value);
+          }
+        },
+
         watchKeyboard(e) {
           if (e.key === 'Enter') {
-            this.$refs.inputElem.blur();
-            if (!this.isFloat) {
-              this.value = Math.floor(this.value);
-            }
-            if (this.value < this.min || this.value > this.max) {
-                this.value = this.init;
-                let dialog = new DialogBean(
-                    tags.DIALOG_COMPULSIVE,
-                    this.string.tips,
-                    this.string.numberInputTip.replace('{{min}}', this.min).replace('{{max}}', this.max),
-                    new DialogOperation(this.string.confirm, tags.DIALOG_OPERATION_TYPE_PLAIN, () => {
-                        return true;
-                    })
-                );
-                this.addDialog(dialog);
-            } else {
-                this.$emit('change', this.value);
-            }
+            this.handleInput();
           }
         },
 
