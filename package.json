@@ -1,6 +1,6 @@
 {
     "name": "ehunter",
-    "version": "2.4.0",
+    "version": "2.6.1",
     "description": "A Vue.js project",
     "author": "Alex Chen <c360785655@gmail.com>",
     "private": true,
@@ -8,7 +8,7 @@
         "dev": "webpack --config build/webpack.dev.conf.js",
         "build": "webpack --config build/webpack.prod.conf.js",
         "publish": "npm run test && npm run build && web-ext build -s dist -a publish_output",
-        "publish_no_test": "npm run build && web-ext build -s dist -a publish_output",
+        "publish_no_test": "npm run build && web-ext build -s dist -a publish_output --overwrite-dest",
         "test": "npm run unit",
         "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run"
     },

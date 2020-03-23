@@ -256,6 +256,9 @@ export default {
         },
 
         watchWheel(e) {
+            if (typeof e.wheelDeltaY === 'undefined') { // fix Firefox
+                e.wheelDeltaY = e.deltaY;
+            }
             if (e.metaKey || e.ctrlKey || e.wheelDeltaY === 0) {
                 return;
             }

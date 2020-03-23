@@ -24,7 +24,8 @@ export default {
         /* eslint-disable camelcase */
         if (typeof GM_info !== 'undefined' && GM_info.version) { // the ENV is Tampermonkey
             return new Promise((resolve, reject) => {
-                GM_xmlhttpRequest({
+                const httpRequest = (typeof GM_xmlhttpRequest === 'undefined') ? GM.xmlHttpRequest : GM_xmlhttpRequest;
+                httpRequest({
                     method: option.method,
                     url,
                     onload: x => {
