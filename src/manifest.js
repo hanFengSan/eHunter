@@ -69,17 +69,19 @@ module.exports.chrome = {
 };
 
 module.exports.tampermonkey =
-    '// ==UserScript==' + '\n' +
-    '// @name         eHunter' + '\n' +
-    '// @namespace    http://tampermonkey.net/' + '\n' +
-    '// @version      ' + config.version + '\n' +
-    '// @description  This extension provides a scroll mode and book mode to e-hentai/exhentai/nhentai, for the best reading experince!  此扩展为e-hentai/exhentai/nhentai提供一个滚动模式和书本模式, 提供良好的阅读体验.' + '\n' +
-    '// @supportURL   https://github.com/hanFengSan/eHunter/issues' + '\n' +
-    '// @author       Alex Chen' + '\n' +
-    '// @match        https://exhentai.org/*' + '\n' +
-    '// @match        https://e-hentai.org/*' + '\n' +
-    '// @match        https://nhentai.net/*' + '\n' +
-    '// @connect      alexskye.info' + '\n' +
-    '// @connect      githubusercontent.com' + '\n' +
-    '// @grant        GM_xmlhttpRequest' + '\n' +
-    '// ==/UserScript==';
+`// ==UserScript==
+// @name
+// @namespace    http://tampermonkey.net/
+// @version      ${config.version}
+// @description  This extension provides a scroll mode and book mode to e-hentai/exhentai/nhentai, for the best reading experince!  此扩展为e-hentai/exhentai/nhentai提供一个滚动模式和书本模式, 提供良好的阅读体验.
+// @supportURL   https://github.com/hanFengSan/eHunter/issues
+// @author       Alex Chen
+// @match        https://exhentai.org/*
+// @match        https://e-hentai.org/*
+// @match        https://nhentai.net/*
+// @connect      alexskye.info
+// @connect      githubusercontent.com
+// @grant        GM_xmlhttpRequest
+// @license      MIT
+// ==/UserScript==
+`
