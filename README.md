@@ -13,9 +13,9 @@ Provide a scroll mode and book mode, for a better reading experience.
 It creates a new element in the Eh page, and inject Vue components to provide a scroll mode and book mode.
 
 ## Install
-Chrome: [Web store](https://chrome.google.com/webstore/detail/ehunter-more-powerful-e-h/dnnicnedpmjkbkdeijccbjkkcpcbmdoo)
-Firefox: [Web store](https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/)
-Tampermonkey: [Greasy fork](https://greasyfork.org/zh-CN/scripts/39198-ehunter)
+Tampermonkey: [openuserjs](https://openuserjs.org/scripts/alexchen/eHunter)
+Chrome: coming soon
+Firefox: Coming soon
 
 You also can get it from the 'release' of this project.
 

@@ -11,9 +11,10 @@
 实现上基本隔离了具体环境, 可很容易得移植到其他漫画网站/平台等.
 
 ## 获取
-Chrome版本: [地址](https://chrome.google.com/webstore/detail/ehunter-more-powerful-e-h/dnnicnedpmjkbkdeijccbjkkcpcbmdoo)
-Firefox版本: [地址](https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/)
-油猴版本: [地址](https://greasyfork.org/zh-CN/scripts/39198-ehunter)
+油猴版本: [openuserjs](https://openuserjs.org/scripts/alexchen/eHunter)
+Chrome版本: 新版本即将上架
+Firefox版本: 新版本即将上架
+
 
 ## 运行
 1. `npm install`后, 再`npm run dev`就可以进入dev模式了(当然,我个人喜好用yarn).
