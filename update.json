@@ -8,16 +8,8 @@
         "always":true,
         "operations":[
             {
-                "name":"Chrome应用商店",
-                "url":"https://chrome.google.com/webstore/detail/ehunter-more-powerful-e-h/dnnicnedpmjkbkdeijccbjkkcpcbmdoo"
-            },
-            {
                 "name":"油猴",
-                "url":"https://greasyfork.org/zh-CN/scripts/39198-ehunter"
-            },
-            {
-                "name":"Firefox",
-                "url":"https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/"
+                "url":"https://openuserjs.org/scripts/alexchen/eHunter"
             },
             {
                 "name":"crx/xpi下载",
@@ -34,20 +26,8 @@
         "always":true,
         "operations":[
             {
-                "name":"Chrome Web Store",
-                "url":"https://chrome.google.com/webstore/detail/ehunter-more-powerful-e-h/dnnicnedpmjkbkdeijccbjkkcpcbmdoo"
-            },
-            {
                 "name":"Tampermonkey",
-                "url":"https://greasyfork.org/zh-CN/scripts/39198-ehunter"
-            },
-            {
-                "name":"Firefox",
-                "url":"https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/"
-            },
-            {
-                "name":"crx/xpi download",
-                "url":"https://pan.baidu.com/s/1YTONumJwAAHMPpUfcyqkhg"
+                "url":"https://openuserjs.org/scripts/alexchen/eHunter"
             }
         ]
     },
@@ -60,20 +40,8 @@
         "always":true,
         "operations":[
             {
-                "name":"Chrome Web Store",
-                "url":"https://chrome.google.com/webstore/detail/ehunter-more-powerful-e-h/dnnicnedpmjkbkdeijccbjkkcpcbmdoo"
-            },
-            {
                 "name":"Tampermonkey",
-                "url":"https://greasyfork.org/zh-CN/scripts/39198-ehunter"
-            },
-            {
-                "name":"Firefox",
-                "url":"https://addons.mozilla.org/zh-CN/firefox/addon/ehunter/"
-            },
-            {
-                "name":"crx/xpi downloadダウンロード",
-                "url":"https://pan.baidu.com/s/1YTONumJwAAHMPpUfcyqkhg"
+                "url":"https://openuserjs.org/scripts/alexchen/eHunter"
             }
         ]
     }
