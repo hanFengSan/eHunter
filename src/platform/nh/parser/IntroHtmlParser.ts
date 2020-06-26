@@ -15,7 +15,7 @@ export class IntroHtmlParser {
     }
 
     getTitle(): string {
-        return this.html.querySelector('h1')!.innerHTML;
+        return this.html.querySelector('h1.title')!.innerText;
     }
 
     private parseData() {
