@@ -15,7 +15,8 @@ export class IntroHtmlParser {
     }
 
     getTitle(): string {
-        return this.html.querySelector('h1')!.innerHTML;
+        let titleDOM = <HTMLElement> this.html.querySelector('h1.title')
+        return titleDOM!.innerText;
     }
 
     private parseData() {

@@ -27,11 +27,11 @@ export class ImgHtmlParser {
     }
 
     getIntroUrl(): string {
-        return this.html.querySelector('.back-to-gallery')!.children![0].getAttribute('href')!;
+        return this.html.querySelector('.go-back')!.getAttribute('href')!;
     }
 
     getAlbumId(): string {
-        return this.html.querySelector('.back-to-gallery')!.children![0].getAttribute('href')!.replace(/(\/|g)/g, '');
+        return this.html.querySelector('.go-back')!.getAttribute('href')!.replace(/(\/|g)/g, '');
     }
 
     getImgUrl(): string {
