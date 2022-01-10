@@ -69,8 +69,9 @@ module.exports.chrome = {
 };
 
 module.exports.tampermonkey =
-`// ==UserScript==
-// @name
+`
+// ==UserScript==
+// @name         eHunter
 // @namespace    http://tampermonkey.net/
 // @version      ${config.version}
 // @description  This extension provides a scroll mode and book mode to e-hentai/exhentai/nhentai, for the best reading experince!  此扩展为e-hentai/exhentai/nhentai提供一个滚动模式和书本模式, 提供良好的阅读体验.
@@ -79,6 +80,7 @@ module.exports.tampermonkey =
 // @match        https://exhentai.org/*
 // @match        https://e-hentai.org/*
 // @match        https://nhentai.net/*
+// @match        https://www.manhuaren.com/*
 // @connect      alexskye.info
 // @connect      githubusercontent.com
 // @grant        GM_xmlhttpRequest

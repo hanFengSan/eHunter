@@ -1,4 +1,4 @@
-import string from '../assets/value/string'
+import string from '../assets/value/String'
 import instruction from '../assets/value/instruction'
 import bookInstruction from '../assets/value/bookInstruction'
 import version from '../assets/value/version'

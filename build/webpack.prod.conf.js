@@ -31,13 +31,13 @@ module.exports = merge(baseWebpackConfig, {
                 collapseWhitespace: true,
                 removeAttributeQuotes: true
             }
+        }),
+        new webpack.BannerPlugin({
+            banner: require(resolve('src/manifest')).tampermonkey,
+            raw: false,
+            entryOnly: true,
+            include: /inject\.js/
         })
-        // new webpack.BannerPlugin({
-        //     banner: require(resolve('src/manifest')).tampermonkey,
-        //     raw: false,
-        //     entryOnly: true,
-        //     include: /inject\.js/
-        // })
     ]
 })
 
