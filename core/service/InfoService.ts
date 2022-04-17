@@ -41,8 +41,8 @@ class InfoService {
         let lastShowDialogTime = await SettingService.getUpdateTime();
         Promise
             .race([
-                new TextReq(config.updateServer1, true, false).request(),
-                new TextReq(config.updateServer2, true, false).request()
+                new TextReq(config.updateServer1, true, false).setCredentials('omit').request(),
+                new TextReq(config.updateServer2, true, false).setCredentials('omit').request()
             ])
             .then(data => {
                 message = new ServerMessage(JSON.parse(data));

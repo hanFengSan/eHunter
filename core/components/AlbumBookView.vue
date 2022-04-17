@@ -15,6 +15,7 @@
                 :active="true"
                 :albumId="albumId"
                 :onClick="getPageClickAction(i)"
+                v-on:update-img-page-info="updateImgPageInfo"
                 :data="page.imgPageInfo">
             </page-view>
             <div class="page start-page" v-if="page.type===tags.TYPE_START" @click="getPageClickAction(i)()">
@@ -161,7 +162,8 @@ export default {
             let pageSizes = [];
             for (let pages of this.screens) {
                 let maxPageRatio = pages.reduce((max, i) => {
-                    max = i.imgPageInfo.heightOfWidth > max ? i.imgPageInfo.heightOfWidth : max;
+                    let heightOfWidth = i.imgPageInfo.preciseHeightOfWidth ? i.imgPageInfo.preciseHeightOfWidth : i.imgPageInfo.heightOfWidth;
+                    max = heightOfWidth > max ? heightOfWidth : max;
                     return max;
                 }, 0);
                 let pagesRatio = maxPageRatio / pages.length; // assume all the widths of each page are 1
@@ -172,9 +174,10 @@ export default {
                     width = this.screenSize.width / pages.length;
                 }
                 pages.forEach(page => {
+                    let heightOfWidth = page.imgPageInfo.preciseHeightOfWidth ? page.imgPageInfo.preciseHeightOfWidth : page.imgPageInfo.heightOfWidth;
                     pageSizes.push({
                         id: page.id,
-                        height: width * page.imgPageInfo.heightOfWidth,
+                        height: width * heightOfWidth,
                         width
                     });
                 });
@@ -357,6 +360,10 @@ export default {
             if (this.autoFlipTimer) {
                 window.clearInterval(this.autoFlipTimer);
             }
+        },
+
+        updateImgPageInfo(index, newImgPageInfo) {
+            this.$set(this.imgPageInfos, index, newImgPageInfo);
         }
     }
 };

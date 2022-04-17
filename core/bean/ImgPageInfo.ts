@@ -5,5 +5,6 @@ export interface ImgPageInfo {
     src: string,
     heightOfWidth: number,
     thumbHeight?: number,
-    thumbWidth?: number
+    thumbWidth?: number,
+    preciseHeightOfWidth?: number
 }

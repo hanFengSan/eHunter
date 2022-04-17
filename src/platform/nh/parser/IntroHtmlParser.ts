@@ -24,7 +24,7 @@ export class IntroHtmlParser {
             const thumbHeight = i.children[0].getAttribute('height') * 1;
             const thumbWidth = i.children[0].getAttribute('width') * 1;
             const pageUrl = i.getAttribute('href');
-            const imgSrc = thumbSrc.replace('t.', 'i.').replace('t.', '.');
+            const imgSrc = thumbSrc.replace(/t(?=\.[a-zA-Z]*?$)/g, '');
             this.imgPageInfos.push({
                 id: pageUrl,
                 index: this.imgPageInfos.length, // set id to index

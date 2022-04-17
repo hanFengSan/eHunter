@@ -7,5 +7,6 @@ switch (window.location.host) {
         new EHPlatform().init();
     break;
     case 'nhentai.net':
+    case 'nhentai.to':
         new NHPlatform().init();
 }

@@ -6,7 +6,7 @@ export class ImgHtmlParser {
     private i2: HTMLElement | undefined;
     private imgSizeInfo: Array<string> | undefined;
 
-    constructor(html) {
+constructor(html) {
         this.htmlText = html.replace(/src=/g, 'x-src='); // avoid load assets
         this.html = document.createElement('html');
         this.html.innerHTML = this.htmlText;
@@ -41,11 +41,15 @@ export class ImgHtmlParser {
     }
 
     getImgHeight(): number {
-        return Number(this.imgSizeInfo![0].trim());
+        return Number(this.imgSizeInfo![1].trim());
     }
 
     getImgWidth(): number {
-        return Number(this.imgSizeInfo![1].trim());
+        return Number(this.imgSizeInfo![0].trim());
+    }
+
+    getPreciseHeightOfWidth(): number {
+        return Number(this.getImgHeight() / this.getImgWidth());
     }
 
     getIntroUrl(): string {

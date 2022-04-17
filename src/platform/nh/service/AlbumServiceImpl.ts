@@ -88,18 +88,18 @@ export class AlbumServiceImpl extends AlbumService {
         if (this.imgPageInfos.length === 0) {
             this.imgPageInfos = (await this._getIntroParser()).getImgPageInfos();
         }
-        return this.imgPageInfos;
+        return JSON.parse(JSON.stringify(this.imgPageInfos));
     }
 
     async getImgPageInfo(index: number): Promise<ImgPageInfo> {
         return (await this.getImgPageInfos())[index];
     }
 
-    async getImgSrc(index: number, mode): Promise<string> {
-        return (await this.getImgPageInfo(index)).src;
+    async getImgSrc(index: number, mode): Promise<ImgPageInfo | Error> {
+        return {...(await this.getImgPageInfo(index))};
     }
 
-    async getNewImgSrc(index: number, mode): Promise<string> {
+    async getNewImgSrc(index: number, mode): Promise<ImgPageInfo | Error> {
         return await this.getImgSrc(index, mode);
     }
 

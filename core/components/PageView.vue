@@ -138,9 +138,14 @@ export default {
         async getImgSrc() {
             // avoid redundant getImgSrc(), overlap refreshing of 'origin'
             if (this.curLoadStatus !== tags.STATE_LOADING) {
-                let src = await this.service.album.getImgSrc(this.index, tags.MODE_FAST);
-                if (this.imgPageInfo.src !== src) {
-                    this.imgPageInfo.src = src;
+                let newImgPageInfoOrErr = await this.service.album.getImgSrc(this.index, tags.MODE_FAST);
+                if (newImgPageInfoOrErr instanceof Error) {
+                    console.Error("getImgSrc", newImgPageInfoOrErr);
+                    return;
+                }
+                if (this.imgPageInfo.src !== newImgPageInfoOrErr.src) {
+                    this.imgPageInfo = newImgPageInfoOrErr;
+                    this.$emit("update-img-page-info", this.index, newImgPageInfoOrErr);
                 }
                 this.curLoadStatus = tags.STATE_LOADING;
             }
@@ -152,13 +157,14 @@ export default {
             this.message = '';
             this.imgPageInfo.src = '';
             this.curLoadStatus = tags.STATE_LOADING;
-            let src = await this.service.album.getNewImgSrc(this.index, mode);
-            if (!(src instanceof Error)) {
+            let newImgPageInfoOrErr = await this.service.album.getNewImgSrc(this.index, mode);
+            if (!(newImgPageInfoOrErr instanceof Error)) {
                 await this.$nextTick();
                 await Utils.timeout(300);
-                this.imgPageInfo.src = src;
+                this.imgPageInfo = newImgPageInfoOrErr;
+                this.$emit("update-img-page-info", this.index, newImgPageInfoOrErr);
             } else {
-                switch (src.message) {
+                switch (newImgPageInfoOrErr.message) {
                     case tags.ERROR_NO_ORIGIN:
                         this.message = this.string.noOriginalImg;
                         break;

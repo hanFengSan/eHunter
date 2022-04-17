@@ -6,7 +6,7 @@ import { BasePlatform } from '../base'
 
 export default class NHApp extends BasePlatform {
     isAlbumViewPage() {
-        return window.location.pathname.split('/').length === 5;
+        return window.location.pathname.match(/^\/g\/[0-9]*?\/[0-9]+$/) != null;
     }
 
     blockHostActions(): void {

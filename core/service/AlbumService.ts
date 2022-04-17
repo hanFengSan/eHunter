@@ -13,17 +13,17 @@ export interface IndexInfo {
 }
 
 export abstract class AlbumService {
-    abstract async getPageCount(): Promise<number>;
-    abstract async getCurPageNum(): Promise<number>;
-    abstract async getTitle(): Promise<string>;
-    abstract async getImgPageInfos(): Promise<Array<ImgPageInfo>>;
-    abstract async getImgPageInfo(index: number): Promise<ImgPageInfo>;
-    abstract async getImgSrc(index: number, mode): Promise<string>;
-    abstract async getNewImgSrc(index: number, mode): Promise<string>;
-    abstract async getThumbInfos(noCache?: boolean): Promise<Array<ThumbInfo>>;
-    abstract async getThumbInfo(index: number): Promise<ThumbInfo>;
-    abstract async getAlbumId(): Promise<string>;
-    abstract async getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo): Promise<PreviewThumbnailStyle>;
+    abstract getPageCount(): Promise<number>;
+    abstract getCurPageNum(): Promise<number>;
+    abstract getTitle(): Promise<string>;
+    abstract getImgPageInfos(): Promise<Array<ImgPageInfo>>;
+    abstract getImgPageInfo(index: number): Promise<ImgPageInfo>;
+    abstract getImgSrc(index: number, mode): Promise<ImgPageInfo | Error>;
+    abstract getNewImgSrc(index: number, mode): Promise<ImgPageInfo | Error>;
+    abstract getThumbInfos(noCache?: boolean): Promise<Array<ThumbInfo>>;
+    abstract getThumbInfo(index: number): Promise<ThumbInfo>;
+    abstract getAlbumId(): Promise<string>;
+    abstract getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo): Promise<PreviewThumbnailStyle>;
     abstract supportOriginImg(): boolean;
     abstract supportImgChangeSource(): boolean;
     abstract supportThumbView(): boolean;

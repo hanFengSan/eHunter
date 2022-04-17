@@ -24,11 +24,12 @@
             ref="pageContainers"
             v-for="(imgPageInfo, i) of volImgPageInfos"
             :key="imgPageInfo.id"
-            :style="{'width':`${widthScale}%`,'padding-bottom':`${widthScale * imgPageInfo.heightOfWidth}%`,'margin': `${scrolledPageMargin}px auto`}">
+            :style="{'width':`${widthScale}%`,'padding-bottom':`${widthScale * (imgPageInfo.preciseHeightOfWidth ? imgPageInfo.preciseHeightOfWidth : imgPageInfo.heightOfWidth)}%`,'margin': `${scrolledPageMargin}px auto`}">
             <page-view
                 :index="imgPageInfo.index"
                 :active="nearbyArray.indexOf(index(i)) > -1"
                 :albumId="albumId"
+                v-on:update-img-page-info="updateImgPageInfo"
                 :data="imgPageInfo">
             </page-view>
         </div>
@@ -264,6 +265,10 @@ export default {
                     this.toggleTopBar(!this.showTopBar);
                     break;
             }
+        },
+
+        updateImgPageInfo(index, newImgPageInfo) {
+            this.$set(this.imgPageInfos, index, newImgPageInfo);
         }
     }
 };

@@ -168,10 +168,10 @@ export class AlbumCacheService {
         return JSON.parse(JSON.stringify(album.imgPageInfos));
     }
 
-    async getImgSrc(albumId, index, mode, sourceId?): Promise<string | Error> {
+    async getImgSrc(albumId, index, mode, sourceId?): Promise<ImgPageInfo | Error> {
         let album = await this._getAlbum(albumId);
         if (album.imgPageInfos[index].src) {
-            return album.imgPageInfos[index].src;
+            return {...album.imgPageInfos[index]};
         }
         try {
             let param = sourceId ? `?nl=${sourceId}` : ''; // change source 0f img
@@ -197,8 +197,9 @@ export class AlbumCacheService {
                 default:
                     album.imgPageInfos[index].src = parser.getImgUrl();
             }
+            album.imgPageInfos[index].preciseHeightOfWidth = parser.getPreciseHeightOfWidth();
             await this._saveAlbum(albumId);
-            return album.imgPageInfos[index].src;
+            return {...album.imgPageInfos[index]};
         } catch (e) {
             console.error(e);
             return new Error(tags.STATE_ERROR);
@@ -206,7 +207,7 @@ export class AlbumCacheService {
         }
     }
 
-    async getNewImgSrc(albumId: string, index: number, mode): Promise<string | Error> {
+    async getNewImgSrc(albumId: string, index: number, mode): Promise<ImgPageInfo | Error> {
         let album = await this._getAlbum(albumId);
         album.imgPageInfos[index].src = '';
         await this._saveAlbum(albumId);

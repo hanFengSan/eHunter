@@ -9,6 +9,11 @@ Provide a scroll mode and book mode, for a better reading experience.
 
 ![avatar](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg)
 
+# Use in iPad
+You can follow the guide to use eHunter in iPad:
+CN: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_cn.md)
+EN: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_en.md)
+
 ## Implementation
 It creates a new element in the Eh page, and inject Vue components to provide a scroll mode and book mode.
 

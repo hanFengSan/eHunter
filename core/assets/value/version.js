@@ -1,23 +1,12 @@
 export default {
     cn: `
-* \`书页模式\`下支持奇偶页切换
+* 修复图片比例问题。比例问题在韩漫上最明显，但该版本可能会有些许抖动
+* 修复对nhentai的支持
 
-* 支持回车关闭弹窗
-
-* 迁移老的订阅数据
-
-* \`滚动模式\`下支持调整页间距
-
-* 支持手动修改配置值
-
-### 2.5.0 更新
-
-* 在\`书页模式\`下, 支持鼠标滚轮(触控板)翻页.
-
-* 添加\`滚轮方向\`设置, 用于设置鼠标滚动翻页方向.
-
-* 添加\`滚轮翻页\`设置, 用于设置鼠标滚动翻页时的灵敏度.
-
+### iPad支持
+* 目前在iOS 15/iPadOS 15上可以运行油猴脚本了，因此eHunter也能成功在iPad上使用
+* 目前没有在UI上做移动端适配，因此比较适合iPad使用，看看大家的需求再决定要不要对iPhone做UI优化
+* 使用指南: [链接](https://github.com/hanFengSan/eHunter/blob/master/ipad_cn.md)
 
 ### eHunter-local
 eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](https://github.com/hanFengSan/eHunter_local)
@@ -26,24 +15,13 @@ eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](ht
 
 `,
     en: `
-* In \`Book\` mode, you can switch the \`Odd/Even\` to see the big image that crossing screens.
+* Fixed image ratio bug
+* Fixed the support for nhentai
 
-* Support using \`Enter\` key to close dialog.
-
-* Migrate the old data of subscription.
-
-* In \`Scroll\` mode, you can change the space between pages.
-
-* Support manually changing the value of configuration.
-
-### 2.5.0 Updates
-
-* Support mouse wheel to flip pages in \`Book\` mode.
-
-* Add \`Wheel Direction\` for customize the direction of flipping.
-
-* Add \`Wheel Flip\` for customize the sensitivity of mouse wheel while flipping.
-
+### Use in iPad
+* The greasymonkey/tampermonkey script can run on iOS 15/iPadOS 15, so the eHunter also can run on iPad now
+* I don't optimize the UX on mobile platform yet, so it may be have a bad UX on iPhone.
+* Guide: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_en.md)
 
 ### eHunter-local
 The eHunter-local is local version of eHunter, supporting Windows and MacOS. [Home Page](https://github.com/hanFengSan/eHunter_local)
@@ -52,24 +30,13 @@ The eHunter-local is local version of eHunter, supporting Windows and MacOS. [Ho
 
 `,
     jp: `
-* In \`Book\` mode, you can switch the \`Odd/Even\` to see the big image that crossing screens.
+* Fixed image ratio bug
+* Fixed the support for nhentai
 
-* Support using \`Enter\` key to close dialog.
-
-* Migrate the old data of subscription.
-
-* In \`Scroll\` mode, you can change the space between pages.
-
-* Support manually changing the value of configuration.
-
-### 2.5.0 Updates
-
-* Support mouse wheel to flip pages in \`Book\` mode.
-
-* Add \`Wheel Direction\` for customize the direction of flipping.
-
-* Add \`Wheel Flip\` for customize the sensitivity of mouse wheel while flipping.
-
+### Use in iPad
+* The greasymonkey/tampermonkey script can run on iOS 15/iPadOS 15, so the eHunter also can run on iPad now.
+* I don't optimize the UX on mobile platform yet, so it may be have a bad UX on iPhone.
+* Guide: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_en.md)
 
 ### eHunter-local
 eHunter-localはeHunterのローカル版で、WindowsとMacOSをサポートしています。[Home Page](https://github.com/hanFengSan/eHunter_local)

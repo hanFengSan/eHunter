@@ -34,9 +34,12 @@ module.exports.chrome = {
         'http://githubusercontent.com/',
         'https://githubusercontent.com/',
         'https://nhentai.net/',
+        'https://nhentai.to/',
         'https://e-hentai.org/',
         'https://raw.githubusercontent.com/',
         'http://raw.githubusercontent.com/',
+        'https://jp.animesales.xyz/',
+        'http://jp.animesales.xyz/',
         'storage',
         'background',
         'notifications',
@@ -52,6 +55,7 @@ module.exports.chrome = {
                 '*://hanfengsan.org/*',
                 '*://e-hentai.org/*',
                 '*://nhentai.net/*',
+                '*://nhentai.to/*',
                 '*://mingzuozhibiba.cn/*'
             ],
             'js': [
@@ -79,8 +83,9 @@ module.exports.tampermonkey =
 // @match        https://exhentai.org/*
 // @match        https://e-hentai.org/*
 // @match        https://nhentai.net/*
-// @connect      alexskye.info
+// @match        https://nhentai.to/*
 // @connect      githubusercontent.com
+// @connect      jp.animesales.xyz
 // @grant        GM_xmlhttpRequest
 // @license      MIT
 // ==/UserScript==
