@@ -1,7 +1,7 @@
 {
     "cn":{
-        "title":"新版本: v2.7.1",
-        "version":"2.7.1",
+        "title":"新版本: v2.7.2",
+        "version":"2.7.2",
         "text":"1. 修复图片比例问题（韩漫最为明显），可能会有些页面抖动 2. 修复对nhentai的支持",
         "time":1571736652834,
         "duration":604800000,
@@ -14,8 +14,8 @@
         ]
     },
     "en":{
-        "title":"New version: v2.7.1",
-        "version":"2.7.1",
+        "title":"New version: v2.7.2",
+        "version":"2.7.2",
         "text":"1. Fixed image ratio problems 2. Fixed the support of nhentai",
         "time":1571736652834,
         "duration":604800000,
@@ -28,8 +28,8 @@
         ]
     },
     "jp":{
-        "title":"新しいバージョン: v2.7.1",
-        "version":"2.7.1",
+        "title":"新しいバージョン: v2.7.2",
+        "version":"2.7.2",
         "text":"1. Fixed image ratio problems 2. Fixed the support of nhentai",
         "time":1571736652834,
         "duration":604800000,
