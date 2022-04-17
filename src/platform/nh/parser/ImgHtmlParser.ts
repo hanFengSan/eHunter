@@ -19,22 +19,22 @@ export class ImgHtmlParser {
     }
 
     getImgHeight(): number {
-        return Number(this.html.querySelector('#image-container')!.querySelector('.fit-horizontal')!.getAttribute('height'));
+        return Number(this.html.querySelector('#image-container')!.children[0]!.children[0]!.getAttribute('height'));
     }
 
     getImgWidth(): number {
-        return Number(this.html.querySelector('#image-container')!.querySelector('.fit-horizontal')!.getAttribute('width'));
+        return Number(this.html.querySelector('#image-container')!.children[0]!.children[0]!.getAttribute('width'));
     }
 
     getIntroUrl(): string {
-        return this.html.querySelector('.back-to-gallery')!.children![0].getAttribute('href')!;
+        return this.html.querySelector('.go-back')!.getAttribute('href')!;
     }
 
     getAlbumId(): string {
-        return this.html.querySelector('.back-to-gallery')!.children![0].getAttribute('href')!.replace(/(\/|g)/g, '');
+        return this.getIntroUrl().replace(/(\/|g)/g, '');
     }
 
     getImgUrl(): string {
-        return this.html.querySelector('#image-container')!.querySelector('.fit-horizontal')!.getAttribute('x-src')!;
+        return this.html.querySelector('#image-container')!.children[0]!.children[0]!.getAttribute('x-src')!;
     }
 }

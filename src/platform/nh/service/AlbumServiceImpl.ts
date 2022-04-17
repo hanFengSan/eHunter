@@ -96,7 +96,19 @@ export class AlbumServiceImpl extends AlbumService {
     }
 
     async getImgSrc(index: number, mode): Promise<ImgPageInfo | Error> {
-        return {...(await this.getImgPageInfo(index))};
+        let imgPageInfo = await this.getImgPageInfo(index);
+        if (imgPageInfo.src != null && imgPageInfo.src !== '') {
+            return {...imgPageInfo}
+        }
+        let req = new TextReq(imgPageInfo.pageUrl);
+        req.setTimeOutTime(5);
+        let text = await req.request();
+        let parser = new ImgHtmlParser(text);
+        let imgUrl = parser.getImgUrl();
+        let preciseHeightOfWidth = parser.getImgHeight() / parser.getImgWidth();
+        this.imgPageInfos[index].src = imgUrl;
+        this.imgPageInfos[index].preciseHeightOfWidth = preciseHeightOfWidth;
+        return {...this.imgPageInfos[index]}
     }
 
     async getNewImgSrc(index: number, mode): Promise<ImgPageInfo | Error> {
