@@ -6,6 +6,11 @@
 <img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_5.jpg" style="width: 800px; display: block; padding: 10px;"/>
 <img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg" style="width: 800px; display: block; padding: 10px;"/>
 
+# 在iPad上使用
+现在可以在iPad上使用eHunter了！可参考以下指南：
+CN: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_cn.md)
+EN: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_en.md)
+
 ## 实现方式概要
 在在原页面上新创建一个节点, 将vue注入到此节点上. 爬虫是利用fetch实现的.
 实现上基本隔离了具体环境, 可很容易得移植到其他漫画网站/平台等.
