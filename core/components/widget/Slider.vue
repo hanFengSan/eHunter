@@ -1,104 +1,95 @@
 <template>
-<div class="slider"         
-        @mousedown="handleMouseDown"
-        @click="handleClick"
-        ref="slider">
-    <div class="track"></div>
-    <div class="fill" :style="{ 'width': fillScale + '%' }"></div>
-    <div class="thumb"
-        :style="{ 'left': fillScale + '%', 'width': isHolding ? '15px': undefined, 'height': isHolding ? '15px': undefined }" ></div>
-</div>
+    <div class="slider" @mousedown="handleMouseDown" @click="handleClick" ref="slider">
+        <div class="track"></div>
+        <div class="fill" :style="{ 'width': fillScale + '%' }"></div>
+        <div class="thumb"
+            :style="{ 'left': fillScale + '%', 'width': isHolding ? '15px' : undefined, 'height': isHolding ? '15px' : undefined }">
+        </div>
+    </div>
 </template>
 
-<script>
-export default {
-    name: 'Slider',
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
 
-    props: ['min', 'max', 'step', 'init'],
+const props = defineProps<{
+    min: number
+    max: number
+    step: number
+    init: number
+}>()
 
-    data() {
-        return {
-            val: 0,
-            isHolding: false,
-            oldMouseX: 0,
-            oldVal: 0,
-            widthRatio: 0,
-            stepPrecision: 0
-        };
-    },
+const emit = defineEmits(['change'])
 
-    created() {
-        this.val = this.init;
-        this.stepPrecision = this.getStepPrecision(this.step);
-    },
+const val = ref(props.init)
+const isHolding = ref(false)
+const oldMouseX = ref(0)
+const oldVal = ref(0)
+const widthRatio = ref(0)
+const slider = ref<HTMLDivElement | null>(null)
 
-    computed: {
-        fillScale() {
-            return (this.val - this.min) / ((this.max - this.min) / 100);
-        }
-    },
+const fillScale = computed(() => {
+    return (val.value - props.min) / ((props.max - props.min) / 100)
+})
 
-    watch: {
-      init() {
-        this.val = this.init;
-      }
-    },
+watch(() => props.init, (newVal) => {
+    val.value = newVal
+})
 
-    methods: {
-        getWidthRatio() {
-            return this.$refs.slider.offsetWidth / (this.max - this.min);
-        },
-        handleMouseDown(e) {
-            this.isHolding = true;
-            this.handleClick(e);
-            this.oldMouseX = e.clientX;
-            this.oldVal = this.val;
-            this.widthRatio = this.getWidthRatio();
-            document.addEventListener('mousemove', this.handleMouseMove);
-            document.addEventListener('mouseup', this.handleMouseUp);
-            e.preventDefault();
-        },
-        handleMouseUp(e) {
-            this.isHolding = false;
-            document.removeEventListener('mousemove', this.handleMouseMove);
-            document.removeEventListener('mouseup', this.handleMouseUp);
-            e.preventDefault();
-        },
-        handleMouseMove(e) {
-            if (this.isHolding) {
-                const x = this.oldVal + (e.clientX - this.oldMouseX) / this.widthRatio;
-                this.onChange(x);
-            }
-            e.preventDefault();
-        },
-        handleClick(e) {
-            const x = this.min + e.offsetX / this.getWidthRatio();
-            this.onChange(x);
-        },
-        onChange(x) {
-            if (x > this.max) {
-                this.val = this.getValByStep(this.max);
+function getWidthRatio() {
+    return slider.value!.offsetWidth / (props.max - props.min)
+}
+
+function handleClick(e) {
+    const x = props.min + e.offsetX / getWidthRatio()
+    onChange(x)
+}
+
+function getValByStep(x) {
+    for (let i = props.min; i <= props.max; i = i + props.step) {
+        if (i > x) {
+            if (i === props.min) {
+                return Number(i.toFixed(0))
             } else {
-                this.val = this.getValByStep(x < this.min ? this.min : x);
+                return Number((i - props.step).toFixed(0))
             }
-            this.$emit('change', this.val);
-        },
-        getStepPrecision(val) {
-            return String(String(this.step).match('.[0-9]')).length - 1;
-        },
-        getValByStep(x) {
-            for (let i = this.min; i <= this.max; i = i + this.step) {
-                if (i > x) {
-                    if (i === this.min) {
-                        return Number(i.toFixed(this.stepPrecision));
-                    } else {
-                        return Number((i - this.step).toFixed(this.stepPrecision));
-                    }
-                }
-            }
-            return this.max;
         }
     }
+    return props.max
+}
+
+function onChange(x) {
+    if (x > props.max) {
+        val.value = getValByStep(props.max)
+    } else {
+        val.value = getValByStep(x < props.min ? props.min : x)
+    }
+    emit('change', val.value)
+}
+
+function handleMouseUp(e) {
+    isHolding.value = false
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+    e.preventDefault()
+}
+
+function handleMouseMove(e) {
+    if (isHolding.value) {
+        const x = oldVal.value + (e.clientX - oldMouseX.value) / widthRatio.value
+        onChange(x)
+    }
+    e.preventDefault()
+}
+
+function handleMouseDown(e) {
+    isHolding.value = true
+    handleClick(e)
+    oldMouseX.value = e.clientX
+    oldVal.value = val.value
+    widthRatio.value = getWidthRatio()
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    e.preventDefault()
 }
 </script>
 
@@ -114,8 +105,9 @@ div {
     position: relative;
     width: 200px;
     height: 20px;
-    cursor: pointer;    
-    > .track {
+    cursor: pointer;
+
+    >.track {
         position: absolute;
         left: 0;
         height: 2px;
@@ -124,7 +116,8 @@ div {
         transform: translateY(-50%);
         background: $slider_track_bg;
     }
-    > .fill {
+
+    >.fill {
         position: absolute;
         left: 0;
         height: 2px;
@@ -133,7 +126,8 @@ div {
         transform: translateY(-50%);
         background: $slider_track_fill_color;
     }
-    > .thumb {
+
+    >.thumb {
         position: absolute;
         width: 12px;
         height: 12px;

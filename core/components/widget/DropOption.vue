@@ -1,59 +1,84 @@
 <template>
-<div class="drop-option">
-    <div class="text clickable no-select" @click="select()">{{ curVal }}</div>
-    <svg class="icon-drop-down clickable no-select" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" @click="select()">
-        <path d="M7 10l5 5 5-5z"/>
-        <path d="M0 0h24v24H0z" fill="none"/>
-    </svg>
-    <popover :active="active" :custom-style="{'margin-left': '7px', 'margin-top': '4px'}" :close="close">
-        <div class="options no-select">
-            <div class="item" v-for="(item, index) in list" :key="item.name||item" @click="onClick(index)">
-                <span>{{ item.name || item }}</span>
+    <div class="drop-option" @click="onSelect">
+        <div class="text clickable no-select">{{ curValName }}</div>
+        <DropDownIcon class="icon-drop-down clickable no-select" />
+        <popover :active="active" :custom-style="{ 'margin-left': '7px', 'margin-top': '4px' }" @close="onClose">
+            <div class="options no-select">
+                <div class="item" v-for="(item, index) in list" :key="item.name || item.i18nKey"
+                    @click="onClick(index)">
+                    <span>{{ item.i18nKey ? i18n[item.i18nKey] : item.name }}</span>
+                </div>
             </div>
-        </div>
-    </popover>
-</div>
+        </popover>
+    </div>
 </template>
 
-<script>
-import Popover from './Popover.vue';
+<script setup lang="ts">
+import DropDownIcon from '../../assets/svg/drop_down.svg?component'
+import Popover from './Popover.vue'
+import { i18n } from '../../store/i18n'
+import { ref, computed } from 'vue'
 
-export default {
-    name: 'DropOption',
+interface ListItem {
+    name?: string
+    abbrName?: string
+    i18nKey?: string
+    abbrI18nKey?: string
+    val: string | number
+}
 
-    props: ['list', 'change', 'curVal'],
+const props = withDefaults(defineProps<{
+    list: Array<ListItem>,
+    curVal: string | number,
+    formatCurValByList?: boolean,
+    useAbbrName?: boolean,
+}>(), {
+    formatCurValByList: false,
+    useAbbrName: false
+})
 
-    data() {
-        return {
-            active: false
-        };
-    },
+const emit = defineEmits(['change'])
 
-    components: { Popover },
+let active = ref(false)
 
-    computed: {
-    },
+function onSelect() {
+    active.value = !active.value
+}
 
-    methods: {
-        select() {
-            this.active = !this.active;
-        },
+function onClose() {
+    active.value = false
+}
 
-        onClick(index) {
-            this.select();
-            this.$emit('change', index);
-        },
+function onClick(index) {
+    onSelect()
+    emit('change', props.list[index].val, index)
+}
 
-        close() {
-            this.active = false;
+const curValName = computed(() => {
+    if (props.formatCurValByList) {
+        for (let item of props.list) {
+            if (item.val == props.curVal) {
+                if (props.useAbbrName && item.abbrI18nKey) {
+                    return i18n.value[item.abbrI18nKey]
+                }
+                if (item.i18nKey) {
+                    return i18n.value[item.i18nKey]
+                }
+                if (props.useAbbrName && item.abbrName) {
+                    return item.abbrName
+                }
+                return item.name
+            }
         }
     }
-};
+    return String(props.curVal)
+})
 </script>
 
 <style lang="scss" scoped>
 @import "../../style/_responsive";
 @import "../../style/_variables";
+
 div {
     display: flex;
 }
@@ -62,36 +87,46 @@ div {
     position: relative;
     justify-content: center;
     align-items: center;
-    overflow: visible;     
-    > .text {                
+    overflow: visible;
+    cursor: pointer;
+
+    >.text {
         margin-left: 7px;
         padding: 3px 5px;
         background: rgba(0, 0, 0, 0.2);
         white-space: nowrap;
+        color: white;
+        font-size: 14px;
     }
-    > .icon-drop-down {
+
+    >.icon-drop-down {
         fill: white;
         height: 18px;
         width: 18px;
         margin-left: 2px;
     }
+
     .options {
         flex-direction: column;
         transition: all 0.3s ease;
-        > .item {
+
+        >.item {
             padding: 5px 10px;
             white-space: nowrap;
-            color: rgba(0,0,0,0.8);
+            color: rgba(0, 0, 0, 0.8);
             padding: 7px 11px;
             min-width: 52px;
             transition: all 0.3s ease;
-            > span {
+
+            >span {
                 transition: all 0.3s ease;
             }
+
             &:hover {
                 cursor: pointer;
                 background: rgba(0, 0, 0, 0.1);
-                > span {
+
+                >span {
                     color: $accent_color;
                     margin-left: 5px;
                     margin-right: -5px;

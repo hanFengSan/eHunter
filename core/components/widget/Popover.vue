@@ -1,56 +1,44 @@
 <template>
-    <transition name="slide-fade">
-        <div class="popover" v-if="active" :style="customStyle" @click="handleClick($event)">
+    <Transition name="slide-fade">
+        <div class="popover" v-if="active" :style="customStyle" @click.stop="">
                 <slot></slot>
         </div>
-    </transition>
+    </Transition>
 </template>
 
-<script>
-export default {
-    name: 'Popover',
+<script setup lang="ts">
+import { watch } from 'vue'
 
-    props: ['active', 'customStyle', 'close', 'canCancel'],
+const props = defineProps({
+  active: Boolean,
+  customStyle: Object,
+})
 
-    data() {
-        return {
-            timer: {}
-        };
-    },
+const emit = defineEmits(['close'])
 
-    watch: {
-        active(newVal, oldVal) {
-            if (!this.canCancel) {
-                // when user click outside, close popover
-                if (newVal) {
-                    // user a timer, avoiding call 'close' when 'open'
-                    this.timer = setTimeout(() => {
-                        document.addEventListener('click', this.handleOuterClick);
-                    }, 500);
-                }
-                if (oldVal) {
-                    document.removeEventListener('click', this.handleOuterClick);
-                    // remove timer if closing is too fast to having no time for adding event
-                    if (this.timer) {
-                        clearTimeout(this.timer);
-                    }
-                }
-            }
-        }
-    },
+function handleClick(e) {
+    e.stopPropagation(); // avoiding emit click event within popover
+}
 
-    methods: {
-        handleOuterClick() {
-            if (this.close) {
-                this.close();
-            }
-        },
+function handleOuterClick() {
+    emit('close')
+}
 
-        handleClick(e) {
-            e.stopPropagation(); // avoiding emit click event within popover
+// user a timer, avoiding call 'close' when 'open'
+let timer:any;
+watch(() => props.active, async (newVal, oldVal) => {
+    if (newVal) {
+        timer = setTimeout(() => {
+            document.addEventListener('click', handleOuterClick);
+        }, 100);
+    }
+    if (oldVal) {
+        document.removeEventListener('click', handleOuterClick);
+        if (timer) {
+            clearTimeout(timer);
         }
     }
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -1,527 +1,194 @@
 <template>
     <nav class="top-bar">
-        <div class="float-content" :style="floatBtnStyle">
+        <div class="float-content">
             <transition name="fast-horizontal-fade">
-                <circle-icon-button 
-                    v-if="showTopBar"
-                    ref="topBarButton" 
-                    class="button tips tips-left tips-down" 
-                    icon="expand"
-                    :title-content="string.toggleMoreSettings"
-                    :rotate="showMoreSettings"
-                    @click="toggleMoreSettings">
-                </circle-icon-button>
+                <CircleIconButton v-if="store.showTopBar" ref="topBarButton" class="button tips tips-left tips-down"
+                    icon-type="expand" :title-content="i18n.toggleMoreSettings" :rotate="store.showMoreSettings"
+                    @click="storeAction.toggleShowMoreSettings()" />
             </transition>
-            <circle-icon-button 
-                ref="topBarButton" 
-                class="button tips tips-left tips-down" 
-                icon="menu" 
-                :title-content="string.toggleTopBar"
-                :rotate="showTopBar" 
-                @click="changeTopBar">
-            </circle-icon-button>
-            <circle-icon-button class="button tips tips-left tips-down" :title-content="string.closeEHunter" icon="close" @click="closeEHunter"></circle-icon-button>
+            <CircleIconButton ref="topBarButton" class="button tips tips-left tips-down" icon-type="menu"
+                :title-content="i18n.toggleTopBar" :rotate="store.showTopBar" @click="storeAction.toggleShowTopBar()" />
+            <CircleIconButton class="button tips tips-left tips-down" :title-content="i18n.closeEHunter" icon-type="close"
+                @click="emit('closeEHunter')" />
         </div>
-        <div :class="['inner-content', { hide: !showTopBar, 'more-settings': showMoreSettings }]" :style="topBarStyle">
-            <template v-if="readSettings">
-                <template v-for="item of configuration">
-                  <div class="item" v-if="item.show" :key="item.title">
-                      <span class="label tips tips-down tips-right" :title-content="item.tip">{{ item.title }}:</span>
-                      <drop-option
-                        v-if="item.type==='SELECT'||item.type==='SLIDER_SELECT'"
-                        :list="item.list"
-                        @change="item.select"
-                        :cur-val="item.curValTitle">
-                      </drop-option>
-                      <pop-slider
-                          v-if="item.type==='SLIDER_SELECT'"
-                          :active="item.slider.active"
-                          :min="item.slider.min"
-                          :max="item.slider.max"
-                          :step="item.slider.step"
-                          :init="item.slider.init"
-                          :close="item.slider.close"
-                          :is-float="item.slider.isFloat"
-                          @change="item.slider.change">
-                      </pop-slider>
-                      <div v-if="item.type==='SWITCH'" class="bar-switch">
-                        <simple-switch :active="item.curVal" @change="item.change"></simple-switch>
-                      </div>
-                  </div>
-                </template>
-                <div class="item less-margin">
-                    <span class="label icon tips tips-down" title-content="Change language/切换语言/言語を変更">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/>
-                        </svg>
-                    :</span>
-                    <drop-option :list="langList" @change="(val) => dropOptionChange('lang', val)" :cur-val="string.lang"></drop-option>
-                </div>
-                <div class="item icon-margin">
-                    <a class="label icon tips tips-down clickable" :title-content="string.resetTip" @click="resetCache">
-                        <svg class="reset" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                        </svg>
-                    </a>
-                </div>
-                <div class="item icon-margin">
-                    <a class="label icon tips tips-down clickable" :title-content="string.infoTip" @click="showInfoDialog">
-                        <svg class="info" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                        </svg>
-                    </a>
-                </div>
-                <div class="item">
-                    <a class="label icon tips tips-down clickable" :title-content="string.githubTip" target="_blank" href="https://github.com/hanFengSan/eHunter">
-                        <svg class="github" version="1.1" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
-                        </svg>
-                    </a>
-                </div>
-            </template>
+        <div :class="['inner-content', { hide: !store.showTopBar, 'more-settings': store.showMoreSettings }]">
+            <div class="item">
+                <span class="label tips tips-down tips-right" :title-content="i18n.readingModeTip">{{ i18n.readingMode }}:</span>
+                <DropOption 
+                    :list="settingConf.readingModeList"
+                    :cur-val="store.readingMode"
+                    :format-cur-val-by-list="true"
+                    @change="(val) => storeAction.setReadingMode(val)" />
+            </div>
+            <div class="item" v-if="store.readingMode == 0">
+                <span class="label tips tips-down tips-right" :title-content="i18n.widthScaleTip">{{ i18n.widthScale }}:</span>
+                <NumDropOption 
+                    :quick-options="settingConf.widthScale.list"
+                    :cur-val="store.widthScale"
+                    :suffix="settingConf.widthScale.suffix"
+                    :min="30"
+                    :max="100"
+                    :is-float="true"
+                    @change="(val) => storeAction.setWidthScale(val)" />
+            </div>
+            <div class="item">
+                <span class="label tips tips-down tips-right" :title-content="i18n.loadNumTip">{{ i18n.loadNum }}:</span>
+                <NumDropOption 
+                    :quick-options="settingConf.loadNum.list"
+                    :cur-val="store.loadNum"
+                    :suffix="settingConf.loadNum.suffix"
+                    :min="1"
+                    :max="100"
+                    @change="(val) => storeAction.setLoadNum(val)" />
+            </div>
+            <div class="item" v-if="store.readingMode == 0">
+                <span class="label tips tips-down tips-right" :title-content="i18n.volSizeTip">{{ i18n.volSize }}:</span>
+                <NumDropOption 
+                    :quick-options="settingConf.volumeSize.list"
+                    :cur-val="store.volumeSize"
+                    :suffix="settingConf.volumeSize.suffix"
+                    :min="1"
+                    :max="200"
+                    @change="(val) => storeAction.setVolumeSize(val)" />
+            </div>
+            <div class="item" v-if="store.readingMode == 0 && store.isSupportThumbView">
+                <span class="label tips tips-down tips-right" :title-content="i18n.thumbViewTip">{{ i18n.thumbView }}:</span>
+                <SimpleSwitch
+                    :active="store.showThumbView"
+                    @change="() => storeAction.toggleShowThumbView()" />
+            </div>
+            <div class="item" v-if="store.readingMode == 0">
+                <span class="label tips tips-down tips-right" :title-content="i18n.pageMarginTip">{{ i18n.pageMargin }}:</span>
+                <NumDropOption 
+                    :quick-options="settingConf.scrollPageMargin.list"
+                    :cur-val="store.scrollPageMargin"
+                    :suffix="settingConf.scrollPageMargin.suffix"
+                    :min="0"
+                    :max="300"
+                    @change="(val) => storeAction.setScrollPageMargin(val)" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1">
+                <span class="label tips tips-down tips-right" :title-content="i18n.screenSizeTip">{{ i18n.screenSize }}:</span>
+                <NumDropOption 
+                    :quick-options="settingConf.pagesPerScreen.list"
+                    :cur-val="store.pagesPerScreen"
+                    :suffix="settingConf.pagesPerScreen.suffix"
+                    :min="1"
+                    :max="10"
+                    @change="(val) => storeAction.setPagesPerScreen(val)" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1">
+                <span class="label tips tips-down tips-right" :title-content="i18n.bookDirectionTip">{{ i18n.bookDirection }}:</span>
+                <DropOption 
+                    :list="settingConf.bookDirection.list"
+                    :cur-val="store.bookDirection"
+                    :format-cur-val-by-list="true"
+                    :use-abbr-name="true"
+                    @change="(val) => storeAction.setBookDirection(val)" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1">
+                <span class="label tips tips-down tips-right" :title-content="i18n.paginationTip">{{ i18n.pagination }}:</span>
+                <SimpleSwitch
+                    :active="store.showBookPagination"
+                    @change="() => storeAction.toggleShowBookPagination()" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1 && store.showMoreSettings">
+                <span class="label tips tips-down tips-right" :title-content="i18n.oddEvenTip">{{ i18n.oddEven }}:</span>
+                <SimpleSwitch
+                    :active="store.isChangeOddEven"
+                    @change="() => storeAction.toggleIsChangeOddEven()" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1 && store.showMoreSettings">
+                <span class="label tips tips-down tips-right" :title-content="i18n.reverseFlipTip">{{ i18n.reverseFlip }}:</span>
+                <SimpleSwitch
+                    :active="store.isReverseFlip"
+                    @change="() => storeAction.toggleIsReverseFlip()" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1 && store.showMoreSettings">
+                <span class="label tips tips-down tips-right" :title-content="i18n.autoFlipTip">{{ i18n.autoFlip }}:</span>
+                <SimpleSwitch
+                    :active="store.isAutoFlip"
+                    @change="() => storeAction.toggleIsAutoFlip()" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1 && store.showMoreSettings">
+                <span class="label tips tips-down tips-right" :title-content="i18n.autoFlipFrequencyTip">{{ i18n.autoFlipFrequency }}:</span>
+                <NumDropOption 
+                    :quick-options="settingConf.autoFlipFrequency.list"
+                    :cur-val="store.autoFlipFrequency"
+                    :suffix="settingConf.autoFlipFrequency.suffix"
+                    :min="1"
+                    :max="240"
+                    @change="(val) => storeAction.setAutoFlipFrequency(val)" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1 && store.showMoreSettings">
+                <span class="label tips tips-down tips-right" :title-content="i18n.thumbViewTip">{{ i18n.thumbView }}:</span>
+                <SimpleSwitch
+                    :active="store.showBookThumbView"
+                    @change="() => storeAction.toggleShowBookThumbView()" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1 && store.showMoreSettings">
+                <span class="label tips tips-down tips-right" :title-content="i18n.wheelDirectionTip">{{ i18n.wheelDirection }}:</span>
+                <SimpleSwitch
+                    :active="store.IsReverseBookWheeFliplDirection"
+                    @change="() => storeAction.toggleIsReverseBookWheeFliplDirection()" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1 && store.showMoreSettings">
+                <span class="label tips tips-down tips-right" :title-content="i18n.wheelSensitivityTip">{{ i18n.wheelSensitivity }}:</span>
+                <NumDropOption 
+                    :quick-options="settingConf.wheelSensitivity.list"
+                    :cur-val="store.wheelSensitivity"
+                    :min="1"
+                    :max="250"
+                    @change="(val) => storeAction.setWheelSensitivity(val)" />
+            </div>
+            <div class="item less-margin">
+                <span class="label icon tips tips-down" title-content="Change language/切换语言/言語を変更">
+                    <GlobeIcon />:
+                </span>
+                <DropOption
+                    :list="settingConf.langList"
+                    @change="(val) => storeAction.setLang(val)"
+                    :cur-val="i18n.lang"
+                    :format-cur-val-by-list="true"
+                    :use-abbr-name="true" />
+            </div>
+            <div class="item icon-margin">
+                <a class="label icon tips tips-down clickable" :title-content="i18n.resetTip" @click="emit('resetCache')">
+                    <RefreshIcon />
+                </a>
+            </div>
+            <div class="item icon-margin">
+                <a class="label icon tips tips-down clickable" :title-content="i18n.infoTip" @click="showInfoDialog">
+                    <InfoIcon class="info" />
+                </a>
+            </div>
+            <div class="item">
+                <a class="label icon tips tips-down clickable" :title-content="i18n.githubTip" target="_blank" href="https://github.com/hanFengSan/eHunter">
+                    <GithubIcon class="github" />
+                </a>
+            </div>
         </div>
     </nav>
 </template>
 
-<script>
-import { mapGetters, mapActions } from 'vuex';
-import DropOption from './widget/DropOption.vue';
-import PopSlider from './widget/PopSlider.vue';
-import SimpleSwitch from './widget/SimpleSwitch.vue';
-import CircleIconButton from './widget/CircleIconButton.vue';
-import SettingService from '../service/SettingService.ts';
-import * as tags from '../assets/value/tags';
-import InfoService from '../service/InfoService.ts';
-// import Logger from '../utils/Logger';
+<script setup lang="ts">
+import DropOption from './widget/DropOption.vue'
+import NumDropOption from './widget/NumDropOption.vue'
+import SimpleSwitch from './widget/SimpleSwitch.vue'
+import CircleIconButton from './widget/CircleIconButton.vue'
+import { i18n } from '../store/i18n'
+import { store, storeAction, settingConf } from '../store/app'
+import GlobeIcon from '../assets/svg/globe.svg?component'
+import RefreshIcon from '../assets/svg/refresh.svg?component'
+import InfoIcon from '../assets/svg/info.svg?component'
+import GithubIcon from '../assets/svg/github.svg?component'
+import { ref, watch, computed, onMounted } from 'vue'
 
-export default {
-    name: 'TopBar',
+const emit = defineEmits(['closeEHunter', 'resetCache'])
 
-    inject: ['config', 'service'],
-    
-    components: { DropOption, PopSlider, SimpleSwitch, CircleIconButton },
+function showInfoDialog() {
 
-    data() {
-        return {
-            readSettings: false,
-            // language
-            langList: [
-                { name: 'English', val: tags.LANG_EN },
-                { name: '简体中文', val: tags.LANG_CN },
-                { name: '日本語', val: tags.LANG_JP }
-            ],
-            configurationBoard: {},
-        };
-    },
-
-    async created() {
-        this.readSettings = true;
-    },
-
-    computed: {
-        ...mapGetters([
-            'showTopBar',
-            'topBarHeight',
-            'albumWidth',
-            'loadNum',
-            'showThumbView',
-            'volumeSize',
-            'readingMode',
-            'showBookScreenAnimation',
-            'showBookPagination',
-            'bookScreenSize',
-            'bookDirection',
-            'string',
-            'showMoreSettings',
-            'reverseFlip',
-            'autoFlip',
-            'autoFlipFrequency',
-            'showThumbViewInBook',
-            'wheelSensitivity',
-            'wheelDirection',
-            'scrolledPageMargin',
-            'oddEven'
-        ]),
-        floatBtnStyle() {
-            return { 
-                height: this.px(this.topBarHeight)
-            };
-        },
-        topBarStyle() {
-            return { 
-                height: this.showMoreSettings? this.px(this.topBarHeight * 2) : this.px(this.topBarHeight)
-            };
-        },
-        configuration() {
-          const addReactiveVal = (name, val) => {
-            if (!this.configurationBoard.hasOwnProperty(name)) {
-              this.$set(this.configurationBoard, name, val);
-            }
-          };
-          // select template
-          const getSelect = ({title, tip, show, curVal, list, change}) => {
-            const baseConfig = { title, tip, show, type: 'SELECT', list, change};
-            const item = baseConfig.list.find(i => i.val === curVal);
-            return {
-              ...baseConfig,
-              curValTitle: item.sname || item.name,
-              select: (index) => {
-                change(baseConfig.list[index].val);
-              }
-            }
-          }
-          // slider + select template
-          const getSliderSelect = ({id, title, tip, show, curValTitle, list, sliderMin, sliderMax, sliderStep, isFloat, curVal, change}) => {
-            const sliderValName = `show${id}Name`;
-            addReactiveVal(sliderValName, false);
-            const baseConfig = {
-              title,
-              tip,
-              show,
-              type: 'SLIDER_SELECT',
-              curValTitle,
-              list,
-              slider: {
-                active: this.configurationBoard[sliderValName],
-                min: sliderMin,
-                max: sliderMax,
-                step: sliderStep,
-                init: curVal,
-                isFloat,
-                close: () => this.configurationBoard[sliderValName] = false,
-                change
-              }
-            };
-            return {
-              ...baseConfig,
-              select: (index) => {
-                const val = baseConfig.list[index].val;
-                if (val == -1) {
-                  this.configurationBoard[sliderValName] = true;
-                } else {
-                  change(val);
-                }
-              }
-            }
-          }
-          // ReadingMode
-          const readingModeConfig = getSelect({
-            title: this.string.readingMode,
-            tip: this.string.readingModeTip,
-            show: true,
-            curVal: this.readingMode,
-            list: [{ name: this.string.scrollMode, val: 0 }, { name: this.string.bookMode, val: 1 }],
-            change: (val) => SettingService.setReadingMode(val)
-          });
-          // loadNum
-          const loadNumConfig = getSliderSelect({
-            id: 'LoadNum',
-            title: this.string.loadNum,
-            tip: this.string.loadNumTip,
-            show: true,
-            curValTitle: this.loadNum + 'P',
-            list: [
-              { name: '1P', val: 1 },
-              { name: '2P', val: 2 },
-              { name: '3P', val: 3 },
-              { name: '5P', val: 5 },
-              { name: '10P', val: 10 },
-              { name: '20P', val: 20 },
-              { name: '30P', val: 30 },
-              { name: '40P', val: 40 },
-              { name: '50P', val: 50 },
-              { name: '100P', val: 100 },
-              { name: this.string.custom, val: -1 }
-            ],
-            sliderMin: 1,
-            sliderMax: 100,
-            sliderStep: 1,
-            isFloat: false,
-            curVal: this.loadNum,
-            change: (val) => SettingService.setLoadNum(val)
-          });
-          // width
-          const widthConfig = getSliderSelect({
-            id: 'Width',
-            title: this.string.widthScale,
-            tip: this.string.widthScaleTip,
-            show: this.readingMode === 0,
-            curValTitle: this.albumWidth + '%',
-            list: [
-              { name: '40%', val: 40 },
-              { name: '50%', val: 50 },
-              { name: '55%', val: 55 },
-              { name: '60%', val: 60 },
-              { name: '65%', val: 65 },
-              { name: '70%', val: 70 },
-              { name: '75%', val: 75 },
-              { name: '80%', val: 80 },
-              { name: '85%', val: 85 },
-              { name: '90%', val: 90 },
-              { name: '95%', val: 95 },
-              { name: '100%', val: 100 },
-              { name: this.string.custom, val: -1 }
-            ],
-            sliderMin: 30,
-            sliderMax: 100,
-            sliderStep: 1,
-            isFloat: true,
-            curVal: this.albumWidth,
-            change: (val) => SettingService.setAlbumWidth(val)
-          });
-          // volSize
-          const volSizeConfig = getSliderSelect({
-            id: 'VolSize',
-            title: this.string.volSize,
-            tip: this.string.volSizeTip,
-            show: this.readingMode===0,
-            curValTitle: this.volumeSize + 'P',
-            list: [
-              { name: '10P', val: 10 },
-              { name: '20P', val: 20 },
-              { name: '30P', val: 30 },
-              { name: '50P', val: 50 },
-              { name: '100P', val: 100 },
-              { name: this.string.custom, val: -1 }
-            ],
-            sliderMin: 1,
-            sliderMax: 200,
-            sliderStep: 1,
-            isFloat: false,
-            curVal: this.volumeSize,
-            change: (val) => SettingService.setVolumeSize(val)
-          });
-          // thumbView
-          const thumbViewConfig = {
-            title: this.string.thumbView,
-            tip: this.string.thumbViewTip,
-            show: this.readingMode===0 && this.service.album.supportThumbView(),
-            type: 'SWITCH',
-            curVal: this.showThumbView,
-            change: (val) => SettingService.toggleThumbView(val)
-          };
-          // screenSize
-          const screenSizeConfig = getSliderSelect({
-            id: 'ScreenSize',
-            title: this.string.screenSize,
-            tip: this.string.screenSizeTip,
-            show: this.readingMode === 1,
-            curValTitle: this.bookScreenSize + 'P',
-            list: [
-              { name: '1P', val: 1 },
-              { name: '2P', val: 2 },
-              { name: '3P', val: 3 },
-              { name: '4P', val: 4 },
-              { name: '5P', val: 5 }
-            ],
-            sliderMin: 1,
-            sliderMax: 10,
-            sliderStep: 1,
-            isFloat: false,
-            curVal: this.screenSize,
-            change: (val) => SettingService.setBookScreenSize(val)
-          });
-          // bookDirection
-          const bookDirectionConfig = getSelect({
-            title: this.string.bookDirection,
-            tip: this.string.bookDirectionTip,
-            show: this.readingMode === 1,
-            curVal: this.bookDirection,
-            list: [{ name: this.string.rtl, sname: 'RTL', val: 0 }, { name: this.string.ltr, sname: 'LTR', val: 1 }],
-            change: (val) => SettingService.setBookDirection(val)
-          });
-          // pagination
-          const paginationConfig = {
-            title: this.string.pagination,
-            tip: this.string.paginationTip,
-            show: this.readingMode === 1,
-            type: 'SWITCH',
-            curVal: this.showBookPagination,
-            change: (val) => SettingService.setBookPagination(val)
-          };
-          // reverseFlip
-          const reverseFlipConfig = {
-            title: this.string.reverseFlip,
-            tip: this.string.reverseFlipTip,
-            show: this.readingMode === 1 && this.showMoreSettings,
-            type: 'SWITCH',
-            curVal: this.reverseFlip,
-            change: (val) => SettingService.setReverseFlip(val)
-          };
-          // autoFlip
-          const autoFlipConfig = {
-            title: this.string.autoFlip,
-            tip: this.string.autoFlipTip,
-            show: this.readingMode === 1 && this.showMoreSettings,
-            type: 'SWITCH',
-            curVal: this.autoFlip,
-            change: (val) => this.setAutoFlip(val)
-          };
-          // autoFlipFrequency
-          const autoFlipFrequencyConfig = getSliderSelect({
-            id: 'AutoFlipFrequency',
-            title: this.string.autoFlipFrequency,
-            tip: this.string.autoFlipFrequencyTip,
-            show: this.readingMode === 1 && this.showMoreSettings,
-            curValTitle: this.autoFlipFrequency + 's',
-            list: [
-              { name: '3 sec', val: 3 },
-              { name: '5 sec', val: 5 },
-              { name: '8 sec', val: 8 },
-              { name: '10 sec', val: 10 },
-              { name: '15 sec', val: 15 },
-              { name: '20 sec', val: 20 },
-              { name: '30 sec', val: 30 },
-              { name: '45 sec', val: 45 },
-              { name: '1 min', val: 60 },
-              { name: '1 min 30s', val: 90 },
-              { name: '2 min', val: 120 },
-              { name: '3 min', val: 180 },
-              { name: '5 min', val: 300 },
-              { name: this.string.custom, val: -1 }
-            ],
-            sliderMin: 1,
-            sliderMax: 240,
-            sliderStep: 1,
-            isFloat: false,
-            curVal: this.autoFlipFrequency,
-            change: (val) => SettingService.setAutoFlipFrequency(val)
-          });
-          // thumbViewInBook
-          const thumbViewInBookConfig = {
-            title: this.string.thumbView,
-            tip: this.string.thumbViewTip,
-            show: this.readingMode === 1 && this.showMoreSettings,
-            type: 'SWITCH',
-            curVal: this.showThumbViewInBook,
-            change: (val) => SettingService.setShowThumbViewInBook(val)
-          };
-          // wheelSensitivity
-          const wheelSensitivityConfig = getSliderSelect({
-            id: 'WheelSensitivity',
-            title: this.string.wheelSensitivity,
-            tip: this.string.wheelSensitivityTip,
-            show: this.readingMode === 1 && this.showMoreSettings,
-            curValTitle: this.wheelSensitivity,
-            list: [
-              { name: '10', val: 10 },
-              { name: '30', val: 30 },
-              { name: '50', val: 50 },
-              { name: '80', val: 80 },
-              { name: '100', val: 100 },
-              { name: '120', val: 120 },
-              { name: '150', val: 150 },
-              { name: '170', val: 170 },
-              { name: '200', val: 200 },
-              { name: '220', val: 220 },
-              { name: '250', val: 250 },
-              { name: this.string.custom, val: -1 }
-            ],
-            sliderMin: 1,
-            sliderMax: 240,
-            sliderStep: 1,
-            isFloat: false,
-            curVal: this.wheelSensitivity,
-            change: (val) => SettingService.setWheelSensitivity(val)
-          });
-          // wheelDirection
-          const wheelDirectionConfig = {
-            title: this.string.wheelDirection,
-            tip: this.string.wheelDirectionTip,
-            show: this.readingMode === 1 && this.showMoreSettings,
-            type: 'SWITCH',
-            curVal: this.wheelDirection,
-            change: (val) => SettingService.setWheelDirection(val)
-          };
-          // scrolledPageMargin
-          const scrolledPageMarginConfig = getSliderSelect({
-            id: 'ScrolledPageMargin',
-            title: this.string.pageMargin,
-            tip: this.string.pageMarginTip,
-            show: this.readingMode === 0 && this.showMoreSettings,
-            curValTitle: this.scrolledPageMargin + 'px',
-            list: [
-              { name: '0px', val: 0 },
-              { name: '30px', val: 30 },
-              { name: '70px', val: 70 },
-              { name: '100px', val: 100 },
-              { name: '150px', val: 150 },
-              { name: this.string.custom, val: -1 }
-            ],
-            sliderMin: 0,
-            sliderMax: 300,
-            sliderStep: 1,
-            isFloat: true,
-            curVal: this.scrolledPageMargin,
-            change: (val) => SettingService.setScrolledPageMargin(val)
-          });
-          // oddEven
-          const oddEvenConfig = {
-            title: this.string.oddEven,
-            tip: this.string.oddEvenTip,
-            show: this.readingMode === 1 && this.showMoreSettings,
-            type: 'SWITCH',
-            curVal: this.oddEven,
-            change: (val) => this.setOddEven(val)
-          };
-          return [
-            readingModeConfig,
-            widthConfig,
-            loadNumConfig,
-            volSizeConfig,
-            thumbViewConfig,
-            screenSizeConfig,
-            bookDirectionConfig,
-            paginationConfig,
-            oddEvenConfig,
-            reverseFlipConfig,
-            autoFlipConfig,
-            autoFlipFrequencyConfig,
-            thumbViewInBookConfig,
-            wheelDirectionConfig,
-            wheelSensitivityConfig,
-            scrolledPageMarginConfig
-          ];
-        }
-    },
-
-    methods: {
-        ...mapActions(['toggleTopBar', 'addDialog', 'setAutoFlip', 'setOddEven']),
-
-        async dropOptionChange(tag, index) {
-            switch (tag) {
-                case 'lang':
-                    await SettingService.setLang(this.langList[index].val);
-                    InfoService.showInstruction(this.config);
-            }
-        },
-
-        changeTopBar() {
-            SettingService.setShowTopBar(!this.showTopBar);
-        },
-
-        closeEHunter() {
-            SettingService.toggleEHunter(false);
-            this.service.eHunter.showEHunterView(false);
-        },
-
-        showInfoDialog() {
-            InfoService.showInstruction(this.config);
-        },
-
-        resetCache() {
-            localStorage.clear();
-            window.location.reload();
-        },
-
-        toggleMoreSettings(show) {
-            SettingService.setShowMoreSettings(!this.showMoreSettings);
-        }
-    }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -531,73 +198,89 @@ export default {
 div {
     display: flex;
 }
+
 .top-bar {
     width: 100%;
     padding: 0;
     margin: 0;
     background: transparent;
     position: relative;
-    > .float-content {
+
+    >.float-content {
         position: absolute;
         top: 0;
         right: 0;
         align-items: center;
         z-index: 10;
-        > .button {
+        height: v-bind('store.topBarHeight+"px"');
+
+        >.button {
             margin-right: 13px;
         }
     }
 
-    > .inner-content {
+    >.inner-content {
         color: white;
         flex-grow: 1;
         background: $accent_color;
         font-size: 14px;
         transition: all 0.4s cubic-bezier(0.62, -0.62, 0.28, 1.55);
-        > .item {
+        height: v-bind('store.showMoreSettings ? store.topBarHeight * 2 + "px" : store.topBarHeight + "px"');
+
+        >.item {
             margin-left: 18px;
             position: relative;
             height: 40px;
+
             &.less-margin {
                 margin-left: 10px;
             }
+
             &.icon-margin {
                 margin-left: 15px;
             }
-            > .label {
+
+            >.label {
                 display: flex;
                 align-items: center;
                 font-size: 14px;
                 margin: auto;
                 white-space: nowrap;
                 cursor: default;
+
                 &.icon {
-                    > svg {
+                    >svg {
                         fill: white;
                         height: 18px;
                         width: 18px;
+
                         &.reset {
                             height: 18px;
                             width: 18px;
                         }
+
                         &.info {
                             height: 20px;
                             width: 20px;
                         }
+
                         &.github {
                             height: 17px;
                             height: 17px;
                         }
                     }
                 }
+
                 &.clickable {
                     cursor: pointer;
                 }
             }
         }
+
         &.hide {
             transform: translateY(-100%);
         }
+
         &.more-settings {
             flex-wrap: wrap;
             align-content: flex-start;

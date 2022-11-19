@@ -11,27 +11,12 @@
   </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from 'vuex';
-import AwesomeScrollView from './base/AwesomeScrollView.vue';
-import TopBar from './TopBar.vue';
-import Logger from '../utils/Logger.js';
-import Pagination from './widget/Pagination.vue';
-import PageView from './PageView.vue';
-import SettingService from '../service/SettingService.ts';
-import * as tags from '../assets/value/tags';
-
-export default {
-    name: 'LoadingView',
-
-    data() {
-        return {};
-    }
-};
+<script setup lang="ts">
 </script>
 
 <style lang="scss" scoped>
 @import '../style/_variables';
+
 $peter-river: $body_bg;
 $clouds: #ecf0f1;
 .loading-view {
@@ -40,6 +25,8 @@ $clouds: #ecf0f1;
     align-items: center;
     background: $body_bg;
     .loading-animation {
+        display: flex;
+        flex-direction: column;
         .book {
             top: 50%;
             transform: translateY(-50%);

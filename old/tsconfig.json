@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "outDir": "./built/",
+        "sourceMap": true,
+        "strict": true,
+        "noImplicitReturns": true,
+        "noImplicitAny": false,
+        "module": "es2015",
+        "moduleResolution": "node",
+        "target": "es5",
+        "lib": [
+            "es2015",
+            "DOM"
+        ]
+    },
+    "include": [
+        "./core/**/*",
+        "./src/**/*"
+    ],
+    "baseUrl": ".",
+    "paths": {
+        "src": "src",
+        "core": "core"
+    }
+}

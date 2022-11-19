@@ -1,25 +1,16 @@
 {
-    "compilerOptions": {
-        "outDir": "./built/",
-        "sourceMap": true,
-        "strict": true,
-        "noImplicitReturns": true,
-        "noImplicitAny": false,
-        "module": "es2015",
-        "moduleResolution": "node",
-        "target": "es5",
-        "lib": [
-            "es2015",
-            "DOM"
-        ]
-    },
-    "include": [
-        "./core/**/*",
-        "./src/**/*"
-    ],
+  "extends": "@vue/tsconfig/tsconfig.web.json",
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-        "src": "src",
-        "core": "core"
+      "@/*": ["./src/*"]
     }
+  },
+
+  "references": [
+    {
+      "path": "./tsconfig.config.json"
+    }
+  ]
 }

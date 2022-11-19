@@ -1,35 +1,16 @@
 <template>
-<div class="switch" @click="handleClick">
+<div class="switch" @click="emit('change', !active)">
     <div :class="{ 'track': true, active }"></div>
     <div :class="{ 'thumb': true, active }"></div>
 </div>
 </template>
 
-<script>
-export default {
-    name: 'SimpleSwitch',
+<script setup lang="ts">
+const props = defineProps<{
+  active: boolean
+}>()
 
-    props: {
-        active: {
-            type: Boolean
-        },
-        change: {
-            type: Function,
-            default: () => {}
-        }
-    },
-
-    data() {
-        return {
-        };
-    },
-
-    methods: {
-        handleClick() {
-            this.$emit('change', !this.active);
-        }
-    }
-}
+const emit = defineEmits(['change'])
 </script>
 
 <style lang="scss" scoped>

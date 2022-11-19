@@ -1,41 +1,22 @@
-import { ImgPageInfo } from "../bean/ImgPageInfo";
-import { ThumbInfo } from "../bean/ThumbInfo";
+import type { ImgPageInfo, ThumbInfo, PreviewThumbnailStyle, ImgSrcMode } from '../model/model'
 
-export interface PreviewThumbnailStyle {
-    'background-image': string;
-    'background-position': string;
-    'background-size': string;
-}
+export const NameAlbumService = 'album_service'
 
-export interface IndexInfo {
-    val: number;
-    updater: string;
-}
+export interface AlbumService {
+    isSupportOriginImg(): boolean
+    isSupportImgChangeSource(): boolean
+    isSupportThumbView(): boolean
 
-export abstract class AlbumService {
-    abstract getPageCount(): Promise<number>;
-    abstract getCurPageNum(): Promise<number>;
-    abstract getTitle(): Promise<string>;
-    abstract getImgPageInfos(): Promise<Array<ImgPageInfo>>;
-    abstract getImgPageInfo(index: number): Promise<ImgPageInfo>;
-    abstract getImgSrc(index: number, mode): Promise<ImgPageInfo | Error>;
-    abstract getNewImgSrc(index: number, mode): Promise<ImgPageInfo | Error>;
-    abstract getThumbInfos(noCache?: boolean): Promise<Array<ThumbInfo>>;
-    abstract getThumbInfo(index: number): Promise<ThumbInfo>;
-    abstract getAlbumId(): Promise<string>;
-    abstract getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo): Promise<PreviewThumbnailStyle>;
-    abstract supportOriginImg(): boolean;
-    abstract supportImgChangeSource(): boolean;
-    abstract supportThumbView(): boolean;
+    getTitle(): string
+    getAlbumId(): string
+    getPageCount(): number  
+    getCurPageNum(): number
 
-    getBookScreenCount(pageCount: number, screenSize: number): number {
-        // 2 is start page and end page
-        return Math.ceil((pageCount + 2) / screenSize);
-    }
+    init(): Promise<Error | void>
 
-    getRealCurIndexInfo(pageCount: number, curIndex: IndexInfo): IndexInfo {
-        let index = curIndex.val;
-        index = index >= pageCount ? pageCount - 1 : index;
-        return { val: index, updater: curIndex.updater };
-    }
+    getThumbInfos(isDisableCache: boolean): Array<ThumbInfo>
+    getImgPageInfos(): Array<ImgPageInfo>
+    getImgSrc(index: number, mode: ImgSrcMode): Promise<ImgPageInfo | Error>
+    
+    getPreviewThumbnailStyle(index: number): PreviewThumbnailStyle 
 }

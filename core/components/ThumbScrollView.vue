@@ -1,128 +1,77 @@
 <template>
     <aside class="thumb-content">
-        <awesome-scroll-view ref="scrollView"  class="thumb-scroll-view">
+        <AwesomeScrollView ref="scrollView" class="thumb-scroll-view">
             <div class="header">
                 <span class="app-name">EHUNTER</span>
             </div>
-            <!-- 160 is $thumb-view-height -->
-            <div class="indicator" :style="{top: px(160*(curIndex.val - volFirstIndex))}"></div>
-            <div class="thumb-container" @click="select(index(i))" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
-                <template v-if="(readingMode === 0 && showThumbView) || (readingMode ===1 && showThumbViewInBook)">
-                    <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
-                    <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
-                </template>
+            <div class="indicator"></div>
+            <div class="thumb-container" @click="select(computedVolFirstIndex + i)" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
+                <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
+                <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
                 <div class="hover-mask"></div>
-                <div class="index">{{ index(i) + 1 }}</div>
+                <div class="index">{{ computedVolFirstIndex + i + 1 }}</div>
             </div>
-        </awesome-scroll-view>
+        </AwesomeScrollView>
     </aside>
 </template>
 
-<script>
-import { mapGetters, mapActions } from 'vuex';
-import AwesomeScrollView from './base/AwesomeScrollView.vue';
-import * as tags from '../assets/value/tags';
-// import Logger from '../utils/Logger';
+<script setup lang="ts">
+import { store, storeAction, computedVolFirstIndex } from '../store/app'
+import AwesomeScrollView from './widget/AwesomeScrollView.vue'
+import { ref, computed, watch } from 'vue'
 
-export default {
-    name: 'ThumbScrollView',
+const thumbItemHeight = ref(160)
 
-    inject: ['service'],
-    
-    props: {
-        thumbInfos: {
-            type: Array
-        },
-        pageCount: {
-            type: Number
-        }
-    },
+const emit = defineEmits(['update_index'])
+const updaterName = 'thumb'
+const scrollView: any = ref(null)
+const thumbContainers: any = ref(null)
 
-    components: {
-        AwesomeScrollView
-    },
+const indicatorTop = computed(() => {
+    if (store.readingMode == 0) {
+        return thumbItemHeight.value * (store.curViewIndex - computedVolFirstIndex.value)
+    }
+    // book mode
+    return thumbItemHeight.value * store.curViewIndex
+})
 
-    computed: {
-        ...mapGetters({
-            centerIndex: 'curIndex',
-            volumeSize: 'volumeSize',
-            _volFirstIndex: 'volFirstIndex',
-            readingMode: 'readingMode',
-            showThumbView: 'showThumbView',
-            showThumbViewInBook: 'showThumbViewInBook',
-            readingMode: 'readingMode'
-        }),
+const volThumbs: any = computed(() => {
+    if (store.readingMode === 0) {
+        return store.thumbInfos.slice(computedVolFirstIndex.value, computedVolFirstIndex.value + store.volumeSize)
+    }
+    // let book mode compatible with volume, using one volume
+    return store.thumbInfos
+})
 
-        volFirstIndex() {
-            if (this.readingMode === 0) {
-                return this._volFirstIndex;
+function select(index: number) {
+    storeAction.setCurViewIndex(index, updaterName)
+}
+
+watch(() => store.curViewIndex, (newVal, oldVal) => {
+    // sync pagination
+    if (store.curViewIndexUpdater !== updaterName) {
+        if (newVal !== computedVolFirstIndex.value && thumbContainers.value) {
+            // sort again, because if changing volume size, it may be out-of-order
+            let cons = thumbContainers.value.sort((a, b) => a.offsetTop - b.offsetTop);
+            let t = newVal - computedVolFirstIndex.value
+            if (cons[t]) {
+                scrollView.value.scrollTo(cons[t].offsetTop, 1000);
             }
-            // let book mode compatible with volume, using one volume
-            if (this.readingMode === 1) {
-                return 0;
-            }
-        },
-
-        // the thumbs of current volume
-        volThumbs() {
-            if (this.readingMode === 0) {
-                return this.thumbInfos.slice(this.volFirstIndex, this.volFirstIndex + this.volumeSize);
-            }
-            // let book mode compatible with volume, using one volume
-            if (this.readingMode === 1) {
-                return this.thumbInfos;
-            }
-        },
-
-        curIndex() {
-            return this.service.album.getRealCurIndexInfo(this.pageCount, this.centerIndex)
-        }
-    },
-
-    watch: {
-        centerIndex: {
-            handler: function(val, oldVal) {
-                // sync pagination
-                if (this.curIndex.updater !== tags.THUMB_VIEW) {
-                    if (this.curIndex.val !== this.volFirstIndex && this.$refs.thumbContainers) {
-                        // sort again, because if changing volume size, it may be out-of-order
-                        let cons = this.$refs.thumbContainers.sort((a, b) => a.offsetTop - b.offsetTop);
-                        // Logger.logText('Thumb', this.curIndex.val);
-                        if (cons[this.volIndex(this.curIndex.val)]) {
-                            this.$refs.scrollView.ScrollTo(cons[this.volIndex(this.curIndex.val)].offsetTop, 1000);
-                        }
-                    } else {
-                        this.$refs.scrollView.ScrollTo(0, 1000); // if is page 1, scroll to top, cuz of having a header
-                    }
-                }
-            },
-            deep: true
-        }
-    },
-
-    methods: {
-        ...mapActions(['setIndex']),
-
-        select(index) {
-            this.setIndex({ val: index, updater: tags.THUMB_VIEW });
-        },
-
-        // get index of album for index of current volume
-        index(i) {
-            return this.volFirstIndex + i;
-        },
-
-        // get index of current volume for index of album
-        volIndex(i) {
-            return i - this.volFirstIndex;
+        } else {
+            scrollView.value.scrollTo(0, 1000) // if is page 1, scroll to top, cuz of having a header
         }
     }
-};
+})
 </script>
 
 <style lang="scss" scoped>
 @import '../style/_responsive';
 @import '../style/_variables';
+
+$indicator_color: white;
+$thumb_scroll_view_bg: #444444;
+$header-bg: #2ecc71;
+
 .thumb-content {
     position: relative;
     .thumb-scroll-view {
@@ -130,10 +79,10 @@ export default {
         background: $thumb_scroll_view_bg;
         height: 100%;
         display: inline-block;
-        width: $thumb-view-width;
+        width: v-bind('store.thumbItemWidth+"px"');
         > .header {
             position: relative;
-            height: $header-height;
+            height: 40px;
             background: $header-bg;
             > .app-name {
                 color: white;
@@ -183,10 +132,10 @@ export default {
         }
         .thumb-container {
             position: relative;
-            width: $thumb-view-width;
-            padding: $thumb-view-margin 0;
+            width: 100%;
+            padding: 4px 0;
             margin: 0;
-            height: $thumb-view-height;
+            height: v-bind('store.thumbItemHeight+"px"');
             text-align: center;
             display: flex;
             align-items: center;
@@ -194,9 +143,9 @@ export default {
             box-sizing: border-box;
             > .thumb {
                 display: block;
-                width: $thumb-width;
+                width: v-bind('store.thumbImgWidth+"px"');
                 // 1/1.44 is the default scale of ehentai's thumb. 100px width per one thumb in img.
-                height: $thumb-width * 144 / 100;
+                height: v-bind('store.thumbImgWidth * 144 / 100 + "px"');
                 transition: all 0.5s ease;
             }
             > .loc {
@@ -235,9 +184,8 @@ export default {
             position: absolute;
             box-sizing: border-box;
             margin-top: $header-height;
-            height: $thumb-view-height;
+            height: v-bind('store.thumbItemHeight+"px"');
             left: 0;
-            top: 0;
             right: 0;
             background: rgba($indicator_color, 0.3);
             border-left: 3px solid rgba($indicator_color, 0.5);
@@ -245,6 +193,7 @@ export default {
             transition: all 0.5s ease;
             z-index: 10;
             pointer-events: none;
+            top: v-bind('indicatorTop+"px"');
         }
     }
 }

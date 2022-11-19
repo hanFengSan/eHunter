@@ -5,35 +5,32 @@
         <h6 class="index">{{ index + 1 }}</h6>
         <article class="loading-info-panel" v-if="active">
             <transition name="slide-fade">
-                <p class="loading-info" v-if="curLoadStatus!=tags.STATE_LOADED" @click.stop="() => {}">
+                <p class="loading-info" v-if="curLoadStatus!=ImgLoadStatus.Loaded" @click.stop="() => {}">
                     <span class="text">{{ loadingInfo }}</span>
                     <span class="operation">
-                        <flat-button 
+                        <FlatButton 
                             class="tips tips-down no-margin" 
-                            :title-content="string.originImgTip" 
-                            :label="string.originImg" 
+                            :title-content="i18n.originImgTip" 
+                            :label="i18n.originImg" 
                             mode="inline" 
                             type="positive"
-                            v-if="service.album.supportOriginImg()"
-                            @click="getNewImgSrc(tags.MODE_ORIGIN)">
-                        </flat-button>
-                        <flat-button 
+                            v-if="albumService.isSupportOriginImg()"
+                            @click="getNewImgSrc(ImgSrcMode.Origin)" />
+                        <FlatButton 
                             class="tips tips-down" 
-                            :title-content="string.refreshTip" 
-                            :label="string.refresh" 
+                            :title-content="i18n.refreshTip" 
+                            :label="i18n.refresh" 
                             mode="inline" 
                             type="positive"
-                            @click="getNewImgSrc()">
-                        </flat-button>
-                        <flat-button 
+                            @click="getNewImgSrc(ImgSrcMode.Default)" />
+                        <FlatButton 
                             class="tips tips-down" 
-                            :title-content="string.refreshByOtherSourceTip" 
-                            :label="string.refreshByOtherSource" 
+                            :title-content="i18n.refreshByOtherSourceTip" 
+                            :label="i18n.refreshByOtherSource" 
                             mode="inline" 
                             type="positive"
-                            v-if="service.album.supportImgChangeSource()"
-                            @click="getNewImgSrc(tags.MODE_CHANGE_SOURCE)">
-                        </flat-button>
+                            v-if="albumService.isSupportImgChangeSource()"
+                            @click="getNewImgSrc(ImgSrcMode.ChangeSource)" />
                     </span>
                 </p>
             </transition>
@@ -41,7 +38,7 @@
     </div>
     <div class="layer img-layer">
         <img class="album-item" 
-            v-if="active" 
+            v-if="active && imgPageInfo.src" 
             :src="imgPageInfo.src" 
             @load="loaded()"
             @error="failLoad($event)">
@@ -49,156 +46,134 @@
 </section>
 </template>
 
-<script>
-import { mapGetters } from 'vuex';
-import FlatButton from './widget/FlatButton.vue';
-import Logger from '../utils/Logger.js';
-import * as tags from '../assets/value/tags';
-import Utils from '../utils/Utils.ts';
+<script setup lang="ts">
+import FlatButton from './widget/FlatButton.vue'
+import { inject, ref, computed, watch, nextTick, onMounted } from 'vue'
+import { store, storeAction } from '../store/app'
+import { NameAlbumService } from '../service/AlbumService'
+import type { AlbumService } from '../service/AlbumService'
+import { ImgSrcMode } from '../model/model'
+import { i18n } from '../store/i18n'
+import Utils from '../utils/Utils'
+import Logger from '../utils/Logger'
 
-export default {
-    name: 'PageView',
+const props = defineProps<{
+    index: number,
+    active: boolean
+}>()
 
-    props: {
-        data: {
-            type: Object
-        },
-        index: {
-            type: Number
-        },
-        active: {
-            type: Boolean
-        },
-        albumId: {
-            type: String
-        },
-        onClick: {
-            type: Function
+enum ImgLoadStatus {
+    Waiting = 0,
+    Loading = 1,
+    Error = 2,
+    Loaded = 3,
+}
+
+const emit = defineEmits(['clickBackground'])
+
+const albumService = <AlbumService>inject(NameAlbumService)
+
+const reloadTimes = ref(0)
+const message = ref('')
+const curLoadStatus = ref(ImgLoadStatus.Waiting) // 0:waiting, 1:loading, 2:error, 3:loaded
+const previewStyle:any = albumService.getPreviewThumbnailStyle(props.index)
+const isFirstLoad = ref(true)
+
+const imgPageInfo = computed(() => {
+    return store.imgPageInfos[props.index]
+})
+
+async function loadImgSrc(mode: ImgSrcMode) {
+    let resp = await albumService.getImgSrc(props.index, mode)
+    if (resp instanceof Error) {
+        return;
+    }
+    if (imgPageInfo.value.src != resp.src) {
+        storeAction.setImgPageInfoSrc(props.index, resp.src)
+    }
+    if (resp.preciseHeightOfWidth && imgPageInfo.value.preciseHeightOfWidth != resp.preciseHeightOfWidth) {
+        storeAction.setImgPageInfoPreciseHeightOfWidth(props.index, resp.preciseHeightOfWidth)
+    }
+}
+
+const loadingInfo = computed(() => {
+    let reloadInfo = reloadTimes.value ? `[${i18n.value.reload}-${reloadTimes.value}] ` : '';
+    if (message.value) {
+        return reloadInfo + message.value;
+    }
+    switch (curLoadStatus.value) {
+        case ImgLoadStatus.Error:
+            return reloadInfo + i18n.value.loadingImgFailed
+        case ImgLoadStatus.Loaded:
+            return reloadInfo + i18n.value.imgLoaded
+        case ImgLoadStatus.Waiting:
+            return reloadInfo + i18n.value.waiting
+        case ImgLoadStatus.Loading:
+        default:
+            return reloadInfo + i18n.value.loadingImg
+    }
+})
+
+onMounted(() => {
+    if (props.active && !imgPageInfo.value.src) {
+        loadImgSrc(ImgSrcMode.Default)
+    }
+})
+
+watch(() => props.active, (newVal) => {
+    if (newVal && !imgPageInfo.value.src) {
+        loadImgSrc(ImgSrcMode.Default)
+    }
+})
+
+// refresh img
+async function getNewImgSrc(mode: ImgSrcMode) {
+    reloadTimes.value++
+    message.value = ''
+    storeAction.setImgPageInfoSrc(props.index, '')
+    curLoadStatus.value = ImgLoadStatus.Loading
+    let resp = await albumService.getImgSrc(props.index, mode)
+    if (resp instanceof Error) {
+        switch (resp.message) {
+            case 'ERROR_NO_ORIGIN':
+                message.value = i18n.value.noOriginalImg
+                break
+            default:
+                message.value = i18n.value.loadingFailed
         }
-    },
+        return
+    }
+    await nextTick()
+    await Utils.timeout(300)
+    if (imgPageInfo.value.src != resp.src) {
+        storeAction.setImgPageInfoSrc(props.index, resp.src)
+    }
+    if (resp.preciseHeightOfWidth && imgPageInfo.value.preciseHeightOfWidth != resp.preciseHeightOfWidth) {
+        storeAction.setImgPageInfoPreciseHeightOfWidth(props.index, resp.preciseHeightOfWidth)
+    }
+}
 
-    inject: ['service'],
-    
-    components: { FlatButton },
-
-    data() {
-        return {
-            imgPageInfo: {},
-            reloadTimes: 0,
-            message: '',
-            curLoadStatus: null,
-            previewStyle: {}
-        };
-    },
-
-    async created() {
-        this.imgPageInfo = JSON.parse(JSON.stringify(this.data));
-        this.imgPageInfo.isFirstLoad = true;
-        this.curLoadStatus = tags.STATE_WAITING;
-        if (this.active) {
-            this.getImgSrc();
-        }
-        this.service.album.getThumbInfo(this.index).then(async thumbInfo => {
-            this.previewStyle = await this.service.album.getPreviewThumbnailStyle(this.index, this.imgPageInfo, thumbInfo);
-        });
-    },
-
-    computed: {
-        ...mapGetters(['string']),
-        tags: () => tags,
-        loadingInfo() {
-            let reloadInfo = this.reloadTimes ? `[${this.string.reload}-${this.reloadTimes}] ` : '';
-            if (this.message) {
-                return reloadInfo + this.message;
-            }
-            switch (this.curLoadStatus) {
-                case tags.STATE_ERROR:
-                    return reloadInfo + this.string.loadingImgFailed;
-                case tags.STATE_LOADED:
-                    return reloadInfo + this.string.imgLoaded;
-                case tags.STATE_WAITING:
-                    return reloadInfo + this.string.waiting;
-                case tags.STATE_LOADING:
-                default:
-                    return reloadInfo + this.string.loadingImg;
-            }
-        }
-    },
-
-    watch: {
-        active(val, oldVal) {
-            if (val) {
-                this.getImgSrc();
-            }
-        }
-    },
-
-    methods: {
-        // for lazy load img
-        async getImgSrc() {
-            // avoid redundant getImgSrc(), overlap refreshing of 'origin'
-            if (this.curLoadStatus !== tags.STATE_LOADING) {
-                let newImgPageInfoOrErr = await this.service.album.getImgSrc(this.index, tags.MODE_FAST);
-                if (newImgPageInfoOrErr instanceof Error) {
-                    console.Error("getImgSrc", newImgPageInfoOrErr);
-                    return;
-                }
-                if (this.imgPageInfo.src !== newImgPageInfoOrErr.src) {
-                    this.imgPageInfo = newImgPageInfoOrErr;
-                    this.$emit("update-img-page-info", this.index, newImgPageInfoOrErr);
-                }
-                this.curLoadStatus = tags.STATE_LOADING;
-            }
-        },
-
-        // refresh img
-        async getNewImgSrc(mode) {
-            this.reloadTimes++;
-            this.message = '';
-            this.imgPageInfo.src = '';
-            this.curLoadStatus = tags.STATE_LOADING;
-            let newImgPageInfoOrErr = await this.service.album.getNewImgSrc(this.index, mode);
-            if (!(newImgPageInfoOrErr instanceof Error)) {
-                await this.$nextTick();
-                await Utils.timeout(300);
-                this.imgPageInfo = newImgPageInfoOrErr;
-                this.$emit("update-img-page-info", this.index, newImgPageInfoOrErr);
-            } else {
-                switch (newImgPageInfoOrErr.message) {
-                    case tags.ERROR_NO_ORIGIN:
-                        this.message = this.string.noOriginalImg;
-                        break;
-                    default:
-                        this.message = this.string.loadingFailed;
-                }
-            }
-        },
-
-        failLoad(e) {
-            e.preventDefault();
-            if (this.imgPageInfo.src) {
-                this.curLoadStatus = tags.STATE_ERROR;
-                Logger.logText('LOADING', 'loading image failed');
-                if (this.imgPageInfo.isFirstLoad) {
-                    // auto request src when first loading is failed
-                    this.imgPageInfo.isFirstLoad = false;
-                    Logger.logText('LOADING', 'reloading image');
-                    this.getNewImgSrc(tags.MODE_FAST);
-                }
-            }
-        },
-
-        loaded() {
-            this.curLoadStatus = tags.STATE_LOADED;
-        },
-
-        onClickBg() {
-            if (this.onClick) {
-                this.onClick();
-            }
+function failLoad(e) {
+    e.preventDefault()
+    if (imgPageInfo.value.src) {
+        curLoadStatus.value = ImgLoadStatus.Error;
+        Logger.logText('LOADING', 'loading image failed')
+        if (isFirstLoad.value) {
+            // auto request src when first loading is failed
+            isFirstLoad.value = false
+            Logger.logText('LOADING', 'reloading image')
+            getNewImgSrc(ImgSrcMode.Default)
         }
     }
-};
+}
+
+function loaded() {
+    curLoadStatus.value = ImgLoadStatus.Loaded;
+}
+
+function onClickBg() {
+    emit('clickBackground')
+}
 </script>
 
 <style lang="scss" scoped>

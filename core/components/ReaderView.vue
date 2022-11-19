@@ -44,8 +44,7 @@
 </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from 'vuex';
+<script setup lang="ts">
 import AlbumScrollView from './AlbumScrollView.vue';
 import TopBar from './TopBar.vue';
 import AlbumBookView from './AlbumBookView.vue';

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars,no-undef,indent */
-import core from '../../../core'
+import core from '../../../core/index'
 import { AlbumServiceImpl } from './service/AlbumServiceImpl'
 import config from '../../config'
 import { BasePlatform } from '../base'
