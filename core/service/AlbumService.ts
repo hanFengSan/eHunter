@@ -10,7 +10,7 @@ export interface AlbumService {
     getTitle(): string
     getAlbumId(): string
     getPageCount(): number  
-    getCurPageNum(): number
+    getCurPageIndex(): number
 
     init(): Promise<Error | void>
 

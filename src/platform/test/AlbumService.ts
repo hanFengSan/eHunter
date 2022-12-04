@@ -48,7 +48,7 @@ export class TestAlbumService implements AlbumService {
     getPageCount(): number {
         return 64
     }
-    getCurPageNum(): number {
+    getCurPageIndex(): number {
         return 0
     }
 

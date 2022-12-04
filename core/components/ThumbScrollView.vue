@@ -5,11 +5,12 @@
                 <span class="app-name">EHUNTER</span>
             </div>
             <div class="indicator"></div>
-            <div class="thumb-container" @click="select(computedVolFirstIndex + i)" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
+            <div class="thumb-container" @click="select(i)" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
                 <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
                 <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
                 <div class="hover-mask"></div>
-                <div class="index">{{ computedVolFirstIndex + i + 1 }}</div>
+                <div class="index" v-if="store.readingMode == 0">{{ computedVolFirstIndex + i + 1 }}</div>
+                <div class="index" v-if="store.readingMode == 1">{{ i + 1 }}</div>
             </div>
         </AwesomeScrollView>
     </aside>
@@ -44,7 +45,11 @@ const volThumbs: any = computed(() => {
 })
 
 function select(index: number) {
-    storeAction.setCurViewIndex(index, updaterName)
+    if (store.readingMode == 0) {
+        storeAction.setCurViewIndex(computedVolFirstIndex.value + index, updaterName)
+    } else {
+        storeAction.setCurViewIndex(index, updaterName)
+    }
 }
 
 watch(() => store.curViewIndex, (newVal, oldVal) => {

@@ -1,11 +1,12 @@
 <template>
     <div id="ehunter-app" class="ehunter-app normalize">
-        <div style="display:flex; flex-direction: row;width: 100%;height: 100%;">
+        <div v-if="isInited" style="display:flex; flex-direction: row;width: 100%;height: 100%;">
             <div>
                 <ThumbScrollView />
             </div>
             <div style="display: flex; flex-direction: column; flex-grow: 1; height: 100%">
-                <AlbumScrollView />
+                <!-- <AlbumScrollView /> -->
+                <AlbumBookView />
                 <!-- <TopBar />
                 <PageView :active="true" :index="0"/> -->
             </div>
@@ -82,13 +83,18 @@ import ThumbScrollView from './components/ThumbScrollView.vue'
 import LoadingView from './components/LoadingView.vue'
 import AwesomeScrollView from './components/widget/AwesomeScrollView.vue'
 import AlbumScrollView from './components/AlbumScrollView.vue'
+import AlbumBookView from './components/AlbumBookView.vue'
 import PageView from './components/PageView.vue'
-import { inject } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { NameAlbumService } from './service/AlbumService'
 import type { AlbumService } from './service/AlbumService'
 
+const isInited = ref(false)
 const albumService = <AlbumService>inject(NameAlbumService)
-init(albumService)
+onMounted(() => {
+    init(albumService)
+    isInited.value = true
+})
 
 </script>
 

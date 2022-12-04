@@ -211,7 +211,7 @@ div {
         top: 0;
         right: 0;
         align-items: center;
-        z-index: 10;
+        z-index: 10000;
         height: v-bind('store.topBarHeight+"px"');
 
         >.button {

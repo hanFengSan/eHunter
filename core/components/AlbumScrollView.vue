@@ -14,8 +14,8 @@
                 :page-sum="computedVolumeSum" @change="selectVol" />
             <div class="page-container" ref="pageContainers" v-for="i of computedVolPageIndexList"
                 :key="i"
-                :style="{ 'width': `${store.widthScale}%`, 'padding-bottom': `${store.widthScale * (store.imgPageInfos[i].preciseHeightOfWidth ? store.imgPageInfos[i].preciseHeightOfWidth : store.imgPageInfos[i].heightOfWidth)}%`, 'margin': `${store.scrollPageMargin}px auto` }">
-                <PageView :index="i" :active="nearbyIndexList.indexOf(i) > -1" />
+                :style="{ 'width': `${store.widthScale}%`, 'padding-bottom': `${store.widthScale * storeAction.getImgPageHeightOfWidth(i)}%`, 'margin': `${store.scrollPageMargin}px auto` }">
+                <PageView :index="i" :active="nearbyIndexList.indexOf(i) > -1"/>
             </div>
             <Pagination v-if="computedVolumeSum > 1" class="bottom-pagination" :cur-index="computedCurVolNo - 1"
                 :page-sum="computedVolumeSum" @change="selectVol" />
@@ -81,38 +81,10 @@ async function scrollToCurIndex() {
     )
 }
 
-function watchKeyboard(e) {
-    const keyboardUpdater = 'keyboard'
-    if (e.metaKey || e.ctrlKey) {
-        return
-    }
-    switch (e.key) {
-        case 'ArrowLeft':
-        case 'a':
-            storeAction.setCurViewIndex(store.curViewIndex - 1, keyboardUpdater)
-            break
-        case 'ArrowRight':
-        case 'd':
-            storeAction.setCurViewIndex(store.curViewIndex + 1, keyboardUpdater)
-            break
-        case 'Shift':
-            storeAction.toggleShowMoreSettings()
-            break
-        case 'Escape':
-            storeAction.toggleShowTopBar()
-            break
-    }
-}
-
 onMounted(() => {
     setTimeout(() => {
         scrollToCurIndex()
     }, 200)
-    document.addEventListener('keydown', watchKeyboard)
-})
-
-onUnmounted(() => {
-    document.removeEventListener('keydown', watchKeyboard)
 })
 
 // return a indexes array. the index is index of page, determining the show of pages.
@@ -130,10 +102,6 @@ const nearbyIndexList = computed(() => {
         result.push(i)
     }
     return result
-})
-
-const volPreloadImgSrcList = computed(() => {
-
 })
 
 watch(() => store.curViewIndex, (newVal, oldVal) => {

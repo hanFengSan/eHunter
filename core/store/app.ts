@@ -1,18 +1,23 @@
 import { computed, reactive } from 'vue'
 import { i18n, lang } from './i18n'
-import type {AlbumService} from '../service/AlbumService'
-import {NameAlbumService} from '../service/AlbumService'
+import type { AlbumService } from '../service/AlbumService'
+import { NameAlbumService } from '../service/AlbumService'
 import type { ImgPageInfo, ThumbInfo } from 'core/model/model'
+import { initViewportSizeUpdater, initKeyboardListener, resetAutoFlipTimer, checkInstructions } from './event'
 
 export const store = reactive({
+    // common
+    viewportWidth: 0,
+    viewportHeight: 0,
+
     // env variables
     isSupportThumbView: true,
 
     // top bar
-    showTopBar: true,
+    showTopBar: false,
     showMoreSettings: false,
     topBarHeight: 40, // px, for calc
-    readingMode: 0, // 0: scroll, 1: book
+    readingMode: 1, // 0: scroll, 1: book
     widthScale: 80, // percent, the scale of img
     loadNum: 3, // the sum of pages per loading
     volumeSize: 100, // default 10, the page quantity per volume
@@ -23,12 +28,13 @@ export const store = reactive({
     isReverseFlip: false, // reverse the page flipping direction
     isAutoFlip: false,
     autoFlipFrequency: 10, // sec
-    showBookThumbView: false,
+    showBookThumbView: true,
     IsReverseBookWheeFliplDirection: false,
     wheelSensitivity: 100,
     scrollPageMargin: 70,
 
     // thumbView
+    thumbViewWidth: 150, // px
     thumbItemWidth: 150, // px
     thumbItemHeight: 160, // px
     thumbImgWidth: 100, // px
@@ -38,6 +44,7 @@ export const store = reactive({
 
     // book view
     pagesPerScreen: 2, // the page quantity per screen
+    flipDirection: 0, // 0: next, 1: pre
 
     // gallery info
     thumbInfos: <ThumbInfo[]>[],
@@ -88,6 +95,25 @@ export const computedVolPreloadPageIndexList = computed(() => {
         }
     }
     return result
+})
+
+// the viewport width of AlbumBookView or AlbumScrollView, for calculating the page size of book view
+export const computedAlbumViewportWidth = computed(() => {
+    if ((store.readingMode == 0 && store.showThumbView) || (store.readingMode == 1 && store.showBookThumbView)) {
+        return store.viewportWidth - store.thumbViewWidth
+    }
+    return store.viewportWidth
+})
+
+export const computedAlbumViewportHeight = computed(() => {
+    if (store.showTopBar) {
+        return store.viewportHeight - store.topBarHeight
+    }
+    return store.viewportHeight
+})
+
+export const computedAlbumViewportRatio = computed(() => {
+    return computedAlbumViewportHeight.value / computedAlbumViewportWidth.value
 })
 
 export const settingConf = {
@@ -143,10 +169,12 @@ export const storeAction = {
         store.showTopBar = !store.showTopBar
     },
     setTopBar: (val: boolean) => {
-        store.showTopBar =val
+        store.showTopBar = val
     },
     setReadingMode: (val: number) => {
         store.readingMode = val
+        resetAutoFlipTimer()
+        checkInstructions()
     },
     setWidthScale: (val: number) => {
         store.widthScale = val
@@ -177,6 +205,7 @@ export const storeAction = {
     },
     toggleIsAutoFlip: () => {
         store.isAutoFlip = !store.isAutoFlip
+        resetAutoFlipTimer()
     },
     setAutoFlipFrequency: (val: number) => {
         store.autoFlipFrequency = val
@@ -200,16 +229,24 @@ export const storeAction = {
         if (val == store.curViewIndex) {
             return
         }
+        let result = store.curViewIndex
         if (val < 0) {
-            store.curViewIndex = 0
-        } else if (val <= store.pageCount - 1) {
-            store.curViewIndex = val
+            result = 0
+        } else if (val >= store.pageCount) {
+            result = store.pageCount - 1
         } else {
-            store.curViewIndex = store.pageCount - 1
+            result = val
         }
+        if (result > store.curViewIndex) {
+            store.flipDirection = 0
+        } else if (result < store.curViewIndex) {
+            store.flipDirection = 1
+        }
+        store.curViewIndex = result
         if (updater) {
             store.curViewIndexUpdater = updater
         }
+        resetAutoFlipTimer()
     },
     setThumbInfos: (val: Array<ThumbInfo>) => {
         store.thumbInfos = val
@@ -226,9 +263,24 @@ export const storeAction = {
         if (index < store.imgPageInfos.length) {
             store.imgPageInfos[index].preciseHeightOfWidth = val
         }
+    },
+    setViewportWidth: (val: number) => {
+        store.viewportWidth = val
+    },
+    setViewportHeight: (val: number) => {
+        store.viewportHeight = val
+    },
+    getImgPageInfo: (val: number) => {
+        return store.imgPageInfos[val]
+    },
+    getImgPageHeightOfWidth: (val: number) => {
+        let info = storeAction.getImgPageInfo(val)
+        if (info.preciseHeightOfWidth) {
+            return info.preciseHeightOfWidth
+        }
+        return info.heightOfWidth
     }
 }
-
 
 let isInited = false
 export function init(albumService: AlbumService) {
@@ -236,9 +288,13 @@ export function init(albumService: AlbumService) {
         return
     }
     store.pageCount = albumService.getPageCount()
-    store.curViewIndex = albumService.getCurPageNum()
     store.thumbInfos = JSON.parse(JSON.stringify(albumService.getThumbInfos(false)))
     store.imgPageInfos = JSON.parse(JSON.stringify(albumService.getImgPageInfos()))
     store.albumTitle = albumService.getTitle()
+    store.curViewIndex = albumService.getCurPageIndex()
+    initViewportSizeUpdater()
+    initKeyboardListener()
+    resetAutoFlipTimer()
+    checkInstructions()
     isInited = true
 }

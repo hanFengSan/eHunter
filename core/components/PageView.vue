@@ -38,7 +38,7 @@
     </div>
     <div class="layer img-layer">
         <img class="album-item" 
-            v-if="active && imgPageInfo.src" 
+            v-if="active && imgPageInfo && imgPageInfo.src" 
             :src="imgPageInfo.src" 
             @load="loaded()"
             @error="failLoad($event)">
@@ -59,7 +59,7 @@ import Logger from '../utils/Logger'
 
 const props = defineProps<{
     index: number,
-    active: boolean
+    active: boolean,
 }>()
 
 enum ImgLoadStatus {
@@ -80,7 +80,7 @@ const previewStyle:any = albumService.getPreviewThumbnailStyle(props.index)
 const isFirstLoad = ref(true)
 
 const imgPageInfo = computed(() => {
-    return store.imgPageInfos[props.index]
+    return storeAction.getImgPageInfo(props.index)
 })
 
 async function loadImgSrc(mode: ImgSrcMode) {
