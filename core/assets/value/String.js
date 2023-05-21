@@ -59,6 +59,16 @@ export default {
         en: 'If too big, the program will be slow',
         jp: '大きすぎると、プログラムは遅くなります'
     },
+    reloadNum: {
+        cn: '重载次数',
+        en: 'reload quantity',
+        jp: 'リロード回数',
+    },
+    reloadNumTip: {
+        cn: '设置过大可能会触发exhentai保护',
+        jp: '設定値が大きすぎると、エクスエンタイプロテクションが発動する可能性があります。',
+        en: 'Setting too large may trigger exhentai protection',
+    },
     thumbView: {
         cn: '缩略图栏',
         en: 'Thumbnail',

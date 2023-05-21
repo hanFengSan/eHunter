@@ -19,6 +19,7 @@ class SettingService {
             toggleEHunter: { val: true },
             toggleThumbView: { eventName: 'toggleThumbView', val: true },
             loadNum: { eventName: 'setLoadNum', val: 3 },
+            reloadNum: { eventName: 'setReloadNum', val: 0 },
             volumeSize: { eventName: 'setVolumeSize', val: 50 },
             showBookScreenAnimation: { eventName: 'setBookScreenAnimation', val: false },
             showBookPagination: { eventName: 'setBookPagination', val: true },
@@ -142,6 +143,14 @@ class SettingService {
 
     async getLoadNum() {
         return await this._getSettingItem('loadNum');
+    }
+
+    async setReloadNum(val) {
+        await this._setSettingItem('reloadNum', val);
+    }
+
+    async getReloadNum() {
+        return await this._getSettingItem('reloadNum');
     }
 
     async setVolumeSize(val) {

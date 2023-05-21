@@ -143,7 +143,8 @@ export default {
             'wheelSensitivity',
             'wheelDirection',
             'scrolledPageMargin',
-            'oddEven'
+            'oddEven',
+            'reloadNum'
         ]),
         floatBtnStyle() {
             return { 
@@ -333,6 +334,28 @@ export default {
             list: [{ name: this.string.rtl, sname: 'RTL', val: 0 }, { name: this.string.ltr, sname: 'LTR', val: 1 }],
             change: (val) => SettingService.setBookDirection(val)
           });
+          // reload
+          const reloadNumConfig = getSliderSelect({
+            id: 'reloadNum',
+            title: this.string.reloadNum,
+            tip: this.string.reloadNumTip,
+            show: true,
+            curValTitle: this.reloadNum + '次',
+            list: [
+              { name: '0次', val: 0 },
+              { name: '1次', val: 1 },
+              { name: '2次', val: 2 },
+              { name: '3次', val: 3 },
+              { name: '4次', val: 5 },
+              { name: this.string.custom, val: 0 }
+            ],
+            sliderMin: 1,
+            sliderMax: 10,
+            sliderStep: 1,
+            isFloat: false,
+            curVal: this.reloadNum,
+            change: (val) => SettingService.setReloadNum(val)
+          });
           // pagination
           const paginationConfig = {
             title: this.string.pagination,
@@ -473,6 +496,7 @@ export default {
             loadNumConfig,
             volSizeConfig,
             thumbViewConfig,
+            reloadNumConfig,
             screenSizeConfig,
             bookDirectionConfig,
             paginationConfig,

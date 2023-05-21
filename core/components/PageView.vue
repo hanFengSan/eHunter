@@ -87,7 +87,8 @@ export default {
             reloadTimes: 0,
             message: '',
             curLoadStatus: null,
-            previewStyle: {}
+            previewStyle: {},
+            changeReloadNum: 0,
         };
     },
 
@@ -104,7 +105,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(['string']),
+        ...mapGetters(['string', 'reloadNum']),
         tags: () => tags,
         loadingInfo() {
             let reloadInfo = this.reloadTimes ? `[${this.string.reload}-${this.reloadTimes}] ` : '';
@@ -184,6 +185,12 @@ export default {
                     this.imgPageInfo.isFirstLoad = false;
                     Logger.logText('LOADING', 'reloading image');
                     this.getNewImgSrc(tags.MODE_FAST);
+                } else if (this.reloadNum && this.changeReloadNum <= this.reloadNum) {
+                    this.changeReloadNum++;
+                    Logger.logText('LOADING', 'change reloading image');
+                    this.getNewImgSrc(tags.MODE_CHANGE_SOURCE)
+                } else {
+                    this.changeReloadNum = 0;
                 }
             }
         },
