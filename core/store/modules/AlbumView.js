@@ -19,7 +19,8 @@ const state = {
         toggleSyncScroll: true, // unused
         showTopBar: true,
         loadNum: 3, // the sum of pages per loading
-        scrolledPageMargin: 70
+        scrolledPageMargin: 70,
+        reloadNum: 0,
     },
     book: {
         bookIndex: 0, // index of screens
@@ -48,6 +49,7 @@ const getters = {
     showTopBar: state => state.album.showTopBar,
     topBarHeight: state => state.topBarHeight,
     loadNum: state => state.album.loadNum,
+    reloadNum: state => state.album.reloadNum,
     volumeSize: state => state.volumeSize,
     curVolume: state => {
         let remainder = state.curIndex.val % state.volumeSize;
@@ -96,6 +98,7 @@ const actions = {
     toggleSyncScroll: ({ commit }, isActive) => commit(types.TOGGLE_SYNC_SCROLL, { isActive }),
     toggleTopBar: ({ commit }, show) => commit(types.TOGGLE_SHOW_TOP_BAR, { show }),
     setLoadNum: ({ commit }, num) => commit(types.SET_LOAD_NUM, { num }),
+    setReloadNum: ({ commit }, num) => commit(types.SET_RELOAD_NUM, { num }),
     setVolumeSize: ({ commit }, num) => commit(types.SET_VOLUME_SIZE, { num }),
     setBookIndex: ({ commit }, index) => commit(types.SET_BOOK_INDEX, { index }),
     setReadingMode: ({ commit }, mode) => commit(types.SET_READING_MODE, { mode }),
@@ -146,6 +149,9 @@ const mutations = {
     },
     [types.SET_LOAD_NUM](state, { num }) {
         state.album.loadNum = num;
+    },
+    [types.SET_RELOAD_NUM](state, { num }) {
+        state.album.reloadNum = num;
     },
     [types.SET_VOLUME_SIZE](state, { num }) {
         state.volumeSize = num;
