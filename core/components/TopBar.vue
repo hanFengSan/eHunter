@@ -6,10 +6,12 @@
                     icon-type="expand" :title-content="i18n.toggleMoreSettings" :rotate="store.showMoreSettings"
                     @click="storeAction.toggleShowMoreSettings()" />
             </transition>
+            <CircleIconButton class="button" icon-type="eject" @click="storeAction.toggleShowQuickAction" size="normal" :rotate="store.showQuickAction"/>
             <CircleIconButton ref="topBarButton" class="button tips tips-left tips-down" icon-type="menu"
-                :title-content="i18n.toggleTopBar" :rotate="store.showTopBar" @click="storeAction.toggleShowTopBar()" />
-            <CircleIconButton class="button tips tips-left tips-down" :title-content="i18n.closeEHunter" icon-type="close"
-                @click="emit('closeEHunter')" />
+                :title-content="i18n.toggleTopBar" :rotate="store.showTopBar" @click="storeAction.toggleShowTopBar()" size="normal"/>
+        </div>
+        <div class="quick-action-list">
+            <QuickActionList></QuickActionList>
         </div>
         <div :class="['inner-content', { hide: !store.showTopBar, 'more-settings': store.showMoreSettings }]">
             <div class="item">
@@ -172,6 +174,7 @@
 </template>
 
 <script setup lang="ts">
+/// <reference types="vite-svg-loader" />
 import DropOption from './widget/DropOption.vue'
 import NumDropOption from './widget/NumDropOption.vue'
 import SimpleSwitch from './widget/SimpleSwitch.vue'
@@ -182,6 +185,7 @@ import GlobeIcon from '../assets/svg/globe.svg?component'
 import RefreshIcon from '../assets/svg/refresh.svg?component'
 import InfoIcon from '../assets/svg/info.svg?component'
 import GithubIcon from '../assets/svg/github.svg?component'
+import QuickActionList from './QuickActionList.vue'
 import { ref, watch, computed, onMounted } from 'vue'
 
 const emit = defineEmits(['closeEHunter', 'resetCache'])
@@ -211,7 +215,7 @@ div {
         top: 0;
         right: 0;
         align-items: center;
-        z-index: 10000;
+        z-index: 20000;
         height: v-bind('store.topBarHeight+"px"');
 
         >.button {
@@ -286,6 +290,13 @@ div {
             align-content: flex-start;
             padding-right: 120px;
         }
+    }
+    .quick-action-list {
+        position: absolute;
+        top: 24px;
+        right: 5px;
+        align-items: center;
+        z-index: 20000;
     }
 }
 </style>

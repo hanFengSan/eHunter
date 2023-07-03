@@ -1,15 +1,7 @@
 <template>
     <div id="ehunter-app" class="ehunter-app normalize">
         <div v-if="isInited" style="display:flex; flex-direction: row;width: 100%;height: 100%;">
-            <div>
-                <ThumbScrollView />
-            </div>
-            <div style="display: flex; flex-direction: column; flex-grow: 1; height: 100%">
-                <!-- <AlbumScrollView /> -->
-                <AlbumBookView />
-                <!-- <TopBar />
-                <PageView :active="true" :index="0"/> -->
-            </div>
+            <ReaderView />
         </div>
         <!-- <LoadingView style="width: 100%; height: 500px;"/>
         <AwesomeScrollView>
@@ -84,6 +76,7 @@ import LoadingView from './components/LoadingView.vue'
 import AwesomeScrollView from './components/widget/AwesomeScrollView.vue'
 import AlbumScrollView from './components/AlbumScrollView.vue'
 import AlbumBookView from './components/AlbumBookView.vue'
+import ReaderView from './components/ReaderView.vue'
 import PageView from './components/PageView.vue'
 import { inject, onMounted, ref } from 'vue'
 import { NameAlbumService } from './service/AlbumService'

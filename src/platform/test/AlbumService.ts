@@ -65,7 +65,7 @@ export class TestAlbumService implements AlbumService {
     }
 
     async getImgSrc(index: number, mode: ImgSrcMode): Promise<ImgPageInfo | Error> {
-        // await Util.timeout(3000)
+        // await Util.timeout(30000)
         mockImgPageInfos[index].src = mockImgPageInfos[index].pageUrl
         return mockImgPageInfos[index]
     }

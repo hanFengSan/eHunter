@@ -12,6 +12,7 @@ import { watch } from 'vue'
 const props = defineProps({
   active: Boolean,
   customStyle: Object,
+  isCloseToRight: Boolean,
 })
 
 const emit = defineEmits(['close'])

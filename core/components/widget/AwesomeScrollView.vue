@@ -124,6 +124,18 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+//  .awesome-scroll-view::-webkit-scrollbar {
+//         display: none;
+//     }
+
+// .awesome-scroll-view:hover::-webkit-scrollbar {
+//     display: initial;
+// }
+
+// .awesome-scroll-view.isHidden:hover::-webkit-scrollbar {
+//     display: none;
+// }
+    
 .awesome-scroll-view {
     position: relative;
     overflow-y: overlay;
@@ -131,45 +143,46 @@ defineExpose({
     display: flex;
     flex-direction: column;
 
-    &::-webkit-scrollbar {
-        display: none;
-    }
+    // &::-webkit-scrollbar {
+    //     display: initial;
+    // }
 
-    &:hover::-webkit-scrollbar {
-        display: initial;
-    }
+    // &:hover::-webkit-scrollbar {
+    //     display: initial;
+    // }
 
-    &.isHidden:hover::-webkit-scrollbar {
-        display: none;
-    }
+    // &.isHidden:hover::-webkit-scrollbar {
+    //     display: none;
+    // }
 
     &.scrollbar {
         transition: all 0.3s ease;
 
         &::-webkit-scrollbar {
+            overflow: visible;
             width: 10px;
         }
 
-        &::-webkit-scrollbar-track {
-            background-color: transparent;
-            border-width: 0;
-        }
+        // &::-webkit-scrollbar-track {
+        //     background-color: transparent;
+        //     border-width: 0;
+        // }
 
-        &::-webkit-scrollbar-thumb {
-            border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.4);
-            border-style: solid;
-            border-color: transparent;
-            border-width: 3px;
-            background-clip: padding-box;
-        }
+        // &::-webkit-scrollbar-thumb {
+        //     border-radius: 20px;
+        //     background-color: rgba(255, 255, 255, 0.4);
+        //     border-style: solid;
+        //     border-color: transparent;
+        //     border-width: 3px;
+        //     background-clip: padding-box;
+        // }
 
-        &::-webkit-scrollbar-button,
-        &::-webkit-scrollbar-track-piece,
-        &::-webkit-scrollbar-corner,
-        &::-webkit-resizer {
-            display: none;
-        }
+        // &::-webkit-scrollbar-button,
+        // &::-webkit-scrollbar-track-piece,
+        // &::-webkit-scrollbar-corner,
+        // &::-webkit-resizer {
+        //     display: none;
+        // }
     }
 }
 </style>

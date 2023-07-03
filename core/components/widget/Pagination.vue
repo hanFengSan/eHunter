@@ -1,20 +1,20 @@
 <template>
     <section class="pagination">
         <div :class="['item', { disable: curIndex === 0 }]" @click="prev()">
-            <RightArrowIcon class="icon" />
+            <LeftArrowIcon class="icon" />
         </div>
         <span :class="['item', { active: n === curIndex }]" v-for="n in pages" :key="n" @click="selectPage(n)">{{
                 showNum(n)
         }}</span>
         <div :class="['item', { disable: curIndex === pageSum - 1 }]" @click="next()">
-            <LeftArrowIcon class="icon" />
+            <RightArrowIcon class="icon" />
         </div>
     </section>
 </template>
 
 <script setup>
-import RightArrowIcon from '../../assets/svg/right_arrow.svg?component'
 import LeftArrowIcon from '../../assets/svg/left_arrow.svg?component'
+import RightArrowIcon from '../../assets/svg/right_arrow.svg?component'
 import { ref, computed } from 'vue'
 
 const props = defineProps({

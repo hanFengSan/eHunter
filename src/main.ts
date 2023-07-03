@@ -6,6 +6,8 @@ import { NameAlbumService } from '../core/service/AlbumService'
 import type { AlbumService } from '../core/service/AlbumService'
 // import './assets/main.css'
 
+/// <reference types="vite-svg-loader" />
+
 const app = createApp(TestApp)
 
 const testAlbumService: AlbumService = new TestAlbumService('')

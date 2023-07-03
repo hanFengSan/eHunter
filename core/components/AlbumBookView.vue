@@ -1,5 +1,5 @@
 <template>
-    <section class="album-book-view" @wheel="handleWheelFlipEvent">
+    <section class="album-book-view" @wheel="handleWheelFlipEvent" @click="onClickBg">
         <TransitionGroup :name="store.flipDirection == 0 ? 'screen-flip' : 'screen-flip-reverse'">
         <div class="book-page-container"
             v-for="i in pageList"
@@ -11,6 +11,11 @@
                 :active="true"/>
         </div>
         </TransitionGroup>
+        <div class="action-panel">
+            <div class="next"></div>
+            <div class="setting"></div>
+            <div class="pre"></div>
+        </div>
     </section>
 </template>
 
@@ -88,11 +93,15 @@ function calcScreenPageSize(screen: number[]): BookPageDisplayParam[] {
     for (let i = 0; i < screen.length; i++) {
         let pageIndex = screen[i]
         let height = width * storeAction.getImgPageHeightOfWidth(pageIndex)
+        let top = computedAlbumViewportHeight.value / 2 - height / 2
+        if (store.showTopBar) {
+            top += store.topBarHeight
+        }
         result.push({
             pageIndex: pageIndex,
             height: height,
             width: width,
-            top: computedAlbumViewportHeight.value / 2 - height / 2,
+            top: top,
             right: getPagePositionRight(width, i),
         })
     }
@@ -103,15 +112,27 @@ const pageList = computed(() => {
     return [...calcScreenPageSize(curScreenIndexList.value), ...calcScreenPageSize(nextScreenIndexList.value)]
 })
 
+function onClickBg(e: any) {
+    console.log(e)
+    let y = e.clientY
+    switch(true) {
+        case y >= 0 && y < store.viewportHeight * 0.3:
+            storeAction.setCurViewIndex(store.curViewIndex - store.pagesPerScreen, 'album_book_view')
+            break
+        case y >= store.viewportHeight * 0.3 && y <= store.viewportHeight * 0.7:
+            console.log('setting')
+            break
+        case y >= store.viewportHeight * 0.7 && y <= store.viewportHeight:
+            storeAction.setCurViewIndex(store.curViewIndex + store.pagesPerScreen, 'album_book_view')
+            break
+    }
+}
+
 </script>
 
 <style lang="scss" scoped>
 @import '../style/_responsive';
 @import '../style/_variables';
-
-div {
-    display: flex;
-}
 
 .album-book-view {
     display: flex;
@@ -123,13 +144,55 @@ div {
     // transition: all 0.5s ease;
     
     > .book-page-container {
+        user-select: none;
         position: absolute;
         // transition: all 0.5s ease-in-out;
         box-sizing: border-box;
-        // box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.1);
         box-shadow: 0px 19px 10px -8px rgba(0,0,0,0.35);
-    -webkit-box-shadow: 0px 19px 10px -8px rgba(0,0,0,0.35);
-    -moz-box-shadow: 0px 19px 10px -8px rgba(0,0,0,0.35);
+    }
+}
+
+.action-panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    opacity: 0.5;
+    display: none;
+    background-color: black;
+    pointer-events: none;
+
+    .next {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 30%;
+        bottom: 0;
+        background-color: red;
+        pointer-events: none;
+
+    }
+    .pre {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 30%;
+        top: 0;
+        background-color: green;
+        pointer-events: none;
+
+    }
+    .setting {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 40%;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: purple;
+        pointer-events: none;
     }
 }
 

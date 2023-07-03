@@ -146,6 +146,7 @@ $header-bg: #2ecc71;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            transition: all 0.1s ease;
             > .thumb {
                 display: block;
                 width: v-bind('store.thumbImgWidth+"px"');
@@ -159,29 +160,41 @@ $header-bg: #2ecc71;
                 font-size: 12px;
             }
             > .index {
-                display: none;
+                position: absolute;
+                display: block;
+                font-weight: bolder;
+                font-size: 40px;
+                color: rgba($body_bg, 0.8);
+                -webkit-text-stroke:1px rgba(white, 0.8);
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 20;
+                user-select: none;
+                cursor: default;
+                transition: all 0.2s ease;
             }
             &:hover {
-                > .hover-mask {
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    left: 0;
-                    bottom: 0;
-                    background: rgba($indicator_color, 0.2);
-                }
+                // > .hover-mask {
+                //     position: absolute;
+                //     top: 0;
+                //     right: 0;
+                //     left: 0;
+                //     bottom: 0;
+                //     // background: rgba($indicator_color, 0.2);
+                //     background: rgba(black, 0.3);
+                //     z-index: 0;
+                // }
+                background: rgba(black, 0.4);
+            //     border-left: 3px solid rgba(white, 0.7);
+            // border-right: 3px solid rgba(white, 0.7);
+                // .thumb {
+                //     background: rgba(black, 0.4);
+                // }
                 > .index {
-                    position: absolute;
-                    display: block;
-                    font-weight: bolder;
-                    font-size: 40px;
-                    color: rgba($body_bg, 0.8);
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    z-index: 20;
-                    user-select: none;
-                    cursor: default;
+                    font-size: 60px;
+                    color: $body_bg;
+                    -webkit-text-stroke:1px white;
                 }
             }
         }
@@ -192,11 +205,12 @@ $header-bg: #2ecc71;
             height: v-bind('store.thumbItemHeight+"px"');
             left: 0;
             right: 0;
-            background: rgba($indicator_color, 0.3);
-            border-left: 3px solid rgba($indicator_color, 0.5);
-            border-right: 3px solid rgba($indicator_color, 0.5);
+            // background: rgba($indicator_color, 0.3);
+            border-left: 3px solid rgba(white, 0.4);
+            border-right: 3px solid rgba(white, 0.4);
+            background: rgba(black, 0.4);
             transition: all 0.5s ease;
-            z-index: 10;
+            // z-index: 10;
             pointer-events: none;
             top: v-bind('indicatorTop+"px"');
         }

@@ -32,6 +32,7 @@ export const store = reactive({
     IsReverseBookWheeFliplDirection: false,
     wheelSensitivity: 100,
     scrollPageMargin: 70,
+    showQuickAction: false,
 
     // thumbView
     thumbViewWidth: 150, // px
@@ -279,7 +280,10 @@ export const storeAction = {
             return info.preciseHeightOfWidth
         }
         return info.heightOfWidth
-    }
+    },
+    toggleShowQuickAction: () => {
+        store.showQuickAction = !store.showQuickAction
+    },
 }
 
 let isInited = false
