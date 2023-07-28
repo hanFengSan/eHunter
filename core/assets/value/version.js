@@ -1,7 +1,6 @@
 export default {
     cn: `
-* 修复图片比例问题。比例问题在韩漫上最明显，但该版本可能会有些许抖动
-* 修复对nhentai的支持
+* 修复exhentai的缩略图显示
 
 ### iPad支持
 * 目前在iOS 15/iPadOS 15上可以运行油猴脚本了，因此eHunter也能成功在iPad上使用
@@ -15,8 +14,7 @@ eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](ht
 
 `,
     en: `
-* Fixed image ratio bug
-* Fixed the support for nhentai
+* Fixed thumbnail problem in the exhentai
 
 ### Use in iPad
 * The greasymonkey/tampermonkey script can run on iOS 15/iPadOS 15, so the eHunter also can run on iPad now
@@ -30,8 +28,7 @@ The eHunter-local is local version of eHunter, supporting Windows and MacOS. [Ho
 
 `,
     jp: `
-* Fixed image ratio bug
-* Fixed the support for nhentai
+* Fixed thumbnail problem in the exhentai
 
 ### Use in iPad
 * The greasymonkey/tampermonkey script can run on iOS 15/iPadOS 15, so the eHunter also can run on iPad now.
