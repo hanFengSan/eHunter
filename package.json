@@ -37,7 +37,7 @@
         "uglifyjs-webpack-plugin": "^1.2.4",
         "vue": "^2.6.10",
         "vuex": "^3.1.0",
-        "web-ext": "^1.8.1"
+        "web-ext": "^7.4.0"
     },
     "devDependencies": {
         "@babel/core": "^7.4.3",
