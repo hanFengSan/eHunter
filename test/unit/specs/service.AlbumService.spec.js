@@ -1,6 +1,6 @@
-import { AlbumService } from '../../../src/service/AlbumService';
-import { AlbumCacheService } from '../../../src/service/storage/AlbumCacheService';
-import * as tags from '../../../src/assets/value/tags';
+import { AlbumService } from '../../../core/service/AlbumService';
+import { AlbumCacheService } from '../../../src/platform/eh/service/AlbumCacheService';
+import * as tags from '../../../core/assets/value/tags';
 
 describe('service.AlbumService', () => {
     let as;

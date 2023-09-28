@@ -11,16 +11,23 @@ function resolve(dir) {
 
 module.exports = merge(baseWebpackConfig, {
     mode: 'production',
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                uglifyOptions: {
+                    compress: {
+                        warnings: false
+                    },
+                    output: {
+                        comments: /^ (@(?!see)\w+\s|=)/
+                    }
+                },
+                sourceMap: false,
+                parallel: true
+            })
+        ]
+    },
     plugins: [
-        new UglifyJsPlugin({
-            uglifyOptions: {
-                compress: {
-                    warnings: false
-                }
-            },
-            sourceMap: false,
-            parallel: true
-        }),
         new HtmlWebpackPlugin({
             filename: 'popup.html',
             template: 'src/legacy/index.popup.html',
@@ -31,13 +38,13 @@ module.exports = merge(baseWebpackConfig, {
                 collapseWhitespace: true,
                 removeAttributeQuotes: true
             }
+        }),
+        new webpack.BannerPlugin({
+            banner: require(resolve('src/manifest')).tampermonkey,
+            raw: true,
+            entryOnly: true,
+            include: /inject\.js/
         })
-        // new webpack.BannerPlugin({
-        //     banner: require(resolve('src/manifest')).tampermonkey,
-        //     raw: false,
-        //     entryOnly: true,
-        //     include: /inject\.js/
-        // })
     ]
 })
 

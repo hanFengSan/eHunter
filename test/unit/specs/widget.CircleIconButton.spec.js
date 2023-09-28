@@ -1,4 +1,4 @@
-import CircleIconButton from '../../../src/components/widget/CircleIconButton'
+import CircleIconButton from '../../../core/components/widget/CircleIconButton'
 import { destroyVM, createTest, createVue } from '../util'
 
 describe('widget.CircleIconButton', () => {

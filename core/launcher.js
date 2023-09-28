@@ -1,4 +1,4 @@
-import app from './App.vue'
+import app from './app.vue'
 
 let service = {}
 let config = {}
