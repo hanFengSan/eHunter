@@ -17,17 +17,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: 20
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build inject.js
+      - name: Build userscript
         run: npm run build
 
       - name: Upload build outputs
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}.js
+          name: userscript
           path: dist/inject.js
