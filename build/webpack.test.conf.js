@@ -3,7 +3,7 @@ const merge = require('webpack-merge')
 const baseWebpackConfig = require('./webpack.base.conf')
 
 const webpackConfig = merge(baseWebpackConfig, {
-    mode: 'testing',
+    mode: 'development',
     // use inline sourcemap for karma-sourcemap-loader
     devtool: '#inline-source-map'
 });
