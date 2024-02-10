@@ -1,6 +1,9 @@
 <template>
 <div class="slider"         
         @mousedown="handleMouseDown"
+        @touchmove="handleTouchMove"
+        @touchstart="handleTouchStart"
+        @touchend="handleTouchEnd"
         @click="handleClick"
         ref="slider">
     <div class="track"></div>
@@ -71,6 +74,28 @@ export default {
             }
             e.preventDefault();
         },
+        handleTouchStart(e) {
+            const touch = e.touches[0];
+            this.isHolding = true;
+            const rect = e.target.getBoundingClientRect();
+            this.handleClick({offsetX: touch.pageX - rect.left});
+            this.oldMouseX = touch.clientX;
+            this.oldVal = this.val;
+            this.widthRatio = this.getWidthRatio();
+            e.preventDefault();
+        },
+        handleTouchMove(e) {
+            const touch = e.touches[0];
+            if (this.isHolding) {
+                const x = this.oldVal + (touch.clientX - this.oldMouseX) / this.widthRatio;
+                this.onChange(x);
+            }
+            e.preventDefault();
+        },
+        handleTouchEnd(e) {
+            this.isHolding = false;
+            e.preventDefault();
+        },
         handleClick(e) {
             const x = this.min + e.offsetX / this.getWidthRatio();
             this.onChange(x);
@@ -84,7 +109,7 @@ export default {
             this.$emit('change', this.val);
         },
         getStepPrecision(val) {
-            return String(String(this.step).match('.[0-9]')).length - 1;
+            return String(String(this.step).match('.[0-9][0-9]')).length - 1;
         },
         getValByStep(x) {
             for (let i = this.min; i <= this.max; i = i + this.step) {
