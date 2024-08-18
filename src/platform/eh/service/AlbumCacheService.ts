@@ -30,7 +30,6 @@ export class AlbumCacheService {
     private storageName = 'AlbumCache';
     private storageVersionName = 'AlbumCacheVersion';
     private _isNormalMode = false; // make sure in 'Normal' mode
-    private _isChangedMode = false;
     private albumService: AlbumServiceImpl;
     private _album: AlbumCache | undefined;
 
@@ -95,35 +94,9 @@ export class AlbumCacheService {
             return JSON.parse(JSON.stringify(album.thumbInfos));
         } else {
             try {
-                let text;
-                let reqUrl = API.getIntroHtml(introUrl, 1);
-                // compatible with large mode
-                try { // If in 'Normal' mode of thumbnails, this will be right
-                    text = await new TextReq(reqUrl).request();
-                    new IntroHtmlParser(text, reqUrl).getThumbObjList(sumOfPage, albumId);
-                    this._isNormalMode = true;
-                    await SettingService.setNormalMode(true);
-                } catch (e) { // In 'Large' mode
-                    // Send a request to change to 'Normal' mode
-                    try {
-                        introUrl = (await window.fetch(`${window.location.origin}${introUrl}?inline_set=ts_m`, { method: 'GET', credentials: 'include' })).url;
-                        text = await new TextReq(API.getIntroHtml(introUrl, 1)).request();
-                        this.albumService.setIntroUrl(introUrl);
-                        this._isNormalMode = true;
-                        Logger.logText('Cache', 'switch to small');
-                        this._isChangedMode = true;
-                        await SettingService.setNormalMode(false);
-                    } catch (e) {
-                        InfoService.showReloadError(store.getters.string.changingToSmallFailed);
-                        Logger.logObj('AlbumCache', e);
-                    }
-                }
-                let introPage = new IntroHtmlParser(text, reqUrl);
-                let thumbInfos = introPage.getThumbObjList(sumOfPage, albumId);
-                album.thumbInfos = thumbInfos;
-                this._album!.thumbInfos = thumbInfos; // wired
+                let thumbInfos = (await this._getThumbAndImgPageInfos(albumId, introUrl, sumOfPage))[0];
                 await this._saveAlbum(albumId);
-                return JSON.parse(JSON.stringify(album.thumbInfos));
+                return thumbInfos;
             } catch (e) {
                 // TODO: show tips for the error
                 console.error(e);
@@ -145,27 +118,28 @@ export class AlbumCacheService {
                 introUrl = this.albumService.getIntroUrl(); // after changine mode, the introUrl maybe changed.
             }
             try {
-                return await this._getImgPageInfos(albumId, introUrl, sumOfPage);
+                return (await this._getThumbAndImgPageInfos(albumId, introUrl, sumOfPage))[1];
             } catch (e) {
                 Logger.logText('CacheService', 'loading ImgPageInfos failed. It\'s large.');
                 while (!this._isNormalMode) {
                     await Utils.timeout(100);
                     introUrl = this.albumService.getIntroUrl();
                 }
-                return await this._getImgPageInfos(albumId, introUrl, sumOfPage);
+                return (await this._getThumbAndImgPageInfos(albumId, introUrl, sumOfPage))[1];
             }
         }
     }
 
-    async _getImgPageInfos(albumId: string, introUrl: string, sumOfPage: number): Promise<Array<ImgPageInfo>> {
+    async _getThumbAndImgPageInfos(albumId: string, introUrl: string, sumOfPage: number): Promise<[Array<ThumbInfo>, Array<ImgPageInfo>]> {
         let album = await this._getAlbum(albumId);
-        let imgPageInfos = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
+        let [thumbInfos, imgPageInfos] = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
+        this._album!.thumbInfos = thumbInfos;
         this._album!.imgPageInfos = imgPageInfos;
         await this._saveAlbum(albumId);
-        if (this._isChangedMode) {
-            window.fetch(`${introUrl}?inline_set=ts_l`, { method: 'GET', credentials: 'include' }); // change back
-        }
-        return JSON.parse(JSON.stringify(album.imgPageInfos));
+        return [
+            JSON.parse(JSON.stringify(album.thumbInfos)),
+            JSON.parse(JSON.stringify(album.imgPageInfos)),
+        ];
     }
 
     async getImgSrc(albumId, index, mode, sourceId?): Promise<ImgPageInfo | Error> {

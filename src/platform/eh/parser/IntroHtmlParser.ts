@@ -35,39 +35,31 @@ export class IntroHtmlParser {
         }
     }
 
-    getThumbObjList(sumOfPage, albumId): Array<ThumbInfo> {
-        return this._computeThumbList(this._getThumbImgList(albumId, sumOfPage), sumOfPage);
-    }
-
-    _getThumbKeyId() {
-        let tmp = this.html.getElementsByClassName('gdtm')![0].children![0].getAttribute('style')!.match(/m\/.*?\//);
-        return (tmp + '').replace(/(m|\/)/g, '');
-    }
-
-    _getThumbPageCount(sumOfPage) {
-        // 20 is the img sum per spirit in small thumb model
-        if (sumOfPage < 20) {
-            return 1;
-        }
-        let reminder = sumOfPage % 20;
-        if (reminder > 1) {
-            return (sumOfPage - reminder) / 20 + 1;
+    getThumbObjList(): Array<ThumbInfo> {
+        if (this._isValidIntroPage()) {
+            return Array.from(this.html.querySelectorAll('.gdtm>div')).map(div=>{
+                let url_s = (div as HTMLDivElement).style.backgroundImage;
+                let pos_s = (div as HTMLDivElement).style.backgroundPositionX;
+                if(url_s && url_s.startsWith('url("') && pos_s && pos_s.endsWith('px')) {
+                    let url = url_s.substring(5, url_s.length - 2);
+                    let pos = parseInt(pos_s.substring(0, pos_s.length - 2));
+                    return {
+                        id: url+pos,
+                        src: url,
+                        mode: ThumbMode.SPIRIT,
+                        offset: -pos,
+                    };
+                }
+                else
+                    return {
+                        id: '',
+                        src: '',
+                        mode: ThumbMode.SPIRIT,
+                    };
+            }).filter(x=>x.src!=='');
         } else {
-            return sumOfPage / 20;
+            return [];
         }
-    }
-
-    _getThumbImgList(albumId, sumOfPage): string[] {
-        let thumbKeyId = this._getThumbKeyId();
-        let imgList: string[] = [];
-        for (let i = 0; i < this._getThumbPageCount(sumOfPage); i++) {
-            if (window.location.hostname === 'e-hentai.org') {
-                imgList.push(`https://ehgt.org/m/${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
-            } else {
-                imgList.push(`https://s.exhentai.org/m/${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
-            }
-        }
-        return imgList;
     }
 
     _getTruePageIndex() {
@@ -85,24 +77,5 @@ export class IntroHtmlParser {
             }
         }
         return true;
-    }
-
-    _computeThumbList(imgList, sumOfPage): Array<ThumbInfo> {
-        let thumbObjList: Array<ThumbInfo> = [];
-        for (let i = 0; i < imgList.length; i++) {
-            for (let t = 0; t < 20; t++) {
-                if (i !== imgList.length - 1 ||
-                    (t < (sumOfPage % 20 || 20))
-                ) {
-                    thumbObjList.push({
-                        id: imgList[i] + t,
-                        src: imgList[i],
-                        mode: ThumbMode.SPIRIT,
-                        offset: t * 100
-                    })
-                }
-            }
-        }
-        return thumbObjList;
     }
 }

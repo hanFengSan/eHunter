@@ -2,6 +2,7 @@
 import { ReqQueue } from '../../base/request/ReqQueue'
 import { IntroHtmlParser } from './IntroHtmlParser'
 import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
+import { ThumbInfo } from "../../../../core/bean/ThumbInfo";
 
 export class ImgUrlListParser {
     private introUrl: string;
@@ -14,7 +15,7 @@ export class ImgUrlListParser {
         this.introPageUrls = this._getIntroPageUrls();
     }
 
-    request(): Promise<Array<ImgPageInfo>> {
+    request(): Promise<[Array<ThumbInfo>, Array<ImgPageInfo>]> {
         return new Promise((resolve, reject) => {
             this._request(resolve, reject);
         });
@@ -45,15 +46,18 @@ export class ImgUrlListParser {
         new ReqQueue(this.introPageUrls)
             .request()
             .then(map => {
-                let result = this.introPageUrls.reduce((imgUrls, introUrl) => {
-                    imgUrls = imgUrls.concat(new IntroHtmlParser(map.get(introUrl), introUrl).getImgUrls());
-                    return imgUrls;
-                }, <Array<ImgPageInfo>>[]);
+                let result = this.introPageUrls.reduce((acc, introUrl) => {
+                    acc[0] = acc[0].concat(new IntroHtmlParser(map.get(introUrl), introUrl).getThumbObjList());
+                    acc[1] = acc[1].concat(new IntroHtmlParser(map.get(introUrl), introUrl).getImgUrls());
+                    return acc;
+                }, [[], []] as [ThumbInfo[], ImgPageInfo[]]);
+                console.log('!!!request', result);
+
                 let index = 0;
-                result.forEach(i => {
+                result[1].forEach(i => {
                     i.index = index++
                 });
-                if (result.length !== 0) {
+                if (result[1].length !== 0) {
                     resolve(result);
                 } else {
                     reject(new Error('parsing img html failed. It may be in Large mode'))
