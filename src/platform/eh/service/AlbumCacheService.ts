@@ -32,6 +32,7 @@ export class AlbumCacheService {
     private _isNormalMode = false; // make sure in 'Normal' mode
     private albumService: AlbumServiceImpl;
     private _album: AlbumCache | undefined;
+    private _parseAlbumPromise: Promise<[Array<ThumbInfo>, Array<ImgPageInfo>]> | undefined;
 
     constructor(albumService) {
         this._initStorage();
@@ -130,15 +131,23 @@ export class AlbumCacheService {
         }
     }
 
+    async _parseAlbum(introUrl: string, sumOfPage: number) {
+        return await (new ImgUrlListParser(introUrl, sumOfPage)).request();
+    }
+
     async _getThumbAndImgPageInfos(albumId: string, introUrl: string, sumOfPage: number): Promise<[Array<ThumbInfo>, Array<ImgPageInfo>]> {
-        let album = await this._getAlbum(albumId);
-        let [thumbInfos, imgPageInfos] = await (new ImgUrlListParser(introUrl, sumOfPage)).request();
+        if(!this._parseAlbumPromise)
+            this._parseAlbumPromise = this._parseAlbum(introUrl, sumOfPage);
+        let [thumbInfos, imgPageInfos] = await this._parseAlbumPromise;
+        this._parseAlbumPromise = undefined;
+
         this._album!.thumbInfos = thumbInfos;
-        this._album!.imgPageInfos = imgPageInfos;
+        this._album!.imgPageInfos = imgPageInfos
         await this._saveAlbum(albumId);
+
         return [
-            JSON.parse(JSON.stringify(album.thumbInfos)),
-            JSON.parse(JSON.stringify(album.imgPageInfos)),
+            JSON.parse(JSON.stringify(thumbInfos)),
+            JSON.parse(JSON.stringify(imgPageInfos)),
         ];
     }
 

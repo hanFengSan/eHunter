@@ -51,7 +51,6 @@ export class ImgUrlListParser {
                     acc[1] = acc[1].concat(new IntroHtmlParser(map.get(introUrl), introUrl).getImgUrls());
                     return acc;
                 }, [[], []] as [ThumbInfo[], ImgPageInfo[]]);
-                console.log('!!!request', result);
 
                 let index = 0;
                 result[1].forEach(i => {
