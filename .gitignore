@@ -11,3 +11,4 @@ web-ext-artifacts
 dist.pem
 *.crx
 *.xpi
+/.vs
