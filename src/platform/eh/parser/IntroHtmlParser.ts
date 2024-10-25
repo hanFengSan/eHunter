@@ -15,11 +15,11 @@ export class IntroHtmlParser {
 
     getImgUrls(): Array<ImgPageInfo> {
         if (this._isValidIntroPage()) {
-            return Array.prototype.slice.call(this.html.getElementsByClassName('gdtm'), 0).map(item => {
-                item.children[0].getAttribute('style').match(/width:(.*?)px; height:(.*?)px;/g);
+            return Array.prototype.slice.call(this.html.getElementsByClassName("gt200")[0].children, 0).map(item => {
+                item.getElementsByTagName("div")[0].getAttribute('style').match(/width:(.*?)px;height:(.*?)px;/g);
                 const thumbHeight = Number(RegExp.$2);
                 const thumbWidth = Number(RegExp.$1);
-                let pageUrl = item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '';
+                let pageUrl = item.getAttribute('href').match(/\/s.*$/) + '';
                 return {
                     id: pageUrl,
                     index: 0,
@@ -40,7 +40,7 @@ export class IntroHtmlParser {
     }
 
     _getThumbKeyId() {
-        let tmp = this.html.getElementsByClassName('gdtm')![0].children![0].getAttribute('style')!.match(/m\/.*?\//);
+        let tmp = this.html.getElementsByClassName('gt200')![0].children![0].getElementsByTagName("div")![0].getAttribute('style')!.match(/m\/.*?\//);
         return (tmp + '').replace(/(m|\/)/g, '');
     }
 
