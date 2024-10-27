@@ -85,7 +85,7 @@ export class AlbumCacheService {
 
     async _saveAlbum(albumId: string): Promise<void> {
         // L.o('save', this._album);
-        await storage.save({ key: this.storageName, id: albumId, data: await this._getAlbum(albumId), expires: 1000 * 60 * 60 });
+        await storage.save({ key: this.storageName, id: albumId, data: await this._getAlbum(albumId), expires: 1000 });
     }
 
     async getThumbInfos(albumId: string, introUrl, sumOfPage): Promise<Array<ThumbInfo>> {
