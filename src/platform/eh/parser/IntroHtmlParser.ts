@@ -15,21 +15,40 @@ export class IntroHtmlParser {
 
     getImgUrls(): Array<ImgPageInfo> {
         if (this._isValidIntroPage()) {
-            return Array.prototype.slice.call(this.html.getElementsByClassName('gdtm'), 0).map(item => {
-                item.children[0].getAttribute('style').match(/width:(.*?)px; height:(.*?)px;/g);
-                const thumbHeight = Number(RegExp.$2);
-                const thumbWidth = Number(RegExp.$1);
-                let pageUrl = item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '';
-                return {
-                    id: pageUrl,
-                    index: 0,
-                    pageUrl,
-                    src: '',
-                    thumbHeight,
-                    thumbWidth,
-                    heightOfWidth: thumbHeight / thumbWidth
-                };
-            })
+            let isNew = this.html.querySelectorAll('#gdt>.gdtm').length == 0
+            if (isNew) {
+                return Array.prototype.slice.call(this.html.querySelector('#gdt')!.children).map(item => {
+                    item.children[0].getAttribute('style').match(/width:(.*?)px;height:(.*?)px;/g);
+                    const thumbHeight = Number(RegExp.$2);
+                    const thumbWidth = Number(RegExp.$1);
+                    let pageUrl = item.getAttribute('href').match(/\/s.*$/) + '';
+                    return {
+                        id: pageUrl,
+                        index: 0,
+                        pageUrl,
+                        src: '',
+                        thumbHeight,
+                        thumbWidth,
+                        heightOfWidth: thumbHeight / thumbWidth
+                    };
+                })
+            } else {
+                return Array.prototype.slice.call(this.html.getElementsByClassName('gdtm'), 0).map(item => {
+                    item.children[0].getAttribute('style').match(/width:(.*?)px; height:(.*?)px;/g);
+                    const thumbHeight = Number(RegExp.$2);
+                    const thumbWidth = Number(RegExp.$1);
+                    let pageUrl = item.getElementsByTagName('a')[0].getAttribute('href').match(/\/s.*$/) + '';
+                    return {
+                        id: pageUrl,
+                        index: 0,
+                        pageUrl,
+                        src: '',
+                        thumbHeight,
+                        thumbWidth,
+                        heightOfWidth: thumbHeight / thumbWidth
+                    };
+                })
+            }
         } else {
             return [];
         }
@@ -40,8 +59,8 @@ export class IntroHtmlParser {
     }
 
     _getThumbKeyId() {
-        let tmp = this.html.getElementsByClassName('gdtm')![0].children![0].getAttribute('style')!.match(/m\/.*?\//);
-        return (tmp + '').replace(/(m|\/)/g, '');
+        let key = this.html.querySelector('#gdt')!.children![0].children![0].getAttribute('style')!.match(/https:.*?\/cm\/.*?\//g)![0]
+        return key
     }
 
     _getThumbPageCount(sumOfPage) {
@@ -61,11 +80,7 @@ export class IntroHtmlParser {
         let thumbKeyId = this._getThumbKeyId();
         let imgList: string[] = [];
         for (let i = 0; i < this._getThumbPageCount(sumOfPage); i++) {
-            if (window.location.hostname === 'e-hentai.org') {
-                imgList.push(`https://ehgt.org/m/${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
-            } else {
-                imgList.push(`https://s.exhentai.org/m/${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
-            }
+            imgList.push(`${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
         }
         return imgList;
     }

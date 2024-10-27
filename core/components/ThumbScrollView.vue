@@ -1,6 +1,6 @@
 <template>
     <aside class="thumb-content">
-        <awesome-scroll-view ref="scrollView"  class="thumb-scroll-view">
+        <awesome-scroll-view ref="scrollView"  class="thumb-scroll-view" :isThumbView="true">
             <div class="header">
                 <span class="app-name">EHUNTER</span>
             </div>
