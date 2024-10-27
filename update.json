@@ -4,7 +4,7 @@
         "version":"2.7.5",
         "text":"1. 修复exhentai/ehentai的解析问题",
         "time":1690647347098,
-        "duration":604800000,
+        "duration":60000,
         "always":true,
         "operations":[
             {
@@ -18,7 +18,7 @@
         "version":"2.7.5",
         "text":"1. Fixed the parser of exhentai/ehentai",
         "time":1690647347098,
-        "duration":604800000,
+        "duration":60000,
         "always":true,
         "operations":[
             {
@@ -32,7 +32,7 @@
         "version":"2.7.5",
         "text":"1. Fixed the parser of exhentai/ehentai",
         "time":1690647347098,
-        "duration":604800000,
+        "duration":60000,
         "always":true,
         "operations":[
             {
