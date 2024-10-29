@@ -18,7 +18,7 @@ export class IntroHtmlParser {
             let isNew = this.html.querySelectorAll('#gdt>.gdtm').length == 0
             if (isNew) {
                 return Array.prototype.slice.call(this.html.querySelector('#gdt')!.children).map(item => {
-                    item.children[0].getAttribute('style').match(/width:(.*?)px;height:(.*?)px;/g);
+                    item.innerHTML.match(/width:(.*?)px;height:(.*?)px;/g);
                     const thumbHeight = Number(RegExp.$2);
                     const thumbWidth = Number(RegExp.$1);
                     let pageUrl = item.getAttribute('href').match(/\/s.*$/) + '';
@@ -59,7 +59,8 @@ export class IntroHtmlParser {
     }
 
     _getThumbKeyId() {
-        let key = this.html.querySelector('#gdt')!.children![0].children![0].getAttribute('style')!.match(/https:.*?\/cm\/.*?\//g)![0]
+        let key = this.html.querySelector('#gdt')!.children[0].innerHTML.match(/url\(https:.*?\/cm\/.*?\//g)![0]
+        key = key.replace('url(', '')
         return key
     }
 

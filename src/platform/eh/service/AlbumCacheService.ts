@@ -70,6 +70,16 @@ export class AlbumCacheService {
         if (this._album) {
             return this._album;
         } else {
+            // disable cache to avoid cache problem
+            let now = new Date().getTime()
+            if (now < 1732757677943) { // before 2024-11-28, disable cache
+                this._album = {
+                    title: '',
+                    thumbInfos: [],
+                    imgPageInfos: []
+                };
+                return this._album!;
+            }
             try {
                 this._album = await storage.load({ key: this.storageName, id: albumId });
             } catch (e) {
@@ -85,7 +95,7 @@ export class AlbumCacheService {
 
     async _saveAlbum(albumId: string): Promise<void> {
         // L.o('save', this._album);
-        await storage.save({ key: this.storageName, id: albumId, data: await this._getAlbum(albumId), expires: 1000 });
+        await storage.save({ key: this.storageName, id: albumId, data: await this._getAlbum(albumId), expires: 1000 * 60 * 60 });
     }
 
     async getThumbInfos(albumId: string, introUrl, sumOfPage): Promise<Array<ThumbInfo>> {

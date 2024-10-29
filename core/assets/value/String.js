@@ -284,6 +284,11 @@ export default {
         en: 'Changing to `"Normal"` mode failed, because of poor network. You can reload this page or go back to previous page and change the mode of thumbnails to `"Normal"`',
         jp: 'ネットワークが不十分であるため、`「Normal」`モードに変更できませんでした。 このページをリロードするか、前のページに戻ってサムネイルのモードを`「Normal」`に変更することができます'
     },
+    parseFailed: {
+        cn: '解析错误, 可能是因为 Thumbnail Settings 不是`"Normal"`或`"Small"`, 可前往 Settings 页面修改配置后重试。详细错误如下:',
+        en: 'Parsing failed, may be because the `Thumbnail Settings` is not `"Normal"` or `"Small"`. You can go to the Settings Page to change and try again. error detail:',
+        jp: '解析に失敗しました。Thumbnail Settings が「Normal」または「Small」ではない可能性があります。設定ページに移動して変更し、もう一度試してください。エラーの詳細:'
+    },
     loadingTip: {
         cn: '在前页采用Normal模式查看缩略图可加速加载',
         en: 'You can use "Normal" mode of thumbnail in previous page to accelerate the load.',

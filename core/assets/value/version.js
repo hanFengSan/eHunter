@@ -1,6 +1,7 @@
 export default {
     cn: `
-* 修复exhentai的缩略图显示
+* 修复exhentai/ehentai的Labeling支持问题
+* 目前存在缩略图尺寸自动换为Small的问题, 后续再修复
 
 ### iPad支持
 * 目前在iOS 15/iPadOS 15上可以运行油猴脚本了，因此eHunter也能成功在iPad上使用
@@ -14,7 +15,8 @@ eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](ht
 
 `,
     en: `
-* Fixed thumbnail problem in the exhentai
+* Fixed the Labeling support issue of exhentai/ehentai
+* There is currently an issue where the thumbnail size is automatically changed to Small, which will be fixed later.
 
 ### Use in iPad
 * The greasymonkey/tampermonkey script can run on iOS 15/iPadOS 15, so the eHunter also can run on iPad now
@@ -28,7 +30,8 @@ The eHunter-local is local version of eHunter, supporting Windows and MacOS. [Ho
 
 `,
     jp: `
-* Fixed thumbnail problem in the exhentai
+* exhentai/ehentaiのlabelingの問題を修正しました。
+* 現在、サムネイルのサイズが自動的に「Small」に変更される問題が発生していますが、これは後で修正される予定です。
 
 ### Use in iPad
 * The greasymonkey/tampermonkey script can run on iOS 15/iPadOS 15, so the eHunter also can run on iPad now.
