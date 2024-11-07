@@ -59,8 +59,9 @@ export class IntroHtmlParser {
     }
 
     _getThumbKeyId() {
-        let key = this.html.querySelector('#gdt')!.children[0].innerHTML.match(/url\(https:.*?\/cm\/.*?\//g)![0]
-        key = key.replace('url(', '')
+        let url = this.html.querySelector('#gdt')!.children[0].innerHTML.match(/url\(https.*?\)/g)![0].replace('url(', '').replace(')', '')
+        let key = url.replace(url.match(/[0-9-]{3,20}\./)![0], '__PLACE_HOLDER__')
+        // console.log('key', key)
         return key
     }
 
@@ -81,7 +82,12 @@ export class IntroHtmlParser {
         let thumbKeyId = this._getThumbKeyId();
         let imgList: string[] = [];
         for (let i = 0; i < this._getThumbPageCount(sumOfPage); i++) {
-            imgList.push(`${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
+            if (thumbKeyId.includes('__PLACE_HOLDER__')) { // new
+                let url = thumbKeyId.replace('__PLACE_HOLDER__', `${albumId}-${i < 10 ? '0' + i : i}.`)
+                imgList.push(url);
+            } else {
+                imgList.push(`${thumbKeyId}/${albumId}-${i < 10 ? '0' + i : i}.jpg`);
+            }
         }
         return imgList;
     }
