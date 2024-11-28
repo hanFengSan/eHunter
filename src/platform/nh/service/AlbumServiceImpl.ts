@@ -126,7 +126,7 @@ export class AlbumServiceImpl extends AlbumService {
         return (await this.getThumbInfos())[index];
     }
 
-    async getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo): Promise<PreviewThumbnailStyle> {
+    async getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo, width: number, height: number): Promise<PreviewThumbnailStyle> {
         return {
             'background-image': `url(${thumbInfo.src})`,
             'background-position': `0% 0%`,

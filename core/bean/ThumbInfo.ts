@@ -7,5 +7,8 @@ export interface ThumbInfo {
     id: string | number,
     src: string;
     mode: ThumbMode,
-    offset?: number;
+    offset?: number,
+    style: string,
+    height: number,
+    width: number,
 }

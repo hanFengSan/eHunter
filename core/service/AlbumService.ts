@@ -23,7 +23,7 @@ export abstract class AlbumService {
     abstract getThumbInfos(noCache?: boolean): Promise<Array<ThumbInfo>>;
     abstract getThumbInfo(index: number): Promise<ThumbInfo>;
     abstract getAlbumId(): Promise<string>;
-    abstract getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo): Promise<PreviewThumbnailStyle>;
+    abstract getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo, width: number, height: number): Promise<PreviewThumbnailStyle> | Promise<string>;
     abstract supportOriginImg(): boolean;
     abstract supportImgChangeSource(): boolean;
     abstract supportThumbView(): boolean;

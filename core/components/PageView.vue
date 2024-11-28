@@ -1,5 +1,5 @@
 <template>
-<section class="page-view" @click="onClickBg()">
+<section class="page-view" ref="page" @click="onClickBg()">
     <div class="layer preview-layer" :style="previewStyle"></div>
     <div class="layer loading-layer">
         <h6 class="index">{{ index + 1 }}</h6>
@@ -98,9 +98,27 @@ export default {
         if (this.active) {
             this.getImgSrc();
         }
-        this.service.album.getThumbInfo(this.index).then(async thumbInfo => {
-            this.previewStyle = await this.service.album.getPreviewThumbnailStyle(this.index, this.imgPageInfo, thumbInfo);
+    },
+
+    async mounted() {
+        const pageDiv = this.$refs.page;
+        const resizeCallback = async () => {
+            const width = pageDiv.offsetWidth;
+            const height = pageDiv.offsetHeight;
+            let thumbInfo = await this.service.album.getThumbInfo(this.index);
+            this.previewStyle = await this.service.album.getPreviewThumbnailStyle(this.index, this.imgPageInfo, thumbInfo, width, height);
+        };
+        resizeCallback();
+        this.resizeObserver = new ResizeObserver(() => {
+            resizeCallback();
         });
+        this.resizeObserver.observe(pageDiv);
+    },
+
+    beforeDestroy() {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
     },
 
     computed: {

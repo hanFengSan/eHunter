@@ -8,7 +8,7 @@
             <div class="indicator" :style="{top: px(160*(curIndex.val - volFirstIndex))}"></div>
             <div class="thumb-container" @click="select(index(i))" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
                 <template v-if="(readingMode === 0 && showThumbView) || (readingMode ===1 && showThumbViewInBook)">
-                    <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
+                    <div class="thumb spirit-mode" v-if="item.mode === 0" :style="getSpriteStyle(item)"></div>
                     <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
                 </template>
                 <div class="hover-mask"></div>
@@ -115,6 +115,14 @@ export default {
         // get index of current volume for index of album
         volIndex(i) {
             return i - this.volFirstIndex;
+        },
+
+        getSpriteStyle(item) {
+            if (item.height > item.width) {
+                return `${item.style}; height: ${item.height}px; width: ${item.width}px; transform: scale(${144 / item.height}); position: absolute;`
+            } else {
+                return `${item.style}; height: ${item.height}px; width: ${item.width}px; transform: scale(${100 / item.width}); position: absolute;`
+            }
         }
     }
 };

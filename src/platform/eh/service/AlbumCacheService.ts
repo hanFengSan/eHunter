@@ -71,25 +71,25 @@ export class AlbumCacheService {
             return this._album;
         } else {
             // disable cache to avoid cache problem
-            let now = new Date().getTime()
-            if (now < 1732757677943) { // before 2024-11-28, disable cache
+            // let now = new Date().getTime()
+            // if (now < 1732757677943) { // before 2024-11-28, disable cache
                 this._album = {
                     title: '',
                     thumbInfos: [],
                     imgPageInfos: []
                 };
                 return this._album!;
-            }
-            try {
-                this._album = await storage.load({ key: this.storageName, id: albumId });
-            } catch (e) {
-                this._album = {
-                    title: '',
-                    thumbInfos: [],
-                    imgPageInfos: []
-                };
-            }
-            return this._album!;
+            // }
+            // try {
+            //     this._album = await storage.load({ key: this.storageName, id: albumId });
+            // } catch (e) {
+            //     this._album = {
+            //         title: '',
+            //         thumbInfos: [],
+            //         imgPageInfos: []
+            //     };
+            // }
+            // return this._album!;
         }
     }
 
@@ -99,47 +99,19 @@ export class AlbumCacheService {
     }
 
     async getThumbInfos(albumId: string, introUrl, sumOfPage): Promise<Array<ThumbInfo>> {
-        let album = await this._getAlbum(albumId);
-        if (album.thumbInfos.length > 0) {
-            Logger.logText('CacheService', 'read thumbInfos from cache');
-            return JSON.parse(JSON.stringify(album.thumbInfos));
-        } else {
-            try {
-                let text;
-                let reqUrl = API.getIntroHtml(introUrl, 1);
-                // compatible with large mode
-                try { // If in 'Normal' mode of thumbnails, this will be right
-                    text = await new TextReq(reqUrl).request();
-                    new IntroHtmlParser(text, reqUrl).getThumbObjList(sumOfPage, albumId);
-                    this._isNormalMode = true;
-                    await SettingService.setNormalMode(true);
-                } catch (e) { // In 'Large' mode
-                    // Send a request to change to 'Normal' mode
-                    try {
-                        introUrl = (await window.fetch(`${window.location.origin}${introUrl}?inline_set=ts_m`, { method: 'GET', credentials: 'include' })).url;
-                        text = await new TextReq(API.getIntroHtml(introUrl, 1)).request();
-                        this.albumService.setIntroUrl(introUrl);
-                        this._isNormalMode = true;
-                        Logger.logText('Cache', 'switch to small');
-                        this._isChangedMode = true;
-                        await SettingService.setNormalMode(false);
-                    } catch (e) {
-                        InfoService.showReloadError(store.getters.string.changingToSmallFailed);
-                        Logger.logObj('AlbumCache', e);
-                    }
-                }
-                let introPage = new IntroHtmlParser(text, reqUrl);
-                let thumbInfos = introPage.getThumbObjList(sumOfPage, albumId);
-                album.thumbInfos = thumbInfos;
-                this._album!.thumbInfos = thumbInfos; // wired
-                await this._saveAlbum(albumId);
-                return JSON.parse(JSON.stringify(album.thumbInfos));
-            } catch (e) {
-                // TODO: show tips for the error
-                console.error(e);
-                return [];
+        let imgPageInfos = await this.getImgPageInfos(albumId, introUrl, sumOfPage);
+        let result = imgPageInfos.map((i: ImgPageInfo) => {
+            return {
+                id: i.id,
+                src: '',
+                mode: 0,
+                offset: 0,
+                style: i.thumbStyle,
+                height: i.thumbHeight!,
+                width: i.thumbWidth!,
             }
-        }
+        })
+        return result
     }
 
     async getImgPageInfos(albumId: string, introUrl: string, sumOfPage: number): Promise<Array<ImgPageInfo>> {
@@ -148,21 +120,11 @@ export class AlbumCacheService {
             Logger.logText('CacheService', 'read imgPageInfos from cache');
             return JSON.parse(JSON.stringify(album.imgPageInfos));
         } else {
-            if (!await SettingService.getNormalMode()) {
-                while (!this._isNormalMode) {
-                    await Utils.timeout(100);
-                }
-                introUrl = this.albumService.getIntroUrl(); // after changine mode, the introUrl maybe changed.
-            }
             try {
                 return await this._getImgPageInfos(albumId, introUrl, sumOfPage);
             } catch (e) {
-                Logger.logText('CacheService', 'loading ImgPageInfos failed. It\'s large.');
-                while (!this._isNormalMode) {
-                    await Utils.timeout(100);
-                    introUrl = this.albumService.getIntroUrl();
-                }
-                return await this._getImgPageInfos(albumId, introUrl, sumOfPage);
+                Logger.logText('CacheService', 'loading ImgPageInfos failed. error: ' + e);
+                return []
             }
         }
     }

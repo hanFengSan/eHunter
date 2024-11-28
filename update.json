@@ -1,8 +1,8 @@
 {
     "cn":{
-        "title":"新版本: v2.7.7",
-        "version":"2.7.7",
-        "text":"1. 修复exhentai/ehentai的缩略图解析问题",
+        "title":"新版本: v2.8.0",
+        "version":"2.8.0",
+        "text":"1. 修复exhentai/ehentai的解析问题",
         "time":1690647347098,
         "duration":3000,
         "always":true,
@@ -14,9 +14,9 @@
         ]
     },
     "en":{
-        "title":"New version: v2.7.7",
-        "version":"2.7.7",
-        "text":"1. Fixed the thumbnail support issue of exhentai/ehentai",
+        "title":"New version: v2.8.0",
+        "version":"2.8.0",
+        "text":"1. Fixed the support issue of exhentai/ehentai",
         "time":1690647347098,
         "duration":3000,
         "always":true,
@@ -28,9 +28,9 @@
         ]
     },
     "jp":{
-        "title":"新しいバージョン: v2.7.7",
-        "version":"2.7.7",
-        "text":"1. exhentai/ehentaiのthumbnailの問題を修正しました",
+        "title":"新しいバージョン: v2.8.0",
+        "version":"2.8.0",
+        "text":"1. exhentai/ehentaiの問題を修正しました",
         "time":1690647347098,
         "duration":3000,
         "always":true,
