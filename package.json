@@ -26,7 +26,7 @@
         "karma-chrome-launcher": "^2.2.0",
         "less": "^2.7.2",
         "less-loader": "^4.0.0",
-        "markdown-it": "^8.4.2",
+        "markdown-it": "^12.3.2",
         "markdown-it-emoji": "^1.4.0",
         "muse-ui": "^2.0.0-rc.5",
         "react-native-storage": "0.2.2",
