@@ -1,47 +1,29 @@
 <template>
-  <div class="album-scroll-view">
-    <div class="preload">
-      <img :src="src" width="100" height="144" v-for="src of preloadImgs" :key="src">
-    </div>
-    <!-- scroll view -->
-    <awesome-scroll-view
-        ref="scrollView"
-        class="scroll-view"
-        v-if="imgPageInfos.length > 0"
-        :on-scroll-stopped="onScrollStopped"
-        @topIn="changeTopBar(true)"
-        @topLeave="changeTopBar(false)">
-        <h1>{{ title }}</h1>
-        <pagination
-            v-if="volumeSum != 1"
-            class="top-pagination"
-            :cur-index="curVolume"
-            :page-sum="volumeSum"
-            @change="selectVol"
-        />
-        <div
-            class="page-container"
-            ref="pageContainers"
-            v-for="(imgPageInfo, i) of volImgPageInfos"
-            :key="imgPageInfo.id"
-            :style="{'width':`${widthScale}%`,'padding-bottom':`${widthScale * (imgPageInfo.preciseHeightOfWidth ? imgPageInfo.preciseHeightOfWidth : imgPageInfo.heightOfWidth)}%`,'margin': `${scrolledPageMargin}px auto`}">
-            <page-view
-                :index="imgPageInfo.index"
-                :active="nearbyArray.indexOf(index(i)) > -1"
-                :albumId="albumId"
-                v-on:update-img-page-info="updateImgPageInfo"
-                :data="imgPageInfo">
-            </page-view>
+    <div class="album-scroll-view">
+        <div class="preload">
+            <img :src="src" width="100" height="144" v-for="src of preloadImgs" :key="src">
         </div>
-        <pagination
-            v-if="volumeSum != 1"
-            class="bottom-pagination"
-            :curIndex="curVolume"
-            :pageSum="volumeSum"
-            @change="selectVol"
-        />
-    </awesome-scroll-view>
-  </div>
+        <!-- scroll view -->
+        <awesome-scroll-view ref="scrollView" class="scroll-view" v-if="imgPageInfos.length > 0"
+            :on-scroll-stopped="onScrollStopped" @topIn="changeTopBar(true)" @topLeave="changeTopBar(false)">
+            <h1>{{ title }}</h1>
+            <pagination v-if="volumeSum != 1" class="top-pagination" :cur-index="curVolume" :page-sum="volumeSum"
+                @change="selectVol" />
+            <div class="page-container" ref="pageContainers" v-for="(imgPageInfo, i) of volImgPageInfos"
+                :key="imgPageInfo.id"
+                :style="{ 'width': `${widthScale}%`, 'padding-bottom': `${widthScale * (imgPageInfo.preciseHeightOfWidth ? imgPageInfo.preciseHeightOfWidth : imgPageInfo.heightOfWidth)}%`, 'margin': `${scrolledPageMargin}px auto` }">
+                <page-view :index="imgPageInfo.index" :active="nearbyArray.indexOf(index(i)) > -1" :albumId="albumId"
+                    v-on:update-img-page-info="updateImgPageInfo" :data="imgPageInfo">
+                </page-view>
+            </div>
+            <pagination v-if="volumeSum != 1" class="bottom-pagination" :curIndex="curVolume" :pageSum="volumeSum"
+                @change="selectVol" />
+        </awesome-scroll-view>
+        <div class="auto-scroll-button" @click="autoScrollButtonClick">A</div>
+        <pop-slider v-if='showAutoScrollSlider' class="scroll-speed-slider" :active="true" :min="0" :max="2"
+            :step="0.01" :init="scrollSpeed" :close="autoScrollButtonClick" :is-float="true"
+            @change="updateAutoScrollSpeed" />
+    </div>
 </template>
 
 <script>
@@ -51,6 +33,7 @@ import TopBar from './TopBar.vue';
 import Logger from '../utils/Logger.js';
 import Pagination from './widget/Pagination.vue';
 import PageView from './PageView.vue';
+import PopSlider from './widget/PopSlider.vue';
 import SettingService from '../service/SettingService.ts';
 import * as tags from '../assets/value/tags';
 
@@ -80,7 +63,12 @@ export default {
     data() {
         return {
             scrollTop: 0,
-            preloadImgs: []
+            preloadImgs: [],
+
+            // for auto scroll animation
+            showAutoScrollSlider: false,
+            scrollSpeed: 0,
+            requestId: 0,
         };
     },
 
@@ -88,12 +76,17 @@ export default {
         AwesomeScrollView,
         TopBar,
         Pagination,
-        PageView
+        PageView,
+        PopSlider
     },
 
     async created() {
         setTimeout(() => this.setIndex({ val: this.curIndex.val, updater: tags.SCROLL_VIEW_VOL }), 200);
         document.addEventListener('keydown', this.watchKeyboard);
+    },
+
+    beforeDestroy() {
+        this.cancelAutoScroll();
     },
 
     destroyed() {
@@ -111,7 +104,7 @@ export default {
             volumePreloadCount: 'volumePreloadCount',
             showMoreSettings: 'showMoreSettings',
             showTopBar: 'showTopBar',
-            scrolledPageMargin: 'scrolledPageMargin'
+            scrolledPageMargin: 'scrolledPageMargin',
         }),
 
         // return a indexes array. the index is index of page, determining the show of pages.
@@ -139,7 +132,7 @@ export default {
 
     watch: {
         centerIndex: {
-            handler: async function(val, oldVal) {
+            handler: async function (val, oldVal) {
                 if (this.curIndex.updater !== tags.SCROLL_VIEW && this.$refs.pageContainers) {
                     // sync index
                     if (this.curIndex.val === this.volFirstIndex) {
@@ -182,14 +175,14 @@ export default {
                     this.setIndex({ val: index, updater: tags.SCROLL_VIEW });
                 }
             }
-        }
+        },
     },
 
     methods: {
         ...mapActions(['setIndex', 'toggleTopBar']),
 
         range(start, count) {
-            return Array.apply(0, Array(count)).map(function(element, index) {
+            return Array.apply(0, Array(count)).map(function (element, index) {
                 return index + start;
             });
         },
@@ -269,6 +262,77 @@ export default {
 
         updateImgPageInfo(index, newImgPageInfo) {
             this.$set(this.imgPageInfos, index, newImgPageInfo);
+        },
+
+        autoScrollButtonClick() {
+            this.showAutoScrollSlider = !this.showAutoScrollSlider;
+        },
+
+        updateAutoScrollSpeed(val) {
+            this.scrollSpeed = val;
+            if (this.scrollSpeed > 0) {
+                if (this.requestId === 0) {
+                    this.scheduleAutoScroll();
+                }
+            } else {
+                this.cancelAutoScroll();
+            }
+        },
+
+        cancelAutoScroll() {
+            if (this.requestId !== 0) {
+                window.cancelAnimationFrame(this.requestId);
+                this.requestId = 0;
+            }
+        },
+
+        outOfViewPortCheckUtil() {
+            const setInterval = 200; // hardcoded here, check every 0.2s
+            let timeElapsed = 0;
+            return (deltaTime) => {
+                timeElapsed += deltaTime;
+                if (timeElapsed >= setInterval) {
+                    timeElapsed = 0;
+                    const rect = this.$refs.scrollView.$refs.asv.getBoundingClientRect();
+                    const visible = rect.top >= 0 &&
+                        rect.left >= 0 &&
+                        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && 
+                        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+                    if (!visible) {
+                        this.updateAutoScrollSpeed(0);
+                    }
+                }
+            }
+        },
+
+        scheduleAutoScroll() {
+            const container = this.$refs.scrollView.$refs.asv;
+            const thisVal = this;
+            // just to make sure we have cancelled the previously scheduled update.
+            this.cancelAutoScroll();
+
+            const checkOutOfViewPortAndStop = this.outOfViewPortCheckUtil();
+            let start = undefined;
+            let scrollValue = 0;
+            this.requestId = window.requestAnimationFrame(function scroll(timeStamp) {
+                if (start === undefined) {
+                    start = timeStamp;
+                }
+                const deltaTime = timeStamp - start; // in milliseconds
+                start = timeStamp;
+                // accumulate scroll value here since only whole numbers are accepted
+                scrollValue += thisVal.scrollSpeed * (deltaTime / 5);
+                const integerPart = Math.trunc(scrollValue);
+                if (integerPart >= 1) {
+                    container.scrollTop += integerPart;
+                    // update scrollTop to trigger page load, see watch scrollTop.
+                    thisVal.scrollTop = container.scrollTop;
+                    scrollValue -= integerPart;
+                }
+                thisVal.requestId = window.requestAnimationFrame(scroll);
+                // check after the update is scheduled
+                checkOutOfViewPortAndStop(deltaTime);
+            });
         }
     }
 };
@@ -277,11 +341,38 @@ export default {
 <style lang="scss" scoped>
 @import '../style/_responsive';
 @import '../style/_variables';
+
 .album-scroll-view {
     position: relative;
     flex-direction: column;
     align-items: center;
-    > .preload {
+
+    .scroll-speed-slider {
+        position: absolute;
+        bottom: 5%;
+        top: unset;
+        left: 50%;
+        transform: translateX(-50%);
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    .auto-scroll-button {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 50px;
+        right: 50px;
+        background: #28af60;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 15%;
+        cursor: pointer;
+    }
+
+    >.preload {
         position: absolute;
         top: 0;
         left: 0;
@@ -290,9 +381,11 @@ export default {
         z-index: -10;
         opacity: 0;
     }
-    > .scroll-view {
+
+    >.scroll-view {
         height: 100%;
         width: 100%;
+
         h1 {
             color: #c9cacf;
             padding: 10px 20px;
@@ -300,21 +393,26 @@ export default {
             text-align: center;
             margin-top: 60px;
         }
-        > .top-pagination {
+
+        >.top-pagination {
             margin-top: 15px;
             margin-bottom: 15px;
         }
-        > .bottom-pagination {
+
+        >.bottom-pagination {
             margin-top: 15px;
             margin-bottom: 30px;
         }
+
         .page-container {
             transition: all 0.3s ease;
             height: 0;
             position: relative;
+
             &:first-of-type {
                 margin-top: 35px;
             }
+
             &:last-of-type {
                 margin-bottom: 35px;
             }
