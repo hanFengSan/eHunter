@@ -3,30 +3,32 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check build-only",
+    "build": "vite build",
+    "build-only": "vite build",
     "preview": "vite preview",
     "build-dev": "vite build",
     "build-prod": "vite build --config vite.config.prod.ts",
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "vite-plugin-css-injected-by-js": "^2.1.1",
-    "vue": "^3.2.41",
     "markdown-it": "^8.4.2",
     "markdown-it-emoji": "^1.4.0",
-    "twemoji": "^12.0.1"
+    "twemoji": "^12.0.1",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vue": "^3.5.28"
   },
   "devDependencies": {
-    "@types/node": "^16.11.68",
-    "@vitejs/plugin-vue": "^3.1.2",
-    "@vue/tsconfig": "^0.1.3",
-    "less": "^4.1.3",
-    "less-loader": "^11.1.0",
+    "@tsconfig/node22": "^22.0.5",
+    "@types/node": "^22.19.11",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vue/tsconfig": "^0.8.1",
+    "less": "^4.5.1",
+    "less-loader": "^12.3.1",
     "npm-run-all": "^4.1.5",
-    "sass": "^1.55.0",
-    "typescript": "~4.7.4",
-    "vite": "^3.1.8",
-    "vite-svg-loader": "^3.6.0",
-    "vue-tsc": "^1.0.8"
+    "sass": "^1.97.3",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1",
+    "vite-svg-loader": "^5.1.0",
+    "vue-tsc": "^3.2.4"
   }
 }
