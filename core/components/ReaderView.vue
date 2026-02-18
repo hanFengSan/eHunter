@@ -5,7 +5,7 @@
     </div>
     <div class="main-content">
         <!-- top bar view -->
-        <TopBar class="top-bar"/>
+        <TopBar class="top-bar" @closeEHunter="closeReader"/>
         <!-- panel view -->
         <transition name="slow-horizontal-fade">
             <AlbumScrollView class="content scroll-mode" v-if="store.readingMode === 0" />
@@ -27,6 +27,13 @@ import TopBar from './TopBar.vue';
 import AlbumBookView from './AlbumBookView.vue';
 import { i18n } from '../store/i18n'
 import { store, storeAction } from '../store/app'
+
+function closeReader() {
+    const elem = document.querySelector('.ehunter-container') as HTMLElement | null
+    if (elem) {
+        elem.style.display = 'none'
+    }
+}
 </script>
 
 <style lang="scss" scoped>

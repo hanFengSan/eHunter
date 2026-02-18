@@ -274,6 +274,96 @@ export default <any>{
         en: 'Show/hide more settings [Shift]',
         jp: '他の設定を表示/隠す [Shift]'
     },
+    openMoreSettingsModal: {
+        cn: '更多设置',
+        en: 'More settings',
+        jp: '詳細設定'
+    },
+    settingsGeneral: {
+        cn: '通用',
+        en: 'General',
+        jp: '一般'
+    },
+    settingsScrollMode: {
+        cn: '滚动模式',
+        en: 'Scroll mode',
+        jp: 'スクロールモード'
+    },
+    settingsBookMode: {
+        cn: '书页模式',
+        en: 'Book mode',
+        jp: 'ページモード'
+    },
+    settingsQuick: {
+        cn: '快捷设置',
+        en: 'Quick settings',
+        jp: 'クイック設定'
+    },
+    languageSetting: {
+        cn: '语言',
+        en: 'Language',
+        jp: '言語'
+    },
+    settingsOther: {
+        cn: '其他',
+        en: 'Other',
+        jp: 'その他'
+    },
+    autoSourceRetry: {
+        cn: '自动换源重试',
+        en: 'Auto source retry',
+        jp: '自動ソース再試行'
+    },
+    autoSourceRetryTip: {
+        cn: '加载失败时自动尝试换源',
+        en: 'Automatically retry with another source when loading fails',
+        jp: '読み込み失敗時に別ソースで自動再試行'
+    },
+    resetAllConfirmTitle: {
+        cn: '确认清空缓存并重置设置',
+        en: 'Confirm cache clear and reset',
+        jp: 'キャッシュ削除と設定リセットを確認'
+    },
+    resetAllConfirmDesc: {
+        cn: '该操作会清空缓存并恢复所有设置为默认值，且不可撤销。',
+        en: 'This clears cache and restores all settings to default, and cannot be undone.',
+        jp: 'この操作はキャッシュを削除し、すべての設定を初期値に戻します。取り消しできません。'
+    },
+    versionLabel: {
+        cn: '版本号',
+        en: 'Version',
+        jp: 'バージョン'
+    },
+    enabled: {
+        cn: '已启用',
+        en: 'Enabled',
+        jp: '有効'
+    },
+    hidden: {
+        cn: '已隐藏',
+        en: 'Hidden',
+        jp: '非表示'
+    },
+    quickDragHint: {
+        cn: '拖拽设置项可调整顺序，并可在上下区域间移动来控制显示。',
+        en: 'Drag items to reorder, and move between sections to show or hide.',
+        jp: 'ドラッグで並び替え、上下の領域間移動で表示/非表示を切り替えます。'
+    },
+    quickEnabledHint: {
+        cn: '这些会显示在顶部快捷栏',
+        en: 'Shown in top quick bar',
+        jp: '上部クイックバーに表示'
+    },
+    quickHiddenHint: {
+        cn: '这些不会显示在顶部快捷栏',
+        en: 'Hidden from top quick bar',
+        jp: '上部クイックバーに非表示'
+    },
+    disabled: {
+        cn: '已禁用',
+        en: 'Disabled',
+        jp: '無効'
+    },
     confirm: {
         cn: '确定',
         en: 'CONFIRM',

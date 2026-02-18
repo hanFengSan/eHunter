@@ -1,5 +1,5 @@
 <template>
-  <popover class="PopSlider" :active="active" @close="emit('close')">
+  <popover class="PopSlider" :active="active" :custom-style="{ maxWidth: 'min(92vw, 360px)' }" @close="emit('close')">
     <div class="content" @keydown="stopArrowEvent">
       <input ref="inputElem" class="value" type="number" @keydown="watchKeyboard" v-model="value">
       <slider class="slider" :min="min" :max="max" :step="step" :init="init" @change="emitChange"></slider>

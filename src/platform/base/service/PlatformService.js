@@ -50,6 +50,43 @@ export default {
             return false;
         }
     },
+    storageRemove(key) {
+        try {
+            if (typeof GM_deleteValue === 'function') {
+                GM_deleteValue(key);
+                return true;
+            }
+        } catch (e) {
+        }
+        try {
+            window.localStorage.removeItem(key);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
+    storageClear() {
+        try {
+            if (typeof GM_listValues === 'function' && typeof GM_deleteValue === 'function') {
+                const keys = GM_listValues();
+                if (Array.isArray(keys)) {
+                    keys.forEach(key => {
+                        try {
+                            GM_deleteValue(key);
+                        } catch (e) {
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+        }
+        try {
+            window.localStorage.clear();
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
     getExtension() {
         return chrome.extension;
     },

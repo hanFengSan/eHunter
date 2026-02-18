@@ -86,6 +86,7 @@
 
 ## 要求
 - 所有UI组件都需要自建，不能使用第三方库
+- UI默认使用flex布局，且需要显示指定flex-direction
 
 # 平台设计说明和目标
 - 参考./design.md
@@ -93,6 +94,8 @@
 ## Active Technologies
 - TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules (001-add-pageflip-toggle)
 - 浏览器端偏好存储（优先 userscript storage，降级 localStorage） (001-add-pageflip-toggle)
+- TypeScript 5.9 + Vue 3.5 + Vue runtime, Vite 6, existing core widget components (`DropOption`, `NumDropOption`, `SimpleSwitch`, `SimpleDialog`, `Popover`, `CircleIconButton`) (001-more-settings-modal)
+- Userscript storage (`GM_*`) preferred with Platform storage/localStorage fallback; existing reader/cache storage keys (001-more-settings-modal)
 
 ## Recent Changes
 - 001-add-pageflip-toggle: Added TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules

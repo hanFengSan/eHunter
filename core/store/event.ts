@@ -48,7 +48,7 @@ function handleKeyboardEvent(e: any) {
             }
             break
         case 'Shift':
-            storeAction.toggleShowMoreSettings()
+            storeAction.toggleShowMoreSettingsDialog()
             break
         case 'Escape':
             storeAction.toggleShowTopBar()

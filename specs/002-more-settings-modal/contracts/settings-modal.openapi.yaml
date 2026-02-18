@@ -1,0 +1,263 @@
+openapi: 3.0.3
+info:
+  title: eHunter Unified Settings Modal Contract
+  version: 1.0.0
+  description: |
+    Logical contract for unified settings modal behaviors inside the reader UI.
+    These endpoints describe interaction/state boundaries for implementation planning and testing.
+servers:
+  - url: https://ehunter.local
+paths:
+  /settings/modal:
+    get:
+      summary: Get unified settings modal payload
+      operationId: getSettingsModalPayload
+      responses:
+        '200':
+          description: Current modal categories and settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsModalPayload'
+  /settings/preferences:
+    patch:
+      summary: Update one or more setting values
+      operationId: patchSettingsPreferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingsPreferencePatch'
+      responses:
+        '200':
+          description: Updated preference snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsPreferenceSnapshot'
+  /settings/quick-items:
+    patch:
+      summary: Update quick setting selection and global order
+      operationId: patchQuickSettingItems
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuickSettingsPatch'
+      responses:
+        '200':
+          description: Updated quick settings projection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuickSettingsState'
+  /settings/factory-reset/confirm:
+    post:
+      summary: Confirm and execute clear-cache plus reset-settings action
+      operationId: confirmFactoryReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactoryResetConfirmRequest'
+      responses:
+        '202':
+          description: Reset accepted and started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetOperation'
+        '409':
+          description: Confirmation mismatch or stale state
+components:
+  schemas:
+    SettingsModalPayload:
+      type: object
+      required:
+        - categories
+        - settings
+        - quickSettings
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/SettingsCategory'
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/SettingItem'
+        quickSettings:
+          $ref: '#/components/schemas/QuickSettingsState'
+    SettingsCategory:
+      type: object
+      required:
+        - id
+        - label
+        - order
+        - anchorId
+      properties:
+        id:
+          type: string
+          enum: [general, scroll, book, quick, other]
+        label:
+          type: string
+        order:
+          type: integer
+        anchorId:
+          type: string
+    SettingItem:
+      type: object
+      required:
+        - id
+        - categoryId
+        - label
+        - controlType
+        - valueType
+        - modeScope
+      properties:
+        id:
+          type: string
+        categoryId:
+          type: string
+          enum: [general, scroll, book, quick, other]
+        label:
+          type: string
+        description:
+          type: string
+          nullable: true
+        controlType:
+          type: string
+          enum: [select, number, toggle, action, readonly]
+        valueType:
+          type: string
+          enum: [string, number, boolean, none]
+        currentValue:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: 'null'
+        defaultValue:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: 'null'
+        modeScope:
+          type: string
+          enum: [both, scroll-only, book-only]
+    SettingsPreferencePatch:
+      type: object
+      required:
+        - updates
+      properties:
+        updates:
+          type: array
+          items:
+            type: object
+            required: [settingItemId, value]
+            properties:
+              settingItemId:
+                type: string
+              value:
+                oneOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+    QuickSettingsPatch:
+      type: object
+      required:
+        - selectedItemIds
+        - globalOrder
+      properties:
+        selectedItemIds:
+          type: array
+          items:
+            type: string
+        globalOrder:
+          type: array
+          items:
+            type: string
+    QuickSettingsState:
+      type: object
+      required:
+        - selectedItemIds
+        - globalOrder
+        - pinnedItemId
+      properties:
+        selectedItemIds:
+          type: array
+          items:
+            type: string
+        globalOrder:
+          type: array
+          items:
+            type: string
+        pinnedItemId:
+          type: string
+          description: Fixed "reading mode" item id, always first.
+    SettingsPreferenceSnapshot:
+      type: object
+      required:
+        - schemaVersion
+        - updatedAt
+        - settings
+        - quickSelection
+        - quickGlobalOrder
+      properties:
+        schemaVersion:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+        settings:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: number
+              - type: boolean
+        quickSelection:
+          type: array
+          items:
+            type: string
+        quickGlobalOrder:
+          type: array
+          items:
+            type: string
+    FactoryResetConfirmRequest:
+      type: object
+      required:
+        - confirmed
+      properties:
+        confirmed:
+          type: boolean
+          enum: [true]
+        confirmationText:
+          type: string
+          nullable: true
+    ResetOperation:
+      type: object
+      required:
+        - type
+        - requiresConfirmation
+        - status
+      properties:
+        type:
+          type: string
+          enum: [factory-reset]
+        requiresConfirmation:
+          type: boolean
+        status:
+          type: string
+          enum: [idle, confirming, running, success, failed]
+        errorMessage:
+          type: string
+          nullable: true
+        confirmedAt:
+          type: string
+          format: date-time
+          nullable: true

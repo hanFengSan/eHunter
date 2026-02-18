@@ -132,7 +132,11 @@ async function getNewImgSrc(mode: ImgSrcMode) {
     message.value = ''
     storeAction.setImgPageInfoSrc(props.index, '')
     curLoadStatus.value = ImgLoadStatus.Loading
-    let resp = await albumService.getImgSrc(props.index, mode)
+    let actualMode = mode
+    if (mode === ImgSrcMode.Default && store.autoRetryByOtherSource && albumService.isSupportImgChangeSource()) {
+        actualMode = ImgSrcMode.ChangeSource
+    }
+    let resp = await albumService.getImgSrc(props.index, actualMode)
     if (resp instanceof Error) {
         switch (resp.message) {
             case 'ERROR_NO_ORIGIN':

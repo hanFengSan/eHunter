@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { i18n, lang } from './i18n'
 import type { AlbumService } from '../service/AlbumService'
 import { NameAlbumService } from '../service/AlbumService'
@@ -7,6 +7,40 @@ import { initViewportSizeUpdater, initKeyboardListener, resetAutoFlipTimer, chec
 import PlatformService from '../../src/platform/base/service/PlatformService.js'
 
 type PageTurnAnimationMode = 'realistic' | 'slide' | 'none'
+
+type ModeScope = 'both' | 'scroll-only' | 'book-only'
+type SettingsPanelCategory = 'general' | 'scroll' | 'book'
+type SettingControlType = 'drop' | 'num' | 'switch'
+
+export interface QuickSettingOption {
+    id: string
+    i18nKey: string
+    modeScope: ModeScope
+    fixed?: boolean
+}
+
+export interface SettingsCategory {
+    id: 'general' | 'scroll' | 'book' | 'quick' | 'other'
+    i18nKey: string
+}
+
+export interface SettingFieldDefinition {
+    id: string
+    control: SettingControlType
+    labelI18nKey: string
+    tipI18nKey?: string
+    modeScope: ModeScope
+    showInTopBar: boolean
+    showInDialog: boolean
+    dialogCategory?: SettingsPanelCategory
+    dropKey?: 'readingModeList' | 'bookDirection' | 'pageTurnAnimation' | 'langList'
+    numKey?: 'widthScale' | 'loadNum' | 'volumeSize' | 'pagesPerScreen' | 'autoFlipFrequency' | 'wheelSensitivity' | 'scrollPageMargin'
+    min?: number
+    max?: number
+    useAbbrName?: boolean
+    isFloat?: boolean
+    requireThumbSupportInTopBar?: boolean
+}
 
 interface PageTurnAnimationPreference {
     schemaVersion: number
@@ -18,9 +52,293 @@ interface PageTurnAnimationPreference {
 const pageTurnAnimationPreferenceKey = 'ehunter:reader:prefs:page-turn-animation'
 const pageTurnAnimationPreferenceSchemaVersion = 1
 const defaultPageTurnAnimationMode: PageTurnAnimationMode = 'realistic'
+const unifiedSettingsPreferenceKey = 'ehunter:reader:prefs:unified-settings'
+const unifiedSettingsPreferenceSchemaVersion = 1
 let bookTurnSettleTimerID: number = 0
 let isBookTurning = false
 let pendingBookTurn: null | { val: number, updater: string } = null
+
+export const quickSettingOptions: QuickSettingOption[] = [
+    { id: 'readingMode', i18nKey: 'readingMode', modeScope: 'both', fixed: true },
+    { id: 'widthScale', i18nKey: 'widthScale', modeScope: 'scroll-only' },
+    { id: 'loadNum', i18nKey: 'loadNum', modeScope: 'both' },
+    { id: 'volumeSize', i18nKey: 'volSize', modeScope: 'scroll-only' },
+    { id: 'showThumbView', i18nKey: 'thumbView', modeScope: 'scroll-only' },
+    { id: 'scrollPageMargin', i18nKey: 'pageMargin', modeScope: 'scroll-only' },
+    { id: 'pagesPerScreen', i18nKey: 'screenSize', modeScope: 'book-only' },
+    { id: 'bookDirection', i18nKey: 'bookDirection', modeScope: 'book-only' },
+    { id: 'pageTurnAnimationMode', i18nKey: 'pageTurnAnimation', modeScope: 'book-only' },
+    { id: 'showBookPagination', i18nKey: 'pagination', modeScope: 'book-only' },
+    { id: 'isChangeOddEven', i18nKey: 'oddEven', modeScope: 'book-only' },
+    { id: 'isReverseFlip', i18nKey: 'reverseFlip', modeScope: 'book-only' },
+    { id: 'isAutoFlip', i18nKey: 'autoFlip', modeScope: 'book-only' },
+    { id: 'autoFlipFrequency', i18nKey: 'autoFlipFrequency', modeScope: 'book-only' },
+    { id: 'showBookThumbView', i18nKey: 'thumbView', modeScope: 'book-only' },
+    { id: 'IsReverseBookWheeFliplDirection', i18nKey: 'wheelDirection', modeScope: 'book-only' },
+    { id: 'wheelSensitivity', i18nKey: 'wheelSensitivity', modeScope: 'book-only' },
+    { id: 'lang', i18nKey: 'languageSetting', modeScope: 'both' },
+    { id: 'autoRetryByOtherSource', i18nKey: 'autoSourceRetry', modeScope: 'both' },
+]
+
+export const settingsCategories: SettingsCategory[] = [
+    { id: 'general', i18nKey: 'settingsGeneral' },
+    { id: 'scroll', i18nKey: 'settingsScrollMode' },
+    { id: 'book', i18nKey: 'settingsBookMode' },
+    { id: 'quick', i18nKey: 'settingsQuick' },
+    { id: 'other', i18nKey: 'settingsOther' },
+]
+
+export const settingFieldDefinitions: SettingFieldDefinition[] = [
+    {
+        id: 'readingMode',
+        control: 'drop',
+        labelI18nKey: 'readingMode',
+        tipI18nKey: 'readingModeTip',
+        modeScope: 'both',
+        showInTopBar: true,
+        showInDialog: false,
+        dropKey: 'readingModeList',
+    },
+    {
+        id: 'lang',
+        control: 'drop',
+        labelI18nKey: 'languageSetting',
+        modeScope: 'both',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'general',
+        dropKey: 'langList',
+        useAbbrName: true,
+    },
+    {
+        id: 'loadNum',
+        control: 'num',
+        labelI18nKey: 'loadNum',
+        tipI18nKey: 'loadNumTip',
+        modeScope: 'both',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'general',
+        numKey: 'loadNum',
+        min: 1,
+        max: 100,
+    },
+    {
+        id: 'autoRetryByOtherSource',
+        control: 'switch',
+        labelI18nKey: 'autoSourceRetry',
+        tipI18nKey: 'autoSourceRetryTip',
+        modeScope: 'both',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'general',
+    },
+    {
+        id: 'widthScale',
+        control: 'num',
+        labelI18nKey: 'widthScale',
+        tipI18nKey: 'widthScaleTip',
+        modeScope: 'scroll-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'scroll',
+        numKey: 'widthScale',
+        min: 30,
+        max: 100,
+        isFloat: true,
+    },
+    {
+        id: 'volumeSize',
+        control: 'num',
+        labelI18nKey: 'volSize',
+        tipI18nKey: 'volSizeTip',
+        modeScope: 'scroll-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'scroll',
+        numKey: 'volumeSize',
+        min: 1,
+        max: 200,
+    },
+    {
+        id: 'showThumbView',
+        control: 'switch',
+        labelI18nKey: 'thumbView',
+        tipI18nKey: 'thumbViewTip',
+        modeScope: 'scroll-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'scroll',
+        requireThumbSupportInTopBar: true,
+    },
+    {
+        id: 'scrollPageMargin',
+        control: 'num',
+        labelI18nKey: 'pageMargin',
+        tipI18nKey: 'pageMarginTip',
+        modeScope: 'scroll-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'scroll',
+        numKey: 'scrollPageMargin',
+        min: 0,
+        max: 300,
+    },
+    {
+        id: 'pagesPerScreen',
+        control: 'num',
+        labelI18nKey: 'screenSize',
+        tipI18nKey: 'screenSizeTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+        numKey: 'pagesPerScreen',
+        min: 1,
+        max: 10,
+    },
+    {
+        id: 'bookDirection',
+        control: 'drop',
+        labelI18nKey: 'bookDirection',
+        tipI18nKey: 'bookDirectionTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+        dropKey: 'bookDirection',
+        useAbbrName: true,
+    },
+    {
+        id: 'pageTurnAnimationMode',
+        control: 'drop',
+        labelI18nKey: 'pageTurnAnimation',
+        tipI18nKey: 'pageTurnAnimationTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+        dropKey: 'pageTurnAnimation',
+    },
+    {
+        id: 'showBookPagination',
+        control: 'switch',
+        labelI18nKey: 'pagination',
+        tipI18nKey: 'paginationTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+    },
+    {
+        id: 'isChangeOddEven',
+        control: 'switch',
+        labelI18nKey: 'oddEven',
+        tipI18nKey: 'oddEvenTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+    },
+    {
+        id: 'isReverseFlip',
+        control: 'switch',
+        labelI18nKey: 'reverseFlip',
+        tipI18nKey: 'reverseFlipTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+    },
+    {
+        id: 'isAutoFlip',
+        control: 'switch',
+        labelI18nKey: 'autoFlip',
+        tipI18nKey: 'autoFlipTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+    },
+    {
+        id: 'autoFlipFrequency',
+        control: 'num',
+        labelI18nKey: 'autoFlipFrequency',
+        tipI18nKey: 'autoFlipFrequencyTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+        numKey: 'autoFlipFrequency',
+        min: 1,
+        max: 240,
+    },
+    {
+        id: 'showBookThumbView',
+        control: 'switch',
+        labelI18nKey: 'thumbView',
+        tipI18nKey: 'thumbViewTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+    },
+    {
+        id: 'IsReverseBookWheeFliplDirection',
+        control: 'switch',
+        labelI18nKey: 'wheelDirection',
+        tipI18nKey: 'wheelDirectionTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+    },
+    {
+        id: 'wheelSensitivity',
+        control: 'num',
+        labelI18nKey: 'wheelSensitivity',
+        tipI18nKey: 'wheelSensitivityTip',
+        modeScope: 'book-only',
+        showInTopBar: true,
+        showInDialog: true,
+        dialogCategory: 'book',
+        numKey: 'wheelSensitivity',
+        min: 1,
+        max: 250,
+    },
+]
+
+export const settingFieldMap: Record<string, SettingFieldDefinition> = settingFieldDefinitions
+    .reduce((map, item) => {
+        map[item.id] = item
+        return map
+    }, {} as Record<string, SettingFieldDefinition>)
+
+export const dialogSettingFieldIds: Record<SettingsPanelCategory, string[]> = {
+    general: settingFieldDefinitions.filter(item => item.showInDialog && item.dialogCategory === 'general').map(item => item.id),
+    scroll: settingFieldDefinitions.filter(item => item.showInDialog && item.dialogCategory === 'scroll').map(item => item.id),
+    book: settingFieldDefinitions.filter(item => item.showInDialog && item.dialogCategory === 'book').map(item => item.id),
+}
+
+const pinnedQuickSettingId = 'readingMode'
+const defaultQuickSettingOrder = quickSettingOptions.map(item => item.id)
+const defaultQuickSettingSelected = [
+    'readingMode',
+    'widthScale',
+    'loadNum',
+    'pagesPerScreen',
+    'bookDirection',
+    'pageTurnAnimationMode',
+    'showBookPagination',
+]
+
+interface UnifiedSettingsPreference {
+    schemaVersion: number
+    updatedAt: string
+    settings: Record<string, any>
+    quickSelection: string[]
+    quickOrder: string[]
+}
 
 function normalizePageTurnAnimationMode(value: any): PageTurnAnimationMode {
     if (value === 'slide' || value === 'none' || value === 'realistic') {
@@ -123,6 +441,192 @@ function readPageTurnAnimationMode(): PageTurnAnimationMode {
     return getSystemPreferredPageTurnAnimationMode()
 }
 
+function readUnifiedSettingsRaw(): any {
+    const gmGetValue = (<any>globalThis).GM_getValue
+    if (typeof gmGetValue === 'function') {
+        return gmGetValue(unifiedSettingsPreferenceKey, null)
+    }
+    try {
+        return PlatformService.storageGet(unifiedSettingsPreferenceKey, null)
+    } catch (e) {
+        return null
+    }
+}
+
+function writeUnifiedSettingsRaw(data: UnifiedSettingsPreference): void {
+    const gmSetValue = (<any>globalThis).GM_setValue
+    if (typeof gmSetValue === 'function') {
+        gmSetValue(unifiedSettingsPreferenceKey, data)
+        return
+    }
+    try {
+        PlatformService.storageSet(unifiedSettingsPreferenceKey, data)
+    } catch (e) {
+    }
+}
+
+function sanitizeQuickSettingSelection(rawSelection: any, rawOrder: any): { selected: string[], order: string[] } {
+    const validIds = new Set(quickSettingOptions.map(item => item.id))
+    const orderInput = Array.isArray(rawOrder) ? rawOrder : defaultQuickSettingOrder
+    const selectedInput = Array.isArray(rawSelection) ? rawSelection : defaultQuickSettingSelected
+
+    const order: string[] = []
+    for (const id of orderInput) {
+        if (typeof id === 'string' && validIds.has(id) && !order.includes(id)) {
+            order.push(id)
+        }
+    }
+    for (const id of defaultQuickSettingOrder) {
+        if (!order.includes(id)) {
+            order.push(id)
+        }
+    }
+
+    const selected: string[] = []
+    for (const id of selectedInput) {
+        if (typeof id === 'string' && validIds.has(id) && !selected.includes(id)) {
+            selected.push(id)
+        }
+    }
+    if (!selected.includes(pinnedQuickSettingId)) {
+        selected.unshift(pinnedQuickSettingId)
+    }
+
+    const orderWithoutPinned = order.filter(id => id !== pinnedQuickSettingId)
+    return {
+        selected,
+        order: [pinnedQuickSettingId, ...orderWithoutPinned],
+    }
+}
+
+function parseUnifiedSettingsPreference(rawData: any): UnifiedSettingsPreference | null {
+    if (!rawData) {
+        return null
+    }
+    if (typeof rawData === 'string') {
+        try {
+            rawData = JSON.parse(rawData)
+        } catch (e) {
+            return null
+        }
+    }
+    if (typeof rawData !== 'object') {
+        return null
+    }
+    const quick = sanitizeQuickSettingSelection(rawData.quickSelection, rawData.quickOrder)
+    return {
+        schemaVersion: Number(rawData.schemaVersion) || unifiedSettingsPreferenceSchemaVersion,
+        updatedAt: typeof rawData.updatedAt === 'string' ? rawData.updatedAt : new Date().toISOString(),
+        settings: typeof rawData.settings === 'object' && rawData.settings ? rawData.settings : {},
+        quickSelection: quick.selected,
+        quickOrder: quick.order,
+    }
+}
+
+function persistUnifiedSettingsState() {
+    const payload: UnifiedSettingsPreference = {
+        schemaVersion: unifiedSettingsPreferenceSchemaVersion,
+        updatedAt: new Date().toISOString(),
+        settings: {
+            readingMode: store.readingMode,
+            widthScale: store.widthScale,
+            loadNum: store.loadNum,
+            volumeSize: store.volumeSize,
+            showThumbView: store.showThumbView,
+            scrollPageMargin: store.scrollPageMargin,
+            pagesPerScreen: store.pagesPerScreen,
+            bookDirection: store.bookDirection,
+            pageTurnAnimationMode: store.pageTurnAnimationMode,
+            showBookPagination: store.showBookPagination,
+            isChangeOddEven: store.isChangeOddEven,
+            isReverseFlip: store.isReverseFlip,
+            isAutoFlip: store.isAutoFlip,
+            autoFlipFrequency: store.autoFlipFrequency,
+            showBookThumbView: store.showBookThumbView,
+            IsReverseBookWheeFliplDirection: store.IsReverseBookWheeFliplDirection,
+            wheelSensitivity: store.wheelSensitivity,
+            lang: lang.value,
+            autoRetryByOtherSource: store.autoRetryByOtherSource,
+        },
+        quickSelection: [...store.quickSettingSelected],
+        quickOrder: [...store.quickSettingOrder],
+    }
+    writeUnifiedSettingsRaw(payload)
+}
+
+function applyUnifiedSettingsPreference() {
+    const preference = parseUnifiedSettingsPreference(readUnifiedSettingsRaw())
+    if (!preference) {
+        store.quickSettingSelected = [...defaultQuickSettingSelected]
+        store.quickSettingOrder = [...defaultQuickSettingOrder]
+        return
+    }
+
+    const setting = preference.settings || {}
+    const numberFields: Array<[string, string]> = [
+        ['readingMode', 'readingMode'],
+        ['widthScale', 'widthScale'],
+        ['loadNum', 'loadNum'],
+        ['volumeSize', 'volumeSize'],
+        ['scrollPageMargin', 'scrollPageMargin'],
+        ['pagesPerScreen', 'pagesPerScreen'],
+        ['bookDirection', 'bookDirection'],
+        ['autoFlipFrequency', 'autoFlipFrequency'],
+        ['wheelSensitivity', 'wheelSensitivity'],
+    ]
+    for (const [sourceKey, targetKey] of numberFields) {
+        if (typeof setting[sourceKey] === 'number' && Number.isFinite(setting[sourceKey])) {
+            ;(<any>store)[targetKey] = setting[sourceKey]
+        }
+    }
+
+    const boolFields: Array<[string, string]> = [
+        ['showThumbView', 'showThumbView'],
+        ['showBookPagination', 'showBookPagination'],
+        ['isChangeOddEven', 'isChangeOddEven'],
+        ['isReverseFlip', 'isReverseFlip'],
+        ['isAutoFlip', 'isAutoFlip'],
+        ['showBookThumbView', 'showBookThumbView'],
+        ['IsReverseBookWheeFliplDirection', 'IsReverseBookWheeFliplDirection'],
+        ['autoRetryByOtherSource', 'autoRetryByOtherSource'],
+    ]
+    for (const [sourceKey, targetKey] of boolFields) {
+        if (typeof setting[sourceKey] === 'boolean') {
+            ;(<any>store)[targetKey] = setting[sourceKey]
+        }
+    }
+
+    store.pageTurnAnimationMode = normalizePageTurnAnimationMode(setting.pageTurnAnimationMode)
+    if (typeof setting.lang === 'string' && ['cn', 'en', 'jp'].includes(setting.lang)) {
+        lang.value = setting.lang
+    }
+
+    const quick = sanitizeQuickSettingSelection(preference.quickSelection, preference.quickOrder)
+    store.quickSettingSelected = quick.selected
+    store.quickSettingOrder = quick.order
+    persistUnifiedSettingsState()
+}
+
+export const computedVisibleQuickSettingIds = computed(() => {
+    const selected = new Set(store.quickSettingSelected)
+    return store.quickSettingOrder.filter(id => {
+        if (!selected.has(id)) {
+            return false
+        }
+        const item = quickSettingOptions.find(option => option.id === id)
+        if (!item) {
+            return false
+        }
+        if (item.modeScope === 'both') {
+            return true
+        }
+        if (item.modeScope === 'scroll-only') {
+            return store.readingMode === 0
+        }
+        return store.readingMode === 1
+    })
+})
+
 export const store = reactive({
     // common
     viewportWidth: 0,
@@ -134,6 +638,8 @@ export const store = reactive({
     // top bar
     showTopBar: false,
     showMoreSettings: false,
+    showMoreSettingsDialog: false,
+    activeSettingsCategory: <SettingsCategory['id']>'general',
     topBarHeight: 40, // px, for calc
     readingMode: 1, // 0: scroll, 1: book
     widthScale: 80, // percent, the scale of img
@@ -150,7 +656,12 @@ export const store = reactive({
     IsReverseBookWheeFliplDirection: false,
     wheelSensitivity: 100,
     scrollPageMargin: 70,
-    showQuickAction: false,
+    autoRetryByOtherSource: true,
+    quickSettingSelected: [...defaultQuickSettingSelected],
+    quickSettingOrder: [...defaultQuickSettingOrder],
+    isFactoryResetDialogVisible: false,
+    factoryResetStatus: 'idle',
+    factoryResetErrorMessage: '',
 
     // thumbView
     thumbViewWidth: 150, // px
@@ -290,7 +801,23 @@ export const settingConf = {
 
 export const storeAction = {
     toggleShowMoreSettings: () => {
-        store.showMoreSettings = !store.showMoreSettings
+        storeAction.toggleShowMoreSettingsDialog()
+    },
+    toggleShowMoreSettingsDialog: () => {
+        store.showMoreSettingsDialog = !store.showMoreSettingsDialog
+        if (store.showMoreSettingsDialog) {
+            store.activeSettingsCategory = 'general'
+        }
+    },
+    openMoreSettingsDialog: () => {
+        store.showMoreSettingsDialog = true
+        store.activeSettingsCategory = 'general'
+    },
+    closeMoreSettingsDialog: () => {
+        store.showMoreSettingsDialog = false
+    },
+    setActiveSettingsCategory: (val: SettingsCategory['id']) => {
+        store.activeSettingsCategory = val
     },
     toggleShowTopBar: () => {
         store.showTopBar = !store.showTopBar
@@ -302,24 +829,31 @@ export const storeAction = {
         store.readingMode = val
         resetAutoFlipTimer()
         checkInstructions()
+        persistUnifiedSettingsState()
     },
     setWidthScale: (val: number) => {
         store.widthScale = val
+        persistUnifiedSettingsState()
     },
     setLoadNum: (val: number) => {
         store.loadNum = val
+        persistUnifiedSettingsState()
     },
     setVolumeSize: (val: number) => {
         store.volumeSize = val
+        persistUnifiedSettingsState()
     },
     toggleShowThumbView: () => {
         store.showThumbView = !store.showThumbView
+        persistUnifiedSettingsState()
     },
     setPagesPerScreen: (val: number) => {
         store.pagesPerScreen = val
+        persistUnifiedSettingsState()
     },
     setBookDirection: (val: number) => {
         store.bookDirection = val
+        persistUnifiedSettingsState()
     },
     setPageTurnAnimationMode: (val: string) => {
         let mode = normalizePageTurnAnimationMode(val)
@@ -333,37 +867,136 @@ export const storeAction = {
             isBookTurning = false
             pendingBookTurn = null
         }
+        persistUnifiedSettingsState()
     },
     toggleShowBookPagination: () => {
         store.showBookPagination = !store.showBookPagination
+        persistUnifiedSettingsState()
     },
     toggleIsChangeOddEven: () => {
         store.isChangeOddEven = !store.isChangeOddEven
+        persistUnifiedSettingsState()
     },
     toggleIsReverseFlip: () => {
         store.isReverseFlip = !store.isReverseFlip
+        persistUnifiedSettingsState()
     },
     toggleIsAutoFlip: () => {
         store.isAutoFlip = !store.isAutoFlip
         resetAutoFlipTimer()
+        persistUnifiedSettingsState()
     },
     setAutoFlipFrequency: (val: number) => {
         store.autoFlipFrequency = val
+        persistUnifiedSettingsState()
     },
     toggleShowBookThumbView: () => {
         store.showBookThumbView = !store.showBookThumbView
+        persistUnifiedSettingsState()
     },
     toggleIsReverseBookWheeFliplDirection: () => {
         store.IsReverseBookWheeFliplDirection = !store.IsReverseBookWheeFliplDirection
+        persistUnifiedSettingsState()
     },
     setWheelSensitivity: (val: number) => {
         store.wheelSensitivity = val
+        persistUnifiedSettingsState()
     },
     setScrollPageMargin: (val: number) => {
         store.scrollPageMargin = val
+        persistUnifiedSettingsState()
     },
     setLang: (val: string) => {
         lang.value = val
+        persistUnifiedSettingsState()
+    },
+    setAutoRetryByOtherSource: (val: boolean) => {
+        store.autoRetryByOtherSource = val
+        persistUnifiedSettingsState()
+    },
+    isQuickSettingSelected: (id: string) => {
+        return store.quickSettingSelected.includes(id)
+    },
+    toggleQuickSettingSelection: (id: string) => {
+        if (id === pinnedQuickSettingId) {
+            return
+        }
+        let index = store.quickSettingSelected.indexOf(id)
+        if (index >= 0) {
+            store.quickSettingSelected.splice(index, 1)
+        } else {
+            store.quickSettingSelected.push(id)
+        }
+        if (!store.quickSettingSelected.includes(pinnedQuickSettingId)) {
+            store.quickSettingSelected.unshift(pinnedQuickSettingId)
+        }
+        persistUnifiedSettingsState()
+    },
+    moveQuickSettingItem: (id: string, targetIndex: number) => {
+        if (id === pinnedQuickSettingId) {
+            return
+        }
+        let from = store.quickSettingOrder.indexOf(id)
+        if (from < 0) {
+            return
+        }
+        const withoutPinned = store.quickSettingOrder.filter(item => item !== pinnedQuickSettingId)
+        const currentIndex = withoutPinned.indexOf(id)
+        if (currentIndex < 0) {
+            return
+        }
+        const boundedTarget = Math.max(0, Math.min(targetIndex, withoutPinned.length - 1))
+        if (boundedTarget === currentIndex) {
+            return
+        }
+        withoutPinned.splice(currentIndex, 1)
+        withoutPinned.splice(boundedTarget, 0, id)
+        store.quickSettingOrder = [pinnedQuickSettingId, ...withoutPinned]
+        persistUnifiedSettingsState()
+    },
+    showFactoryResetDialog: () => {
+        store.isFactoryResetDialogVisible = true
+        store.factoryResetStatus = 'confirming'
+        store.factoryResetErrorMessage = ''
+    },
+    hideFactoryResetDialog: () => {
+        store.isFactoryResetDialogVisible = false
+        if (store.factoryResetStatus === 'confirming') {
+            store.factoryResetStatus = 'idle'
+        }
+    },
+    runFactoryReset: () => {
+        try {
+            store.factoryResetStatus = 'running'
+            store.factoryResetErrorMessage = ''
+            PlatformService.storageClear()
+            store.readingMode = 1
+            store.widthScale = 80
+            store.loadNum = 3
+            store.volumeSize = 100
+            store.showThumbView = true
+            store.bookDirection = 0
+            store.showBookPagination = true
+            store.isChangeOddEven = false
+            store.isReverseFlip = false
+            store.isAutoFlip = false
+            store.autoFlipFrequency = 10
+            store.showBookThumbView = true
+            store.IsReverseBookWheeFliplDirection = false
+            store.wheelSensitivity = 100
+            store.scrollPageMargin = 70
+            store.autoRetryByOtherSource = true
+            store.pageTurnAnimationMode = defaultPageTurnAnimationMode
+            store.quickSettingSelected = [...defaultQuickSettingSelected]
+            store.quickSettingOrder = [...defaultQuickSettingOrder]
+            persistPageTurnAnimationMode(defaultPageTurnAnimationMode)
+            persistUnifiedSettingsState()
+            store.factoryResetStatus = 'success'
+            store.isFactoryResetDialogVisible = false
+        } catch (e) {
+            store.factoryResetStatus = 'failed'
+            store.factoryResetErrorMessage = 'Factory reset failed'
+        }
     },
     setCurViewIndex: (val: number, updater: string) => {
         const applyCurViewIndex = (target: number, targetUpdater: string) => {
@@ -475,9 +1108,6 @@ export const storeAction = {
         }
         return info.heightOfWidth
     },
-    toggleShowQuickAction: () => {
-        store.showQuickAction = !store.showQuickAction
-    },
 }
 
 let isInited = false
@@ -491,9 +1121,14 @@ export function init(albumService: AlbumService) {
     store.albumTitle = albumService.getTitle()
     store.curViewIndex = albumService.getCurPageIndex()
     store.pageTurnAnimationMode = readPageTurnAnimationMode()
+    applyUnifiedSettingsPreference()
     initViewportSizeUpdater()
     initKeyboardListener()
     resetAutoFlipTimer()
     checkInstructions()
     isInited = true
 }
+
+watch(() => lang.value, () => {
+    persistUnifiedSettingsState()
+})
