@@ -1,0 +1,155 @@
+openapi: 3.0.3
+info:
+  title: eHunter Reader Preference Contract
+  version: 1.0.0
+  description: Contract for global book-mode page turn animation preference and application behavior.
+  x-behavior-notes:
+    - Default mode is realistic when no valid preference exists.
+    - If system reduced-motion is enabled and no stored preference exists, effective mode is none.
+    - Rapid inputs may be coalesced and reported as coalesced status.
+servers:
+  - url: https://reader.local
+paths:
+  /reader/preferences/page-turn-animation:
+    get:
+      summary: Get global page-turn animation preference
+      operationId: getPageTurnAnimationPreference
+      responses:
+        '200':
+          description: Current effective preference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTurnAnimationPreference'
+    put:
+      summary: Update global page-turn animation preference
+      operationId: updatePageTurnAnimationPreference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PageTurnAnimationPreferenceUpdate'
+      responses:
+        '200':
+          description: Updated preference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTurnAnimationPreference'
+        '400':
+          description: Invalid preference value
+  /reader/page-turn:
+    post:
+      summary: Execute a book-mode page turn
+      operationId: applyBookPageTurn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PageTurnRequest'
+      responses:
+        '200':
+          description: Applied page turn result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTurnResult'
+        '409':
+          description: Request coalesced by newer intent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTurnResult'
+components:
+  schemas:
+    AnimationMode:
+      type: string
+      enum:
+        - realistic
+        - slide
+        - none
+    PreferenceScope:
+      type: string
+      enum:
+        - global
+    PageTurnAnimationPreference:
+      type: object
+      required:
+        - animationMode
+        - scope
+        - updatedAt
+        - schemaVersion
+      properties:
+        animationMode:
+          $ref: '#/components/schemas/AnimationMode'
+        scope:
+          $ref: '#/components/schemas/PreferenceScope'
+        updatedAt:
+          type: string
+          format: date-time
+        schemaVersion:
+          type: integer
+          minimum: 1
+    PageTurnAnimationPreferenceUpdate:
+      type: object
+      required:
+        - animationMode
+      properties:
+        animationMode:
+          $ref: '#/components/schemas/AnimationMode'
+    TurnSource:
+      type: string
+      enum:
+        - click
+        - wheel
+        - keyboard
+        - autoflip
+    TurnDirection:
+      type: string
+      enum:
+        - next
+        - prev
+    TurnStatus:
+      type: string
+      enum:
+        - accepted
+        - coalesced
+        - ignored_boundary
+    PageTurnRequest:
+      type: object
+      required:
+        - source
+        - fromIndex
+        - toIndex
+        - direction
+      properties:
+        source:
+          $ref: '#/components/schemas/TurnSource'
+        fromIndex:
+          type: integer
+          minimum: 0
+        toIndex:
+          type: integer
+          minimum: 0
+        direction:
+          $ref: '#/components/schemas/TurnDirection'
+    PageTurnResult:
+      type: object
+      required:
+        - fromIndex
+        - toIndex
+        - status
+        - animationModeApplied
+      properties:
+        fromIndex:
+          type: integer
+          minimum: 0
+        toIndex:
+          type: integer
+          minimum: 0
+        status:
+          $ref: '#/components/schemas/TurnStatus'
+        animationModeApplied:
+          $ref: '#/components/schemas/AnimationMode'

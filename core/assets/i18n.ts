@@ -129,6 +129,31 @@ export default <any>{
         en: 'show/hide the sliding animation when changing location(Beta)',
         jp: '場所を変更するときのスライドアニメーションの表示/非表示(测试中)'
     },
+    pageTurnAnimation: {
+        cn: '翻页动效',
+        en: 'Page turn animation',
+        jp: 'ページめくり効果'
+    },
+    pageTurnAnimationTip: {
+        cn: '设置书页模式翻页动效',
+        en: 'Set page turn animation for book mode',
+        jp: 'ページモードのアニメーションを設定'
+    },
+    pageTurnAnimationRealistic: {
+        cn: '拟真翻页',
+        en: 'Realistic',
+        jp: 'リアル'
+    },
+    pageTurnAnimationSlide: {
+        cn: '平移翻页',
+        en: 'Slide',
+        jp: 'スライド'
+    },
+    pageTurnAnimationNone: {
+        cn: '无动效',
+        en: 'None',
+        jp: 'なし'
+    },
     reverseFlip: {
         cn: '反转翻页',
         en: 'Reverse flip',

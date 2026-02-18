@@ -17,6 +17,39 @@ export default {
         },
         local: window.localStorage
     },
+    storageGet(key, defaultValue = null) {
+        try {
+            if (typeof GM_getValue === 'function') {
+                return GM_getValue(key, defaultValue);
+            }
+        } catch (e) {
+        }
+        try {
+            let val = window.localStorage.getItem(key);
+            return val === null ? defaultValue : val;
+        } catch (e) {
+            return defaultValue;
+        }
+    },
+    storageSet(key, value) {
+        try {
+            if (typeof GM_setValue === 'function') {
+                GM_setValue(key, value);
+                return true;
+            }
+        } catch (e) {
+        }
+        try {
+            let val = value;
+            if (typeof value !== 'string') {
+                val = JSON.stringify(value);
+            }
+            window.localStorage.setItem(key, val);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
     getExtension() {
         return chrome.extension;
     },

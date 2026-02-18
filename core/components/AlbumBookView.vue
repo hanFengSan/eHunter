@@ -1,16 +1,17 @@
 <template>
-    <section class="album-book-view" @wheel="handleWheelFlipEvent" @click="onClickBg">
-        <TransitionGroup :name="store.flipDirection == 0 ? 'screen-flip' : 'screen-flip-reverse'">
-        <div class="book-page-container"
-            v-for="i in pageList"
-            :key="i.pageIndex"
-            v-show="curScreenIndexList.includes(i.pageIndex)"
-            :style="pageContainerStyle(i)">
-            <PageView
-                :index="i.pageIndex"
-                :active="true"/>
+    <section :class="['album-book-view', `mode-${store.pageTurnAnimationMode}`]" @wheel="handleWheelFlipEvent" @click="onClickBg">
+        <Transition :name="bookTransitionName">
+        <div class="book-spread" :key="spreadTransitionKey">
+            <div class="book-page-container"
+                v-for="i in curScreenPageList"
+                :key="i.pageIndex"
+                :style="pageContainerStyle(i)">
+                <PageView
+                    :index="i.pageIndex"
+                    :active="true"/>
+            </div>
         </div>
-        </TransitionGroup>
+        </Transition>
         <div class="action-panel">
             <div class="next"></div>
             <div class="setting"></div>
@@ -54,16 +55,6 @@ const curScreenIndexList = computed(() => {
     return indexList
 })
 
-const nextScreenIndexList = computed(() => {
-    let indexList: number[] = []
-    for (let i = store.curViewIndex + store.pagesPerScreen; i < store.curViewIndex + 2 * store.pagesPerScreen; i++) {
-        if (i >= -1 && i < store.pageCount) {
-            indexList.push(i)
-        }
-    }
-    return indexList
-})
-
 function getPagePositionRight(pageWidth: number, pageScreenIndex: number): number {
     let rightPadding = (computedAlbumViewportWidth.value - pageWidth * store.pagesPerScreen) / 2
     let nums = pageScreenIndex
@@ -75,6 +66,9 @@ function getPagePositionRight(pageWidth: number, pageScreenIndex: number): numbe
 
 function calcScreenPageSize(screen: number[]): BookPageDisplayParam[] {
     let result: BookPageDisplayParam[] = []
+    if (screen.length === 0) {
+        return result
+    }
     // calculate page size per screen
     let maxPageRatio = screen.reduce((max, index) => {
         let val = storeAction.getImgPageHeightOfWidth(index)
@@ -91,14 +85,14 @@ function calcScreenPageSize(screen: number[]): BookPageDisplayParam[] {
         width = computedAlbumViewportWidth.value / screen.length
     }
     for (let i = 0; i < screen.length; i++) {
-        let pageIndex = screen[i]
+        let pageIndex = <number>screen[i]
         let height = width * storeAction.getImgPageHeightOfWidth(pageIndex)
         let top = computedAlbumViewportHeight.value / 2 - height / 2
         if (store.showTopBar) {
             top += store.topBarHeight
         }
-        result.push({
-            pageIndex: pageIndex,
+            result.push({
+                pageIndex: pageIndex,
             height: height,
             width: width,
             top: top,
@@ -108,8 +102,22 @@ function calcScreenPageSize(screen: number[]): BookPageDisplayParam[] {
     return result
 }
 
-const pageList = computed(() => {
-    return [...calcScreenPageSize(curScreenIndexList.value), ...calcScreenPageSize(nextScreenIndexList.value)]
+const curScreenPageList = computed(() => {
+    return calcScreenPageSize(curScreenIndexList.value)
+})
+
+const spreadTransitionKey = computed(() => {
+    return `${store.curViewIndex}-${store.pagesPerScreen}-${store.bookDirection}`
+})
+
+const bookTransitionName = computed(() => {
+    if (store.pageTurnAnimationMode === 'none') {
+        return 'screen-none'
+    }
+    if (store.pageTurnAnimationMode === 'slide') {
+        return store.flipDirection == 0 ? 'screen-slide-next' : 'screen-slide-prev'
+    }
+    return store.flipDirection == 0 ? 'screen-flip' : 'screen-flip-reverse'
 })
 
 function onClickBg(e: any) {
@@ -117,13 +125,13 @@ function onClickBg(e: any) {
     let y = e.clientY
     switch(true) {
         case y >= 0 && y < store.viewportHeight * 0.3:
-            storeAction.setCurViewIndex(store.curViewIndex - store.pagesPerScreen, 'album_book_view')
+            storeAction.setCurViewIndex(store.curViewIndex - store.pagesPerScreen, 'click')
             break
         case y >= store.viewportHeight * 0.3 && y <= store.viewportHeight * 0.7:
             console.log('setting')
             break
         case y >= store.viewportHeight * 0.7 && y <= store.viewportHeight:
-            storeAction.setCurViewIndex(store.curViewIndex + store.pagesPerScreen, 'album_book_view')
+            storeAction.setCurViewIndex(store.curViewIndex + store.pagesPerScreen, 'click')
             break
     }
 }
@@ -143,12 +151,99 @@ function onClickBg(e: any) {
     width: 100%;
     // transition: all 0.5s ease;
     
+    > .book-spread {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+
+        > .book-page-container {
+            user-select: none;
+            position: absolute;
+            box-sizing: border-box;
+            box-shadow: 0px 19px 10px -8px rgba(0,0,0,0.35);
+        }
+    }
+
     > .book-page-container {
         user-select: none;
         position: absolute;
         // transition: all 0.5s ease-in-out;
         box-sizing: border-box;
         box-shadow: 0px 19px 10px -8px rgba(0,0,0,0.35);
+    }
+
+    &.mode-realistic {
+        perspective: 1800px;
+        perspective-origin: 50% 50%;
+
+        > .book-spread {
+            backface-visibility: hidden;
+            will-change: transform, opacity, filter;
+            overflow: visible;
+            --curl-before-opacity: 0;
+            --curl-after-opacity: 0;
+            --curl-before-transform: translateX(0) scaleX(1);
+            --curl-after-transform: translateX(0) scaleX(1);
+
+            &::before,
+            &::after {
+                content: '';
+                position: absolute;
+                inset: -2% -1%;
+                pointer-events: none;
+                opacity: var(--curl-before-opacity);
+                transition: opacity .42s ease, transform .42s cubic-bezier(0.22, 0.61, 0.36, 1);
+            }
+
+            // page curl highlight
+            &::before {
+                background: radial-gradient(
+                    120% 85% at 52% 50%,
+                    rgba(255, 255, 255, 0.32) 0%,
+                    rgba(255, 255, 255, 0.12) 26%,
+                    rgba(255, 255, 255, 0.02) 62%,
+                    rgba(255, 255, 255, 0) 100%
+                );
+                mix-blend-mode: screen;
+            }
+
+            // inner fold shadow near spine
+            &::after {
+                background: linear-gradient(
+                    90deg,
+                    rgba(0, 0, 0, 0.34) 0%,
+                    rgba(0, 0, 0, 0.16) 14%,
+                    rgba(0, 0, 0, 0.06) 30%,
+                    rgba(0, 0, 0, 0) 55%
+                );
+                opacity: var(--curl-after-opacity);
+                transform: var(--curl-after-transform);
+            }
+
+            &::before {
+                transform: var(--curl-before-transform);
+            }
+
+            > .book-page-container {
+                overflow: hidden;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    pointer-events: none;
+                    background: linear-gradient(
+                        90deg,
+                        rgba(0, 0, 0, 0.16) 0%,
+                        rgba(0, 0, 0, 0.04) 18%,
+                        rgba(255, 255, 255, 0) 60%
+                    );
+                    opacity: 0.35;
+                }
+            }
+        }
     }
 }
 
@@ -199,25 +294,96 @@ function onClickBg(e: any) {
 // transition styles
 .screen-flip-enter-active,
 .screen-flip-leave-active {
-  transition: all .6s ease;
+  transition: transform .46s cubic-bezier(0.22, 0.61, 0.36, 1), opacity .46s ease, filter .46s ease, clip-path .46s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 .screen-flip-enter-from {
+    transform-origin: right center;
+    transform: rotateY(66deg) rotateX(3.2deg) skewY(-2.4deg) translateX(10%) scale(0.95, 0.98);
+    opacity: 0.64;
+    filter: brightness(0.88) saturate(0.92);
+    clip-path: polygon(4% 0%, 100% 3%, 96% 100%, 0% 96%);
+    --curl-before-opacity: 0.62;
+    --curl-after-opacity: 0.72;
+    --curl-before-transform: translateX(-3.2%) scaleX(0.9);
+    --curl-after-transform: translateX(-2.2%) scaleX(1.12);
 }
 
 .screen-flip-leave-to {
-  transform: translateY(-100vh);
+  transform-origin: left center;
+  transform: rotateY(-80deg) rotateX(-2.8deg) skewY(2.6deg) translateX(-16%) scale(0.91, 0.97);
+  opacity: 0;
+  filter: brightness(0.5) saturate(0.82) blur(1.1px);
+  clip-path: polygon(0% 0%, 88% 7%, 82% 93%, 0% 100%);
+    --curl-before-opacity: 0.78;
+    --curl-after-opacity: 0.82;
+    --curl-before-transform: translateX(5.2%) scaleX(1.16);
+    --curl-after-transform: translateX(3.8%) scaleX(1.24);
 }
 
 .screen-flip-reverse-enter-active,
 .screen-flip-reverse-leave-active {
-  transition: all .6s ease;
+  transition: transform .46s cubic-bezier(0.22, 0.61, 0.36, 1), opacity .46s ease, filter .46s ease, clip-path .46s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 .screen-flip-reverse-enter-from {
-    transform: translateY(-100vh);
+    transform-origin: left center;
+    transform: rotateY(-66deg) rotateX(-3.2deg) skewY(2.4deg) translateX(-10%) scale(0.95, 0.98);
+    opacity: 0.64;
+    filter: brightness(0.88) saturate(0.92);
+    clip-path: polygon(0% 3%, 96% 0%, 100% 96%, 4% 100%);
+    --curl-before-opacity: 0.62;
+    --curl-after-opacity: 0.72;
+    --curl-before-transform: translateX(3.2%) scaleX(-0.9);
+    --curl-after-transform: translateX(2.2%) scaleX(-1.12);
 }
 
 .screen-flip-reverse-leave-to {
+  transform-origin: right center;
+  transform: rotateY(80deg) rotateX(2.8deg) skewY(-2.6deg) translateX(16%) scale(0.91, 0.97);
   opacity: 0;
+  filter: brightness(0.5) saturate(0.82) blur(1.1px);
+  clip-path: polygon(12% 7%, 100% 0%, 100% 100%, 18% 93%);
+    --curl-before-opacity: 0.78;
+    --curl-after-opacity: 0.82;
+    --curl-before-transform: translateX(-5.2%) scaleX(-1.16);
+    --curl-after-transform: translateX(-3.8%) scaleX(-1.24);
+}
+
+.screen-slide-next-enter-active,
+.screen-slide-next-leave-active,
+.screen-slide-prev-enter-active,
+.screen-slide-prev-leave-active {
+    transition: transform .22s ease, opacity .22s ease;
+}
+
+.screen-slide-next-enter-from {
+    transform: translateX(18%);
+    opacity: 0.75;
+}
+
+.screen-slide-next-leave-to {
+    transform: translateX(-18%);
+    opacity: 0;
+}
+
+.screen-slide-prev-enter-from {
+    transform: translateX(-18%);
+    opacity: 0.75;
+}
+
+.screen-slide-prev-leave-to {
+    transform: translateX(18%);
+    opacity: 0;
+}
+
+.screen-none-enter-active,
+.screen-none-leave-active {
+    transition-duration: 0s;
+}
+
+.screen-none-enter-from,
+.screen-none-leave-to {
+    opacity: 1;
+    transform: none;
 }
 
 </style>

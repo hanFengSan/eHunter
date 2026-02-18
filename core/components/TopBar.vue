@@ -89,6 +89,14 @@
                     @change="(val) => storeAction.setBookDirection(val)" />
             </div>
             <div class="item" v-if="store.readingMode == 1">
+                <span class="label tips tips-down tips-right" :title-content="i18n.pageTurnAnimationTip">{{ i18n.pageTurnAnimation }}:</span>
+                <DropOption
+                    :list="settingConf.pageTurnAnimation.list"
+                    :cur-val="store.pageTurnAnimationMode"
+                    :format-cur-val-by-list="true"
+                    @change="(val) => storeAction.setPageTurnAnimationMode(val)" />
+            </div>
+            <div class="item" v-if="store.readingMode == 1">
                 <span class="label tips tips-down tips-right" :title-content="i18n.paginationTip">{{ i18n.pagination }}:</span>
                 <SimpleSwitch
                     :active="store.showBookPagination"

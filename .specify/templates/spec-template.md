@@ -7,6 +7,8 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
+**Validation Note**: For each completed development cycle, run `npm run dev` and verify changed behavior in browser using `chrome-devtools-mcp` before marking work complete.
+
 <!--
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,

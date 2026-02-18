@@ -64,7 +64,8 @@ export function initKeyboardListener() {
 let autoFlipTimerID: number = 0
 function handleAutoFlipEvent() {
     if (store.curViewIndex < store.pageCount - 1) {
-        storeAction.setCurViewIndex(store.curViewIndex+1, 'timer')
+        let step = store.readingMode == 1 ? store.pagesPerScreen : 1
+        storeAction.setCurViewIndex(store.curViewIndex + step, 'autoflip')
     }
 }
 

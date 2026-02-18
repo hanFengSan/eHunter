@@ -1,50 +1,116 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: template -> 1.0.0
+- Modified principles:
+  - Template Principle 1 -> I. Refactor-First Boundaries
+  - Template Principle 2 -> II. Behavior-Preserving Changes
+  - Template Principle 3 -> III. Validation Before Completion (NON-NEGOTIABLE)
+  - Template Principle 4 -> IV. Story-Independent Delivery
+  - Template Principle 5 -> V. Built-in UI and Mode Consistency
+- Added sections:
+  - Additional Constraints
+  - Development Workflow & Quality Gates
+- Removed sections: None
+- Templates requiring updates:
+  - ✅ updated: /Users/alex/Desktop/works/js/eHunter/.specify/templates/plan-template.md
+  - ✅ updated: /Users/alex/Desktop/works/js/eHunter/.specify/templates/tasks-template.md
+  - ✅ updated: /Users/alex/Desktop/works/js/eHunter/.specify/templates/spec-template.md
+  - ⚠ pending: .specify/templates/commands/*.md (directory not present; no files to update)
+  - ✅ updated: /Users/alex/Desktop/works/js/eHunter/AGENTS.md
+- Follow-up TODOs: None
+-->
+
+# eHunter Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Refactor-First Boundaries
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All feature work MUST be implemented in `core/` and `src/` unless a change in
+`core_old/` or `old/` is explicitly justified as migration reference or historical bug fix.
+New changes MUST preserve the ongoing refactor structure and MUST NOT reintroduce old
+architecture patterns into refactor directories.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+Rationale: The repository is in a mixed old/new state, so clear directory boundaries
+prevent regression and reduce migration rework.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Behavior-Preserving Changes
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+Changes to parser, cache, request queue, or reader interaction MUST preserve existing
+book mode and scroll mode correctness, with explicit boundary handling for async loading,
+page limits, and rapid user input.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rationale: The product value depends on stable parsing and reading continuity across
+multiple platform paths.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Validation Before Completion (NON-NEGOTIABLE)
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+After each development completion cycle, contributors MUST run `npm run dev` and MUST
+use `chrome-devtools-mcp` to open the page and verify the changed behavior end-to-end.
+A task is NOT complete until this manual verification is performed and the result is
+documented in the feature notes, task output, or PR description.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Rationale: This project is a userscript UI with DOM-dependent runtime behavior that
+cannot be fully validated by static checks alone.
+
+### IV. Story-Independent Delivery
+
+Specifications and tasks MUST keep user stories independently implementable and testable.
+Each story MUST include acceptance scenarios and independent validation criteria so an MVP
+slice can be delivered without coupling to lower-priority stories.
+
+Rationale: Independent slices reduce risk during refactor and make regressions easier
+to isolate.
+
+### V. Built-in UI and Mode Consistency
+
+All UI components MUST be self-built within this repository; third-party UI component
+libraries MUST NOT be introduced. Reader-facing settings and interactions MUST remain
+consistent between book mode and scroll mode unless the spec explicitly limits scope.
+
+Rationale: Custom UI ensures control in userscript injection contexts and avoids design
+and dependency drift.
+
+## Additional Constraints
+
+- EH path correctness is prioritized over NH when scope conflict exists.
+- Changes in `src/platform/base/` MUST include cross-platform impact review notes.
+- Preference persistence MUST define invalid-value fallback behavior.
+- Destructive git operations (`reset --hard`, force push) are prohibited unless explicitly
+  requested by a human owner.
+
+## Development Workflow & Quality Gates
+
+1. Specification flow MUST run in order: `/speckit.specify` -> `/speckit.clarify`
+   (when needed) -> `/speckit.plan` -> `/speckit.tasks`.
+2. Every implementation plan MUST include a Constitution Check section mapping the feature
+   to all five core principles.
+3. Task lists MUST include explicit validation tasks for:
+   - `npm run dev`
+   - browser verification via `chrome-devtools-mcp`
+4. Before handoff, contributors MUST confirm:
+   - acceptance scenarios pass
+   - required manual runtime checks pass
+   - scope boundaries (book vs scroll, EH vs NH) were respected.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution is authoritative for feature specification, planning, and execution in
+this repository. All reviews and implementation outputs MUST include an explicit compliance
+check against these principles.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Amendment procedure:
+- Amendments MUST be made through a documented change request.
+- Every amendment MUST include a Sync Impact Report and required template/runtime doc
+  propagation.
+- Versioning policy MUST use semantic versioning:
+  - MAJOR: incompatible principle removals or redefinitions
+  - MINOR: new principle or materially expanded governance requirement
+  - PATCH: wording clarity and non-semantic refinements
+
+Compliance expectations:
+- Plan, tasks, and delivery notes MUST identify any principle violations and include
+  explicit justification.
+- Unjustified violations MUST block progression to implementation completion.
+
+**Version**: 1.0.0 | **Ratified**: 2026-02-18 | **Last Amended**: 2026-02-18

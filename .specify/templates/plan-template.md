@@ -31,7 +31,11 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- Principle I (Refactor-First Boundaries): Confirm target changes stay in refactor directories, or justify exceptions.
+- Principle II (Behavior-Preserving Changes): Define how mode behavior and async/boundary correctness are preserved.
+- Principle III (Validation Before Completion): Plan MUST include `npm run dev` and `chrome-devtools-mcp` runtime verification steps.
+- Principle IV (Story-Independent Delivery): Ensure each user story remains independently implementable and testable.
+- Principle V (Built-in UI and Mode Consistency): Confirm no third-party UI library is introduced and mode consistency/scope is explicit.
 
 ## Project Structure
 

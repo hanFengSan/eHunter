@@ -4,6 +4,124 @@ import type { AlbumService } from '../service/AlbumService'
 import { NameAlbumService } from '../service/AlbumService'
 import type { ImgPageInfo, ThumbInfo } from 'core/model/model'
 import { initViewportSizeUpdater, initKeyboardListener, resetAutoFlipTimer, checkInstructions } from './event'
+import PlatformService from '../../src/platform/base/service/PlatformService.js'
+
+type PageTurnAnimationMode = 'realistic' | 'slide' | 'none'
+
+interface PageTurnAnimationPreference {
+    schemaVersion: number
+    updatedAt: string
+    scope: 'global'
+    animationMode: PageTurnAnimationMode
+}
+
+const pageTurnAnimationPreferenceKey = 'ehunter:reader:prefs:page-turn-animation'
+const pageTurnAnimationPreferenceSchemaVersion = 1
+const defaultPageTurnAnimationMode: PageTurnAnimationMode = 'realistic'
+let bookTurnSettleTimerID: number = 0
+let isBookTurning = false
+let pendingBookTurn: null | { val: number, updater: string } = null
+
+function normalizePageTurnAnimationMode(value: any): PageTurnAnimationMode {
+    if (value === 'slide' || value === 'none' || value === 'realistic') {
+        return value
+    }
+    return defaultPageTurnAnimationMode
+}
+
+function getSystemPreferredPageTurnAnimationMode(): PageTurnAnimationMode {
+    try {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            return 'none'
+        }
+    } catch (e) {
+    }
+    return defaultPageTurnAnimationMode
+}
+
+function readByUserscriptStorage(): any {
+    const gmGetValue = (<any>globalThis).GM_getValue
+    if (typeof gmGetValue === 'function') {
+        return gmGetValue(pageTurnAnimationPreferenceKey, null)
+    }
+    return null
+}
+
+function writeByUserscriptStorage(data: PageTurnAnimationPreference): boolean {
+    const gmSetValue = (<any>globalThis).GM_setValue
+    if (typeof gmSetValue === 'function') {
+        gmSetValue(pageTurnAnimationPreferenceKey, data)
+        return true
+    }
+    return false
+}
+
+function readByStorageService(): any {
+    try {
+        return PlatformService.storageGet(pageTurnAnimationPreferenceKey, null)
+    } catch (e) {
+        return null
+    }
+}
+
+function writeByStorageService(data: PageTurnAnimationPreference): boolean {
+    try {
+        return PlatformService.storageSet(pageTurnAnimationPreferenceKey, data)
+    } catch (e) {
+        return false
+    }
+}
+
+function parsePageTurnPreference(rawData: any): PageTurnAnimationPreference | null {
+    if (!rawData) {
+        return null
+    }
+    if (typeof rawData === 'string') {
+        try {
+            rawData = JSON.parse(rawData)
+        } catch (e) {
+            return null
+        }
+    }
+    if (typeof rawData !== 'object') {
+        return null
+    }
+    return {
+        schemaVersion: Number(rawData.schemaVersion) || pageTurnAnimationPreferenceSchemaVersion,
+        updatedAt: typeof rawData.updatedAt === 'string' ? rawData.updatedAt : new Date().toISOString(),
+        scope: 'global',
+        animationMode: normalizePageTurnAnimationMode(rawData.animationMode),
+    }
+}
+
+function buildPageTurnPreference(mode: PageTurnAnimationMode): PageTurnAnimationPreference {
+    return {
+        schemaVersion: pageTurnAnimationPreferenceSchemaVersion,
+        updatedAt: new Date().toISOString(),
+        scope: 'global',
+        animationMode: mode,
+    }
+}
+
+function persistPageTurnAnimationMode(mode: PageTurnAnimationMode) {
+    const preference = buildPageTurnPreference(mode)
+    const usedUserscriptStorage = writeByUserscriptStorage(preference)
+    if (!usedUserscriptStorage) {
+        writeByStorageService(preference)
+    }
+}
+
+function readPageTurnAnimationMode(): PageTurnAnimationMode {
+    const userscriptStored = parsePageTurnPreference(readByUserscriptStorage())
+    if (userscriptStored) {
+        return userscriptStored.animationMode
+    }
+    const localStored = parsePageTurnPreference(readByStorageService())
+    if (localStored) {
+        return localStored.animationMode
+    }
+    return getSystemPreferredPageTurnAnimationMode()
+}
 
 export const store = reactive({
     // common
@@ -46,6 +164,7 @@ export const store = reactive({
     // book view
     pagesPerScreen: 2, // the page quantity per screen
     flipDirection: 0, // 0: next, 1: pre
+    pageTurnAnimationMode: <PageTurnAnimationMode>defaultPageTurnAnimationMode,
 
     // gallery info
     thumbInfos: <ThumbInfo[]>[],
@@ -144,6 +263,13 @@ export const settingConf = {
             { i18nKey: 'ltr', abbrI18nKey: 'ltrAbbr', val: 1 },
         ]
     },
+    pageTurnAnimation: {
+        list: [
+            { i18nKey: 'pageTurnAnimationRealistic', val: 'realistic' },
+            { i18nKey: 'pageTurnAnimationSlide', val: 'slide' },
+            { i18nKey: 'pageTurnAnimationNone', val: 'none' },
+        ]
+    },
     autoFlipFrequency: {
         list: [3, 5, 8, 10, 15, 20, 30, 45, 60],
         suffix: ' sec'
@@ -195,6 +321,19 @@ export const storeAction = {
     setBookDirection: (val: number) => {
         store.bookDirection = val
     },
+    setPageTurnAnimationMode: (val: string) => {
+        let mode = normalizePageTurnAnimationMode(val)
+        store.pageTurnAnimationMode = mode
+        persistPageTurnAnimationMode(mode)
+        if (mode === 'none') {
+            if (bookTurnSettleTimerID) {
+                window.clearTimeout(bookTurnSettleTimerID)
+            }
+            bookTurnSettleTimerID = 0
+            isBookTurning = false
+            pendingBookTurn = null
+        }
+    },
     toggleShowBookPagination: () => {
         store.showBookPagination = !store.showBookPagination
     },
@@ -227,27 +366,82 @@ export const storeAction = {
         lang.value = val
     },
     setCurViewIndex: (val: number, updater: string) => {
-        if (val == store.curViewIndex) {
+        const applyCurViewIndex = (target: number, targetUpdater: string) => {
+            if (target == store.curViewIndex) {
+                return
+            }
+            let result = store.curViewIndex
+            if (target < 0) {
+                result = 0
+            } else if (target >= store.pageCount) {
+                result = store.pageCount - 1
+            } else {
+                result = target
+            }
+            if (result > store.curViewIndex) {
+                store.flipDirection = 0
+            } else if (result < store.curViewIndex) {
+                store.flipDirection = 1
+            }
+            store.curViewIndex = result
+            if (targetUpdater) {
+                store.curViewIndexUpdater = targetUpdater
+            }
+            resetAutoFlipTimer()
+        }
+
+        const getBookTurnDuration = (): number => {
+            switch (store.pageTurnAnimationMode) {
+                case 'none':
+                    return 0
+                case 'slide':
+                    return 220
+                default:
+                    return 280
+            }
+        }
+
+        const settleBookTurn = () => {
+            if (!pendingBookTurn) {
+                isBookTurning = false
+                bookTurnSettleTimerID = 0
+                return
+            }
+            let nextTurn = pendingBookTurn
+            pendingBookTurn = null
+            applyCurViewIndex(nextTurn.val, nextTurn.updater)
+            let duration = getBookTurnDuration()
+            if (duration <= 0) {
+                settleBookTurn()
+                return
+            }
+            bookTurnSettleTimerID = window.setTimeout(settleBookTurn, duration)
+        }
+
+        if (store.readingMode == 1 && store.pageTurnAnimationMode !== 'none') {
+            if (isBookTurning) {
+                pendingBookTurn = { val, updater }
+                return
+            }
+            isBookTurning = true
+            applyCurViewIndex(val, updater)
+            let duration = getBookTurnDuration()
+            if (duration <= 0) {
+                settleBookTurn()
+            } else {
+                bookTurnSettleTimerID = window.setTimeout(settleBookTurn, duration)
+            }
             return
         }
-        let result = store.curViewIndex
-        if (val < 0) {
-            result = 0
-        } else if (val >= store.pageCount) {
-            result = store.pageCount - 1
-        } else {
-            result = val
+
+        if (bookTurnSettleTimerID) {
+            window.clearTimeout(bookTurnSettleTimerID)
+            bookTurnSettleTimerID = 0
         }
-        if (result > store.curViewIndex) {
-            store.flipDirection = 0
-        } else if (result < store.curViewIndex) {
-            store.flipDirection = 1
-        }
-        store.curViewIndex = result
-        if (updater) {
-            store.curViewIndexUpdater = updater
-        }
-        resetAutoFlipTimer()
+        isBookTurning = false
+        pendingBookTurn = null
+
+        applyCurViewIndex(val, updater)
     },
     setThumbInfos: (val: Array<ThumbInfo>) => {
         store.thumbInfos = val
@@ -296,6 +490,7 @@ export function init(albumService: AlbumService) {
     store.imgPageInfos = JSON.parse(JSON.stringify(albumService.getImgPageInfos()))
     store.albumTitle = albumService.getTitle()
     store.curViewIndex = albumService.getCurPageIndex()
+    store.pageTurnAnimationMode = readPageTurnAnimationMode()
     initViewportSizeUpdater()
     initKeyboardListener()
     resetAutoFlipTimer()

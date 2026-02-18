@@ -71,6 +71,7 @@
   - 缩略图加载与定位是否正确
   - 原图/换源逻辑（若平台支持）是否可用
 - 若修改平台基础请求层（`TextReq`/`ReqQueue`/`MultiAsyncReq`），优先在 EH 与 NH 两个平台链路都做回归。
+- 每次开发完后，必须先运行 `npm run dev`，再使用 `chrome-devtools-mcp` 打开页面进行功能验收，确认行为符合预期后才可视为完成。
 
 ## 提交建议
 
@@ -85,3 +86,13 @@
 
 ## 要求
 - 所有UI组件都需要自建，不能使用第三方库
+
+# 平台设计说明和目标
+- 参考./design.md
+
+## Active Technologies
+- TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules (001-add-pageflip-toggle)
+- 浏览器端偏好存储（优先 userscript storage，降级 localStorage） (001-add-pageflip-toggle)
+
+## Recent Changes
+- 001-add-pageflip-toggle: Added TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules
