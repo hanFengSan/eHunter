@@ -66,8 +66,24 @@ const asv = ref<HTMLDivElement | null>(null)
 let lastPosition;
 let lastPositionTime;
 let isScrollingV2 = false;
+let isAtTop = true
+
+function updateTopState(position: number) {
+    const nextIsAtTop = position <= 0
+    if (nextIsAtTop === isAtTop) {
+        return
+    }
+    isAtTop = nextIsAtTop
+    if (nextIsAtTop) {
+        emit('topIn')
+        return
+    }
+    emit('topLeave')
+}
+
 function watchPosition() {
     let position = asv.value!.scrollTop
+    updateTopState(position)
     let time = new Date().getTime()
     if (!isScrollingV2 && position == lastPosition) {
         // console.log('静止', position)
@@ -90,6 +106,10 @@ let timer;
 onMounted(() => {
     if (props.listenScroll) {
         lastPosition = asv.value!.scrollTop
+        isAtTop = lastPosition <= 0
+        if (isAtTop) {
+            emit('topIn')
+        }
         lastPositionTime = new Date().getTime()
         timer = setInterval(watchPosition, 50)
     }

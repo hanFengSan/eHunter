@@ -15,6 +15,13 @@
         </transition>
     </div>
     <div class="status-pannel">
+        <button
+            class="full-screen"
+            :aria-label="i18n.fullScreen"
+            @click="toggleFullscreen"
+            type="button">
+            <FullScreenIcon />
+        </button>
         <div class="progress">{{ `${store.curViewIndex + 1} / ${store.pageCount}` }}</div>
     </div>
 </div>
@@ -25,8 +32,20 @@ import AlbumScrollView from './AlbumScrollView.vue';
 import ThumbScrollView from './ThumbScrollView.vue';
 import TopBar from './TopBar.vue';
 import AlbumBookView from './AlbumBookView.vue';
+import FullScreenIcon from '../assets/svg/full_screen.svg?component'
 import { i18n } from '../store/i18n'
-import { store, storeAction } from '../store/app'
+import { store } from '../store/app'
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const isFullscreen = ref(false)
+
+function syncFullscreenState() {
+    const doc = document as Document & {
+        webkitFullscreenElement?: Element | null
+        mozFullScreenElement?: Element | null
+    }
+    isFullscreen.value = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement)
+}
 
 function closeReader() {
     const elem = document.querySelector('.ehunter-container') as HTMLElement | null
@@ -34,6 +53,67 @@ function closeReader() {
         elem.style.display = 'none'
     }
 }
+
+function toggleFullscreen() {
+    const doc = document as Document & {
+        webkitExitFullscreen?: () => Promise<void> | void
+        mozCancelFullScreen?: () => Promise<void> | void
+        webkitFullscreenElement?: Element | null
+        mozFullScreenElement?: Element | null
+    }
+    const isFullScreen = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement)
+
+    if (isFullScreen) {
+        if (doc.exitFullscreen) {
+            doc.exitFullscreen()
+            return
+        }
+        if (doc.webkitExitFullscreen) {
+            doc.webkitExitFullscreen()
+            return
+        }
+        if (doc.mozCancelFullScreen) {
+            doc.mozCancelFullScreen()
+        }
+        return
+    }
+
+    const elem = document.querySelector('.ehunter-container') as (HTMLElement & {
+        webkitRequestFullscreen?: () => Promise<void> | void
+        webkitRequestFullScreen?: () => Promise<void> | void
+        mozRequestFullScreen?: () => Promise<void> | void
+    }) | null
+    const target = elem || document.documentElement
+
+    if (target.requestFullscreen) {
+        target.requestFullscreen()
+        return
+    }
+    if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen()
+        return
+    }
+    if (target.webkitRequestFullScreen) {
+        target.webkitRequestFullScreen()
+        return
+    }
+    if (target.mozRequestFullScreen) {
+        target.mozRequestFullScreen()
+    }
+}
+
+onMounted(() => {
+    syncFullscreenState()
+    document.addEventListener('fullscreenchange', syncFullscreenState)
+    document.addEventListener('webkitfullscreenchange', syncFullscreenState as EventListener)
+    document.addEventListener('mozfullscreenchange', syncFullscreenState as EventListener)
+})
+
+onUnmounted(() => {
+    document.removeEventListener('fullscreenchange', syncFullscreenState)
+    document.removeEventListener('webkitfullscreenchange', syncFullscreenState as EventListener)
+    document.removeEventListener('mozfullscreenchange', syncFullscreenState as EventListener)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -107,13 +187,40 @@ div {
         position: absolute;
         bottom: 0;
         right: 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         opacity: 0.5;
         background-color: black;
-        padding: 4px 6px;
+        padding: 3px 5px;
+        gap: 3px;
         > .progress {
-            font-size: 12px;
-            line-height: 12px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            font-size: 11px;
+            line-height: 11px;
             color: white
+        }
+        > .full-screen {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            padding: 0;
+            color: white;
+            transition: color 0.2s ease;
+            &:hover {
+                color: $accent_color;
+            }
+            > svg {
+                fill: currentColor;
+                width: 12px;
+                height: 12px;
+            }
         }
     }
 }
