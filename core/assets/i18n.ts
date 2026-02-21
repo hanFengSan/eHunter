@@ -69,6 +69,11 @@ export default <any>{
         en: 'Show/hide the column of thumbnail',
         jp: 'サムネイルの列を表示または非表示'
     },
+    expandThumbs: {
+        cn: '展开',
+        en: 'Expand',
+        jp: '展開'
+    },
     screenSize: {
         cn: '同屏页数',
         en: 'Pages/screen',

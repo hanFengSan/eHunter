@@ -12,6 +12,10 @@ import {
     type DockSlotId,
     type ReaderModeLayoutKey,
 } from '../model/layout'
+import {
+    clampThumbExpandSegmentIndex,
+    getThumbExpandSegmentByPage,
+} from '../model/thumbExpand'
 import { readLayoutPreference, writeLayoutPreference } from './layoutPreference'
 
 type PageTurnAnimationMode = 'realistic' | 'slide' | 'none'
@@ -685,6 +689,7 @@ export const store = reactive({
     showTopBar: false,
     showMoreSettings: false,
     showMoreSettingsDialog: false,
+    showThumbExpandDialog: false,
     activeSettingsCategory: <SettingsCategory['id']>'general',
     topBarHeight: 40, // px, for calc
     readingMode: 0, // 0: scroll, 1: book
@@ -716,6 +721,7 @@ export const store = reactive({
     thumbItemWidth: 150, // px
     thumbItemHeight: 160, // px
     thumbImgWidth: 100, // px
+    thumbExpandSegmentIndex: 0,
 
     // scroll view
     // volumePreloadCount: 2,
@@ -869,6 +875,16 @@ export const storeAction = {
     },
     closeMoreSettingsDialog: () => {
         store.showMoreSettingsDialog = false
+    },
+    openThumbExpandDialog: () => {
+        store.thumbExpandSegmentIndex = getThumbExpandSegmentByPage(store.curViewIndex)
+        store.showThumbExpandDialog = true
+    },
+    closeThumbExpandDialog: () => {
+        store.showThumbExpandDialog = false
+    },
+    setThumbExpandSegmentIndex: (segmentIndex: number) => {
+        store.thumbExpandSegmentIndex = clampThumbExpandSegmentIndex(segmentIndex, store.pageCount)
     },
     setActiveSettingsCategory: (val: SettingsCategory['id']) => {
         store.activeSettingsCategory = val

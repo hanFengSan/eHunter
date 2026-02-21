@@ -19,6 +19,14 @@
                 </div>
             </div>
         </AwesomeScrollView>
+        <button
+            type="button"
+            class="thumb-expand-trigger"
+            :class="{ 'dock-bottom': store.thumbDockSlot === 'bottom' }"
+            :aria-label="i18n.expandThumbs"
+            @click="onClickExpand">
+            <ExpandIcon class="expand-icon" />
+        </button>
     </aside>
 </template>
 
@@ -39,6 +47,8 @@ import {
     thumbSpriteWidth,
 } from '../model/layout'
 import { ref, computed, watch } from 'vue'
+import { i18n } from '../store/i18n'
+import ExpandIcon from '../assets/svg/expand.svg?component'
 
 const isDockBottom = computed(() => store.thumbDockSlot === 'bottom')
 const computedVolFirstIndexNum = computed(() => Number(computedVolFirstIndex.value))
@@ -64,6 +74,7 @@ const bottomHeaderLetterSpacing = computed(() => {
 
 const emit = defineEmits<{
     (e: 'dock-drag-start', payload: GestureStartPayload): void
+    (e: 'open-thumb-expand'): void
 }>()
 const updaterName = 'thumb'
 const scrollView = ref<null | { scrollTo: (offset: number, duration: number, axis: 'x' | 'y') => void }>(null)
@@ -106,6 +117,10 @@ function select(index: number | string) {
 
 function onDockDragStart(payload: GestureStartPayload) {
     emit('dock-drag-start', payload)
+}
+
+function onClickExpand() {
+    emit('open-thumb-expand')
 }
 
 function scrollToActiveThumb(targetIndex: number) {
@@ -279,6 +294,51 @@ watch(() => store.curViewIndex, (newVal) => {
             // z-index: 10;
             pointer-events: none;
             top: v-bind('indicatorOffset+"px"');
+        }
+    }
+
+    .thumb-expand-trigger {
+        position: absolute;
+        left: 50%;
+        bottom: 8px;
+        transform: translateX(-50%);
+        z-index: 25;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.45);
+        color: rgba(255, 255, 255, 0.92);
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        opacity: 0.78;
+        transition: all 0.2s ease;
+
+        > .expand-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            transform: rotate(0deg);
+        }
+
+        &:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.65);
+        }
+
+        &.dock-bottom {
+            right: 8px;
+            left: auto;
+            top: 50%;
+            bottom: auto;
+            transform: translateY(-50%);
+
+            > .expand-icon {
+                transform: rotate(90deg);
+            }
         }
     }
 

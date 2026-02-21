@@ -73,6 +73,43 @@
 - 若修改平台基础请求层（`TextReq`/`ReqQueue`/`MultiAsyncReq`），优先在 EH 与 NH 两个平台链路都做回归。
 - 每次开发完后，必须先运行 `npm run dev`，再使用 `chrome-devtools-mcp` 打开页面进行功能验收，确认行为符合预期后才可视为完成。
 
+### 使用 chrome-devtools-mcp 进行测试的注意事项
+
+**重要：开发服务器后台运行**
+- 在使用 `chrome-devtools-mcp` 测试前，必须将 `npm run dev` 启动的开发服务器放到后台运行
+- 推荐命令：`npm run dev > /tmp/vite-dev.log 2>&1 &`
+- 原因：如果在前台运行 `npm run dev`，Bash 工具会因为超时（默认 2 分钟）而中断服务器进程，导致无法进行浏览器测试
+- 测试前可通过 `tail /tmp/vite-dev.log` 确认服务器已成功启动
+
+**UI 效果验证流程**
+1. 使用 `chrome-devtools-mcp_new_page` 或 `chrome-devtools-mcp_navigate_page` 打开测试页面
+2. 使用 `chrome-devtools-mcp_take_snapshot` 获取页面结构，定位交互元素
+3. 使用 `chrome-devtools-mcp_click` 等工具进行交互操作
+4. **关键步骤**：使用 `chrome-devtools-mcp_take_screenshot` 截图，利用多模态能力确认 UI 视觉效果
+   - 截图可以验证样式、布局、颜色、间距等视觉细节
+   - 对于弹窗、悬停效果、动画等需要视觉确认的场景尤为重要
+5. 重复步骤 2-4 完成完整的交互流程测试
+
+**响应式测试要求**
+- 每次 UI 相关的改动都需要测试**两种视口宽度**：
+  1. **桌面端（PC）**：1200px × 900px
+     - 使用 `chrome-devtools-mcp_emulate` 设置：`{ "viewport": { "width": 1200, "height": 900, "deviceScaleFactor": 1 } }`
+  2. **移动端（iPhone 12 Pro）**：390px × 844px
+     - 使用 `chrome-devtools-mcp_emulate` 设置：`{ "viewport": { "width": 390, "height": 844, "deviceScaleFactor": 3, "isMobile": true, "hasTouch": true } }`
+- 验证响应式布局是否正确：
+  - 网格列数变化（如 5 列 → 3 列）
+  - 间距和尺寸调整
+  - 移动端特定的交互优化
+  - 边界情况（如 767px、1023px 等断点附近）
+
+**测试检查清单**
+- [ ] 开发服务器已后台运行且可访问
+- [ ] 桌面端视口测试完成并截图确认
+- [ ] 移动端视口测试完成并截图确认
+- [ ] 关键交互流程（打开、关闭、点击、滚动等）已验证
+- [ ] UI 视觉效果（颜色、间距、阴影、圆角等）符合设计预期
+- [ ] 响应式断点处的布局变化正常
+
 ## 提交建议
 
 - 提交信息建议明确标注作用域，例如：
@@ -98,6 +135,8 @@
 - Userscript storage (`GM_*`) preferred with Platform storage/localStorage fallback; existing reader/cache storage keys (001-more-settings-modal)
 - TypeScript 5.9 + Vue 3.5 SFC + SCSS + Vue runtime (`vue`), existing eHunter components and store modules, no new UI library (001-dockable-panel-layout)
 - Userscript storage (`GM_getValue`/`GM_setValue`) preferred, fallback to `PlatformService.storageGet/storageSet` (001-dockable-panel-layout)
+- TypeScript 5.9 + Vue 3.5 SFC + SCSS + Vue runtime, existing core widget components (`AwesomeScrollView`, `Pagination`), existing app store/actions (001-thumb-expand-modal)
+- N/A（本功能不新增持久化） (001-thumb-expand-modal)
 
 ## Recent Changes
 - 001-add-pageflip-toggle: Added TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules

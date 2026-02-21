@@ -41,6 +41,12 @@ export const thumbSpriteHeight = 144
 export const minThumbScale = 0.35
 export const bottomCompactRatio = 0.78
 
+// Thumb expand modal layout constants
+export const thumbExpandWideBreakpoint = 1600
+export const thumbExpandItemWidthWide = 150
+export const thumbExpandItemWidthNormal = 120
+export const thumbExpandItemPadding = 8
+
 const now = () => new Date().toISOString()
 
 export function clampThumbSize(slot: DockSlotId, size: number): number {

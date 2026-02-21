@@ -9,7 +9,7 @@
         @request-dock="(slot) => storeAction.setThumbDockSlot(slot)"
         @request-resize="(size) => storeAction.setThumbPanelSize(size)">
         <template #thumb>
-            <ThumbScrollView @dock-drag-start="onThumbDockDragStart" />
+            <ThumbScrollView @dock-drag-start="onThumbDockDragStart" @open-thumb-expand="onOpenThumbExpand" />
         </template>
         <template #main>
             <div class="main-content">
@@ -33,6 +33,7 @@
         </button>
         <div class="progress">{{ `${store.curViewIndex + 1} / ${store.pageCount}` }}</div>
     </div>
+    <ThumbExpandDialog @select-page="onThumbExpandSelectPage" />
 </div>
 </template>
 
@@ -41,6 +42,7 @@ import AlbumScrollView from './AlbumScrollView.vue';
 import ThumbScrollView from './ThumbScrollView.vue';
 import TopBar from './TopBar.vue';
 import AlbumBookView from './AlbumBookView.vue';
+import ThumbExpandDialog from './dialog/ThumbExpandDialog.vue'
 import DockWorkspace from './layout/DockWorkspace.vue'
 import FullScreenIcon from '../assets/svg/full_screen.svg?component'
 import { i18n } from '../store/i18n'
@@ -124,6 +126,15 @@ function toggleFullscreen() {
 
 function onThumbDockDragStart(payload: GestureStartPayload) {
     dockWorkspaceRef.value?.startDockDrag(payload)
+}
+
+function onOpenThumbExpand() {
+    storeAction.openThumbExpandDialog()
+}
+
+function onThumbExpandSelectPage(pageNumber: number) {
+    storeAction.closeThumbExpandDialog()
+    storeAction.setCurViewIndex(pageNumber - 1, 'thumb-expand')
 }
 
 onMounted(() => {

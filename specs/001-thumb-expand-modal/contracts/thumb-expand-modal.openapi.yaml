@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: Thumb Expand Modal Contract
+  version: 1.0.0
+  description: >-
+    Contract for opening full-thumbnail modal, paginating by 100-page segments,
+    and jumping to a selected page.
+servers:
+  - url: https://ehunter.local
+paths:
+  /reader/thumb-expand/state:
+    get:
+      summary: Get thumbnail modal state for current album context
+      operationId: getThumbExpandState
+      responses:
+        '200':
+          description: Current modal state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThumbnailModalState'
+
+  /reader/thumb-expand/open:
+    post:
+      summary: Open full-thumbnail modal anchored to current thumb dock orientation
+      operationId: openThumbExpandModal
+      responses:
+        '200':
+          description: Modal opened and initialized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThumbnailModalState'
+
+  /reader/thumb-expand/segments/{segmentIndex}:
+    get:
+      summary: Get thumbnails in one 100-page segment
+      operationId: getThumbSegment
+      parameters:
+        - name: segmentIndex
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Segment data returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThumbnailSegment'
+        '400':
+          description: Invalid segment index
+
+  /reader/thumb-expand/jump:
+    post:
+      summary: Jump to selected page and close modal
+      operationId: jumpFromThumbExpand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pageNumber
+              properties:
+                pageNumber:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: Jump applied and modal closed
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - targetPage
+                  - modalClosed
+                properties:
+                  targetPage:
+                    type: integer
+                  modalClosed:
+                    type: boolean
+                    enum: [true]
+        '400':
+          description: Invalid page number
+
+components:
+  schemas:
+    ExpandPlacement:
+      type: string
+      enum: [bottom, right]
+
+    LayoutMode:
+      type: string
+      enum: [five-column, three-column]
+
+    ThumbnailRenderState:
+      type: string
+      enum: [ready, loading, error]
+
+    ThumbnailItem:
+      type: object
+      required:
+        - pageNumber
+        - renderState
+        - isCurrentPage
+        - jumpEnabled
+      properties:
+        pageNumber:
+          type: integer
+          minimum: 1
+        thumbUrl:
+          type: string
+        renderState:
+          $ref: '#/components/schemas/ThumbnailRenderState'
+        isCurrentPage:
+          type: boolean
+        jumpEnabled:
+          type: boolean
+
+    ThumbnailSegment:
+      type: object
+      required:
+        - segmentIndex
+        - startPage
+        - endPage
+        - items
+      properties:
+        segmentIndex:
+          type: integer
+          minimum: 0
+        startPage:
+          type: integer
+          minimum: 1
+        endPage:
+          type: integer
+          minimum: 1
+        items:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/ThumbnailItem'
+
+    ThumbnailModalState:
+      type: object
+      required:
+        - isOpen
+        - placement
+        - layoutMode
+        - activeSegmentIndex
+        - segmentSize
+        - highlightedPage
+        - styleProfile
+      properties:
+        isOpen:
+          type: boolean
+        placement:
+          $ref: '#/components/schemas/ExpandPlacement'
+        layoutMode:
+          $ref: '#/components/schemas/LayoutMode'
+        activeSegmentIndex:
+          type: integer
+          minimum: 0
+        segmentSize:
+          type: integer
+          enum: [100]
+        highlightedPage:
+          type: integer
+          minimum: 1
+        styleProfile:
+          type: string
+          enum: [settings-dialog]
