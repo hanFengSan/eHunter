@@ -83,12 +83,16 @@
 
 **UI 效果验证流程**
 1. 使用 `chrome-devtools-mcp_new_page` 或 `chrome-devtools-mcp_navigate_page` 打开测试页面
-2. 使用 `chrome-devtools-mcp_take_snapshot` 获取页面结构，定位交互元素
-3. 使用 `chrome-devtools-mcp_click` 等工具进行交互操作
-4. **关键步骤**：使用 `chrome-devtools-mcp_take_screenshot` 截图，利用多模态能力确认 UI 视觉效果
+2. **重要**：使用 `chrome-devtools-mcp_take_snapshot` 检查页面 DOM 中是否存在 `vite-error-overlay` 元素
+   - 如果存在该元素，说明 Vite 编译出错，需要先查看错误信息并修复
+   - 可以通过 snapshot 中的错误信息或使用 `chrome-devtools-mcp_take_screenshot` 截图查看详细错误
+   - 必须先解决 Vite 错误后才能继续后续测试
+3. 使用 `chrome-devtools-mcp_take_snapshot` 获取页面结构，定位交互元素
+4. 使用 `chrome-devtools-mcp_click` 等工具进行交互操作
+5. **关键步骤**：使用 `chrome-devtools-mcp_take_screenshot` 截图，利用多模态能力确认 UI 视觉效果
    - 截图可以验证样式、布局、颜色、间距等视觉细节
    - 对于弹窗、悬停效果、动画等需要视觉确认的场景尤为重要
-5. 重复步骤 2-4 完成完整的交互流程测试
+6. 重复步骤 3-5 完成完整的交互流程测试
 
 **响应式测试要求**
 - 每次 UI 相关的改动都需要测试**两种视口宽度**：
@@ -104,6 +108,7 @@
 
 **测试检查清单**
 - [ ] 开发服务器已后台运行且可访问
+- [ ] 页面加载后已检查 `vite-error-overlay` 元素，确认无编译错误
 - [ ] 桌面端视口测试完成并截图确认
 - [ ] 移动端视口测试完成并截图确认
 - [ ] 关键交互流程（打开、关闭、点击、滚动等）已验证
