@@ -87,6 +87,13 @@ $thumb-view-margin: 4px;
 $header-bg: #2ecc71;
 $header-height: 40px;
 
+// dock layout
+$dock_overlay_bg: rgba(0, 0, 0, 0.15);
+$dock_preview_bg: rgba(46, 204, 113, 0.28);
+$dock_preview_border: rgba(46, 204, 113, 0.9);
+$split_handle_hover_bg: rgba(46, 204, 113, 0.28);
+$split_handle_idle_bg: rgba(255, 255, 255, 0.04);
+
 // popup view
 $popup_primary_color: hsl(145, 63%, 49%);
 $popup_alternate_text_color: white;

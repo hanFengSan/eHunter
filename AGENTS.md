@@ -96,6 +96,8 @@
 - 浏览器端偏好存储（优先 userscript storage，降级 localStorage） (001-add-pageflip-toggle)
 - TypeScript 5.9 + Vue 3.5 + Vue runtime, Vite 6, existing core widget components (`DropOption`, `NumDropOption`, `SimpleSwitch`, `SimpleDialog`, `Popover`, `CircleIconButton`) (001-more-settings-modal)
 - Userscript storage (`GM_*`) preferred with Platform storage/localStorage fallback; existing reader/cache storage keys (001-more-settings-modal)
+- TypeScript 5.9 + Vue 3.5 SFC + SCSS + Vue runtime (`vue`), existing eHunter components and store modules, no new UI library (001-dockable-panel-layout)
+- Userscript storage (`GM_getValue`/`GM_setValue`) preferred, fallback to `PlatformService.storageGet/storageSet` (001-dockable-panel-layout)
 
 ## Recent Changes
 - 001-add-pageflip-toggle: Added TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules

@@ -259,6 +259,26 @@ export default <any>{
         en: 'Full screen',
         jp: '全画面表示'
     },
+    dockLeft: {
+        cn: '停靠左侧',
+        en: 'Dock left',
+        jp: '左にドック'
+    },
+    dockRight: {
+        cn: '停靠右侧',
+        en: 'Dock right',
+        jp: '右にドック'
+    },
+    dockBottom: {
+        cn: '停靠底部',
+        en: 'Dock bottom',
+        jp: '下にドック'
+    },
+    resizePanel: {
+        cn: '调整面板尺寸',
+        en: 'Resize panel',
+        jp: 'パネルサイズ調整'
+    },
     closeEHunter: {
         cn: '关闭eHunter',
         en: 'Close eHunter',

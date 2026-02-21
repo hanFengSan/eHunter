@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+coverage/
+specs/
+old/
+core_old/
+.DS_Store
+Thumbs.db
+*.log
+.env*

@@ -5,6 +5,14 @@ import { NameAlbumService } from '../service/AlbumService'
 import type { ImgPageInfo, ThumbInfo } from 'core/model/model'
 import { initViewportSizeUpdater, initKeyboardListener, resetAutoFlipTimer, checkInstructions } from './event'
 import PlatformService from '../../src/platform/base/service/PlatformService.js'
+import {
+    clampThumbSize,
+    createDefaultLayoutPreference,
+    normalizeDockSlot,
+    type DockSlotId,
+    type ReaderModeLayoutKey,
+} from '../model/layout'
+import { readLayoutPreference, writeLayoutPreference } from './layoutPreference'
 
 type PageTurnAnimationMode = 'realistic' | 'slide' | 'none'
 
@@ -57,6 +65,7 @@ const unifiedSettingsPreferenceSchemaVersion = 1
 let bookTurnSettleTimerID: number = 0
 let isBookTurning = false
 let pendingBookTurn: null | { val: number, updater: string } = null
+let readerLayoutPreference = createDefaultLayoutPreference()
 
 export const quickSettingOptions: QuickSettingOption[] = [
     { id: 'readingMode', i18nKey: 'readingMode', modeScope: 'both', fixed: true },
@@ -607,6 +616,40 @@ function applyUnifiedSettingsPreference() {
     persistUnifiedSettingsState()
 }
 
+function getLayoutModeKey(readingMode: number): ReaderModeLayoutKey {
+    return readingMode === 0 ? 'scroll' : 'book'
+}
+
+function syncThumbVisualMetrics(sizePx: number) {
+    store.thumbItemWidth = Math.max(60, Math.round(sizePx))
+    store.thumbImgWidth = Math.max(40, Math.round(store.thumbItemWidth * (100 / 150)))
+    store.thumbItemHeight = Math.max(64, Math.round(store.thumbItemWidth * (160 / 150)))
+}
+
+function applyCurrentModeLayoutPreference() {
+    const key = getLayoutModeKey(store.readingMode)
+    const modeLayout = readerLayoutPreference.layouts[key]
+    const slot = normalizeDockSlot(modeLayout.thumbSlot)
+    store.thumbDockSlot = slot
+    const clampedSize = clampThumbSize(slot, modeLayout.thumbSizePx)
+    store.thumbViewWidth = clampedSize
+    store.thumbViewHeight = clampThumbSize('bottom', modeLayout.thumbSizePx)
+    syncThumbVisualMetrics(clampedSize)
+}
+
+function persistCurrentModeLayoutPreference() {
+    const key = getLayoutModeKey(store.readingMode)
+    const slot = normalizeDockSlot(store.thumbDockSlot)
+    const size = slot === 'bottom' ? store.thumbViewHeight : store.thumbViewWidth
+    readerLayoutPreference.layouts[key] = {
+        thumbSlot: slot,
+        thumbSizePx: clampThumbSize(slot, size),
+        updatedAt: new Date().toISOString(),
+    }
+    readerLayoutPreference.updatedAt = new Date().toISOString()
+    readerLayoutPreference = writeLayoutPreference(readerLayoutPreference)
+}
+
 export const computedVisibleQuickSettingIds = computed(() => {
     const selected = new Set(store.quickSettingSelected)
     return store.quickSettingOrder.filter(id => {
@@ -664,7 +707,9 @@ export const store = reactive({
     factoryResetErrorMessage: '',
 
     // thumbView
+    thumbDockSlot: <DockSlotId>'left',
     thumbViewWidth: 150, // px
+    thumbViewHeight: 200, // px
     thumbItemWidth: 150, // px
     thumbItemHeight: 160, // px
     thumbImgWidth: 100, // px
@@ -730,17 +775,23 @@ export const computedVolPreloadPageIndexList = computed(() => {
 
 // the viewport width of AlbumBookView or AlbumScrollView, for calculating the page size of book view
 export const computedAlbumViewportWidth = computed(() => {
-    if ((store.readingMode == 0 && store.showThumbView) || (store.readingMode == 1 && store.showBookThumbView)) {
+    const showThumb = (store.readingMode == 0 && store.showThumbView) || (store.readingMode == 1 && store.showBookThumbView)
+    if (showThumb && store.thumbDockSlot !== 'bottom') {
         return store.viewportWidth - store.thumbViewWidth
     }
     return store.viewportWidth
 })
 
 export const computedAlbumViewportHeight = computed(() => {
+    const showThumb = (store.readingMode == 0 && store.showThumbView) || (store.readingMode == 1 && store.showBookThumbView)
+    let height = store.viewportHeight
     if (store.showTopBar) {
-        return store.viewportHeight - store.topBarHeight
+        height -= store.topBarHeight
     }
-    return store.viewportHeight
+    if (showThumb && store.thumbDockSlot === 'bottom') {
+        height -= store.thumbViewHeight
+    }
+    return height
 })
 
 export const computedAlbumViewportRatio = computed(() => {
@@ -827,9 +878,33 @@ export const storeAction = {
     },
     setReadingMode: (val: number) => {
         store.readingMode = val
+        applyCurrentModeLayoutPreference()
         resetAutoFlipTimer()
         checkInstructions()
         persistUnifiedSettingsState()
+    },
+    setThumbDockSlot: (slot: DockSlotId) => {
+        const normalized = normalizeDockSlot(slot)
+        const previous = store.thumbDockSlot
+        store.thumbDockSlot = normalized
+        if (normalized === 'bottom') {
+            store.thumbViewHeight = clampThumbSize('bottom', previous === 'bottom' ? store.thumbViewHeight : store.thumbViewWidth)
+            syncThumbVisualMetrics(store.thumbViewHeight)
+        } else {
+            store.thumbViewWidth = clampThumbSize(normalized, previous === 'bottom' ? store.thumbViewHeight : store.thumbViewWidth)
+            syncThumbVisualMetrics(store.thumbViewWidth)
+        }
+        persistCurrentModeLayoutPreference()
+    },
+    setThumbPanelSize: (val: number) => {
+        if (store.thumbDockSlot === 'bottom') {
+            store.thumbViewHeight = clampThumbSize('bottom', val)
+            syncThumbVisualMetrics(store.thumbViewHeight)
+        } else {
+            store.thumbViewWidth = clampThumbSize(store.thumbDockSlot, val)
+            syncThumbVisualMetrics(store.thumbViewWidth)
+        }
+        persistCurrentModeLayoutPreference()
     },
     setWidthScale: (val: number) => {
         store.widthScale = val
@@ -982,6 +1057,10 @@ export const storeAction = {
             store.isAutoFlip = false
             store.autoFlipFrequency = 10
             store.showBookThumbView = true
+            store.thumbDockSlot = 'left'
+            store.thumbViewWidth = 150
+            store.thumbViewHeight = 200
+            syncThumbVisualMetrics(store.thumbViewWidth)
             store.IsReverseBookWheeFliplDirection = false
             store.wheelSensitivity = 100
             store.scrollPageMargin = 70
@@ -991,6 +1070,9 @@ export const storeAction = {
             store.quickSettingOrder = [...defaultQuickSettingOrder]
             persistPageTurnAnimationMode(defaultPageTurnAnimationMode)
             persistUnifiedSettingsState()
+            readerLayoutPreference = createDefaultLayoutPreference()
+            readerLayoutPreference = writeLayoutPreference(readerLayoutPreference)
+            applyCurrentModeLayoutPreference()
             store.factoryResetStatus = 'success'
             store.isFactoryResetDialogVisible = false
         } catch (e) {
@@ -1122,6 +1204,8 @@ export function init(albumService: AlbumService) {
     store.curViewIndex = albumService.getCurPageIndex()
     store.pageTurnAnimationMode = readPageTurnAnimationMode()
     applyUnifiedSettingsPreference()
+    readerLayoutPreference = readLayoutPreference()
+    applyCurrentModeLayoutPreference()
     initViewportSizeUpdater()
     initKeyboardListener()
     resetAutoFlipTimer()

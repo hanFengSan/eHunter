@@ -1,0 +1,129 @@
+openapi: 3.0.3
+info:
+  title: Reader Layout Preference Contract
+  version: 1.0.0
+  description: >-
+    Contract for reading-mode-scoped dock layout retrieval and persistence.
+servers:
+  - url: https://ehunter.local
+paths:
+  /reader-layouts/{mode}:
+    get:
+      summary: Get persisted layout for a reading mode
+      operationId: getReaderLayout
+      parameters:
+        - name: mode
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ReadingMode'
+      responses:
+        '200':
+          description: Layout found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeLayoutConfiguration'
+        '404':
+          description: Layout not found; caller should use defaults
+    put:
+      summary: Save layout for a reading mode
+      operationId: putReaderLayout
+      parameters:
+        - name: mode
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ReadingMode'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModeLayoutConfiguration'
+      responses:
+        '200':
+          description: Layout saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeLayoutConfiguration'
+        '400':
+          description: Invalid layout payload (out-of-range size or invalid slot assignments)
+
+  /reader-layouts/{mode}/reset:
+    post:
+      summary: Reset mode layout to defaults
+      operationId: resetReaderLayout
+      parameters:
+        - name: mode
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ReadingMode'
+      responses:
+        '200':
+          description: Reset completed and default layout returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModeLayoutConfiguration'
+
+components:
+  schemas:
+    ReadingMode:
+      type: string
+      enum: [scroll, book]
+
+    DockSlotId:
+      type: string
+      enum: [left, right, bottom]
+
+    LayoutBlockId:
+      type: string
+      enum: [thumb, main]
+
+    ThumbSlot:
+      type: string
+      enum: [left, right, bottom]
+
+    ModeLayoutState:
+      type: object
+      required:
+        - thumbSlot
+        - thumbSizePx
+        - updatedAt
+      properties:
+        thumbSlot:
+          $ref: '#/components/schemas/ThumbSlot'
+        thumbSizePx:
+          type: number
+          minimum: 120
+          maximum: 520
+        updatedAt:
+          type: string
+          format: date-time
+
+    ModeLayoutConfiguration:
+      type: object
+      required:
+        - schemaVersion
+        - updatedAt
+        - layouts
+      properties:
+        schemaVersion:
+          type: integer
+          minimum: 1
+        updatedAt:
+          type: string
+          format: date-time
+        layouts:
+          type: object
+          required:
+            - scroll
+            - book
+          properties:
+            scroll:
+              $ref: '#/components/schemas/ModeLayoutState'
+            book:
+              $ref: '#/components/schemas/ModeLayoutState'

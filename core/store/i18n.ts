@@ -25,3 +25,10 @@ switch (true) {
 export const i18n = computed(() => {
     return langMap[lang.value]
 })
+
+export const layoutI18nKeys = {
+    dockLeft: 'dockLeft',
+    dockRight: 'dockRight',
+    dockBottom: 'dockBottom',
+    resizePanel: 'resizePanel',
+} as const

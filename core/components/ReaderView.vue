@@ -1,19 +1,28 @@
 <template>
 <div class="reader-view">
-    <div class="sidebar">
-        <ThumbScrollView />
-    </div>
-    <div class="main-content">
-        <!-- top bar view -->
-        <TopBar class="top-bar" @closeEHunter="closeReader"/>
-        <!-- panel view -->
-        <transition name="slow-horizontal-fade">
-            <AlbumScrollView class="content scroll-mode" v-if="store.readingMode === 0" />
-        </transition>
-        <transition name="slow-vertical-fade">
-            <AlbumBookView class="content book-mode" v-if="store.readingMode === 1" />
-        </transition>
-    </div>
+    <DockWorkspace
+        ref="dockWorkspaceRef"
+        :thumb-slot="store.thumbDockSlot"
+        :thumb-size-px="store.thumbDockSlot === 'bottom' ? store.thumbViewHeight : store.thumbViewWidth"
+        :show-thumb="showThumb"
+        :long-press-ms="500"
+        @request-dock="(slot) => storeAction.setThumbDockSlot(slot)"
+        @request-resize="(size) => storeAction.setThumbPanelSize(size)">
+        <template #thumb>
+            <ThumbScrollView @dock-drag-start="onThumbDockDragStart" />
+        </template>
+        <template #main>
+            <div class="main-content">
+                <TopBar class="top-bar" @closeEHunter="closeReader"/>
+                <transition name="slow-horizontal-fade">
+                    <AlbumScrollView class="content scroll-mode" v-if="store.readingMode === 0" />
+                </transition>
+                <transition name="slow-vertical-fade">
+                    <AlbumBookView class="content book-mode" v-if="store.readingMode === 1" />
+                </transition>
+            </div>
+        </template>
+    </DockWorkspace>
     <div class="status-pannel">
         <button
             class="full-screen"
@@ -32,12 +41,21 @@ import AlbumScrollView from './AlbumScrollView.vue';
 import ThumbScrollView from './ThumbScrollView.vue';
 import TopBar from './TopBar.vue';
 import AlbumBookView from './AlbumBookView.vue';
+import DockWorkspace from './layout/DockWorkspace.vue'
 import FullScreenIcon from '../assets/svg/full_screen.svg?component'
 import { i18n } from '../store/i18n'
-import { store } from '../store/app'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { store, storeAction } from '../store/app'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import type { GestureStartPayload } from '../utils/layoutGesture'
 
 const isFullscreen = ref(false)
+const dockWorkspaceRef = ref<null | { startDockDrag: (payload: GestureStartPayload) => void }>(null)
+const showThumb = computed(() => {
+    if (store.readingMode === 0) {
+        return store.showThumbView
+    }
+    return store.showBookThumbView
+})
 
 function syncFullscreenState() {
     const doc = document as Document & {
@@ -102,6 +120,10 @@ function toggleFullscreen() {
     }
 }
 
+function onThumbDockDragStart(payload: GestureStartPayload) {
+    dockWorkspaceRef.value?.startDockDrag(payload)
+}
+
 onMounted(() => {
     syncFullscreenState()
     document.addEventListener('fullscreenchange', syncFullscreenState)
@@ -130,21 +152,29 @@ div {
     align-items: center;
     height: 100%;
     width: 100%;
-    > .sidebar {
+
+    :deep(.main-content) {
         height: 100%;
-    }
-    > .main-content {
-        height: 100%;
+        width: 100%;
         flex-grow: 1;
         position: relative;
+        display: flex;
         flex-direction: column;
-        // transition: all 0.2s ease;
+
         > .top-bar {
             position: absolute;
             z-index: 10000;
             left: 0;
             top: 0;
             width: 100%;
+        }
+
+        > .content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
         }
     }
     > .panel {

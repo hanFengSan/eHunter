@@ -1,16 +1,22 @@
 <template>
-    <aside class="thumb-content">
-        <AwesomeScrollView ref="scrollView" class="thumb-scroll-view">
+    <aside class="thumb-content" :class="{ 'dock-bottom': store.thumbDockSlot === 'bottom' }">
+        <AwesomeScrollView
+            ref="scrollView"
+            class="thumb-scroll-view"
+            :class="{ 'dock-bottom': store.thumbDockSlot === 'bottom' }"
+            :axis="store.thumbDockSlot === 'bottom' ? 'x' : 'y'">
             <div class="header">
-                <span class="app-name">EHUNTER</span>
+                <DockHandle class="app-name" label="EHUNTER" :aria-label="'EHUNTER Dock Handle'" @drag-start="onDockDragStart" />
             </div>
             <div class="indicator"></div>
             <div class="thumb-container" @click="select(i)" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
-                <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
-                <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
-                <div class="hover-mask"></div>
-                <div class="index" v-if="store.readingMode == 0">{{ computedVolFirstIndex + i + 1 }}</div>
-                <div class="index" v-if="store.readingMode == 1">{{ i + 1 }}</div>
+                <div class="thumb-stage">
+                    <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
+                    <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
+                    <div class="hover-mask"></div>
+                    <div class="index" v-if="store.readingMode == 0">{{ computedVolFirstIndex + i + 1 }}</div>
+                    <div class="index" v-if="store.readingMode == 1">{{ i + 1 }}</div>
+                </div>
             </div>
         </AwesomeScrollView>
     </aside>
@@ -19,21 +25,54 @@
 <script setup lang="ts">
 import { store, storeAction, computedVolFirstIndex } from '../store/app'
 import AwesomeScrollView from './widget/AwesomeScrollView.vue'
+import DockHandle from './layout/DockHandle.vue'
+import type { GestureStartPayload } from '../utils/layoutGesture'
+import {
+    baseThumbItemHeight,
+    computeBottomHeaderFontSizePx,
+    computeBottomHeaderLetterSpacingEm,
+    computeSideHeaderFontSizePx,
+    computeSideHeaderLetterSpacingEm,
+    computeThumbContainerScale,
+    computeThumbStageBaseWidth,
+    thumbSpriteHeight,
+    thumbSpriteWidth,
+} from '../model/layout'
 import { ref, computed, watch } from 'vue'
 
-const thumbItemHeight = ref(160)
-
-const emit = defineEmits(['update_index'])
-const updaterName = 'thumb'
-const scrollView: any = ref(null)
-const thumbContainers: any = ref(null)
-
-const indicatorTop = computed(() => {
-    if (store.readingMode == 0) {
-        return thumbItemHeight.value * (store.curViewIndex - computedVolFirstIndex.value)
+const isDockBottom = computed(() => store.thumbDockSlot === 'bottom')
+const activeThumbIndex = computed(() => {
+    if (store.readingMode === 0) {
+        return Math.max(0, store.curViewIndex - computedVolFirstIndex.value)
     }
-    // book mode
-    return thumbItemHeight.value * store.curViewIndex
+    return Math.max(0, store.curViewIndex)
+})
+
+const sideHeaderFontSize = computed(() => {
+    return `${computeSideHeaderFontSizePx(store.thumbItemWidth)}px`
+})
+const sideHeaderLetterSpacing = computed(() => {
+    return `${computeSideHeaderLetterSpacingEm(store.thumbItemWidth).toFixed(3)}em`
+})
+const bottomHeaderFontSize = computed(() => {
+    return `${computeBottomHeaderFontSizePx(store.thumbViewHeight)}px`
+})
+const bottomHeaderLetterSpacing = computed(() => {
+    return `${computeBottomHeaderLetterSpacingEm(store.thumbViewHeight).toFixed(3)}em`
+})
+
+const emit = defineEmits<{
+    (e: 'dock-drag-start', payload: GestureStartPayload): void
+}>()
+const updaterName = 'thumb'
+const scrollView = ref<null | { scrollTo: (offset: number, duration: number, axis: 'x' | 'y') => void }>(null)
+const thumbContainers = ref<HTMLElement[] | null>(null)
+
+const indicatorOffset = computed(() => {
+    if (isDockBottom.value) {
+        return thumbContainerWidth.value * activeThumbIndex.value
+    }
+    return store.thumbItemHeight * activeThumbIndex.value
 })
 
 const volThumbs: any = computed(() => {
@@ -44,6 +83,17 @@ const volThumbs: any = computed(() => {
     return store.thumbInfos
 })
 
+const thumbContainerScale = computed(() => {
+    return computeThumbContainerScale(store.thumbDockSlot, store.thumbItemWidth, store.thumbItemHeight)
+})
+
+const thumbStageBaseWidth = computed(() => {
+    return computeThumbStageBaseWidth(store.thumbDockSlot)
+})
+
+const thumbContainerWidth = computed(() => Math.round(thumbStageBaseWidth.value * thumbContainerScale.value))
+const thumbContainerHeight = computed(() => Math.round(baseThumbItemHeight * thumbContainerScale.value))
+
 function select(index: number) {
     if (store.readingMode == 0) {
         storeAction.setCurViewIndex(computedVolFirstIndex.value + index, updaterName)
@@ -52,19 +102,40 @@ function select(index: number) {
     }
 }
 
-watch(() => store.curViewIndex, (newVal, oldVal) => {
-    // sync pagination
-    if (store.curViewIndexUpdater !== updaterName) {
-        if (newVal !== computedVolFirstIndex.value && thumbContainers.value) {
-            // sort again, because if changing volume size, it may be out-of-order
-            let cons = thumbContainers.value.sort((a, b) => a.offsetTop - b.offsetTop);
-            let t = newVal - computedVolFirstIndex.value
-            if (cons[t]) {
-                scrollView.value.scrollTo(cons[t].offsetTop, 1000);
-            }
-        } else {
-            scrollView.value.scrollTo(0, 1000) // if is page 1, scroll to top, cuz of having a header
+function onDockDragStart(payload: GestureStartPayload) {
+    emit('dock-drag-start', payload)
+}
+
+function scrollToActiveThumb(targetIndex: number) {
+    if (!scrollView.value || !thumbContainers.value || targetIndex < 0) {
+        return
+    }
+    if (isDockBottom.value) {
+        const sorted = [...thumbContainers.value].sort((a, b) => a.offsetLeft - b.offsetLeft)
+        const target = sorted[targetIndex]
+        if (target) {
+            scrollView.value.scrollTo(target.offsetLeft, 1000, 'x')
+            return
         }
+        scrollView.value.scrollTo(0, 1000, 'x')
+        return
+    }
+    const sorted = [...thumbContainers.value].sort((a, b) => a.offsetTop - b.offsetTop)
+    const target = sorted[targetIndex]
+    if (target) {
+        scrollView.value.scrollTo(target.offsetTop, 1000, 'y')
+        return
+    }
+    scrollView.value.scrollTo(0, 1000, 'y')
+}
+
+watch(() => store.curViewIndex, (newVal) => {
+    if (store.curViewIndexUpdater !== updaterName) {
+        if (newVal === computedVolFirstIndex.value) {
+            scrollToActiveThumb(0)
+            return
+        }
+        scrollToActiveThumb(newVal - computedVolFirstIndex.value)
     }
 })
 </script>
@@ -73,107 +144,100 @@ watch(() => store.curViewIndex, (newVal, oldVal) => {
 @import '../style/_responsive';
 @import '../style/_variables';
 
-$indicator_color: white;
-$thumb_scroll_view_bg: #444444;
-$header-bg: #2ecc71;
-
 .thumb-content {
     position: relative;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+
     .thumb-scroll-view {
         position: relative;
         background: $thumb_scroll_view_bg;
         height: 100%;
-        display: inline-block;
-        width: v-bind('store.thumbItemWidth+"px"');
-        > .header {
-            position: relative;
-            height: 40px;
-            background: $header-bg;
-            > .app-name {
-                color: white;
-                font-weight: bolder;
-                font-size: 18px;
-                display: block;
-                position: absolute;
-                white-space: nowrap;
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
+        width: 100%;
+        &:not(.dock-bottom) {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+            > .header {
+                position: relative;
+                height: 40px;
+                background: $header-bg;
+                flex-shrink: 0;
+                > .app-name {
+                    color: white;
+                    font-weight: bolder;
+                    font-size: v-bind('sideHeaderFontSize');
+                    letter-spacing: v-bind('sideHeaderLetterSpacing');
+                    display: block;
+                    position: absolute;
+                    white-space: nowrap;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-            }
-            .more-vertical-solid.icon {
-                display: block;
-                margin-top: 18px;
-                color: white;
-                position: absolute;
-                margin-left: 9px;
-                width: 2px;
-                height: 2px;
-                border-radius: 50%;
-                border: solid 1px currentColor;
-                background-color: currentColor;
-                &:before {
-                    content: '';
-                    position: absolute;
-                    left: -1px;
-                    top: -8px;
-                    width: 2px;
-                    height: 2px;
-                    border-radius: 50%;
-                    border: solid 1px currentColor;
-                    background-color: currentColor;
-                }
-                &:after {
-                    content: '';
-                    position: absolute;
-                    left: -1px;
-                    top: 6px;
-                    width: 2px;
-                    height: 2px;
-                    border-radius: 50%;
-                    border: solid 1px currentColor;
-                    background-color: currentColor;
-                }
+                width: 100%;
+                height: 100%;
             }
         }
         .thumb-container {
             position: relative;
             width: 100%;
-            padding: 4px 0;
+            padding: 3px 0;
             margin: 0;
-            height: v-bind('store.thumbItemHeight+"px"');
+            height: v-bind('thumbContainerHeight+"px"');
+            flex-shrink: 0;
             text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            overflow: hidden;
             transition: all 0.1s ease;
-            > .thumb {
-                display: block;
-                width: v-bind('store.thumbImgWidth+"px"');
-                // 1/1.44 is the default scale of ehentai's thumb. 100px width per one thumb in img.
-                height: v-bind('store.thumbImgWidth * 144 / 100 + "px"');
-                transition: all 0.5s ease;
-            }
-            > .loc {
-                display: block;
-                color: rgba(white, 0.5);
-                font-size: 12px;
-            }
-            > .index {
-                position: absolute;
-                display: block;
-                font-weight: bolder;
-                font-size: 40px;
-                color: rgba($body_bg, 0.8);
-                -webkit-text-stroke:1px rgba(white, 0.8);
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                z-index: 20;
-                user-select: none;
-                cursor: default;
-                transition: all 0.2s ease;
-            }
+
+                > .thumb-stage {
+                    position: relative;
+                    width: v-bind('thumbStageBaseWidth+"px"');
+                    height: v-bind('baseThumbItemHeight+"px"');
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    transform: scale(v-bind('thumbContainerScale'));
+                    transform-origin: center center;
+                    transition: transform 0.2s ease;
+
+                    > .thumb {
+                        display: block;
+                        width: v-bind('thumbSpriteWidth+"px"');
+                        height: v-bind('thumbSpriteHeight+"px"');
+                        transition: all 0.5s ease;
+                        background-repeat: no-repeat;
+                    }
+
+                    > .index {
+                        position: absolute;
+                        display: block;
+                        font-weight: bolder;
+                        font-size: 40px;
+                        color: rgba($body_bg, 0.8);
+                        -webkit-text-stroke:1px rgba(white, 0.8);
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        z-index: 20;
+                        user-select: none;
+                        cursor: default;
+                        transition: all 0.2s ease;
+                    }
+                }
+
             &:hover {
                 // > .hover-mask {
                 //     position: absolute;
@@ -191,7 +255,7 @@ $header-bg: #2ecc71;
                 // .thumb {
                 //     background: rgba(black, 0.4);
                 // }
-                > .index {
+                > .thumb-stage > .index {
                     font-size: 60px;
                     color: $body_bg;
                     -webkit-text-stroke:1px white;
@@ -212,7 +276,65 @@ $header-bg: #2ecc71;
             transition: all 0.5s ease;
             // z-index: 10;
             pointer-events: none;
-            top: v-bind('indicatorTop+"px"');
+            top: v-bind('indicatorOffset+"px"');
+        }
+    }
+
+    &.dock-bottom {
+        .thumb-scroll-view {
+            width: 100%;
+            height: 100%;
+            flex-direction: row;
+            overflow-x: overlay;
+            overflow-y: hidden;
+
+            > .header {
+                width: $header-height;
+                height: 100%;
+
+                > .app-name {
+                    writing-mode: vertical-rl;
+                    text-orientation: upright;
+                    white-space: normal;
+                    letter-spacing: v-bind('bottomHeaderLetterSpacing');
+                    top: 0;
+                    left: 0;
+                    transform: none;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: v-bind('bottomHeaderFontSize');
+                    line-height: 1;
+                }
+            }
+
+            .indicator {
+                display: block;
+                margin-top: 0;
+                margin-left: $header-height;
+                top: 0;
+                left: v-bind('indicatorOffset+"px"');
+                width: v-bind('thumbContainerWidth+"px"');
+                height: 100%;
+                border-left: 0;
+                border-right: 0;
+                border-top: 3px solid rgba(white, 0.4);
+                border-bottom: 3px solid rgba(white, 0.4);
+            }
+
+            .thumb-container {
+                width: v-bind('thumbContainerWidth+"px"');
+                min-width: v-bind('thumbContainerWidth+"px"');
+                height: 100%;
+                padding: 0 1px;
+                flex-direction: column;
+
+                > .thumb-stage {
+                    transform-origin: center center;
+                }
+            }
         }
     }
 }
