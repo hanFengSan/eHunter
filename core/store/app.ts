@@ -677,6 +677,19 @@ export const computedVisibleQuickSettingIds = computed(() => {
     })
 })
 
+// Helper function to get responsive default values based on viewport width
+function getResponsiveDefaults() {
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1024
+    const isMobile = width < 767
+    return {
+        showThumbView: !isMobile,
+        showBookThumbView: !isMobile,
+        pagesPerScreen: isMobile ? 1 : 2,
+    }
+}
+
+const responsiveDefaults = getResponsiveDefaults()
+
 export const store = reactive({
     // common
     viewportWidth: 0,
@@ -697,14 +710,14 @@ export const store = reactive({
     widthScale: 80, // percent, the scale of img
     loadNum: 3, // the sum of pages per loading
     volumeSize: 100, // default 10, the page quantity per volume
-    showThumbView: true,
+    showThumbView: responsiveDefaults.showThumbView,
     bookDirection: 0, // 0: RTL, 1: LTR
     showBookPagination: true, // show/hide bottom floating pagination bar
     isChangeOddEven: false,
     isReverseFlip: false, // reverse the page flipping direction
     isAutoFlip: false,
     autoFlipFrequency: 10, // sec
-    showBookThumbView: true,
+    showBookThumbView: responsiveDefaults.showBookThumbView,
     IsReverseBookWheeFliplDirection: false,
     wheelSensitivity: 100,
     scrollPageMargin: 70,
@@ -728,7 +741,7 @@ export const store = reactive({
     // volumePreloadCount: 2,
 
     // book view
-    pagesPerScreen: 2, // the page quantity per screen
+    pagesPerScreen: responsiveDefaults.pagesPerScreen, // the page quantity per screen
     flipDirection: 0, // 0: next, 1: pre
     pageTurnAnimationMode: <PageTurnAnimationMode>defaultPageTurnAnimationMode,
 
