@@ -1,5 +1,5 @@
 <template>
-<div ref="asv" :class="['awesome-scroll-view', 'scrollbar', { isHidden: isHidden }]" @scroll="onScroll">
+<div ref="asv" :class="['awesome-scroll-view', 'scrollbar', { isHidden: isHidden, isThumbView: isThumbView }]" @scroll="onScroll">
     <slot></slot>
 </div>
 </template>
@@ -19,6 +19,10 @@ export default {
             default: 'rgba(0,0,0,0.4)'
         },
         isHidden: {
+            type: Boolean,
+            default: false
+        },
+        isThumbView: {
             type: Boolean,
             default: false
         },
@@ -102,16 +106,18 @@ export default {
     overflow-y: overlay;
     overflow-x: hidden;
     
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
-    &:hover::-webkit-scrollbar {
-        display: initial;
-    }
-
-    &.isHidden:hover::-webkit-scrollbar {
-        display: none;
+    &.isThumbView {
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    
+        &:hover::-webkit-scrollbar {
+            display: initial;
+        }
+    
+        &.isHidden:hover::-webkit-scrollbar {
+            display: none;
+        }
     }
 
     &.scrollbar {

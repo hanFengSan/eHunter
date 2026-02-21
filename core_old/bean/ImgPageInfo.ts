@@ -3,6 +3,7 @@ export interface ImgPageInfo {
     index: number,
     pageUrl: string,
     src: string,
+    thumbStyle: string,
     heightOfWidth: number,
     thumbHeight?: number,
     thumbWidth?: number,

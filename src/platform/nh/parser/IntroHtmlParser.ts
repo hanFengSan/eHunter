@@ -30,13 +30,17 @@ export class IntroHtmlParser {
                 pageUrl,
                 thumbHeight,
                 thumbWidth,
+                thumbStyle: '',
                 src: '',
                 heightOfWidth: thumbHeight / thumbWidth
             });
             this.thumbInfos.push({
                 id: pageUrl,
                 mode: ThumbMode.IMG,
-                src: thumbSrc
+                src: thumbSrc,
+                style: '',
+                height: 0,
+                width: 0,
             })
         });
     }
