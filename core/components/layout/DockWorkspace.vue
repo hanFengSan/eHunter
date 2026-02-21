@@ -1,11 +1,11 @@
 <template>
   <div ref="rootRef" class="dock-workspace" :class="`slot-${thumbSlot}`">
-    <div v-if="showThumb && (thumbSlot === 'left' || thumbSlot === 'right')" class="thumb-panel side" :style="thumbStyle">
+    <div v-show="thumbSlot === 'left' || thumbSlot === 'right'" class="thumb-panel side" :class="{ collapsed: !showThumb }" :style="sideThumbStyle">
       <slot name="thumb"></slot>
     </div>
 
     <SplitHandle
-      v-if="showThumb && (thumbSlot === 'left' || thumbSlot === 'right')"
+      v-show="showThumb && (thumbSlot === 'left' || thumbSlot === 'right')"
       orientation="vertical"
       :long-press-ms="longPressMs"
       @resize-start="startResize"
@@ -17,14 +17,14 @@
     </div>
 
     <SplitHandle
-      v-if="showThumb && thumbSlot === 'bottom'"
+      v-show="showThumb && thumbSlot === 'bottom'"
       orientation="horizontal"
       :long-press-ms="longPressMs"
       @resize-start="startResize"
       @hover-change="(val) => (isResizeHover = val)"
     />
 
-    <div v-if="showThumb && thumbSlot === 'bottom'" class="thumb-panel bottom" :style="thumbStyle">
+    <div v-show="thumbSlot === 'bottom'" class="thumb-panel bottom" :class="{ collapsed: !showThumb }" :style="bottomThumbStyle">
       <slot name="thumb"></slot>
     </div>
 
@@ -63,11 +63,18 @@ const isResizing = ref(false)
 const isResizeHover = ref(false)
 const previewSlot = ref<DockSlotId>('left')
 
-const thumbStyle = computed(() => {
-    if (props.thumbSlot === 'bottom') {
-        return { height: `${props.thumbSizePx}px` }
-    }
-    return { width: `${props.thumbSizePx}px` }
+const sideThumbStyle = computed(() => {
+    const width = props.showThumb && (props.thumbSlot === 'left' || props.thumbSlot === 'right')
+        ? `${props.thumbSizePx}px`
+        : '0px'
+    return { width }
+})
+
+const bottomThumbStyle = computed(() => {
+    const height = props.showThumb && props.thumbSlot === 'bottom'
+        ? `${props.thumbSizePx}px`
+        : '0px'
+    return { height }
 })
 
 let dragPointerId = -1
@@ -247,6 +254,13 @@ defineExpose({
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
+  opacity: 1;
+  transition: width 0.28s ease, height 0.28s ease, opacity 0.22s ease;
+  &.collapsed {
+    opacity: 0;
+    pointer-events: none;
+  }
   &.side {
     height: 100%;
   }

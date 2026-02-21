@@ -335,10 +335,13 @@ const defaultQuickSettingSelected = [
     'readingMode',
     'widthScale',
     'loadNum',
+    'volumeSize',
+    'showThumbView',
     'pagesPerScreen',
     'bookDirection',
-    'pageTurnAnimationMode',
     'showBookPagination',
+    'showBookThumbView',
+    'lang',
 ]
 
 interface UnifiedSettingsPreference {
@@ -684,7 +687,7 @@ export const store = reactive({
     showMoreSettingsDialog: false,
     activeSettingsCategory: <SettingsCategory['id']>'general',
     topBarHeight: 40, // px, for calc
-    readingMode: 1, // 0: scroll, 1: book
+    readingMode: 0, // 0: scroll, 1: book
     widthScale: 80, // percent, the scale of img
     loadNum: 3, // the sum of pages per loading
     volumeSize: 100, // default 10, the page quantity per volume
@@ -1044,37 +1047,8 @@ export const storeAction = {
         try {
             store.factoryResetStatus = 'running'
             store.factoryResetErrorMessage = ''
-            PlatformService.storageClear()
-            store.readingMode = 1
-            store.widthScale = 80
-            store.loadNum = 3
-            store.volumeSize = 100
-            store.showThumbView = true
-            store.bookDirection = 0
-            store.showBookPagination = true
-            store.isChangeOddEven = false
-            store.isReverseFlip = false
-            store.isAutoFlip = false
-            store.autoFlipFrequency = 10
-            store.showBookThumbView = true
-            store.thumbDockSlot = 'left'
-            store.thumbViewWidth = 150
-            store.thumbViewHeight = 200
-            syncThumbVisualMetrics(store.thumbViewWidth)
-            store.IsReverseBookWheeFliplDirection = false
-            store.wheelSensitivity = 100
-            store.scrollPageMargin = 70
-            store.autoRetryByOtherSource = true
-            store.pageTurnAnimationMode = defaultPageTurnAnimationMode
-            store.quickSettingSelected = [...defaultQuickSettingSelected]
-            store.quickSettingOrder = [...defaultQuickSettingOrder]
-            persistPageTurnAnimationMode(defaultPageTurnAnimationMode)
-            persistUnifiedSettingsState()
-            readerLayoutPreference = createDefaultLayoutPreference()
-            readerLayoutPreference = writeLayoutPreference(readerLayoutPreference)
-            applyCurrentModeLayoutPreference()
-            store.factoryResetStatus = 'success'
-            store.isFactoryResetDialogVisible = false
+            localStorage.clear()
+            window.location.reload()
         } catch (e) {
             store.factoryResetStatus = 'failed'
             store.factoryResetErrorMessage = 'Factory reset failed'

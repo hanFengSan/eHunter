@@ -48,6 +48,12 @@ import { store, storeAction } from '../store/app'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import type { GestureStartPayload } from '../utils/layoutGesture'
 
+type FullscreenTarget = HTMLElement & {
+    webkitRequestFullscreen?: () => Promise<void> | void
+    webkitRequestFullScreen?: () => Promise<void> | void
+    mozRequestFullScreen?: () => Promise<void> | void
+}
+
 const isFullscreen = ref(false)
 const dockWorkspaceRef = ref<null | { startDockDrag: (payload: GestureStartPayload) => void }>(null)
 const showThumb = computed(() => {
@@ -96,12 +102,8 @@ function toggleFullscreen() {
         return
     }
 
-    const elem = document.querySelector('.ehunter-container') as (HTMLElement & {
-        webkitRequestFullscreen?: () => Promise<void> | void
-        webkitRequestFullScreen?: () => Promise<void> | void
-        mozRequestFullScreen?: () => Promise<void> | void
-    }) | null
-    const target = elem || document.documentElement
+    const elem = document.querySelector('.ehunter-container') as FullscreenTarget | null
+    const target: FullscreenTarget = elem || (document.documentElement as FullscreenTarget)
 
     if (target.requestFullscreen) {
         target.requestFullscreen()

@@ -14,8 +14,8 @@
                     <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
                     <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
                     <div class="hover-mask"></div>
-                    <div class="index" v-if="store.readingMode == 0">{{ computedVolFirstIndex + i + 1 }}</div>
-                    <div class="index" v-if="store.readingMode == 1">{{ i + 1 }}</div>
+                    <div class="index" v-if="store.readingMode == 0">{{ computedVolFirstIndexNum + Number(i) + 1 }}</div>
+                    <div class="index" v-if="store.readingMode == 1">{{ Number(i) + 1 }}</div>
                 </div>
             </div>
         </AwesomeScrollView>
@@ -41,9 +41,10 @@ import {
 import { ref, computed, watch } from 'vue'
 
 const isDockBottom = computed(() => store.thumbDockSlot === 'bottom')
+const computedVolFirstIndexNum = computed(() => Number(computedVolFirstIndex.value))
 const activeThumbIndex = computed(() => {
     if (store.readingMode === 0) {
-        return Math.max(0, store.curViewIndex - computedVolFirstIndex.value)
+        return Math.max(0, store.curViewIndex - computedVolFirstIndexNum.value)
     }
     return Math.max(0, store.curViewIndex)
 })
@@ -94,11 +95,12 @@ const thumbStageBaseWidth = computed(() => {
 const thumbContainerWidth = computed(() => Math.round(thumbStageBaseWidth.value * thumbContainerScale.value))
 const thumbContainerHeight = computed(() => Math.round(baseThumbItemHeight * thumbContainerScale.value))
 
-function select(index: number) {
+function select(index: number | string) {
+    const normalizedIndex = Number(index)
     if (store.readingMode == 0) {
-        storeAction.setCurViewIndex(computedVolFirstIndex.value + index, updaterName)
+        storeAction.setCurViewIndex(computedVolFirstIndexNum.value + normalizedIndex, updaterName)
     } else {
-        storeAction.setCurViewIndex(index, updaterName)
+        storeAction.setCurViewIndex(normalizedIndex, updaterName)
     }
 }
 

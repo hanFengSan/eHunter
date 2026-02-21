@@ -97,7 +97,7 @@ export function computeBottomHeaderLetterSpacingEm(thumbViewHeight: number): num
 export function createDefaultModeLayout(mode: ReaderModeLayoutKey): ReaderModeLayoutState {
     return {
         thumbSlot: 'left',
-        thumbSizePx: clampThumbSize('left', mode === 'book' ? 180 : 150),
+        thumbSizePx: clampThumbSize('left', 150),
         updatedAt: now(),
     }
 }
