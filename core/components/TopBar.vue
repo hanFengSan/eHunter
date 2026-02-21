@@ -234,6 +234,14 @@ watch(() => store.showTopBar, (newVal) => {
     }
 })
 
+// 监听 readingMode 变化，重新检查重叠（切换阅读模式时触发）
+watch(() => store.readingMode, () => {
+    // 使用 setTimeout 确保 DOM 完全更新后再检查
+    setTimeout(() => {
+        checkOverlap()
+    }, 500)
+})
+
 </script>
 
 <style lang="scss" scoped>
