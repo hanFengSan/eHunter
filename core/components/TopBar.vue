@@ -1,8 +1,16 @@
 <template>
     <nav class="top-bar">
         <div class="float-content">
-            <CircleIconButton class="button tips tips-left tips-down" icon-type="expand"
-                :title-content="i18n.openMoreSettingsModal" @click="storeAction.openMoreSettingsDialog()" size="normal"/>
+            <div class="more-button-wrapper">
+                <CircleIconButton class="button tips tips-left tips-down" icon-type="more"
+                    :title-content="i18n.more" @click="toggleMoreMenu" size="normal"/>
+                <MoreMenuPopover 
+                    :active="showMoreMenu"
+                    @close="showMoreMenu = false"
+                    @more-settings="storeAction.openMoreSettingsDialog()"
+                    @quick-preview="storeAction.openThumbExpandDialog()"
+                    @download="storeAction.openDownloadConfirmDialog()" />
+            </div>
             <CircleIconButton class="button tips tips-left tips-down" icon-type="menu"
                 :title-content="i18n.toggleTopBar" :rotate="store.showTopBar" @click="storeAction.toggleShowTopBar()" size="normal"/>
             <CircleIconButton class="button tips tips-left tips-down" icon-type="close"
@@ -38,6 +46,7 @@
             </div>
         </div>
         <MoreSettingsDialog />
+        <DownloadConfirmDialog />
     </nav>
 </template>
 
@@ -47,13 +56,17 @@ import DropOption from './widget/DropOption.vue'
 import NumDropOption from './widget/NumDropOption.vue'
 import SimpleSwitch from './widget/SimpleSwitch.vue'
 import CircleIconButton from './widget/CircleIconButton.vue'
+import MoreMenuPopover from './widget/MoreMenuPopover.vue'
 import { i18n } from '../store/i18n'
 import { store, storeAction, computedVisibleQuickSettingIds, settingFieldMap } from '../store/app'
 import MoreSettingsDialog from './MoreSettingsDialog.vue'
-import { computed } from 'vue'
+import DownloadConfirmDialog from './dialog/DownloadConfirmDialog.vue'
+import { computed, ref } from 'vue'
 import { getFieldValue, setFieldValue, getDropList, getNumList, getNumSuffix } from '../store/settingFieldRuntime'
 
 const emit = defineEmits(['closeEHunter'])
+
+const showMoreMenu = ref(false)
 
 const topBarFields = computed(() => {
     return computedVisibleQuickSettingIds.value
@@ -78,6 +91,10 @@ const topBarFields = computed(() => {
 
 function handleFieldChange(id: string, val: any) {
     setFieldValue(id, val)
+}
+
+function toggleMoreMenu() {
+    showMoreMenu.value = !showMoreMenu.value
 }
 
 function closeEHunter() {
@@ -108,7 +125,14 @@ div {
         z-index: 20000;
         height: v-bind('store.topBarHeight+"px"');
 
-        >.button {
+        >.more-button-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        >.button, >.more-button-wrapper {
             margin-right: 13px;
         }
     }

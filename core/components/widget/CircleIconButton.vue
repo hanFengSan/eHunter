@@ -6,6 +6,7 @@
     <LeftArrowIcon v-if="iconType == 'up_arrow'" class="rotate90"/>
     <AppsIcon v-if="iconType == 'apps'"/>
     <MoreVertIcon v-if="iconType == 'more_vert'"/>
+    <MoreIcon v-if="iconType == 'more'"/>
     <EjectIcon v-if="iconType == 'eject'" :class="{ 'rotate180': !rotate }"/>
 </div>
 </template>
@@ -18,10 +19,11 @@ import CloseIcon from '../../assets/svg/close.svg?component'
 import LeftArrowIcon from '../../assets/svg/left_arrow.svg?component'
 import AppsIcon from '../../assets/svg/apps.svg?component'
 import MoreVertIcon from '../../assets/svg/more_vert.svg?component'
+import MoreIcon from '../../assets/svg/more.svg?component'
 import EjectIcon from '../../assets/svg/eject.svg?component'
 
 defineProps({
-  iconType: String, // menu/close/expand/up_arrow/apps/more_vert/eject
+  iconType: String, // menu/close/expand/up_arrow/apps/more_vert/more/eject
   size: String, // normal, big
   rotate: {
     type: Boolean,

@@ -690,6 +690,7 @@ export const store = reactive({
     showMoreSettings: false,
     showMoreSettingsDialog: false,
     showThumbExpandDialog: false,
+    showDownloadConfirmDialog: false,
     activeSettingsCategory: <SettingsCategory['id']>'general',
     topBarHeight: 40, // px, for calc
     readingMode: 0, // 0: scroll, 1: book
@@ -882,6 +883,12 @@ export const storeAction = {
     },
     closeThumbExpandDialog: () => {
         store.showThumbExpandDialog = false
+    },
+    openDownloadConfirmDialog: () => {
+        store.showDownloadConfirmDialog = true
+    },
+    closeDownloadConfirmDialog: () => {
+        store.showDownloadConfirmDialog = false
     },
     setThumbExpandSegmentIndex: (segmentIndex: number) => {
         store.thumbExpandSegmentIndex = clampThumbExpandSegmentIndex(segmentIndex, store.pageCount)

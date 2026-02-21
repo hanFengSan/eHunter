@@ -165,4 +165,23 @@ div {
         }
     }
 }
+
+@media only screen and (max-width: 767px) {
+    .simple-dialog {
+        >article {
+            min-width: 280px;
+            max-width: 90%;
+            padding: 16px 18px;
+
+            >h4 {
+                font-size: 18px;
+                padding-bottom: 8px;
+            }
+
+            >p {
+                font-size: 14px;
+            }
+        }
+    }
+}
 </style>

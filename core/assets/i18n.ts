@@ -304,6 +304,36 @@ export default <any>{
         en: 'More settings',
         jp: '詳細設定'
     },
+    more: {
+        cn: '更多',
+        en: 'More',
+        jp: 'もっと'
+    },
+    moreSettings: {
+        cn: '更多设置',
+        en: 'More settings',
+        jp: '詳細設定'
+    },
+    quickPreview: {
+        cn: '快速预览',
+        en: 'Quick preview',
+        jp: 'クイックプレビュー'
+    },
+    download: {
+        cn: '下载',
+        en: 'Download',
+        jp: 'ダウンロード'
+    },
+    downloadConfirmTitle: {
+        cn: '下载确认',
+        en: 'Download confirmation',
+        jp: 'ダウンロード確認'
+    },
+    downloadConfirmMessage: {
+        cn: '是否下载该画廊的所有图片？',
+        en: 'Download all images from this gallery?',
+        jp: 'このギャラリーのすべての画像をダウンロードしますか？'
+    },
     settingsGeneral: {
         cn: '通用',
         en: 'General',
