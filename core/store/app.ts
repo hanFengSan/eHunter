@@ -1208,8 +1208,15 @@ export function init(albumService: AlbumService) {
         return
     }
     store.pageCount = albumService.getPageCount()
-    store.thumbInfos = JSON.parse(JSON.stringify(albumService.getThumbInfos(false)))
-    store.imgPageInfos = JSON.parse(JSON.stringify(albumService.getImgPageInfos()))
+
+    let thumbInfos = albumService.getThumbInfos(false)
+    // console.log('[init] thumbInfos:', JSON.parse(JSON.stringify(thumbInfos)))
+    store.thumbInfos = JSON.parse(JSON.stringify(thumbInfos))
+
+    let imgPageInfos = albumService.getImgPageInfos()
+    // console.log('[init] imgPageInfos:', JSON.parse(JSON.stringify(imgPageInfos)))
+    store.imgPageInfos = JSON.parse(JSON.stringify(imgPageInfos))
+    
     store.albumTitle = albumService.getTitle()
     store.curViewIndex = albumService.getCurPageIndex()
     store.pageTurnAnimationMode = readPageTurnAnimationMode()
