@@ -1,7 +1,7 @@
 // get img page urls from album intro page
 import { ReqQueue } from '../../base/request/ReqQueue'
 import { IntroHtmlParser } from './IntroHtmlParser'
-import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
+import type { ImgPageInfo } from '../../../../core/model/model'
 
 export class ImgUrlListParser {
     private introUrl: string;

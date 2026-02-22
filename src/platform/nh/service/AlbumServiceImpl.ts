@@ -1,148 +1,124 @@
+/**
+ * NH Album Service Implementation
+ *
+ * Ported from legacy NH service behavior and adapted to the current
+ * AlbumService interface.
+ */
+
+import type { AlbumService } from '../../../../core/service/AlbumService'
+import type { ImgPageInfo, ThumbInfo, PreviewThumbnailStyle, ImgSrcMode } from '../../../../core/model/model'
 import { ImgHtmlParser } from '../parser/ImgHtmlParser'
 import { IntroHtmlParser } from '../parser/IntroHtmlParser'
 import { TextReq } from '../../base/request/TextReq'
-import { ThumbInfo } from '../../../../core/bean/ThumbInfo'
-import { AlbumService, PreviewThumbnailStyle, IndexInfo } from '../../../../core/service/AlbumService'
-import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
-// import Logger from '../utils/Logger';
 
-interface IntroParserResolve {
-    (introHtmlParser: IntroHtmlParser): void;
-}
+export class NHAlbumServiceImpl implements AlbumService {
+  private imgHtmlParser: ImgHtmlParser
+  private thumbInfos: Array<ThumbInfo> = []
+  private imgPageInfos: Array<ImgPageInfo> = []
+  private pageCount: number = 0
+  private introUrl: string = ''
+  private albumId: string = ''
+  private curPageIndex: number = 0
+  private title: string = ''
 
-export class AlbumServiceImpl extends AlbumService {
-    protected imgHtmlParser: ImgHtmlParser;
-    protected thumbInfos: Array<ThumbInfo> = [];
-    protected introParser: IntroHtmlParser | undefined;
-    protected introParserResolves: Array<IntroParserResolve> = [];
-    protected initIntroParserStatus: string = 'ready';
-    protected sumOfPage: number | undefined;
-    protected introUrl: string = '';
-    protected albumId: string = '';
-    protected curPageNum: number | undefined;
-    protected title: string = '';
-    protected imgPageInfos: Array<ImgPageInfo> = [];
+  constructor() {
+    const htmlText = document.documentElement.outerHTML
+    this.imgHtmlParser = new ImgHtmlParser(htmlText)
+  }
 
-    constructor(imgHtml: string) {
-        super();
-        this.imgHtmlParser = new ImgHtmlParser(imgHtml);
+  isSupportOriginImg(): boolean {
+    return false
+  }
+
+  isSupportImgChangeSource(): boolean {
+    return false
+  }
+
+  isSupportThumbView(): boolean {
+    return true
+  }
+
+  getTitle(): string {
+    return this.title
+  }
+
+  getAlbumId(): string {
+    return this.albumId
+  }
+
+  getPageCount(): number {
+    return this.pageCount
+  }
+
+  getCurPageIndex(): number {
+    return this.curPageIndex
+  }
+
+  async init(): Promise<Error | void> {
+    try {
+      this.pageCount = this.imgHtmlParser.getPageCount()
+      this.albumId = this.imgHtmlParser.getAlbumId()
+      this.introUrl = this.imgHtmlParser.getIntroUrl()
+      this.curPageIndex = this.imgHtmlParser.getCurPageNum() - 1
+
+      const introHtml = await new TextReq(this.introUrl).request()
+      const introParser = new IntroHtmlParser(introHtml)
+
+      this.title = introParser.getTitle()
+      this.imgPageInfos = introParser.getImgPageInfos()
+      this.thumbInfos = introParser.getThumbInfos()
+    } catch (error) {
+      return error instanceof Error ? error : new Error(String(error))
     }
+  }
 
-    async _getIntroParser(): Promise<IntroHtmlParser> {
-        return new Promise(async (resolve, reject) => {
-            if (!this.introParser) {
-                if (this.introParserResolves) {
-                    this.introParserResolves.push(resolve);
-                } else {
-                    this.introParserResolves = [resolve];
-                }
-                if (this.initIntroParserStatus === 'ready') {
-                    this.initIntroParserStatus = 'pending';
-                    let text = await new TextReq(this.getIntroUrl()).request();
-                    this.introParser = new IntroHtmlParser(text);
-                    this.introParserResolves.forEach(fn => fn(this.introParser!));
-                    this.initIntroParserStatus = 'done';
-                    this.introParserResolves = [];
-                }
-            } else
-                resolve(this.introParser);
-        });
-    }
+  getThumbInfos(isDisableCache: boolean): Array<ThumbInfo> {
+    return this.thumbInfos
+  }
 
-    getIntroUrl(): string {
-        if (!this.introUrl) {
-            this.introUrl = this.imgHtmlParser.getIntroUrl();
-        }
-        return this.introUrl;
-    }
+  getImgPageInfos(): Array<ImgPageInfo> {
+    return this.imgPageInfos
+  }
 
-    async getPageCount(): Promise<number> {
-        if (!this.sumOfPage) {
-            this.sumOfPage = this.imgHtmlParser.getPageCount();
-        }
-        return this.sumOfPage;
-    }
+  async getImgSrc(index: number, mode: ImgSrcMode): Promise<ImgPageInfo | Error> {
+    try {
+      const imgPageInfo = this.imgPageInfos[index]
+      if (!imgPageInfo) {
+        return new Error(`Image page info not found for index ${index}`)
+      }
 
-    async getAlbumId(): Promise<string> {
-        if (this.albumId === '') {
-            this.albumId = this.imgHtmlParser.getAlbumId();
-        }
-        return this.albumId;
-    }
+      if (imgPageInfo.src) {
+        return { ...imgPageInfo }
+      }
 
-    async getCurPageNum(): Promise<number> {
-        if (!this.curPageNum) {
-            this.curPageNum = this.imgHtmlParser.getCurPageNum();
-        }
-        return this.curPageNum;
-    }
+      const req = new TextReq(imgPageInfo.pageUrl)
+      req.setTimeOutTime(5)
 
-    async getTitle(): Promise<string> {
-        if (!this.title) {
-            this.title = (await this._getIntroParser()).getTitle();
-        }
-        return this.title;
-    }
+      const htmlText = await req.request()
+      const parser = new ImgHtmlParser(htmlText)
 
-    async getImgPageInfos(): Promise<Array<ImgPageInfo>> {
-        if (this.imgPageInfos.length === 0) {
-            this.imgPageInfos = (await this._getIntroParser()).getImgPageInfos();
-        }
-        return JSON.parse(JSON.stringify(this.imgPageInfos));
-    }
+      const imgUrl = parser.getImgUrl()
+      const imgHeight = parser.getImgHeight()
+      const imgWidth = parser.getImgWidth()
 
-    async getImgPageInfo(index: number): Promise<ImgPageInfo> {
-        return (await this.getImgPageInfos())[index];
-    }
+      this.imgPageInfos[index].src = imgUrl
+      if (imgHeight > 0 && imgWidth > 0) {
+        this.imgPageInfos[index].preciseHeightOfWidth = imgHeight / imgWidth
+      }
 
-    async getImgSrc(index: number, mode): Promise<ImgPageInfo | Error> {
-        let imgPageInfo = await this.getImgPageInfo(index);
-        if (imgPageInfo.src != null && imgPageInfo.src !== '') {
-            return {...imgPageInfo}
-        }
-        let req = new TextReq(imgPageInfo.pageUrl);
-        req.setTimeOutTime(5);
-        let text = await req.request();
-        let parser = new ImgHtmlParser(text);
-        let imgUrl = parser.getImgUrl();
-        let preciseHeightOfWidth = parser.getImgHeight() / parser.getImgWidth();
-        this.imgPageInfos[index].src = imgUrl;
-        this.imgPageInfos[index].preciseHeightOfWidth = preciseHeightOfWidth;
-        return {...this.imgPageInfos[index]}
+      return { ...this.imgPageInfos[index] }
+    } catch (error) {
+      return error instanceof Error ? error : new Error(String(error))
     }
+  }
 
-    async getNewImgSrc(index: number, mode): Promise<ImgPageInfo | Error> {
-        return await this.getImgSrc(index, mode);
-    }
+  getPreviewThumbnailStyle(index: number): PreviewThumbnailStyle {
+    const thumbInfo = this.thumbInfos[index]
 
-    async getThumbInfos(noCache = false): Promise<Array<ThumbInfo>> {
-        if (noCache || this.thumbInfos.length === 0) {
-            this.thumbInfos = (await this._getIntroParser()).getThumbInfos();
-        }
-        return this.thumbInfos;
+    return {
+      'background-image': thumbInfo?.src ? `url(${thumbInfo.src})` : '',
+      'background-position': '0% 0%',
+      'background-size': 'cover'
     }
-
-    async getThumbInfo(index): Promise<ThumbInfo> {
-        return (await this.getThumbInfos())[index];
-    }
-
-    async getPreviewThumbnailStyle(index: number, imgPageInfo: ImgPageInfo, thumbInfo: ThumbInfo, width: number, height: number): Promise<PreviewThumbnailStyle> {
-        return {
-            'background-image': `url(${thumbInfo.src})`,
-            'background-position': `0% 0%`,
-            'background-size': 'cover'
-        };
-    }
-
-    supportOriginImg() {
-        return false;
-    }
-
-    supportImgChangeSource() {
-        return false;
-    }
-
-    supportThumbView(): boolean {
-        return true;
-    }
+  }
 }

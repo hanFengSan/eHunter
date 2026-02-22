@@ -74,7 +74,7 @@ import {
 import Pagination from '../widget/Pagination.vue'
 
 // 缩略图固定尺寸常量（从 layout.ts 导入）
-// thumbSpriteWidth: 当前为 100px，后续可能改为 300px
+// thumbSpriteWidth: 当前为 100px
 // thumbSpriteHeight: 当前为 144px，高宽比固定为 1.44
 const thumbWidth = thumbSpriteWidth
 const thumbHeight = thumbSpriteHeight

@@ -20,5 +20,7 @@ body {
     width: 100%;
     background: #333333;
     left: 0px;
+    top: 0px;
+    z-index: 1;
 }
 </style>

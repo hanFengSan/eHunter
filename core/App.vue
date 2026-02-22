@@ -1,5 +1,5 @@
 <template>
-    <div id="ehunter-app" class="ehunter-app normalize">
+    <div class="ehunter-app normalize">
         <div v-if="isInited" style="display:flex; flex-direction: row;width: 100%;height: 100%;">
             <ReaderView />
         </div>

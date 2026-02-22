@@ -1,5 +1,5 @@
-import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
-import { ThumbInfo, ThumbMode } from '../../../../core/bean/ThumbInfo'
+import type { ImgPageInfo, ThumbInfo } from '../../../../core/model/model'
+import { ThumbMode } from '../../../../core/model/model'
 
 // a parser for album's intro page
 export class IntroHtmlParser {

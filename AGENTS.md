@@ -142,6 +142,7 @@
 - Userscript storage (`GM_getValue`/`GM_setValue`) preferred, fallback to `PlatformService.storageGet/storageSet` (001-dockable-panel-layout)
 - TypeScript 5.9 + Vue 3.5 SFC + SCSS + Vue runtime, existing core widget components (`AwesomeScrollView`, `Pagination`), existing app store/actions (001-thumb-expand-modal)
 - N/A（本功能不新增持久化） (001-thumb-expand-modal)
+- TypeScript 5.9 + Vue 3.5.28, Vite 6.4.1, vite-svg-loader 5.1.0 (001-platform-injection)
 
 ## Recent Changes
 - 001-add-pageflip-toggle: Added TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules

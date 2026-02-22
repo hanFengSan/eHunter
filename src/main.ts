@@ -1,30 +1,93 @@
-import { createApp } from 'vue'
-// import { createPinia } from 'pinia'
+import { createApp, ref, h } from 'vue'
 import TestApp from '../core/TestApp.vue'
-import { TestAlbumService } from './platform/test/AlbumService'
+import LoadingErrorWrapper from '../core/components/LoadingErrorWrapper.vue'
 import { NameAlbumService } from '../core/service/AlbumService'
-import type { AlbumService } from '../core/service/AlbumService'
-// import './assets/main.css'
+import { detectPlatform } from './platform/detector'
+import { createPlatformService } from './platform/factory'
+import { initializeWithTimeout } from './platform/initializer'
+import type { InitializationError } from './platform/types'
 
 /// <reference types="vite-svg-loader" />
 
-const app = createApp(TestApp)
+// Detect platform based on current URL
+const detectionResult = detectPlatform()
 
-const testAlbumService: AlbumService = new TestAlbumService('')
+// Early return if no platform detected (non-album page)
+if (!detectionResult.platform) {
+  console.log('eHunter: No platform detected (non-album page), skipping initialization')
+  // Exit silently - no errors thrown per FR-006
+} else {
+  // Platform detected - initialize reader
+  console.log(`eHunter: Platform detected: ${detectionResult.platform}`)
+  
+  // Create Vue app with LoadingErrorWrapper
+  const app = createApp({
+    setup() {
+      const isLoading = ref(true)
+      const error = ref<InitializationError | null>(null)
 
-app.provide(NameAlbumService, testAlbumService)
+      // Initialize platform
+      const init = async () => {
+        try {
+          // Create platform-specific service
+          const albumService = createPlatformService(detectionResult.platform!)
+          
+          // Provide service to Vue app
+          app.provide(NameAlbumService, albumService)
+          
+          // Initialize with timeout
+          await initializeWithTimeout(albumService, detectionResult.platform!)
+          
+          // Success - hide loading
+          isLoading.value = false
+        } catch (err) {
+          // Initialization failed
+          isLoading.value = false
+          error.value = err as InitializationError
+          
+          // Log detailed error to console per FR-019
+          console.error('eHunter initialization failed:', {
+            message: error.value.message,
+            stack: error.value.stack,
+            platform: error.value.platform,
+            url: error.value.url,
+            timestamp: error.value.timestamp
+          })
+        }
+      }
 
+      // Start initialization
+      init()
 
-app.mount('#app')
+      const handleClose = () => {
+        // Remove eHunter container when user closes error
+        const container = document.getElementById('ehunter-app')
+        if (container) {
+          container.remove()
+        }
+      }
 
-// import EHPlatform from './platform/eh'
-// import NHPlatform from './platform/nh'
+      return {
+        isLoading,
+        error,
+        handleClose
+      }
+    },
+    render() {
+      return h(LoadingErrorWrapper, {
+        isLoading: this.isLoading,
+        error: this.error,
+        onClose: this.handleClose
+      }, {
+        default: () => h(TestApp)
+      })
+    }
+  })
 
-// switch (window.location.host) {
-//     case 'exhentai.org':
-//     case 'e-hentai.org':
-//         new EHPlatform().init();
-//     break;
-//     case 'nhentai.net':
-//         new NHPlatform().init();
-// }
+  // Create and mount container
+  const container = document.createElement('div')
+  container.id = 'ehunter-app'
+  document.body.appendChild(container)
+  
+  app.mount('#ehunter-app')
+}

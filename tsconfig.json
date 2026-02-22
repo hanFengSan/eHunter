@@ -1,7 +1,7 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/main.ts", "src/platform/test/**/*", "core/**/*"],
-  "exclude": ["src/platform/base/request/**/*", "src/platform/eh/**/*", "src/platform/nh/**/*", "old/**/*", "core_old/**/*"],
+  "include": ["env.d.ts", "src/main.ts", "src/platform/**/*", "core/**/*"],
+  "exclude": ["old/**/*", "core_old/**/*"],
   "compilerOptions": {
     "baseUrl": ".",
     "allowJs": true,

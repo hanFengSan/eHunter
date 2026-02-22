@@ -4,16 +4,18 @@ import { ImgHtmlParser } from '../parser/ImgHtmlParser'
 import { ImgUrlListParser } from '../parser/ImgUrlListParser'
 import { IntroHtmlParser } from '../parser/IntroHtmlParser'
 import * as API from '../api'
-import storage from '../../../../core/service/storage/LocalStorage'
-import Logger from '../../../../core/utils/Logger'
-import InfoService from '../../../../core/service/InfoService'
-import SettingService from '../../../../core/service/SettingService'
-import store from '../../../../core/store'
-import * as tags from '../../../../core/assets/value/tags'
-import Utils from '../../../../core/utils/Utils'
-import { AlbumServiceImpl } from './AlbumServiceImpl'
-import { ThumbInfo } from '../../../../core/bean/ThumbInfo'
-import { ImgPageInfo } from '../../../../core/bean/ImgPageInfo'
+import storage from '../../../../core_old/service/storage/LocalStorage'
+import * as tags from '../../../../core_old/assets/value/tags'
+import type { EHAlbumServiceImpl } from './AlbumServiceImpl'
+import type { ThumbInfo } from '../../../../core/model/model'
+import type { ImgPageInfo } from '../../../../core/model/model'
+
+// Simple logger replacement
+const Logger = {
+    logText: (tag: string, message: string) => {
+        console.log(`[${tag}] ${message}`)
+    }
+}
 
 /*
 storage
@@ -31,10 +33,10 @@ export class AlbumCacheService {
     private storageVersionName = 'AlbumCacheVersion';
     private _isNormalMode = false; // make sure in 'Normal' mode
     private _isChangedMode = false;
-    private albumService: AlbumServiceImpl;
+    private albumService: EHAlbumServiceImpl;
     private _album: AlbumCache | undefined;
 
-    constructor(albumService) {
+    constructor(albumService: EHAlbumServiceImpl) {
         this._initStorage();
         this._migrate();
         this.albumService = albumService;

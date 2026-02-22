@@ -6,6 +6,7 @@ export interface ImgPageInfo {
     heightOfWidth: number,
     thumbHeight?: number,
     thumbWidth?: number,
+    thumbStyle?: string,
     preciseHeightOfWidth?: number
 }
 
@@ -19,6 +20,9 @@ export interface ThumbInfo {
     src: string;
     mode: ThumbMode,
     offset?: number;
+    style?: string;
+    height?: number;
+    width?: number;
 }
 
 export interface PreviewThumbnailStyle {
