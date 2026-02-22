@@ -1,8 +1,8 @@
 import { stringify as stringifyYaml } from 'yaml'
 import * as fflate from 'fflate'
 import type { AlbumService } from './AlbumService'
-import { ImgSrcMode } from '../model/model'
 import { i18n } from '../store/i18n'
+import { getImageRetryStages } from './imageRetryPolicy'
 
 export type DownloadTaskPhase = 'queued' | 'fetching' | 'compressing' | 'completed' | 'partial' | 'failed'
 export type DownloadSeverity = 'info' | 'success' | 'warning' | 'error'
@@ -58,8 +58,6 @@ interface ResolvedImage {
 }
 
 const defaultChunkSize = 200
-const maxAttemptsPerStage = 3
-
 function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -173,15 +171,16 @@ async function resolveImageBlob(
     pageNumber: number,
     autoRetryByOtherSource: boolean,
 ): Promise<ResolvedImage> {
-    const stages = autoRetryByOtherSource
-        ? [ImgSrcMode.ChangeSource, ImgSrcMode.Origin]
-        : [ImgSrcMode.Default]
+    const stages = getImageRetryStages({
+        autoRetryByOtherSource,
+        supportChangeSource: albumService.isSupportImgChangeSource(),
+    })
 
     let lastError: unknown = null
-    for (const mode of stages) {
-        for (let attempt = 1; attempt <= maxAttemptsPerStage; attempt++) {
+    for (const stage of stages) {
+        for (let attempt = 1; attempt <= stage.attempts; attempt++) {
             try {
-                const imgInfo = await albumService.getImgSrc(pageIndex, mode)
+                const imgInfo = await albumService.getImgSrc(pageIndex, stage.mode)
                 if (imgInfo instanceof Error) {
                     throw imgInfo
                 }
@@ -194,7 +193,7 @@ async function resolveImageBlob(
                 console.log('[GalleryDownloadService] image load begin', {
                     pageIndex,
                     pageNumber,
-                    mode,
+                    mode: stage.mode,
                     attempt,
                     src: imgInfo.src,
                 })
@@ -204,7 +203,7 @@ async function resolveImageBlob(
                 console.log('[GalleryDownloadService] image load done', {
                     pageIndex,
                     pageNumber,
-                    mode,
+                    mode: stage.mode,
                     attempt,
                     src: imgInfo.src,
                     blobSize: blob.size,
@@ -221,12 +220,12 @@ async function resolveImageBlob(
                 console.log('[GalleryDownloadService] image load failed', {
                     pageIndex,
                     pageNumber,
-                    mode,
+                    mode: stage.mode,
                     attempt,
                     reason,
                 })
                 lastError = e
-                if (attempt < maxAttemptsPerStage) {
+                if (attempt < stage.attempts) {
                     await delay(350)
                 }
             }

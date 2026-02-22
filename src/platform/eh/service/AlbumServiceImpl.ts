@@ -134,8 +134,9 @@ export class EHAlbumServiceImpl implements AlbumService {
         return new Error(`Image page info not found for index ${index}`)
       }
 
-      // If image source already loaded, return it
-      if (imgPageInfo.src) {
+      // Keep cache hit for default loading, but force re-fetch for
+      // change-source/origin requests.
+      if (imgPageInfo.src && mode !== ImgSrcMode.ChangeSource && mode !== ImgSrcMode.Origin) {
         return imgPageInfo
       }
 
@@ -150,7 +151,7 @@ export class EHAlbumServiceImpl implements AlbumService {
           try {
             imgPageInfo.src = parser.getOriginalImgUrl()
           } catch (e) {
-            return new Error('Original image not available')
+            return new Error('ERROR_NO_ORIGIN')
           }
           break
         

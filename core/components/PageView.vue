@@ -59,6 +59,7 @@ import { ImgSrcMode } from '../model/model'
 import { i18n } from '../store/i18n'
 import Utils from '../utils/Utils'
 import Logger from '../utils/Logger'
+import { buildRetryQueueAfterFailure as buildImageRetryQueueAfterFailure } from '../service/imageRetryPolicy'
 
 const props = defineProps<{
     index: number,
@@ -79,15 +80,24 @@ const albumService = <AlbumService>inject(NameAlbumService)
 const reloadTimes = ref(0)
 const message = ref('')
 const curLoadStatus = ref(ImgLoadStatus.Waiting) // 0:waiting, 1:loading, 2:error, 3:loaded
-const isFirstLoad = ref(true)
+const lastLoadMode = ref(ImgSrcMode.Default)
+const autoRetryQueue = ref<ImgSrcMode[]>([])
+const isAutoRetryRunning = ref(false)
+const isAutoRetryExhausted = ref(false)
 
 const imgPageInfo = computed(() => {
     return storeAction.getImgPageInfo(props.index)
 })
 
 async function loadImgSrc(mode: ImgSrcMode) {
+    lastLoadMode.value = mode
+    isAutoRetryExhausted.value = false
     let resp = await albumService.getImgSrc(props.index, mode)
     if (resp instanceof Error) {
+        if (mode === ImgSrcMode.Default) {
+            autoRetryQueue.value = buildRetryQueueAfterFailure(mode)
+            await runAutoRetryQueue()
+        }
         return;
     }
     if (imgPageInfo.value.src != resp.src) {
@@ -95,6 +105,40 @@ async function loadImgSrc(mode: ImgSrcMode) {
     }
     if (resp.preciseHeightOfWidth && imgPageInfo.value.preciseHeightOfWidth != resp.preciseHeightOfWidth) {
         storeAction.setImgPageInfoPreciseHeightOfWidth(props.index, resp.preciseHeightOfWidth)
+    }
+}
+
+function getRetryPolicyOptions() {
+    return {
+        autoRetryByOtherSource: store.autoRetryByOtherSource,
+        supportChangeSource: albumService.isSupportImgChangeSource(),
+    }
+}
+
+function buildRetryQueueAfterFailure(failedMode: ImgSrcMode): ImgSrcMode[] {
+    return buildImageRetryQueueAfterFailure(failedMode, getRetryPolicyOptions())
+}
+
+async function runAutoRetryQueue() {
+    if (isAutoRetryRunning.value) {
+        return
+    }
+    isAutoRetryRunning.value = true
+    try {
+        while (autoRetryQueue.value.length > 0) {
+            const mode = autoRetryQueue.value.shift()
+            if (mode === undefined) {
+                break
+            }
+            const loaded = await getNewImgSrc(mode, true)
+            if (loaded) {
+                // Wait for img onload/onerror to continue.
+                return
+            }
+        }
+        isAutoRetryExhausted.value = true
+    } finally {
+        isAutoRetryRunning.value = false
     }
 }
 
@@ -128,17 +172,17 @@ watch(() => props.active, (newVal) => {
     }
 })
 
-// refresh img
-async function getNewImgSrc(mode: ImgSrcMode) {
+async function getNewImgSrc(mode: ImgSrcMode, isAutoRetry = false): Promise<boolean> {
+    if (!isAutoRetry) {
+        autoRetryQueue.value = []
+    }
+    isAutoRetryExhausted.value = false
     reloadTimes.value++
     message.value = ''
     storeAction.setImgPageInfoSrc(props.index, '')
     curLoadStatus.value = ImgLoadStatus.Loading
-    let actualMode = mode
-    if (mode === ImgSrcMode.Default && store.autoRetryByOtherSource && albumService.isSupportImgChangeSource()) {
-        actualMode = ImgSrcMode.ChangeSource
-    }
-    let resp = await albumService.getImgSrc(props.index, actualMode)
+    lastLoadMode.value = mode
+    let resp = await albumService.getImgSrc(props.index, mode)
     if (resp instanceof Error) {
         switch (resp.message) {
             case 'ERROR_NO_ORIGIN':
@@ -147,7 +191,12 @@ async function getNewImgSrc(mode: ImgSrcMode) {
             default:
                 message.value = i18n.value.loadingFailed
         }
-        return
+        if (isAutoRetry) {
+            return false
+        }
+        autoRetryQueue.value = buildRetryQueueAfterFailure(mode)
+        await runAutoRetryQueue()
+        return false
     }
     await nextTick()
     await Utils.timeout(300)
@@ -157,6 +206,7 @@ async function getNewImgSrc(mode: ImgSrcMode) {
     if (resp.preciseHeightOfWidth && imgPageInfo.value.preciseHeightOfWidth != resp.preciseHeightOfWidth) {
         storeAction.setImgPageInfoPreciseHeightOfWidth(props.index, resp.preciseHeightOfWidth)
     }
+    return true
 }
 
 function failLoad(e) {
@@ -164,17 +214,20 @@ function failLoad(e) {
     if (imgPageInfo.value.src) {
         curLoadStatus.value = ImgLoadStatus.Error;
         Logger.logText('LOADING', 'loading image failed')
-        if (isFirstLoad.value) {
-            // auto request src when first loading is failed
-            isFirstLoad.value = false
+        if (!isAutoRetryExhausted.value && autoRetryQueue.value.length === 0) {
+            autoRetryQueue.value = buildRetryQueueAfterFailure(lastLoadMode.value)
+        }
+        if (autoRetryQueue.value.length > 0) {
             Logger.logText('LOADING', 'reloading image')
-            getNewImgSrc(ImgSrcMode.Default)
+            runAutoRetryQueue()
         }
     }
 }
 
 function loaded() {
     curLoadStatus.value = ImgLoadStatus.Loaded;
+    autoRetryQueue.value = []
+    isAutoRetryExhausted.value = false
 }
 
 function onClickBg() {
