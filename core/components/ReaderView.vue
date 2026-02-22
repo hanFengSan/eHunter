@@ -34,6 +34,7 @@
         <div class="progress">{{ `${store.curViewIndex + 1} / ${store.pageCount}` }}</div>
     </div>
     <ThumbExpandDialog @select-page="onThumbExpandSelectPage" />
+    <InstructionDialog />
 </div>
 </template>
 
@@ -43,6 +44,7 @@ import ThumbScrollView from './ThumbScrollView.vue';
 import TopBar from './TopBar.vue';
 import AlbumBookView from './AlbumBookView.vue';
 import ThumbExpandDialog from './dialog/ThumbExpandDialog.vue'
+import InstructionDialog from './dialog/InstructionDialog.vue'
 import DockWorkspace from './layout/DockWorkspace.vue'
 import FullScreenIcon from '../assets/svg/full_screen.svg?component'
 import { i18n } from '../store/i18n'

@@ -3,7 +3,7 @@ import { i18n, lang } from './i18n'
 import type { AlbumService } from '../service/AlbumService'
 import { NameAlbumService } from '../service/AlbumService'
 import type { ImgPageInfo, ThumbInfo } from 'core/model/model'
-import { initViewportSizeUpdater, initKeyboardListener, resetAutoFlipTimer, checkInstructions } from './event'
+import { initViewportSizeUpdater, initKeyboardListener, resetAutoFlipTimer, checkInstructions, openWelcomeInstructionDialog, checkVersion } from './event'
 import PlatformService from '../../src/platform/base/service/PlatformService.js'
 import {
     clampThumbSize,
@@ -57,6 +57,20 @@ export interface DownloadTaskRecord {
     actions: DownloadStatusAction[]
     createdAt: string
     updatedAt: string
+}
+
+export interface InstructionDialogPayload {
+    title: string
+    mdText: string
+    isCompulsive?: boolean
+    operations?: InstructionDialogOperation[]
+}
+
+export interface InstructionDialogOperation {
+    name: string
+    btnType: string
+    isCloseModal: boolean
+    onClick?: () => void
 }
 
 export interface QuickSettingOption {
@@ -614,6 +628,10 @@ function persistUnifiedSettingsState() {
             wheelSensitivity: store.wheelSensitivity,
             lang: lang.value,
             autoRetryByOtherSource: store.autoRetryByOtherSource,
+            hasShownWelcomeInstruction: store.hasShownWelcomeInstruction,
+            hasShownBookInstruction: store.hasShownBookInstruction,
+            lastSeenVersionNotice: store.lastSeenVersionNotice,
+            lastRemoteUpdateNoticeAt: store.lastRemoteUpdateNoticeAt,
         },
         quickSelection: [...store.quickSettingSelected],
         quickOrder: [...store.quickSettingOrder],
@@ -657,6 +675,8 @@ function applyUnifiedSettingsPreference() {
         ['showBookThumbView', 'showBookThumbView'],
         ['IsReverseBookWheeFliplDirection', 'IsReverseBookWheeFliplDirection'],
         ['autoRetryByOtherSource', 'autoRetryByOtherSource'],
+        ['hasShownWelcomeInstruction', 'hasShownWelcomeInstruction'],
+        ['hasShownBookInstruction', 'hasShownBookInstruction'],
     ]
     for (const [sourceKey, targetKey] of boolFields) {
         if (typeof setting[sourceKey] === 'boolean') {
@@ -667,6 +687,26 @@ function applyUnifiedSettingsPreference() {
     store.pageTurnAnimationMode = normalizePageTurnAnimationMode(setting.pageTurnAnimationMode)
     if (typeof setting.lang === 'string' && ['cn', 'en', 'jp'].includes(setting.lang)) {
         lang.value = setting.lang
+    }
+    if (typeof setting.hasShownWelcomeInstruction === 'boolean') {
+        store.hasShownWelcomeInstruction = setting.hasShownWelcomeInstruction
+    } else {
+        store.hasShownWelcomeInstruction = false
+    }
+    if (typeof setting.hasShownBookInstruction === 'boolean') {
+        store.hasShownBookInstruction = setting.hasShownBookInstruction
+    } else {
+        store.hasShownBookInstruction = false
+    }
+    if (typeof setting.lastSeenVersionNotice === 'string') {
+        store.lastSeenVersionNotice = setting.lastSeenVersionNotice
+    } else {
+        store.lastSeenVersionNotice = ''
+    }
+    if (typeof setting.lastRemoteUpdateNoticeAt === 'number' && Number.isFinite(setting.lastRemoteUpdateNoticeAt)) {
+        store.lastRemoteUpdateNoticeAt = setting.lastRemoteUpdateNoticeAt
+    } else {
+        store.lastRemoteUpdateNoticeAt = 0
     }
 
     const quick = sanitizeQuickSettingSelection(preference.quickSelection, preference.quickOrder)
@@ -756,6 +796,11 @@ export const store = reactive({
     showMoreSettingsDialog: false,
     showThumbExpandDialog: false,
     showDownloadConfirmDialog: false,
+    showInstructionDialog: false,
+    instructionDialogTitle: '',
+    instructionDialogMdText: '',
+    instructionDialogCompulsive: false,
+    instructionDialogOperations: <InstructionDialogOperation[]>[],
     activeSettingsCategory: <SettingsCategory['id']>'general',
     topBarHeight: 40, // px, for calc
     readingMode: 0, // 0: scroll, 1: book
@@ -775,6 +820,10 @@ export const store = reactive({
     wheelSensitivity: 100,
     scrollPageMargin: 70,
     autoRetryByOtherSource: true,
+    hasShownWelcomeInstruction: false,
+    hasShownBookInstruction: false,
+    lastSeenVersionNotice: '',
+    lastRemoteUpdateNoticeAt: 0,
     quickSettingSelected: [...defaultQuickSettingSelected],
     quickSettingOrder: [...defaultQuickSettingOrder],
     isFactoryResetDialogVisible: false,
@@ -962,6 +1011,37 @@ export const storeAction = {
     },
     closeDownloadConfirmDialog: () => {
         store.showDownloadConfirmDialog = false
+    },
+    openInstructionDialog: (payload: InstructionDialogPayload) => {
+        store.instructionDialogTitle = payload.title
+        store.instructionDialogMdText = payload.mdText
+        store.instructionDialogCompulsive = payload.isCompulsive !== false
+        store.instructionDialogOperations = payload.operations ? [...payload.operations] : []
+        store.showInstructionDialog = true
+    },
+    closeInstructionDialog: () => {
+        store.showInstructionDialog = false
+        store.instructionDialogOperations = []
+        checkInstructions()
+    },
+    openWelcomeInstructionDialog: () => {
+        openWelcomeInstructionDialog(false)
+    },
+    markWelcomeInstructionShown: () => {
+        store.hasShownWelcomeInstruction = true
+        persistUnifiedSettingsState()
+    },
+    markBookInstructionShown: () => {
+        store.hasShownBookInstruction = true
+        persistUnifiedSettingsState()
+    },
+    markVersionNoticeSeen: (version: string) => {
+        store.lastSeenVersionNotice = version
+        persistUnifiedSettingsState()
+    },
+    markRemoteUpdateNoticeShown: (timestamp: number) => {
+        store.lastRemoteUpdateNoticeAt = timestamp
+        persistUnifiedSettingsState()
     },
     setThumbExpandSegmentIndex: (segmentIndex: number) => {
         store.thumbExpandSegmentIndex = clampThumbExpandSegmentIndex(segmentIndex, store.pageCount)
@@ -1379,6 +1459,7 @@ export function init(albumService: AlbumService) {
     initKeyboardListener()
     resetAutoFlipTimer()
     checkInstructions()
+    checkVersion()
     isInited = true
 }
 

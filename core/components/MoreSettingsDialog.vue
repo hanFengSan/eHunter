@@ -156,6 +156,10 @@
                                     <span class="ehunter-value">{{ versionText }}</span>
                                 </div>
                                 <div class="ehunter-row">
+                                    <span class="ehunter-label">{{ i18n.infoTip }}</span>
+                                    <button class="ehunter-action" @click="storeAction.openWelcomeInstructionDialog">{{ i18n.infoTip }}</button>
+                                </div>
+                                <div class="ehunter-row">
                                     <span class="ehunter-label">Github</span>
                                     <a target="_blank" href="https://github.com/hanFengSan/eHunter" class="ehunter-link">https://github.com/hanFengSan/eHunter</a>
                                 </div>
@@ -588,6 +592,21 @@ onMounted(() => {
                             padding: 8px 12px;
                             cursor: pointer;
                             box-shadow: 0 8px 16px rgba(201, 67, 67, 0.26);
+                        }
+
+                        > .ehunter-action {
+                            border: 1px solid rgba(76, 111, 172, 0.36);
+                            border-radius: 8px;
+                            background: linear-gradient(180deg, #f6f9ff, #e7efff);
+                            color: #274b7e;
+                            font-size: 13px;
+                            padding: 8px 12px;
+                            cursor: pointer;
+                            font-weight: 600;
+
+                            &:hover {
+                                background: linear-gradient(180deg, #edf4ff, #dceaff);
+                            }
                         }
                     }
 
