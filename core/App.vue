@@ -2,6 +2,7 @@
     <div class="ehunter-app normalize">
         <div v-if="isInited" style="display:flex; flex-direction: row;width: 100%;height: 100%;">
             <ReaderView />
+            <StatusNotificationStack />
         </div>
         <!-- <LoadingView style="width: 100%; height: 500px;"/>
         <AwesomeScrollView>
@@ -77,6 +78,7 @@ import AwesomeScrollView from './components/widget/AwesomeScrollView.vue'
 import AlbumScrollView from './components/AlbumScrollView.vue'
 import AlbumBookView from './components/AlbumBookView.vue'
 import ReaderView from './components/ReaderView.vue'
+import StatusNotificationStack from './components/status/StatusNotificationStack.vue'
 import PageView from './components/PageView.vue'
 import { inject, onMounted, ref } from 'vue'
 import { NameAlbumService } from './service/AlbumService'

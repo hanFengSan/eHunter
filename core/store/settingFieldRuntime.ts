@@ -6,6 +6,7 @@ export function getFieldValue(id: string): any {
         case 'readingMode': return store.readingMode
         case 'widthScale': return store.widthScale
         case 'loadNum': return store.loadNum
+        case 'downloadChunkSize': return store.downloadChunkSize
         case 'volumeSize': return store.volumeSize
         case 'showThumbView': return store.showThumbView
         case 'scrollPageMargin': return store.scrollPageMargin
@@ -31,6 +32,7 @@ export function setFieldValue(id: string, val: any): void {
         case 'readingMode': storeAction.setReadingMode(val); break
         case 'widthScale': storeAction.setWidthScale(val); break
         case 'loadNum': storeAction.setLoadNum(val); break
+        case 'downloadChunkSize': storeAction.setDownloadChunkSize(val); break
         case 'volumeSize': storeAction.setVolumeSize(val); break
         case 'showThumbView': if (store.showThumbView !== val) storeAction.toggleShowThumbView(); break
         case 'scrollPageMargin': storeAction.setScrollPageMargin(val); break

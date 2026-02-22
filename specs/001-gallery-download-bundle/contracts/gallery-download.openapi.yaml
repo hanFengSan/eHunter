@@ -1,0 +1,244 @@
+openapi: 3.0.3
+info:
+  title: Gallery Download Workflow Contract
+  version: 1.0.0
+  description: >-
+    Contract describing request/response shapes for starting gallery download tasks,
+    tracking status notifications, and reading configurable download preferences.
+servers:
+  - url: https://ehunter.local
+paths:
+  /downloads/gallery:
+    post:
+      summary: Start a gallery download task
+      operationId: startGalleryDownload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartDownloadRequest'
+      responses:
+        '202':
+          description: Download task accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadTaskAccepted'
+        '400':
+          description: Invalid request payload
+
+  /downloads/gallery/{taskId}:
+    get:
+      summary: Get current download task status
+      operationId: getGalleryDownloadTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadTaskStatus'
+        '404':
+          description: Task not found
+
+  /downloads/gallery/{taskId}/notifications:
+    get:
+      summary: List notifications for a download task
+      operationId: listDownloadNotifications
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatusNotification'
+
+  /settings/download:
+    get:
+      summary: Get download-related preferences
+      operationId: getDownloadSettings
+      responses:
+        '200':
+          description: Current settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadSettings'
+    put:
+      summary: Save download-related preferences
+      operationId: putDownloadSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadSettings'
+      responses:
+        '200':
+          description: Saved settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadSettings'
+        '400':
+          description: Invalid settings value
+
+components:
+  schemas:
+    StartDownloadRequest:
+      type: object
+      required:
+        - albumId
+        - chunkSize
+        - autoRetryByOtherSource
+      properties:
+        albumId:
+          type: string
+        chunkSize:
+          type: integer
+          minimum: 1
+          default: 200
+        autoRetryByOtherSource:
+          type: boolean
+
+    DownloadTaskAccepted:
+      type: object
+      required:
+        - taskId
+        - status
+        - totalPages
+        - totalChunks
+      properties:
+        taskId:
+          type: string
+        status:
+          $ref: '#/components/schemas/DownloadTaskPhase'
+        totalPages:
+          type: integer
+          minimum: 0
+        totalChunks:
+          type: integer
+          minimum: 1
+
+    DownloadTaskStatus:
+      type: object
+      required:
+        - taskId
+        - status
+        - albumTitle
+        - totalPages
+        - processedPages
+        - failedPages
+        - chunks
+      properties:
+        taskId:
+          type: string
+        status:
+          $ref: '#/components/schemas/DownloadTaskPhase'
+        albumTitle:
+          type: string
+        totalPages:
+          type: integer
+          minimum: 0
+        processedPages:
+          type: integer
+          minimum: 0
+        failedPages:
+          type: integer
+          minimum: 0
+        chunks:
+          type: array
+          items:
+            $ref: '#/components/schemas/DownloadChunkStatus'
+
+    DownloadChunkStatus:
+      type: object
+      required:
+        - chunkIndex
+        - totalChunks
+        - status
+        - successCount
+        - failedCount
+        - zipFileName
+      properties:
+        chunkIndex:
+          type: integer
+          minimum: 1
+        totalChunks:
+          type: integer
+          minimum: 1
+        status:
+          $ref: '#/components/schemas/DownloadTaskPhase'
+        successCount:
+          type: integer
+          minimum: 0
+        failedCount:
+          type: integer
+          minimum: 0
+        zipFileName:
+          type: string
+
+    StatusNotification:
+      type: object
+      required:
+        - notificationId
+        - taskId
+        - phase
+        - severity
+        - message
+        - updatedAt
+      properties:
+        notificationId:
+          type: string
+        taskId:
+          type: string
+        phase:
+          $ref: '#/components/schemas/DownloadTaskPhase'
+        severity:
+          type: string
+          enum: [info, success, warning, error]
+        message:
+          type: string
+        progressCurrent:
+          type: integer
+          minimum: 0
+        progressTotal:
+          type: integer
+          minimum: 0
+        updatedAt:
+          type: string
+          format: date-time
+
+    DownloadTaskPhase:
+      type: string
+      enum: [queued, fetching, compressing, completed, partial, failed]
+
+    DownloadSettings:
+      type: object
+      required:
+        - chunkSize
+        - autoRetryByOtherSource
+      properties:
+        chunkSize:
+          type: integer
+          minimum: 1
+          default: 200
+          description: Effective per-zip image count before creating next chunk
+        autoRetryByOtherSource:
+          type: boolean
+          description: Whether fallback order includes source switch before origin retry

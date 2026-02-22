@@ -155,8 +155,20 @@ export class EHAlbumServiceImpl implements AlbumService {
           break
         
         case ImgSrcMode.ChangeSource:
-          // TODO: Implement source change logic
-          return new Error('Change source not yet implemented')
+          try {
+            const sourceId = parser.getSourceId()
+            if (!sourceId) {
+              return new Error('ERROR_CHANGE_SOURCE')
+            }
+            const sourceReq = new TextReq(`${imgPageInfo.pageUrl}?nl=${sourceId}`)
+            const sourceHtml = await sourceReq.request()
+            const sourceParser = new ImgHtmlParser(sourceHtml)
+            imgPageInfo.src = sourceParser.getImgUrl()
+            imgPageInfo.preciseHeightOfWidth = sourceParser.getPreciseHeightOfWidth()
+            return imgPageInfo
+          } catch (e) {
+            return new Error('ERROR_CHANGE_SOURCE')
+          }
         
         default:
           imgPageInfo.src = parser.getImgUrl()
@@ -167,7 +179,6 @@ export class EHAlbumServiceImpl implements AlbumService {
 
       return imgPageInfo
     } catch (error) {
-      console.error('Failed to get image source:', error)
       return error instanceof Error ? error : new Error(String(error))
     }
   }

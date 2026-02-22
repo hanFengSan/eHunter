@@ -45,6 +45,9 @@ export class TestAlbumService implements AlbumService {
     getAlbumId(): string {
         return 'id'
     }
+    getIntroUrl(): string {
+        return '/g/id/test/'
+    }
     getPageCount(): number {
         return 64
     }

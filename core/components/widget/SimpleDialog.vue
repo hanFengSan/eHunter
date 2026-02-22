@@ -145,6 +145,7 @@ div {
             box-sizing: border-box;
             font-size: 22px;
             text-align: left;
+            margin: 2px 0px;
             padding-bottom: 10px;
             color: #000000;
             font-weight: lighter;

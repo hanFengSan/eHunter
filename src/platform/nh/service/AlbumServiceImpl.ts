@@ -46,6 +46,10 @@ export class NHAlbumServiceImpl implements AlbumService {
     return this.albumId
   }
 
+  getIntroUrl(): string {
+    return this.introUrl
+  }
+
   getPageCount(): number {
     return this.pageCount
   }

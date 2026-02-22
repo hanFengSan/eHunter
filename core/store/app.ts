@@ -17,12 +17,47 @@ import {
     getThumbExpandSegmentByPage,
 } from '../model/thumbExpand'
 import { readLayoutPreference, writeLayoutPreference } from './layoutPreference'
+import { GalleryDownloadService } from '../service/GalleryDownloadService'
+import type { DownloadStatusEvent, DownloadTaskPhase, DownloadSeverity } from '../service/GalleryDownloadService'
 
 type PageTurnAnimationMode = 'realistic' | 'slide' | 'none'
 
 type ModeScope = 'both' | 'scroll-only' | 'book-only'
 type SettingsPanelCategory = 'general' | 'scroll' | 'book'
 type SettingControlType = 'drop' | 'num' | 'switch'
+
+export interface DownloadStatusNotification {
+    notificationId: string
+    taskId: string
+    title: string
+    phase: DownloadTaskPhase
+    severity: DownloadSeverity
+    message: string
+    progressCurrent?: number
+    progressTotal?: number
+    actions?: DownloadStatusAction[]
+    createdAt: string
+    updatedAt: string
+}
+
+export interface DownloadStatusAction {
+    id: string
+    label: string
+    variant?: 'plain' | 'danger'
+    onClick?: (notification: DownloadStatusNotification) => void
+}
+
+export interface DownloadTaskRecord {
+    taskId: string
+    albumTitle: string
+    totalPages: number
+    processedPages: number
+    failedPages: number
+    status: DownloadTaskPhase
+    actions: DownloadStatusAction[]
+    createdAt: string
+    updatedAt: string
+}
 
 export interface QuickSettingOption {
     id: string
@@ -46,7 +81,7 @@ export interface SettingFieldDefinition {
     showInDialog: boolean
     dialogCategory?: SettingsPanelCategory
     dropKey?: 'readingModeList' | 'bookDirection' | 'pageTurnAnimation' | 'langList'
-    numKey?: 'widthScale' | 'loadNum' | 'volumeSize' | 'pagesPerScreen' | 'autoFlipFrequency' | 'wheelSensitivity' | 'scrollPageMargin'
+    numKey?: 'widthScale' | 'loadNum' | 'downloadChunkSize' | 'volumeSize' | 'pagesPerScreen' | 'autoFlipFrequency' | 'wheelSensitivity' | 'scrollPageMargin'
     min?: number
     max?: number
     useAbbrName?: boolean
@@ -70,6 +105,8 @@ let bookTurnSettleTimerID: number = 0
 let isBookTurning = false
 let pendingBookTurn: null | { val: number, updater: string } = null
 let readerLayoutPreference = createDefaultLayoutPreference()
+let runtimeAlbumService: AlbumService | null = null
+const downloadRunnerMap: Record<string, GalleryDownloadService> = {}
 
 export const quickSettingOptions: QuickSettingOption[] = [
     { id: 'readingMode', i18nKey: 'readingMode', modeScope: 'both', fixed: true },
@@ -135,6 +172,19 @@ export const settingFieldDefinitions: SettingFieldDefinition[] = [
         numKey: 'loadNum',
         min: 1,
         max: 100,
+    },
+    {
+        id: 'downloadChunkSize',
+        control: 'num',
+        labelI18nKey: 'downloadChunkSize',
+        tipI18nKey: 'downloadChunkSizeTip',
+        modeScope: 'both',
+        showInTopBar: false,
+        showInDialog: true,
+        dialogCategory: 'general',
+        numKey: 'downloadChunkSize',
+        min: 1,
+        max: 1000,
     },
     {
         id: 'autoRetryByOtherSource',
@@ -547,6 +597,7 @@ function persistUnifiedSettingsState() {
             readingMode: store.readingMode,
             widthScale: store.widthScale,
             loadNum: store.loadNum,
+            downloadChunkSize: store.downloadChunkSize,
             volumeSize: store.volumeSize,
             showThumbView: store.showThumbView,
             scrollPageMargin: store.scrollPageMargin,
@@ -583,6 +634,7 @@ function applyUnifiedSettingsPreference() {
         ['readingMode', 'readingMode'],
         ['widthScale', 'widthScale'],
         ['loadNum', 'loadNum'],
+        ['downloadChunkSize', 'downloadChunkSize'],
         ['volumeSize', 'volumeSize'],
         ['scrollPageMargin', 'scrollPageMargin'],
         ['pagesPerScreen', 'pagesPerScreen'],
@@ -709,6 +761,7 @@ export const store = reactive({
     readingMode: 0, // 0: scroll, 1: book
     widthScale: 80, // percent, the scale of img
     loadNum: 3, // the sum of pages per loading
+    downloadChunkSize: 200,
     volumeSize: 100, // default 10, the page quantity per volume
     showThumbView: responsiveDefaults.showThumbView,
     bookDirection: 0, // 0: RTL, 1: LTR
@@ -727,6 +780,8 @@ export const store = reactive({
     isFactoryResetDialogVisible: false,
     factoryResetStatus: 'idle',
     factoryResetErrorMessage: '',
+    downloadNotifications: <DownloadStatusNotification[]>[],
+    downloadTaskMap: <Record<string, DownloadTaskRecord>>{},
 
     // thumbView
     thumbDockSlot: <DockSlotId>'left',
@@ -833,6 +888,10 @@ export const settingConf = {
     },
     loadNum: {
         list: [1, 2, 3, 5, 10, 20, 30, 40, 50, 100],
+        suffix: 'P'
+    },
+    downloadChunkSize: {
+        list: [50, 100, 150, 200, 300, 500],
         suffix: 'P'
     },
     volumeSize: {
@@ -952,6 +1011,14 @@ export const storeAction = {
     },
     setLoadNum: (val: number) => {
         store.loadNum = val
+        persistUnifiedSettingsState()
+    },
+    setDownloadChunkSize: (val: number) => {
+        if (!Number.isFinite(val) || val <= 0) {
+            store.downloadChunkSize = 200
+        } else {
+            store.downloadChunkSize = Math.floor(val)
+        }
         persistUnifiedSettingsState()
     },
     setVolumeSize: (val: number) => {
@@ -1191,6 +1258,89 @@ export const storeAction = {
     setViewportHeight: (val: number) => {
         store.viewportHeight = val
     },
+    getAlbumService: (): AlbumService | null => {
+        return runtimeAlbumService
+    },
+    startDownloadTask: (taskId: string, albumTitle: string, totalPages: number) => {
+        const now = new Date().toISOString()
+        const terminateAction: DownloadStatusAction = {
+            id: `terminate-${taskId}`,
+            label: i18n.value.terminate,
+            variant: 'danger',
+            onClick: () => {
+                const runner = downloadRunnerMap[taskId]
+                if (runner) {
+                    runner.abort(taskId)
+                }
+            },
+        }
+        store.downloadTaskMap[taskId] = {
+            taskId,
+            albumTitle,
+            totalPages,
+            processedPages: 0,
+            failedPages: 0,
+            status: 'queued',
+            actions: [terminateAction],
+            createdAt: now,
+            updatedAt: now,
+        }
+    },
+    registerDownloadRunner: (taskId: string, runner: GalleryDownloadService) => {
+        downloadRunnerMap[taskId] = runner
+    },
+    clearDownloadRunner: (taskId: string) => {
+        delete downloadRunnerMap[taskId]
+    },
+    applyDownloadStatusEvent: (taskId: string, albumTitle: string, event: DownloadStatusEvent) => {
+        const now = new Date().toISOString()
+        if (!store.downloadTaskMap[taskId]) {
+            storeAction.startDownloadTask(taskId, albumTitle, event.totalPages)
+        }
+        const task = store.downloadTaskMap[taskId]
+        task.status = event.phase
+        task.processedPages = event.processedPages
+        task.failedPages = event.failedPages
+        task.totalPages = event.totalPages
+        task.updatedAt = now
+
+        const notificationId = `download:${taskId}`
+        const index = store.downloadNotifications.findIndex(item => item.notificationId === notificationId)
+        const payload: DownloadStatusNotification = {
+            notificationId,
+            taskId,
+            title: albumTitle,
+            phase: event.phase,
+            severity: event.severity,
+            message: event.message,
+            progressCurrent: event.processedPages,
+            progressTotal: event.totalPages,
+            actions: ['completed', 'failed', 'partial'].includes(event.phase) ? [] : task.actions,
+            createdAt: index >= 0 ? store.downloadNotifications[index].createdAt : now,
+            updatedAt: now,
+        }
+        if (index >= 0) {
+            store.downloadNotifications[index] = payload
+            return
+        }
+        store.downloadNotifications.unshift(payload)
+    },
+    dismissDownloadNotification: (notificationId: string) => {
+        const index = store.downloadNotifications.findIndex(item => item.notificationId === notificationId)
+        if (index >= 0) {
+            store.downloadNotifications.splice(index, 1)
+        }
+    },
+    triggerDownloadNotificationAction: (notificationId: string, actionId: string) => {
+        const notification = store.downloadNotifications.find(item => item.notificationId === notificationId)
+        if (!notification || !notification.actions) {
+            return
+        }
+        const action = notification.actions.find(item => item.id === actionId)
+        if (action && action.onClick) {
+            action.onClick(notification)
+        }
+    },
     getImgPageInfo: (val: number) => {
         return store.imgPageInfos[val]
     },
@@ -1209,6 +1359,7 @@ export function init(albumService: AlbumService) {
         return
     }
     store.pageCount = albumService.getPageCount()
+    runtimeAlbumService = albumService
 
     let thumbInfos = albumService.getThumbInfos(false)
     // console.log('[init] thumbInfos:', JSON.parse(JSON.stringify(thumbInfos)))

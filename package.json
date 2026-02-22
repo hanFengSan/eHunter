@@ -11,11 +11,13 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "fflate": "^0.8.2",
     "markdown-it": "^8.4.2",
     "markdown-it-emoji": "^1.4.0",
     "twemoji": "^12.0.1",
     "vite-plugin-css-injected-by-js": "^3.5.2",
-    "vue": "^3.5.28"
+    "vue": "^3.5.28",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.5",

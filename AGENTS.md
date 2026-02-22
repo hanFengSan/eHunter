@@ -143,6 +143,8 @@
 - TypeScript 5.9 + Vue 3.5 SFC + SCSS + Vue runtime, existing core widget components (`AwesomeScrollView`, `Pagination`), existing app store/actions (001-thumb-expand-modal)
 - N/A（本功能不新增持久化） (001-thumb-expand-modal)
 - TypeScript 5.9 + Vue 3.5.28, Vite 6.4.1, vite-svg-loader 5.1.0 (001-platform-injection)
+- TypeScript 5.9 + Vue 3.5 SFC + SCSS + Vue runtime (`vue`), existing `AlbumService`/store modules, zip generation library (`jszip`), YAML serialization library (`yaml`) (001-gallery-download-bundle)
+- Userscript storage preference via existing unified settings persistence (`GM_*` first, platform/local fallback) (001-gallery-download-bundle)
 
 ## Recent Changes
 - 001-add-pageflip-toggle: Added TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules

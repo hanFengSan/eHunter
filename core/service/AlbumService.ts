@@ -9,6 +9,7 @@ export interface AlbumService {
 
     getTitle(): string
     getAlbumId(): string
+    getIntroUrl(): string
     getPageCount(): number  
     getCurPageIndex(): number
 
