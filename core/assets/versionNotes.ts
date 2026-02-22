@@ -2,46 +2,40 @@ type SupportedLang = 'cn' | 'en' | 'jp'
 
 const versionNotesTemplate: Record<SupportedLang, string> = {
     cn: `
-* 修复 exhentai/ehentai 的页数解析问题
-* 现已支持大图缩略图
+* 支持图片打包下载（触发入口：页面右上角的“更多”按钮）
+* 支持iPhone使用，优化移动端使用体验
+* 支持”快速预览“（入口：缩略图栏底部的悬浮按钮、页面右上角的“更多”按钮）
+* 缩略图栏可拖拽改变位置（拖拽顶部的EHUNTER标识）
+* 缩略图栏可改变宽度或高度
+* 图片加载失败时，支持自动换源重试
 
-### iPad 支持
-* 目前在 iOS 15/iPadOS 15 上可运行油猴脚本，因此 eHunter 也可在 iPad 使用
-* 目前未做移动端 UI 适配，暂更适合 iPad；后续按需求评估 iPhone 优化
-* 使用指南: [链接](https://github.com/hanFengSan/eHunter/blob/master/ipad_cn.md)
-
-### eHunter-local
-eHunter-local 是 eHunter 的本地版本，支持 Windows 和 MacOS。 [项目主页](https://github.com/hanFengSan/eHunter_local)
-
-[Github下载](https://github.com/hanFengSan/eHunter_local/releases) [百度网盘](https://pan.baidu.com/s/1wEnBe9uGoBKzNd4DCfbuAg) 提取码: czft
+### iPhone / iPad 支持
+* 目前在 iOS 15/iPadOS 15 上可运行油猴脚本/userscirpt，因此 eHunter 也可在 iPhone / iPad 使用
+* 使用指南: [链接](https://github.com/hanFengSan/eHunter/blob/master/misc/ios_ipad_cn.md)
 `,
     en: `
-* Fixed the support issue of exhentai/ehentai
-* Support for large thumbnail mode
+* Added image bundle download (entry: the "More" button in the top-right corner)
+* Added iPhone support with improved mobile usability
+* Added "Quick Preview" (entry: floating button at the bottom of the thumbnail bar, and the "More" button in the top-right corner)
+* Thumbnail bar position can now be changed by drag-and-drop (drag the EHUNTER header)
+* Thumbnail bar width/height is now resizable
+* Automatically retries with an alternative source when image loading fails
 
-### Use in iPad
-* The userscript can run on iOS 15/iPadOS 15, so eHunter can run on iPad now
-* Mobile UX is not optimized yet, so iPhone experience may be limited
-* Guide: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_en.md)
-
-### eHunter-local
-The eHunter-local is local version of eHunter, supporting Windows and MacOS. [Home Page](https://github.com/hanFengSan/eHunter_local)
-
-[Github releases](https://github.com/hanFengSan/eHunter_local/releases)
+### iPhone / iPad Support
+* Userscripts can run on iOS 15 / iPadOS 15, so eHunter is now available on iPhone and iPad
+* Guide: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_en.md)
 `,
     jp: `
-* exhentai/ehentai の問題を修正しました
-* Support for large thumbnail mode
+* 画像の一括ダウンロードに対応（入口: 右上の「More」ボタン）
+* iPhone での利用に対応し、モバイルでの操作性を改善
+* 「クイックプレビュー」に対応（入口: サムネイルバー下部のフローティングボタン、または右上の「More」ボタン）
+* サムネイルバーの位置をドラッグで変更可能（EHUNTER ヘッダーをドラッグ）
+* サムネイルバーの幅・高さを調整可能
+* 画像の読み込みに失敗した場合、別ソースで自動再試行
 
-### Use in iPad
-* The userscript can run on iOS 15/iPadOS 15, so eHunter can run on iPad now
-* Mobile UX is not optimized yet, so iPhone experience may be limited
-* Guide: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_en.md)
-
-### eHunter-local
-eHunter-local は eHunter のローカル版で、Windows と MacOS をサポートしています。 [Home Page](https://github.com/hanFengSan/eHunter_local)
-
-[Github releases](https://github.com/hanFengSan/eHunter_local/releases)
+### iPhone / iPad 対応
+* iOS 15 / iPadOS 15 では userscript が動作するため、eHunter を iPhone / iPad でも利用できます
+* ガイド: [リンク](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_jp.md)
 `,
 }
 

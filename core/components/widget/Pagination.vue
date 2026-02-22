@@ -1,5 +1,5 @@
 <template>
-    <section class="ehunter-pagination">
+    <section class="ehunter-pagination" @click.stop @touchstart.stop @touchend.stop>
         <div :class="['item', { disable: curIndex === 0 }]" @click="prev()">
             <LeftArrowIcon class="icon" />
         </div>

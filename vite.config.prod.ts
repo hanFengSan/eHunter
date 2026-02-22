@@ -22,6 +22,8 @@ const userscriptBanner = `// ==UserScript==
 // @match        https://exhentai.org/*
 // @match        https://e-hentai.org/*
 // @match        https://nhentai.net/*
+// @connect      hath.network
+// @connect      nhentai.net
 // @connect      githubusercontent.com
 // @connect      jp.animesales.xyz
 // @grant        GM_xmlhttpRequest

@@ -1,43 +1,55 @@
 {
     "cn":{
-        "title":"新版本: v2.8.0",
-        "version":"2.8.0",
-        "text":"1. 修复exhentai/ehentai的解析问题, 2. 支持大图缩略图",
-        "time":1690647347098,
-        "duration":3000,
+        "title":"新版本: v3.0.0",
+        "version":"3.0.0",
+        "text":"1. 支持图片打包下载，2：支持iOS&iPad，优化移动端体验，3：支持图片加载失败时自动换源重试",
+        "time":1771819200000,
+        "duration":432000000,
         "always":true,
         "operations":[
             {
-                "name":"油猴",
+                "name":"油猴/暴力猴脚本更新",
                 "url":"https://openuserjs.org/scripts/alexchen/eHunter"
+            },
+            {
+                "name":"iOS脚本下载",
+                "url":"https://github.com/hanFengSan/eHunter/releases"
             }
         ]
     },
     "en":{
-        "title":"New version: v2.8.0",
-        "version":"2.8.0",
-        "text":"1. Fixed the support issue of exhentai/ehentai 2. Support for large thumbnail mode",
-        "time":1690647347098,
-        "duration":3000,
+        "title":"New version: v3.0.0",
+        "version":"3.0.0",
+        "text":"1. Added image bundle download. 2. Added iOS/iPad support with improved mobile experience. 3. Added automatic retry with alternative sources when image loading fails.",
+        "time":1771819200000,
+        "duration":432000000,
         "always":true,
         "operations":[
             {
-                "name":"Tampermonkey",
+                "name":"Tampermonkey/Violentmonkey script update",
                 "url":"https://openuserjs.org/scripts/alexchen/eHunter"
+            },
+            {
+                "name":"iOS script download",
+                "url":"https://github.com/hanFengSan/eHunter/releases"
             }
         ]
     },
     "jp":{
-        "title":"新しいバージョン: v2.8.0",
-        "version":"2.8.0",
-        "text":"1. exhentai/ehentaiの問題を修正しました 2. Support for large thumbnail mode",
-        "time":1690647347098,
-        "duration":3000,
+        "title":"新バージョン: v3.0.0",
+        "version":"3.0.0",
+        "text":"1. 画像の一括ダウンロードに対応。2. iOS/iPad に対応し、モバイル体験を改善。3. 画像読み込み失敗時に別ソースで自動再試行する機能を追加。",
+        "time":1771819200000,
+        "duration":432000000,
         "always":true,
         "operations":[
             {
-                "name":"Tampermonkey",
+                "name":"Tampermonkey/Violentmonkey スクリプト更新",
                 "url":"https://openuserjs.org/scripts/alexchen/eHunter"
+            },
+            {
+                "name":"iOS スクリプトダウンロード",
+                "url":"https://github.com/hanFengSan/eHunter/releases"
             }
         ]
     }

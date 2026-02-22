@@ -364,6 +364,11 @@ export default <any>{
         en: 'Language',
         jp: '言語'
     },
+    languageSettingTip: {
+        cn: '语言/Language/言語',
+        en: '语言/Language/言語',
+        jp: '语言/Language/言語'
+    },
     settingsOther: {
         cn: '其他',
         en: 'Other',
@@ -570,7 +575,7 @@ export default <any>{
         jp: 'ホイール感度'
     },
     wheelDirection: {
-        cn: '滚轮方向',
+        cn: '反转滚动方向',
         en: 'Wheel Direction',
         jp: 'ホイール方向'
     },

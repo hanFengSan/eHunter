@@ -21,7 +21,10 @@
                             <article ref="generalRef" class="ehunter-group" data-category="general">
                                 <h4>{{ i18n.settingsGeneral }}</h4>
                                 <div class="ehunter-row" v-for="fieldId in dialogGeneralFieldIds" :key="fieldId">
-                                    <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
+                                    <div class="ehunter-label-block">
+                                        <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
+                                        <p v-if="fieldTip(fieldId)" class="ehunter-tip">{{ fieldTip(fieldId) }}</p>
+                                    </div>
                                     <DropOption
                                         v-if="settingFieldMap[fieldId]?.control === 'drop'"
                                         :list="getDropList(fieldId)"
@@ -48,7 +51,10 @@
                             <article ref="scrollRef" class="ehunter-group" data-category="scroll">
                                 <h4>{{ i18n.settingsScrollMode }}</h4>
                                 <div class="ehunter-row" v-for="fieldId in dialogScrollFieldIds" :key="fieldId">
-                                    <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
+                                    <div class="ehunter-label-block">
+                                        <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
+                                        <p v-if="fieldTip(fieldId)" class="ehunter-tip">{{ fieldTip(fieldId) }}</p>
+                                    </div>
                                     <DropOption
                                         v-if="settingFieldMap[fieldId]?.control === 'drop'"
                                         :list="getDropList(fieldId)"
@@ -75,7 +81,10 @@
                             <article ref="bookRef" class="ehunter-group" data-category="book">
                                 <h4>{{ i18n.settingsBookMode }}</h4>
                                 <div class="ehunter-row" v-for="fieldId in dialogBookFieldIds" :key="fieldId">
-                                    <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
+                                    <div class="ehunter-label-block">
+                                        <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
+                                        <p v-if="fieldTip(fieldId)" class="ehunter-tip">{{ fieldTip(fieldId) }}</p>
+                                    </div>
                                     <DropOption
                                         v-if="settingFieldMap[fieldId]?.control === 'drop'"
                                         :list="getDropList(fieldId)"
@@ -115,6 +124,8 @@
                                             class="ehunter-quick-item"
                                             draggable="true"
                                             :data-id="item.id"
+                                            @contextmenu.prevent
+                                            @selectstart.prevent
                                             @dragstart="onDragStart($event, item.id)"
                                             @dragend="onDragEnd"
                                             @dragover.prevent
@@ -137,6 +148,8 @@
                                             class="ehunter-quick-item"
                                             draggable="true"
                                             :data-id="item.id"
+                                            @contextmenu.prevent
+                                            @selectstart.prevent
                                             @dragstart="onDragStart($event, item.id)"
                                             @dragend="onDragEnd"
                                             @dragover.prevent
@@ -265,6 +278,19 @@ function fieldLabel(id: string): string {
         return id
     }
     return i18n.value[field.labelI18nKey]
+}
+
+function fieldTip(id: string): string {
+    const field = settingFieldMap[id]
+    if (!field || !field.tipI18nKey) {
+        return ''
+    }
+    const tip = i18n.value[field.tipI18nKey] || ''
+    const label = i18n.value[field.labelI18nKey] || ''
+    if (!tip || tip === label) {
+        return ''
+    }
+    return tip
 }
 
 function onFieldChange(id: string, val: any) {
@@ -545,7 +571,7 @@ onMounted(() => {
                     > .ehunter-row {
                         display: flex;
                         flex-direction: row;
-                        align-items: center;
+                        align-items: flex-start;
                         justify-content: space-between;
                         gap: 12px;
                         margin: 8px 0;
@@ -557,6 +583,31 @@ onMounted(() => {
                             border-bottom: 1px dashed rgba(128, 150, 186, 0.2);
                         }
 
+                        > .ehunter-label-block {
+                            min-width: 0;
+                            flex: 1;
+                            flex-shrink: 0;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 2px;
+
+                            > .ehunter-label {
+                                font-size: 14px;
+                                color: #2f466d;
+                                font-weight: 500;
+                            }
+
+                            > .ehunter-tip {
+                                margin: 0;
+                                font-size: 11px;
+                                line-height: 1.3;
+                                color: #7a879c;
+                                white-space: normal;
+                                overflow-wrap: anywhere;
+                                word-break: break-word;
+                            }
+                        }
+
                         > .ehunter-label {
                             font-size: 14px;
                             color: #2f466d;
@@ -565,7 +616,7 @@ onMounted(() => {
                             flex-shrink: 0;
                         }
 
-                        > :not(.ehunter-label) {
+                        > :not(.ehunter-label):not(.ehunter-label-block) {
                             margin-left: auto;
                         }
 
@@ -664,6 +715,17 @@ onMounted(() => {
                                 padding: 5px 8px;
                                 transition: all 0.18s ease;
                                 cursor: grab;
+                                user-select: none;
+                                -webkit-user-select: none;
+                                -webkit-touch-callout: none;
+                                -webkit-user-drag: none;
+                                touch-action: manipulation;
+
+                                * {
+                                    user-select: none;
+                                    -webkit-user-select: none;
+                                    -webkit-touch-callout: none;
+                                }
 
                                 &:hover {
                                     background: rgba(232, 243, 255, 0.92);
@@ -682,11 +744,13 @@ onMounted(() => {
                                 > .ehunter-label {
                                     font-size: 13px;
                                     color: #2e4264;
+                                    pointer-events: none;
                                 }
 
                                 > .ehunter-mode-tag {
                                     font-size: 11px;
                                     color: #6a7d9c;
+                                    pointer-events: none;
                                 }
                             }
 
@@ -757,8 +821,8 @@ onMounted(() => {
 
                     > .ehunter-group {
                         > .ehunter-row {
-                            > .ehunter-label {
-                                min-width: 96px;
+                            > .ehunter-label-block {
+                                min-width: 0;
                             }
 
                             > .ehunter-link {
