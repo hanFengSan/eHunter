@@ -65,7 +65,8 @@ export default defineConfig({
     }
   },
   define: {
-    'process.env.NODE_ENV': JSON.stringify('production')
+    'process.env.NODE_ENV': JSON.stringify('production'),
+    __EHUNTER_VERSION__: JSON.stringify(pkg.version)
   },
   appType: 'custom',
   server: {

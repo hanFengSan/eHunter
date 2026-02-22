@@ -1,8 +1,9 @@
-import { stringify as stringifyYaml } from 'yaml'
 import * as fflate from 'fflate'
 import type { AlbumService } from './AlbumService'
 import { i18n } from '../store/i18n'
 import { getImageRetryStages } from './imageRetryPolicy'
+
+declare const __EHUNTER_VERSION__: string | undefined
 
 export type DownloadTaskPhase = 'queued' | 'fetching' | 'compressing' | 'completed' | 'partial' | 'failed'
 export type DownloadSeverity = 'info' | 'success' | 'warning' | 'error'
@@ -79,6 +80,9 @@ function normalizeChunkSize(raw: number): number {
 }
 
 function getEHunterVersion(): string {
+    if (typeof __EHUNTER_VERSION__ === 'string' && __EHUNTER_VERSION__) {
+        return __EHUNTER_VERSION__
+    }
     const raw = (globalThis as any).__EHUNTER_VERSION__
     if (typeof raw === 'string' && raw) {
         return raw
@@ -352,7 +356,7 @@ export class GalleryDownloadService {
                 chunkIndex: currentChunkIndex,
             }
             const zipFiles: Record<string, Uint8Array> = {
-                'metadata.yaml': fflate.strToU8(stringifyYaml(chunkMeta)),
+                'metadata.json': fflate.strToU8(`${JSON.stringify(chunkMeta, null, 2)}\n`),
             }
 
             const sortedChunkImages = [...chunkImages].sort((a, b) => a.pageNumber - b.pageNumber)
