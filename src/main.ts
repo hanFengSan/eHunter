@@ -1,10 +1,12 @@
 import { createApp, ref, h } from 'vue'
 import TestApp from '../core/TestApp.vue'
 import LoadingErrorWrapper from '../core/components/LoadingErrorWrapper.vue'
+import '../core/style/_normalize.scss'
 import { NameAlbumService } from '../core/service/AlbumService'
 import { detectPlatform } from './platform/detector'
 import { createPlatformService } from './platform/factory'
 import { initializeWithTimeout } from './platform/initializer'
+import { applyPlatformHostActions } from './platform/hostActions'
 import type { InitializationError } from './platform/types'
 
 /// <reference types="vite-svg-loader" />
@@ -19,6 +21,10 @@ if (!detectionResult.platform) {
 } else {
   // Platform detected - initialize reader
   console.log(`eHunter: Platform detected: ${detectionResult.platform}`)
+
+  if (detectionResult.platform) {
+    applyPlatformHostActions(detectionResult.platform)
+  }
   
   // Create Vue app with LoadingErrorWrapper
   const app = createApp({
@@ -87,6 +93,7 @@ if (!detectionResult.platform) {
   // Create and mount container
   const container = document.createElement('div')
   container.id = 'ehunter-app'
+  container.classList.add('normalize')
   document.body.appendChild(container)
   
   app.mount('#ehunter-app')

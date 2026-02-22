@@ -1,27 +1,27 @@
 <template>
-    <teleport to="#ehunter-app">
+    <teleport to=".ehunter-app">
         <transition name="slow-opacity-fade" appear>
-            <div v-if="store.showMoreSettingsDialog" class="more-settings-modal" @click.self="storeAction.closeMoreSettingsDialog">
-                <div class="panel" @click.stop>
-                    <header class="panel-header">
+            <div v-if="store.showMoreSettingsDialog" class="ehunter-more-settings-modal" @click.self="storeAction.closeMoreSettingsDialog">
+                <div class="ehunter-panel" @click.stop>
+                    <header class="ehunter-panel-header">
                         <h3>{{ i18n.openMoreSettingsModal }}</h3>
-                        <button class="close-btn" type="button" :aria-label="i18n.cancel" @click="storeAction.closeMoreSettingsDialog">×</button>
+                        <button class="ehunter-close-btn" type="button" :aria-label="i18n.cancel" @click="storeAction.closeMoreSettingsDialog">×</button>
                     </header>
-                    <div class="panel-body">
-                        <nav class="left-nav">
+                    <div class="ehunter-panel-body">
+                        <nav class="ehunter-left-nav">
                             <button
                                 v-for="category in settingsCategories"
                                 :key="category.id"
-                                :class="['category', { active: store.activeSettingsCategory === category.id }]"
+                                :class="['ehunter-category', { 'ehunter-active': store.activeSettingsCategory === category.id }]"
                                 @click="scrollToCategory(category.id)">
                                 {{ i18n[category.i18nKey] }}
                             </button>
                         </nav>
-                        <section ref="contentRef" class="content" @scroll="onContentScroll">
-                            <article ref="generalRef" class="group" data-category="general">
+                        <section ref="contentRef" class="ehunter-content" @scroll="onContentScroll">
+                            <article ref="generalRef" class="ehunter-group" data-category="general">
                                 <h4>{{ i18n.settingsGeneral }}</h4>
-                                <div class="row" v-for="fieldId in dialogGeneralFieldIds" :key="fieldId">
-                                    <span class="label">{{ fieldLabel(fieldId) }}</span>
+                                <div class="ehunter-row" v-for="fieldId in dialogGeneralFieldIds" :key="fieldId">
+                                    <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
                                     <DropOption
                                         v-if="settingFieldMap[fieldId]?.control === 'drop'"
                                         :list="getDropList(fieldId)"
@@ -45,10 +45,10 @@
                                 </div>
                             </article>
 
-                            <article ref="scrollRef" class="group" data-category="scroll">
+                            <article ref="scrollRef" class="ehunter-group" data-category="scroll">
                                 <h4>{{ i18n.settingsScrollMode }}</h4>
-                                <div class="row" v-for="fieldId in dialogScrollFieldIds" :key="fieldId">
-                                    <span class="label">{{ fieldLabel(fieldId) }}</span>
+                                <div class="ehunter-row" v-for="fieldId in dialogScrollFieldIds" :key="fieldId">
+                                    <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
                                     <DropOption
                                         v-if="settingFieldMap[fieldId]?.control === 'drop'"
                                         :list="getDropList(fieldId)"
@@ -72,10 +72,10 @@
                                 </div>
                             </article>
 
-                            <article ref="bookRef" class="group" data-category="book">
+                            <article ref="bookRef" class="ehunter-group" data-category="book">
                                 <h4>{{ i18n.settingsBookMode }}</h4>
-                                <div class="row" v-for="fieldId in dialogBookFieldIds" :key="fieldId">
-                                    <span class="label">{{ fieldLabel(fieldId) }}</span>
+                                <div class="ehunter-row" v-for="fieldId in dialogBookFieldIds" :key="fieldId">
+                                    <span class="ehunter-label">{{ fieldLabel(fieldId) }}</span>
                                     <DropOption
                                         v-if="settingFieldMap[fieldId]?.control === 'drop'"
                                         :list="getDropList(fieldId)"
@@ -99,69 +99,69 @@
                                 </div>
                             </article>
 
-                            <article ref="quickRef" class="group" data-category="quick">
+                            <article ref="quickRef" class="ehunter-group" data-category="quick">
                                 <h4>{{ i18n.settingsQuick }}</h4>
-                                <div class="quick-lanes">
-                                    <p class="lane-intro">{{ i18n.quickDragHint }}</p>
+                                <div class="ehunter-quick-lanes">
+                                    <p class="ehunter-lane-intro">{{ i18n.quickDragHint }}</p>
                                     <div
-                                        class="quick-lane"
+                                        class="ehunter-quick-lane"
                                         @dragover.prevent
                                         @drop="onDropToLane($event, true)">
-                                        <header class="lane-header">{{ i18n.enabled }}</header>
-                                        <p class="lane-desc">{{ i18n.quickEnabledHint }}</p>
+                                        <header class="ehunter-lane-header">{{ i18n.enabled }}</header>
+                                        <p class="ehunter-lane-desc">{{ i18n.quickEnabledHint }}</p>
                                         <div
                                             v-for="item in enabledQuickSettingList"
                                             :key="`enabled-${item.id}`"
-                                            class="quick-item"
+                                            class="ehunter-quick-item"
                                             draggable="true"
                                             :data-id="item.id"
                                             @dragstart="onDragStart($event, item.id)"
                                             @dragend="onDragEnd"
                                             @dragover.prevent
                                             @drop="onDropToItem($event, item.id, true)">
-                                            <span class="drag-handle" aria-hidden="true"></span>
-                                            <span class="label">{{ quickItemLabel(item.id, item.i18nKey) }}</span>
-                                            <span v-if="modeScopeText(item.modeScope)" class="mode-tag">{{ modeScopeText(item.modeScope) }}</span>
+                                            <span class="ehunter-drag-handle" aria-hidden="true"></span>
+                                            <span class="ehunter-label">{{ quickItemLabel(item.id, item.i18nKey) }}</span>
+                                            <span v-if="modeScopeText(item.modeScope)" class="ehunter-mode-tag">{{ modeScopeText(item.modeScope) }}</span>
                                         </div>
                                     </div>
-                                    <div class="lane-divider"></div>
+                                    <div class="ehunter-lane-divider"></div>
                                     <div
-                                        class="quick-lane hidden"
+                                        class="ehunter-quick-lane ehunter-hidden"
                                         @dragover.prevent
                                         @drop="onDropToLane($event, false)">
-                                        <header class="lane-header">{{ i18n.hidden }}</header>
-                                        <p class="lane-desc">{{ i18n.quickHiddenHint }}</p>
+                                        <header class="ehunter-lane-header">{{ i18n.hidden }}</header>
+                                        <p class="ehunter-lane-desc">{{ i18n.quickHiddenHint }}</p>
                                         <div
                                             v-for="item in hiddenQuickSettingList"
                                             :key="`hidden-${item.id}`"
-                                            class="quick-item"
+                                            class="ehunter-quick-item"
                                             draggable="true"
                                             :data-id="item.id"
                                             @dragstart="onDragStart($event, item.id)"
                                             @dragend="onDragEnd"
                                             @dragover.prevent
                                             @drop="onDropToItem($event, item.id, false)">
-                                            <span class="drag-handle" aria-hidden="true"></span>
-                                            <span class="label">{{ quickItemLabel(item.id, item.i18nKey) }}</span>
-                                            <span v-if="modeScopeText(item.modeScope)" class="mode-tag">{{ modeScopeText(item.modeScope) }}</span>
+                                            <span class="ehunter-drag-handle" aria-hidden="true"></span>
+                                            <span class="ehunter-label">{{ quickItemLabel(item.id, item.i18nKey) }}</span>
+                                            <span v-if="modeScopeText(item.modeScope)" class="ehunter-mode-tag">{{ modeScopeText(item.modeScope) }}</span>
                                         </div>
                                     </div>
                                 </div>
                             </article>
 
-                            <article ref="otherRef" class="group" data-category="other">
+                            <article ref="otherRef" class="ehunter-group" data-category="other">
                                 <h4>{{ i18n.settingsOther }}</h4>
-                                <div class="row">
-                                    <span class="label">{{ i18n.versionLabel }}</span>
-                                    <span class="value">{{ versionText }}</span>
+                                <div class="ehunter-row">
+                                    <span class="ehunter-label">{{ i18n.versionLabel }}</span>
+                                    <span class="ehunter-value">{{ versionText }}</span>
                                 </div>
-                                <div class="row">
-                                    <span class="label">Github</span>
-                                    <a target="_blank" href="https://github.com/hanFengSan/eHunter" class="link">https://github.com/hanFengSan/eHunter</a>
+                                <div class="ehunter-row">
+                                    <span class="ehunter-label">Github</span>
+                                    <a target="_blank" href="https://github.com/hanFengSan/eHunter" class="ehunter-link">https://github.com/hanFengSan/eHunter</a>
                                 </div>
-                                <div class="row">
-                                    <span class="label">{{ i18n.resetTip }}</span>
-                                    <button class="danger" @click="storeAction.showFactoryResetDialog">{{ i18n.resetTip }}</button>
+                                <div class="ehunter-row">
+                                    <span class="ehunter-label">{{ i18n.resetTip }}</span>
+                                    <button class="ehunter-danger" @click="storeAction.showFactoryResetDialog">{{ i18n.resetTip }}</button>
                                 </div>
                             </article>
                         </section>
@@ -393,7 +393,7 @@ onMounted(() => {
 @import '../style/_responsive';
 @import '../style/_variables';
 
-.more-settings-modal {
+.ehunter-more-settings-modal {
     position: fixed;
     inset: 0;
     background:
@@ -407,7 +407,7 @@ onMounted(() => {
     justify-content: center;
     padding: 24px;
 
-    > .panel {
+    > .ehunter-panel {
         position: relative;
         width: min(980px, 100%);
         height: min(740px, 100%);
@@ -420,7 +420,7 @@ onMounted(() => {
         display: flex;
         flex-direction: column;
 
-        > .panel-header {
+        > .ehunter-panel-header {
             display: flex;
             align-items: center;
             flex-direction: row;
@@ -437,7 +437,7 @@ onMounted(() => {
                 letter-spacing: 0.2px;
             }
 
-            > .close-btn {
+            > .ehunter-close-btn {
                 position: absolute;
                 right: 14px;
                 top: 12px;
@@ -471,12 +471,13 @@ onMounted(() => {
             }
         }
 
-        > .panel-body {
+        > .ehunter-panel-body {
             flex: 1;
             min-height: 0;
             display: flex;
 
-            > .left-nav {
+            > .ehunter-left-nav {
+                margin: 0px;
                 width: 210px;
                 padding: 14px 10px;
                 display: flex;
@@ -485,7 +486,7 @@ onMounted(() => {
                 border-right: 1px solid rgba(88, 113, 158, 0.16);
                 background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(245, 250, 255, 0.72));
 
-                > .category {
+                > .ehunter-category {
                     border: none;
                     background: transparent;
                     text-align: left;
@@ -502,7 +503,7 @@ onMounted(() => {
                         color: #2b4f86;
                     }
 
-                    &.active {
+                    &.ehunter-active {
                         background: linear-gradient(180deg, #dce9ff, #cfe2ff);
                         color: #1f447d;
                         font-weight: 700;
@@ -511,7 +512,7 @@ onMounted(() => {
                 }
             }
 
-            > .content {
+            > .ehunter-content {
                 flex: 1;
                 min-width: 0;
                 min-height: 0;
@@ -520,7 +521,7 @@ onMounted(() => {
                 padding: 16px 18px;
                 scroll-behavior: smooth;
 
-                > .group {
+                > .ehunter-group {
                     display: block;
                     scroll-margin-top: 12px;
                     padding: 14px;
@@ -537,7 +538,7 @@ onMounted(() => {
                         font-weight: 700;
                     }
 
-                    > .row {
+                    > .ehunter-row {
                         display: flex;
                         flex-direction: row;
                         align-items: center;
@@ -552,7 +553,7 @@ onMounted(() => {
                             border-bottom: 1px dashed rgba(128, 150, 186, 0.2);
                         }
 
-                        > .label {
+                        > .ehunter-label {
                             font-size: 14px;
                             color: #2f466d;
                             font-weight: 500;
@@ -560,16 +561,16 @@ onMounted(() => {
                             flex-shrink: 0;
                         }
 
-                        > :not(.label) {
+                        > :not(.ehunter-label) {
                             margin-left: auto;
                         }
 
-                        > .value {
+                        > .ehunter-value {
                             font-size: 13px;
                             color: #476088;
                         }
 
-                        > .link {
+                        > .ehunter-link {
                             color: #2b5da5;
                             text-decoration: none;
                             font-size: 13px;
@@ -578,7 +579,7 @@ onMounted(() => {
                             max-width: 66%;
                         }
 
-                        > .danger {
+                        > .ehunter-danger {
                             border: none;
                             border-radius: 8px;
                             background: linear-gradient(180deg, #e65f5f, #cc3f3f);
@@ -590,47 +591,47 @@ onMounted(() => {
                         }
                     }
 
-                    > .quick-lanes {
+                    > .ehunter-quick-lanes {
                         display: flex;
                         flex-direction: column;
                         gap: 8px;
                         padding: 0 2px;
 
-                        > .lane-intro {
+                        > .ehunter-lane-intro {
                             margin: 0;
                             font-size: 12px;
                             color: #5a6c8c;
                             line-height: 1.35;
                         }
 
-                        > .lane-divider {
+                        > .ehunter-lane-divider {
                             width: 100%;
                             height: 1px;
                             background: linear-gradient(90deg, rgba(126, 146, 178, 0), rgba(126, 146, 178, 0.5), rgba(126, 146, 178, 0));
                             margin: 2px 0;
                         }
 
-                        > .quick-lane {
+                        > .ehunter-quick-lane {
                             display: flex;
                             flex-direction: column;
                             align-items: stretch;
                             padding: 0 2px;
 
-                            > .lane-header {
+                            > .ehunter-lane-header {
                                 margin: 0;
                                 font-size: 12px;
                                 color: #355a96;
                                 font-weight: 700;
                             }
 
-                            > .lane-desc {
+                            > .ehunter-lane-desc {
                                 margin: 2px 0 5px;
                                 font-size: 11px;
                                 color: #6c7f9f;
                                 line-height: 1.25;
                             }
 
-                            > .quick-item {
+                            > .ehunter-quick-item {
                                 display: grid;
                                 grid-template-columns: 16px minmax(0, 1fr) auto;
                                 align-items: center;
@@ -650,7 +651,7 @@ onMounted(() => {
                                     border-color: rgba(82, 120, 184, 0.36);
                                 }
 
-                                > .drag-handle {
+                                > .ehunter-drag-handle {
                                     width: 10px;
                                     height: 10px;
                                     opacity: 0.8;
@@ -659,35 +660,35 @@ onMounted(() => {
                                         radial-gradient(circle, #5f7498 1.1px, transparent 1.2px) 3px 3px / 6px 6px;
                                 }
 
-                                > .label {
+                                > .ehunter-label {
                                     font-size: 13px;
                                     color: #2e4264;
                                 }
 
-                                > .mode-tag {
+                                > .ehunter-mode-tag {
                                     font-size: 11px;
                                     color: #6a7d9c;
                                 }
                             }
 
-                            &.hidden {
-                                > .lane-header {
+                            &.ehunter-hidden {
+                                > .ehunter-lane-header {
                                     color: #6d7a8e;
                                 }
 
-                                > .quick-item {
+                                > .ehunter-quick-item {
                                     background: rgba(236, 240, 246, 0.92);
                                     border-color: rgba(141, 153, 174, 0.25);
 
-                                    > .drag-handle {
+                                    > .ehunter-drag-handle {
                                         opacity: 0.52;
                                         background:
                                             radial-gradient(circle, #8191a8 1.1px, transparent 1.2px) 0 0 / 6px 6px,
                                             radial-gradient(circle, #8191a8 1.1px, transparent 1.2px) 3px 3px / 6px 6px;
                                     }
 
-                                    > .label,
-                                    > .mode-tag {
+                                    > .ehunter-label,
+                                    > .ehunter-mode-tag {
                                         color: #7e889a;
                                     }
                                 }
@@ -704,18 +705,18 @@ onMounted(() => {
 }
 
 @media only screen and (max-width: 767px) {
-    .more-settings-modal {
+    .ehunter-more-settings-modal {
         padding: 0;
 
-        > .panel {
+        > .ehunter-panel {
             width: 100%;
             height: 100%;
             border-radius: 0;
 
-            > .panel-body {
+            > .ehunter-panel-body {
                 flex-direction: column;
 
-                > .left-nav {
+                > .ehunter-left-nav {
                     width: 100%;
                     border-right: none;
                     border-bottom: 1px solid rgba(71, 89, 126, 0.15);
@@ -725,23 +726,23 @@ onMounted(() => {
                     gap: 6px;
                     padding: 10px;
 
-                    > .category {
+                    > .ehunter-category {
                         flex-shrink: 0;
                         padding: 8px 10px;
                         font-size: 13px;
                     }
                 }
 
-                > .content {
+                > .ehunter-content {
                     padding: 12px 14px;
 
-                    > .group {
-                        > .row {
-                            > .label {
+                    > .ehunter-group {
+                        > .ehunter-row {
+                            > .ehunter-label {
                                 min-width: 96px;
                             }
 
-                            > .link {
+                            > .ehunter-link {
                                 max-width: 58%;
                             }
                         }

@@ -51,6 +51,7 @@ div {
 .options {
     flex-direction: column;
     transition: all 0.3s ease;
+    font-size: 14px;
 
     > .item {
         padding: 5px 10px;

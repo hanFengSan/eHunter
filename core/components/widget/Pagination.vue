@@ -1,5 +1,5 @@
 <template>
-    <section class="pagination">
+    <section class="ehunter-pagination">
         <div :class="['item', { disable: curIndex === 0 }]" @click="prev()">
             <LeftArrowIcon class="icon" />
         </div>
@@ -94,7 +94,7 @@ section {
     display: flex;
 }
 
-.pagination {
+.ehunter-pagination {
     justify-content: center;
     align-items: center;
     transition: $transition;
