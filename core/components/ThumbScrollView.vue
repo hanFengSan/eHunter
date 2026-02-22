@@ -84,7 +84,7 @@ const thumbContainers = ref<HTMLElement[] | null>(null)
 
 const indicatorOffset = computed(() => {
     if (isDockBottom.value) {
-        return (thumbContainerWidth.value + thumbBottomItemPaddingX * 2) * activeThumbIndex.value
+        return thumbContainerWidth.value * activeThumbIndex.value
     }
     return (thumbContainerHeight.value + thumbVerticalItemGap) * activeThumbIndex.value
 })
