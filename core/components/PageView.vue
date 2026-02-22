@@ -1,6 +1,8 @@
 <template>
 <section class="page-view" @click="onClickBg()">
-    <div class="layer preview-layer" :style="previewStyle"></div>
+    <div class="layer preview-layer">
+        <ThumbView class="preview-thumb" :thumb-info="store.thumbInfos[index]" />
+    </div>
     <div class="layer loading-layer">
         <h6 class="index">{{ index + 1 }}</h6>
         <article class="loading-info-panel" v-if="active">
@@ -48,6 +50,7 @@
 
 <script setup lang="ts">
 import FlatButton from './widget/FlatButton.vue'
+import ThumbView from './ThumbView.vue'
 import { inject, ref, computed, watch, nextTick, onMounted } from 'vue'
 import { store, storeAction } from '../store/app'
 import { NameAlbumService } from '../service/AlbumService'
@@ -76,7 +79,6 @@ const albumService = <AlbumService>inject(NameAlbumService)
 const reloadTimes = ref(0)
 const message = ref('')
 const curLoadStatus = ref(ImgLoadStatus.Waiting) // 0:waiting, 1:loading, 2:error, 3:loaded
-const previewStyle:any = albumService.getPreviewThumbnailStyle(props.index)
 const isFirstLoad = ref(true)
 
 const imgPageInfo = computed(() => {
@@ -208,7 +210,16 @@ span {
     > .preview-layer {
         overflow: hidden;
         background-color: black;
-        background-repeat: no-repeat;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: stretch;
+
+        > .preview-thumb {
+            width: 100%;
+            height: 100%;
+        }
+
         &:after {
             display: block;
             content: '';

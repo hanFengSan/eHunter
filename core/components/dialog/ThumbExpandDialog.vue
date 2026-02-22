@@ -13,32 +13,7 @@
                             :class="{ active: item.pageNumber - 1 === store.curViewIndex }"
                             @click="onSelectPage(item.pageNumber)">
                             <div class="thumb-frame" :class="{ error: item.renderState === 'error' }">
-                                <div 
-                                    class="thumb-stage"
-                                    :style="{
-                                        width: `${thumbWidth}px`,
-                                        height: `${thumbHeight}px`,
-                                        transform: `scale(${thumbScale})`
-                                    }">
-                                    <div
-                                        v-if="item.thumbInfo && item.thumbInfo.mode === ThumbMode.SPIRIT"
-                                        class="thumb spirit-mode"
-                                        :style="{ 
-                                            width: `${thumbWidth}px`,
-                                            height: `${thumbHeight}px`,
-                                            background: `transparent url(${item.thumbInfo.src}) -${item.thumbInfo.offset || 0}px 0 no-repeat` 
-                                        }"></div>
-                                    <div
-                                        v-if="item.thumbInfo && item.thumbInfo.mode === ThumbMode.IMG"
-                                        class="thumb img-mode"
-                                        :style="{ 
-                                            width: `${thumbWidth}px`,
-                                            height: `${thumbHeight}px`,
-                                            background: `transparent url(${item.thumbInfo.src}) no-repeat`, 
-                                            'background-size': 'contain' 
-                                        }"></div>
-                                    <div v-if="!item.thumbInfo" class="thumb-fallback">{{ i18n.loadingFailed }}</div>
-                                </div>
+                                <ThumbView :thumb-info="item.thumbInfo" :fallback-text="i18n.loadingFailed" />
                             </div>
                             <div class="page-label">{{ item.pageNumber }}</div>
                         </button>
@@ -56,15 +31,6 @@
 import { computed, watch } from 'vue'
 import { i18n } from '../../store/i18n'
 import { store, storeAction } from '../../store/app'
-import { ThumbMode } from '../../model/model'
-import { 
-    thumbSpriteWidth, 
-    thumbSpriteHeight,
-    thumbExpandItemWidthWide,
-    thumbExpandItemWidthNormal,
-    thumbExpandItemPadding,
-    thumbExpandWideBreakpoint
-} from '../../model/layout'
 import {
     buildThumbExpandItems,
     clampThumbExpandSegmentIndex,
@@ -72,12 +38,7 @@ import {
     getThumbExpandSegmentCount,
 } from '../../model/thumbExpand'
 import Pagination from '../widget/Pagination.vue'
-
-// 缩略图固定尺寸常量（从 layout.ts 导入）
-// thumbSpriteWidth: 当前为 100px
-// thumbSpriteHeight: 当前为 144px，高宽比固定为 1.44
-const thumbWidth = thumbSpriteWidth
-const thumbHeight = thumbSpriteHeight
+import ThumbView from '../ThumbView.vue'
 
 const segmentCount = computed(() => {
     return getThumbExpandSegmentCount(store.pageCount)
@@ -89,19 +50,6 @@ const segmentIndex = computed(() => {
 
 const segmentItems = computed(() => {
     return buildThumbExpandItems(store.thumbInfos, store.pageCount, segmentIndex.value)
-})
-
-// 计算缩放比例，类似 ThumbScrollView 的处理
-// 固定 thumb-item 的基础宽度，让网格自动适应容器
-const thumbItemBaseWidth = computed(() => {
-    return store.viewportWidth >= thumbExpandWideBreakpoint ? thumbExpandItemWidthWide : thumbExpandItemWidthNormal
-})
-
-const thumbScale = computed(() => {
-    // 计算需要的缩放比例，使 sprite 图适应容器
-    // thumb-item 的内容区域 = thumbItemBaseWidth - padding * 2
-    const contentWidth = thumbItemBaseWidth.value - thumbExpandItemPadding * 2
-    return Math.min(1, contentWidth / thumbWidth)
 })
 
 const emit = defineEmits<{
@@ -261,31 +209,13 @@ function onSelectPage(pageNumber: number) {
                         background: rgba(220, 227, 238, 0.5);
                     }
 
-                    > .thumb-stage {
-                        position: relative;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        transform-origin: center center;
+                    > :deep(.thumb-view) {
+                        width: 100%;
+                        height: 100%;
 
-                        > .thumb {
-                            display: block;
-                            transition: all 0.2s ease;
-                            background-repeat: no-repeat;
-                            background-position: 0 0;
-                        }
-
-                        > .thumb-fallback {
-                            display: flex;
-                            flex-direction: row;
-                            align-items: center;
-                            justify-content: center;
-                            width: 100%;
-                            height: 100%;
+                        .thumb-fallback {
                             font-size: 12px;
                             color: #5d6f8f;
-                            text-align: center;
                         }
                     }
                 }

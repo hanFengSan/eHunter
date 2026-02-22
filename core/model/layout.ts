@@ -40,6 +40,10 @@ export const thumbSpriteWidth = 100
 export const thumbSpriteHeight = 144
 export const minThumbScale = 0.35
 export const bottomCompactRatio = 0.78
+export const thumbVerticalItemGap = 10
+export const thumbVerticalItemPaddingX = 10
+export const thumbBottomItemPaddingY = 10
+export const thumbBottomItemPaddingX = 2
 
 // Thumb expand modal layout constants
 export const thumbExpandWideBreakpoint = 1600

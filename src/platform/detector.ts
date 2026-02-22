@@ -19,11 +19,12 @@ import { Platform, type PlatformDetectionResult } from './types'
  */
 export function detectPlatform(): PlatformDetectionResult {
   const host = window.location.host
+  const hostname = window.location.hostname
   const pathname = window.location.pathname
 
   // EH platform: e-hentai.org or exhentai.org with /s/* paths (image pages only)
   // Gallery list pages (/g/*) are NOT supported
-  if ((host === 'e-hentai.org' || host === 'exhentai.org') && pathname.startsWith('/s/')) {
+  if ((hostname === 'e-hentai.org' || hostname === 'exhentai.org') && pathname.startsWith('/s/')) {
     return {
       platform: Platform.EH,
       host,
@@ -33,7 +34,7 @@ export function detectPlatform(): PlatformDetectionResult {
   }
 
   // NH platform: nhentai.net with /g/[id]/[page]/ pattern
-  if (host === 'nhentai.net' && /^\/g\/\d+\/\d+\/$/.test(pathname)) {
+  if (hostname === 'nhentai.net' && /^\/g\/\d+\/\d+\/$/.test(pathname)) {
     return {
       platform: Platform.NH,
       host,
@@ -43,7 +44,7 @@ export function detectPlatform(): PlatformDetectionResult {
   }
 
   // Test platform: localhost or IP addresses
-  if (host === 'localhost' || /^\d+\.\d+\.\d+\.\d+/.test(host)) {
+  if (hostname === 'localhost' || /^\d{1,3}(?:\.\d{1,3}){3}$/.test(hostname)) {
     return {
       platform: Platform.TEST,
       host,

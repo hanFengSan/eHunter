@@ -11,8 +11,7 @@
             <div class="indicator"></div>
             <div class="thumb-container" @click="select(i)" v-for="(item, i) of volThumbs" :key="item.id" ref="thumbContainers">
                 <div class="thumb-stage">
-                    <div class="thumb spirit-mode" v-if="item.mode === 0" :style="{background: `transparent url(${item.src}) -${item.offset}px 0 no-repeat`}"></div>
-                    <div class="thumb img-mode" v-if="item.mode === 1" :style="{background: `transparent url(${item.src}) no-repeat`, 'background-size': 'contain'}"></div>
+                    <ThumbView class="thumb" :thumb-info="item" />
                     <div class="hover-mask"></div>
                     <div class="index" v-if="store.readingMode == 0">{{ computedVolFirstIndexNum + Number(i) + 1 }}</div>
                     <div class="index" v-if="store.readingMode == 1">{{ Number(i) + 1 }}</div>
@@ -43,12 +42,15 @@ import {
     computeSideHeaderLetterSpacingEm,
     computeThumbContainerScale,
     computeThumbStageBaseWidth,
-    thumbSpriteHeight,
-    thumbSpriteWidth,
+    thumbBottomItemPaddingX,
+    thumbBottomItemPaddingY,
+    thumbVerticalItemGap,
+    thumbVerticalItemPaddingX,
 } from '../model/layout'
 import { ref, computed, watch } from 'vue'
 import { i18n } from '../store/i18n'
 import ExpandIcon from '../assets/svg/expand.svg?component'
+import ThumbView from './ThumbView.vue'
 
 const isDockBottom = computed(() => store.thumbDockSlot === 'bottom')
 const computedVolFirstIndexNum = computed(() => Number(computedVolFirstIndex.value))
@@ -82,9 +84,9 @@ const thumbContainers = ref<HTMLElement[] | null>(null)
 
 const indicatorOffset = computed(() => {
     if (isDockBottom.value) {
-        return thumbContainerWidth.value * activeThumbIndex.value
+        return (thumbContainerWidth.value + thumbBottomItemPaddingX * 2) * activeThumbIndex.value
     }
-    return store.thumbItemHeight * activeThumbIndex.value
+    return (thumbContainerHeight.value + thumbVerticalItemGap) * activeThumbIndex.value
 })
 
 const volThumbs: any = computed(() => {
@@ -95,9 +97,7 @@ const volThumbs: any = computed(() => {
     return store.thumbInfos
 })
 
-const thumbContainerScale = computed(() => {
-    return computeThumbContainerScale(store.thumbDockSlot, store.thumbItemWidth, store.thumbItemHeight)
-})
+const thumbContainerScale = computed(() => computeThumbContainerScale(store.thumbDockSlot, store.thumbItemWidth, store.thumbItemHeight))
 
 const thumbStageBaseWidth = computed(() => {
     return computeThumbStageBaseWidth(store.thumbDockSlot)
@@ -105,6 +105,15 @@ const thumbStageBaseWidth = computed(() => {
 
 const thumbContainerWidth = computed(() => Math.round(thumbStageBaseWidth.value * thumbContainerScale.value))
 const thumbContainerHeight = computed(() => Math.round(baseThumbItemHeight * thumbContainerScale.value))
+const indexFontSize = computed(() => {
+    const minSide = Math.min(thumbContainerWidth.value, thumbContainerHeight.value)
+    return Math.max(14, Math.min(40, Math.round(minSide * 0.4)))
+})
+const hoverIndexFontSize = computed(() => {
+    const minSide = Math.min(thumbContainerWidth.value, thumbContainerHeight.value)
+    const hoverSize = Math.max(20, Math.min(60, Math.round(minSide * 0.6)))
+    return Math.max(hoverSize, indexFontSize.value + 4)
+})
 
 function select(index: number | string) {
     const normalizedIndex = Number(index)
@@ -220,29 +229,25 @@ watch(() => store.curViewIndex, (newVal) => {
 
                 > .thumb-stage {
                     position: relative;
-                    width: v-bind('thumbStageBaseWidth+"px"');
-                    height: v-bind('baseThumbItemHeight+"px"');
+                    width: v-bind('thumbContainerWidth+"px"');
+                    height: v-bind('thumbContainerHeight+"px"');
                     display: flex;
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    transform: scale(v-bind('thumbContainerScale'));
-                    transform-origin: center center;
-                    transition: transform 0.2s ease;
+                    transition: all 0.2s ease;
 
                     > .thumb {
-                        display: block;
-                        width: v-bind('thumbSpriteWidth+"px"');
-                        height: v-bind('thumbSpriteHeight+"px"');
+                        width: 100%;
+                        height: 100%;
                         transition: all 0.5s ease;
-                        background-repeat: no-repeat;
                     }
 
                     > .index {
                         position: absolute;
                         display: block;
                         font-weight: bolder;
-                        font-size: 40px;
+                        font-size: v-bind('indexFontSize+"px"');
                         color: rgba($body_bg, 0.8);
                         -webkit-text-stroke:1px rgba(white, 0.8);
                         top: 50%;
@@ -273,17 +278,32 @@ watch(() => store.curViewIndex, (newVal) => {
                 //     background: rgba(black, 0.4);
                 // }
                 > .thumb-stage > .index {
-                    font-size: 60px;
+                    font-size: v-bind('hoverIndexFontSize+"px"');
                     color: $body_bg;
                     -webkit-text-stroke:1px white;
                 }
             }
         }
+
+        &:not(.dock-bottom) {
+            .thumb-container {
+                padding: 3px v-bind('thumbVerticalItemPaddingX + "px"');
+
+                > .thumb-stage {
+                    width: 100%;
+                }
+            }
+
+            .thumb-container + .thumb-container {
+                margin-top: v-bind('thumbVerticalItemGap + "px"');
+            }
+        }
+
         .indicator {
             position: absolute;
             box-sizing: border-box;
             margin-top: $header-height;
-            height: v-bind('store.thumbItemHeight+"px"');
+            height: v-bind('thumbContainerHeight+"px"');
             left: 0;
             right: 0;
             // background: rgba($indicator_color, 0.3);
@@ -390,10 +410,12 @@ watch(() => store.curViewIndex, (newVal) => {
                 width: v-bind('thumbContainerWidth+"px"');
                 min-width: v-bind('thumbContainerWidth+"px"');
                 height: 100%;
-                padding: 0 1px;
+                padding: v-bind('thumbBottomItemPaddingY + "px"') v-bind('thumbBottomItemPaddingX + "px"');
                 flex-direction: column;
 
                 > .thumb-stage {
+                    width: 100%;
+                    height: 100%;
                     transform-origin: center center;
                 }
             }
