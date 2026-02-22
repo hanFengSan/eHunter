@@ -13,8 +13,7 @@
                 <div class="thumb-stage">
                     <ThumbView class="thumb" :thumb-info="item" />
                     <div class="hover-mask"></div>
-                    <div class="index" v-if="store.readingMode == 0">{{ computedVolFirstIndexNum + Number(i) + 1 }}</div>
-                    <div class="index" v-if="store.readingMode == 1">{{ Number(i) + 1 }}</div>
+                    <div class="index">{{ computedVolFirstIndexNum + Number(i) + 1 }}</div>
                 </div>
             </div>
         </AwesomeScrollView>
@@ -55,10 +54,7 @@ import ThumbView from './ThumbView.vue'
 const isDockBottom = computed(() => store.thumbDockSlot === 'bottom')
 const computedVolFirstIndexNum = computed(() => Number(computedVolFirstIndex.value))
 const activeThumbIndex = computed(() => {
-    if (store.readingMode === 0) {
-        return Math.max(0, store.curViewIndex - computedVolFirstIndexNum.value)
-    }
-    return Math.max(0, store.curViewIndex)
+    return Math.max(0, store.curViewIndex - computedVolFirstIndexNum.value)
 })
 
 const sideHeaderFontSize = computed(() => {
@@ -90,11 +86,7 @@ const indicatorOffset = computed(() => {
 })
 
 const volThumbs: any = computed(() => {
-    if (store.readingMode === 0) {
-        return store.thumbInfos.slice(computedVolFirstIndex.value, computedVolFirstIndex.value + store.volumeSize)
-    }
-    // let book mode compatible with volume, using one volume
-    return store.thumbInfos
+    return store.thumbInfos.slice(computedVolFirstIndex.value, computedVolFirstIndex.value + store.volumeSize)
 })
 
 const thumbContainerScale = computed(() => computeThumbContainerScale(store.thumbDockSlot, store.thumbItemWidth, store.thumbItemHeight))
@@ -117,11 +109,7 @@ const hoverIndexFontSize = computed(() => {
 
 function select(index: number | string) {
     const normalizedIndex = Number(index)
-    if (store.readingMode == 0) {
-        storeAction.setCurViewIndex(computedVolFirstIndexNum.value + normalizedIndex, updaterName)
-    } else {
-        storeAction.setCurViewIndex(normalizedIndex, updaterName)
-    }
+    storeAction.setCurViewIndex(computedVolFirstIndexNum.value + normalizedIndex, updaterName)
 }
 
 function onDockDragStart(payload: GestureStartPayload) {
