@@ -67,11 +67,52 @@ export interface InstructionDialogPayload {
     operations?: InstructionDialogOperation[]
 }
 
+export interface InstructionDialogEntry extends InstructionDialogPayload {
+    id: string
+}
+
 export interface InstructionDialogOperation {
     name: string
     btnType: string
     isCloseModal: boolean
     onClick?: () => void
+}
+
+function cloneInstructionDialogPayload(payload: InstructionDialogPayload): InstructionDialogPayload {
+    return {
+        title: payload.title,
+        mdText: payload.mdText,
+        isCompulsive: payload.isCompulsive,
+        operations: payload.operations ? [...payload.operations] : [],
+    }
+}
+
+let instructionDialogSeq = 0
+function createInstructionDialogEntry(payload: InstructionDialogPayload): InstructionDialogEntry {
+    instructionDialogSeq += 1
+    const cloned = cloneInstructionDialogPayload(payload)
+    return {
+        ...cloned,
+        id: `dialog-${Date.now()}-${instructionDialogSeq}`,
+    }
+}
+
+function syncInstructionDialogState() {
+    const dialogs = store.instructionDialogStack
+    const topDialog = dialogs.length > 0 ? dialogs[dialogs.length - 1] : null
+    if (!topDialog) {
+        store.showInstructionDialog = false
+        store.instructionDialogTitle = ''
+        store.instructionDialogMdText = ''
+        store.instructionDialogCompulsive = false
+        store.instructionDialogOperations = []
+        return
+    }
+    store.showInstructionDialog = true
+    store.instructionDialogTitle = topDialog.title
+    store.instructionDialogMdText = topDialog.mdText
+    store.instructionDialogCompulsive = topDialog.isCompulsive !== false
+    store.instructionDialogOperations = topDialog.operations ? [...topDialog.operations] : []
 }
 
 export interface QuickSettingOption {
@@ -793,6 +834,7 @@ export const store = reactive({
     instructionDialogMdText: '',
     instructionDialogCompulsive: false,
     instructionDialogOperations: <InstructionDialogOperation[]>[],
+    instructionDialogStack: <InstructionDialogEntry[]>[],
     activeSettingsCategory: <SettingsCategory['id']>'general',
     topBarHeight: 40, // px, for calc
     readingMode: 0, // 0: scroll, 1: book
@@ -1005,16 +1047,22 @@ export const storeAction = {
         store.showDownloadConfirmDialog = false
     },
     openInstructionDialog: (payload: InstructionDialogPayload) => {
-        store.instructionDialogTitle = payload.title
-        store.instructionDialogMdText = payload.mdText
-        store.instructionDialogCompulsive = payload.isCompulsive !== false
-        store.instructionDialogOperations = payload.operations ? [...payload.operations] : []
-        store.showInstructionDialog = true
+        store.instructionDialogStack.push(createInstructionDialogEntry(payload))
+        syncInstructionDialogState()
     },
-    closeInstructionDialog: () => {
-        store.showInstructionDialog = false
-        store.instructionDialogOperations = []
-        checkInstructions()
+    closeInstructionDialog: (dialogId?: string) => {
+        if (dialogId) {
+            const index = store.instructionDialogStack.findIndex(dialog => dialog.id === dialogId)
+            if (index >= 0) {
+                store.instructionDialogStack.splice(index, 1)
+            }
+        } else {
+            store.instructionDialogStack.pop()
+        }
+        syncInstructionDialogState()
+        if (!store.showInstructionDialog) {
+            checkInstructions()
+        }
     },
     openWelcomeInstructionDialog: () => {
         openWelcomeInstructionDialog(false)

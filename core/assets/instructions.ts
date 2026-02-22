@@ -21,7 +21,7 @@ const welcomeInstructionTemplate: Record<SupportedLang, string> = {
 6.有更多想要的功能, 可以反馈给我, 如果该功能可以有的话, 我有空的时候会支持的.
 
 ### iPhone和iPad使用指引
-说明链接：https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_en.md
+说明链接：[链接](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_cn.md)
 
 ### eHunter-local
 eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](https://github.com/hanFengSan/eHunter_local)
@@ -58,7 +58,7 @@ eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](ht
 6.If there are more features you would like, feel free to send feedback. If they are feasible, I will add them when time allows.
 
 ### iPhone and iPad Guide
-Guide link: https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_en.md
+Guide link: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_en.md)
 
 ### eHunter-local
 The eHunter-local is local version of eHunter, supporting Windows and MacOS. [Home Page](https://github.com/hanFengSan/eHunter_local)
@@ -95,7 +95,7 @@ If you enjoy this extension, I would really appreciate a five-star rating in the
 6.追加してほしい機能があれば、ぜひフィードバックしてください。実現可能であれば、時間のあるときに対応します。
 
 ### iPhone と iPad の利用ガイド
-案内リンク: https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_jp.md
+案内リンク: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_jp.md)
 
 ### eHunter-local
 eHunter-localはeHunterのローカル版で、WindowsとMacOSをサポートしています。[Home Page](https://github.com/hanFengSan/eHunter_local)

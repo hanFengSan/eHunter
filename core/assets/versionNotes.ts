@@ -11,7 +11,7 @@ const versionNotesTemplate: Record<SupportedLang, string> = {
 
 ### iPhone / iPad 支持
 * 目前在 iOS 15/iPadOS 15 上可运行油猴脚本/userscirpt，因此 eHunter 也可在 iPhone / iPad 使用
-* 使用指南: [链接](https://github.com/hanFengSan/eHunter/blob/master/misc/ios_ipad_cn.md)
+* 使用指南: [链接](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_cn.md)
 `,
     en: `
 * Added image bundle download (entry: the "More" button in the top-right corner)

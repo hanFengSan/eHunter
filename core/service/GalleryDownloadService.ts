@@ -307,7 +307,7 @@ export class GalleryDownloadService {
         const totalChunks = Math.max(1, Math.ceil((totalPages || 1) / options.chunkSize))
         const failures: DownloadFailureInfo[] = []
         const chunkResults: DownloadChunkResult[] = []
-        const width = Math.max(3, String(totalPages).length)
+        const width = Math.max(4, String(totalPages).length)
         const fileBaseName = sanitizeFileBaseName(options.galleryTitle)
         const downloadTime = new Date().toISOString()
 
