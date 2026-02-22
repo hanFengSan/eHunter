@@ -136,23 +136,24 @@ function scrollToActiveThumb(targetIndex: number) {
     if (!scrollView.value || !thumbContainers.value || targetIndex < 0) {
         return
     }
+    const scrollDuration = store.readingMode === 1 ? 260 : 1000
     if (isDockBottom.value) {
         const sorted = [...thumbContainers.value].sort((a, b) => a.offsetLeft - b.offsetLeft)
         const target = sorted[targetIndex]
         if (target) {
-            scrollView.value.scrollTo(target.offsetLeft, 1000, 'x')
+            scrollView.value.scrollTo(target.offsetLeft, scrollDuration, 'x')
             return
         }
-        scrollView.value.scrollTo(0, 1000, 'x')
+        scrollView.value.scrollTo(0, scrollDuration, 'x')
         return
     }
     const sorted = [...thumbContainers.value].sort((a, b) => a.offsetTop - b.offsetTop)
     const target = sorted[targetIndex]
     if (target) {
-        scrollView.value.scrollTo(target.offsetTop, 1000, 'y')
+        scrollView.value.scrollTo(target.offsetTop, scrollDuration, 'y')
         return
     }
-    scrollView.value.scrollTo(0, 1000, 'y')
+    scrollView.value.scrollTo(0, scrollDuration, 'y')
 }
 
 watch(() => store.curViewIndex, (newVal) => {
