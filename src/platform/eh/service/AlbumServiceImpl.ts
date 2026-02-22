@@ -13,6 +13,17 @@ import { IntroHtmlParser } from '../parser/IntroHtmlParser'
 import { ImgUrlListParser } from '../parser/ImgUrlListParser'
 import { TextReq } from '../../base/request/TextReq'
 
+const MOCK_THUMB_PARSE_ERROR_QUERY_KEY = 'ehunterMockThumbParseError'
+
+function shouldMockThumbParseError(): boolean {
+  try {
+    const params = new URLSearchParams(window.location.search)
+    return params.get(MOCK_THUMB_PARSE_ERROR_QUERY_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 export class EHAlbumServiceImpl implements AlbumService {
   private imgHtmlParser: ImgHtmlParser
   private thumbInfos: Array<ThumbInfo> = []
@@ -69,6 +80,11 @@ export class EHAlbumServiceImpl implements AlbumService {
 
       // Parse thumbnail and image page info from intro pages
       const imgUrlListParser = new ImgUrlListParser(this.introUrl, this.pageCount)
+
+      if (shouldMockThumbParseError()) {
+        return new Error('MOCK_THUMB_PARSE_ERROR: failed to parse thumbnail list')
+      }
+
       this.imgPageInfos = await imgUrlListParser.request()
 
       // Generate thumbnail info from imgPageInfos

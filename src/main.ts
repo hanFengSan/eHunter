@@ -1,6 +1,6 @@
 import { createApp, ref, h } from 'vue'
 import TestApp from '../core/TestApp.vue'
-import LoadingErrorWrapper from '../core/components/LoadingErrorWrapper.vue'
+import LoadingView from '../core/components/LoadingView.vue'
 import '../core/style/_normalize.scss'
 import { NameAlbumService } from '../core/service/AlbumService'
 import { detectPlatform } from './platform/detector'
@@ -194,7 +194,7 @@ if (!detectionResult.platform) {
           }
         },
         render() {
-          return h(LoadingErrorWrapper, {
+          return h(LoadingView, {
             isLoading: this.isLoading,
             error: this.error,
             onClose: this.handleClose
