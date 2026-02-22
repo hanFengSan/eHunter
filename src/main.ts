@@ -8,7 +8,7 @@ import { createPlatformService } from './platform/factory'
 import { initializeWithTimeout } from './platform/initializer'
 import { applyPlatformHostActions } from './platform/hostActions'
 import PlatformService from './platform/base/service/PlatformService.js'
-import type { InitializationError } from './platform/types'
+import { Platform, type InitializationError } from './platform/types'
 
 /// <reference types="vite-svg-loader" />
 
@@ -107,6 +107,62 @@ if (!detectionResult.platform) {
   let isMounted = false
   let hostActionsApplied = false
   let hideTimerId: number | null = null
+  let originalViewportContent: string | null = null
+  let hadViewportMeta = false
+  let viewportAdjusted = false
+
+  const isMobileLike = (): boolean => {
+    return window.matchMedia('(pointer: coarse)').matches || /iphone|ipad|ipod|android|mobile/i.test(navigator.userAgent)
+  }
+
+  const ensureEHViewportForOpen = (): void => {
+    if (detectionResult.platform !== Platform.EH || !isMobileLike()) {
+      return
+    }
+
+    let viewportMeta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null
+    const desiredContent = 'width=device-width, initial-scale=1, viewport-fit=cover'
+
+    if (!viewportAdjusted) {
+      hadViewportMeta = Boolean(viewportMeta)
+      originalViewportContent = viewportMeta
+        ? viewportMeta.getAttribute('content')
+        : null
+      viewportAdjusted = true
+    }
+
+    if (!viewportMeta) {
+      viewportMeta = document.createElement('meta')
+      viewportMeta.name = 'viewport'
+      viewportMeta.setAttribute('data-ehunter-managed', '1')
+      ;(document.head || document.documentElement).appendChild(viewportMeta)
+    }
+
+    viewportMeta.setAttribute('content', desiredContent)
+  }
+
+  const restoreEHViewportOnClose = (): void => {
+    if (!viewportAdjusted) {
+      return
+    }
+
+    const viewportMeta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null
+    if (!hadViewportMeta) {
+      if (viewportMeta?.getAttribute('data-ehunter-managed') === '1') {
+        viewportMeta.remove()
+      }
+    } else if (viewportMeta) {
+      if (originalViewportContent === null) {
+        viewportMeta.removeAttribute('content')
+      } else {
+        viewportMeta.setAttribute('content', originalViewportContent)
+      }
+    }
+
+    originalViewportContent = null
+    hadViewportMeta = false
+    viewportAdjusted = false
+  }
 
   const clearHideTimer = (): void => {
     if (hideTimerId !== null) {
@@ -179,6 +235,7 @@ if (!detectionResult.platform) {
 
           const handleClose = () => {
             writeEHunterStatus(false)
+            restoreEHViewportOnClose()
             document.body.style.overflow = ''
             const root = document.getElementById(EHUNTER_CONTAINER_ID)
             if (root) {
@@ -224,6 +281,7 @@ if (!detectionResult.platform) {
     document.body.style.overflow = show ? 'hidden' : ''
 
     if (show) {
+      ensureEHViewportForOpen()
       container.style.visibility = 'visible'
       container.style.pointerEvents = 'auto'
       requestAnimationFrame(() => {
@@ -232,6 +290,7 @@ if (!detectionResult.platform) {
       return
     }
 
+    restoreEHViewportOnClose()
     container.style.top = '-100%'
     scheduleHideContainer(container, EHUNTER_CLOSE_DURATION_MS)
   }
