@@ -13,8 +13,8 @@ import { Platform, type PlatformDetectionResult } from './types'
  * @returns PlatformDetectionResult with detected platform or null
  * 
  * URL Patterns:
- * - EH: e-hentai.org/s/* or exhentai.org/s/* (image pages only)
- * - NH: nhentai.net/g/[id]/[page]/
+ * - EH: e-hentai.org/s/* or exhentai.org/s/* (reader page)
+ * - NH: nhentai.net/g/[id]/[page]/ (reader page)
  * - Test: localhost or IP addresses (127.0.0.1, 192.168.x.x, etc.)
  */
 export function detectPlatform(): PlatformDetectionResult {
@@ -22,9 +22,11 @@ export function detectPlatform(): PlatformDetectionResult {
   const hostname = window.location.hostname
   const pathname = window.location.pathname
 
-  // EH platform: e-hentai.org or exhentai.org with /s/* paths (image pages only)
-  // Gallery list pages (/g/*) are NOT supported
-  if ((hostname === 'e-hentai.org' || hostname === 'exhentai.org') && pathname.startsWith('/s/')) {
+  const isEhHost = hostname === 'e-hentai.org' || hostname === 'exhentai.org'
+  const isEhReaderPage = /^\/s\/[^/]+\/\d+-\d+\/?$/.test(pathname)
+
+  // EH platform: reader page only
+  if (isEhHost && isEhReaderPage) {
     return {
       platform: Platform.EH,
       host,
@@ -33,8 +35,10 @@ export function detectPlatform(): PlatformDetectionResult {
     }
   }
 
-  // NH platform: nhentai.net with /g/[id]/[page]/ pattern
-  if (hostname === 'nhentai.net' && /^\/g\/\d+\/\d+\/$/.test(pathname)) {
+  const isNhReaderPage = /^\/g\/\d+\/\d+\/$/.test(pathname)
+
+  // NH platform: reader page only
+  if (hostname === 'nhentai.net' && isNhReaderPage) {
     return {
       platform: Platform.NH,
       host,

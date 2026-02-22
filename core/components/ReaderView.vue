@@ -74,9 +74,19 @@ function syncFullscreenState() {
 }
 
 function closeReader() {
-    const elem = document.querySelector('.ehunter-container') as HTMLElement | null
-    if (elem) {
-        elem.style.display = 'none'
+    const win = window as Window & {
+        __EHUNTER_UI__?: { close: () => void }
+    }
+
+    if (win.__EHUNTER_UI__) {
+        win.__EHUNTER_UI__.close()
+        return
+    }
+
+    const container = document.querySelector('#ehunter-app .ehunter-container') as HTMLElement | null
+    if (container) {
+        container.style.top = '-100%'
+        document.body.style.overflow = ''
     }
 }
 

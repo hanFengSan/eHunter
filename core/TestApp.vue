@@ -9,18 +9,13 @@ import App from './App.vue'
 </script>
 
 <style>
-body {
-    margin: 0;
-    overflow: hidden;
-}
-
 .ehunter-container {
-    position: fixed;
+    position: absolute;
     height: 100%;
     width: 100%;
     background: #333333;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     z-index: 1;
 }
 </style>
