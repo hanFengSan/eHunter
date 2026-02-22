@@ -5,7 +5,7 @@
                 <div class="panel" @click.stop>
                     <header class="panel-header">
                         <h3>{{ i18n.openMoreSettingsModal }}</h3>
-                        <CircleIconButton icon-type="close" @click="storeAction.closeMoreSettingsDialog" />
+                        <button class="close-btn" type="button" :aria-label="i18n.cancel" @click="storeAction.closeMoreSettingsDialog">×</button>
                     </header>
                     <div class="panel-body">
                         <nav class="left-nav">
@@ -184,7 +184,6 @@ import pkgJson from '../../package.json'
 import DropOption from './widget/DropOption.vue'
 import NumDropOption from './widget/NumDropOption.vue'
 import SimpleSwitch from './widget/SimpleSwitch.vue'
-import CircleIconButton from './widget/CircleIconButton.vue'
 import SimpleDialog from './widget/SimpleDialog.vue'
 import { i18n } from '../store/i18n'
 import { store, storeAction, settingsCategories, quickSettingOptions, settingFieldMap } from '../store/app'
@@ -409,6 +408,7 @@ onMounted(() => {
     padding: 24px;
 
     > .panel {
+        position: relative;
         width: min(980px, 100%);
         height: min(740px, 100%);
         border-radius: 18px;
@@ -423,8 +423,9 @@ onMounted(() => {
         > .panel-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 14px 16px 14px 20px;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 14px 56px 14px 20px;
             border-bottom: 1px solid rgba(78, 102, 146, 0.18);
             background: rgba(255, 255, 255, 0.82);
 
@@ -434,6 +435,39 @@ onMounted(() => {
                 color: #1e304f;
                 font-weight: 700;
                 letter-spacing: 0.2px;
+            }
+
+            > .close-btn {
+                position: absolute;
+                right: 14px;
+                top: 12px;
+                z-index: 2;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                border: none;
+                color: #4a6fa5;
+                background: rgba(255, 255, 255, 0.9);
+                cursor: pointer;
+                font-size: 20px;
+                line-height: 1;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 2px 8px rgba(26, 45, 78, 0.12);
+
+                &:hover {
+                    background: rgba(235, 243, 255, 1);
+                    color: #2d5a9e;
+                    transform: scale(1.08);
+                    box-shadow: 0 4px 12px rgba(31, 68, 125, 0.18);
+                }
+
+                &:active {
+                    transform: scale(0.96);
+                }
             }
         }
 
