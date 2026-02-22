@@ -12,6 +12,7 @@ import {
     type DockSlotId,
     type ReaderModeLayoutKey,
 } from '../model/layout'
+import { getAdjacentBookPageIndex } from '../model/bookSpread'
 import {
     clampThumbExpandSegmentIndex,
     getThumbExpandSegmentByPage,
@@ -1239,6 +1240,22 @@ export const storeAction = {
         }
     },
     setCurViewIndex: (val: number, updater: string) => {
+        const resolveBookTarget = (target: number): number => {
+            if (store.readingMode !== 1) {
+                return target
+            }
+            const step = Math.max(1, store.pagesPerScreen)
+            const delta = target - store.curViewIndex
+            if (Math.abs(delta) !== step) {
+                return target
+            }
+            return getAdjacentBookPageIndex({
+                pageCount: store.pageCount,
+                pagesPerScreen: store.pagesPerScreen,
+                isChangeOddEven: store.isChangeOddEven,
+            }, store.curViewIndex, delta > 0 ? 1 : -1)
+        }
+
         const applyCurViewIndex = (target: number, targetUpdater: string) => {
             if (target == store.curViewIndex) {
                 return
@@ -1293,11 +1310,11 @@ export const storeAction = {
 
         if (store.readingMode == 1 && store.pageTurnAnimationMode !== 'none') {
             if (isBookTurning) {
-                pendingBookTurn = { val, updater }
+                pendingBookTurn = { val: resolveBookTarget(val), updater }
                 return
             }
             isBookTurning = true
-            applyCurViewIndex(val, updater)
+            applyCurViewIndex(resolveBookTarget(val), updater)
             let duration = getBookTurnDuration()
             if (duration <= 0) {
                 settleBookTurn()
@@ -1314,7 +1331,7 @@ export const storeAction = {
         isBookTurning = false
         pendingBookTurn = null
 
-        applyCurViewIndex(val, updater)
+        applyCurViewIndex(resolveBookTarget(val), updater)
     },
     setThumbInfos: (val: Array<ThumbInfo>) => {
         store.thumbInfos = val

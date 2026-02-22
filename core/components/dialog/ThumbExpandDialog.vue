@@ -4,7 +4,7 @@
             <div v-if="store.showThumbExpandDialog" class="thumb-expand-modal" @click.self="onClose">
                 <section class="panel" @click.stop>
                     <button class="close-btn" type="button" :aria-label="i18n.cancel" @click="onClose">×</button>
-                    <div class="grid-wrap">
+                    <div ref="gridWrapRef" class="grid-wrap">
                         <button
                             v-for="item in segmentItems"
                             :key="item.pageNumber"
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { i18n } from '../../store/i18n'
 import { store, storeAction } from '../../store/app'
 import {
@@ -52,15 +52,35 @@ const segmentItems = computed(() => {
     return buildThumbExpandItems(store.thumbInfos, store.pageCount, segmentIndex.value)
 })
 
+const gridWrapRef = ref<HTMLElement | null>(null)
+
 const emit = defineEmits<{
     (e: 'select-page', pageNumber: number): void
 }>()
 
-watch(() => store.showThumbExpandDialog, (open) => {
+watch(() => store.showThumbExpandDialog, async (open) => {
     if (open) {
         storeAction.setThumbExpandSegmentIndex(getThumbExpandSegmentByPage(store.curViewIndex))
+        await nextTick()
+        scrollToCurrentPage()
     }
 })
+
+function scrollToCurrentPage() {
+    const grid = gridWrapRef.value
+    if (!grid) {
+        return
+    }
+    const activeItem = grid.querySelector<HTMLElement>('.thumb-item.active')
+    if (!activeItem) {
+        return
+    }
+    activeItem.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+        inline: 'center',
+    })
+}
 
 function onClose() {
     storeAction.closeThumbExpandDialog()

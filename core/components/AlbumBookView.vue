@@ -2,22 +2,31 @@
     <section :class="['album-book-view', `mode-${store.pageTurnAnimationMode}`]" @wheel="handleWheelFlipEvent" @click="onClickBg">
         <Transition
             v-for="spread in cachedBookSpreadList"
-            :key="spread.startIndex"
+            :key="spread.spreadIndex"
             :name="bookTransitionName">
         <div
-            v-show="spread.startIndex === store.curViewIndex"
+            v-show="spread.spreadIndex === curSpreadIndex"
             class="book-spread"
-            :style="spreadStyle(spread.startIndex)">
+            :style="spreadStyle(spread.spreadIndex)">
             <div class="book-page-container"
                 v-for="i in spread.pageList"
-                :key="`${spread.startIndex}-${i.pageIndex}`"
+                :key="`${spread.spreadIndex}-${i.pageIndex}`"
                 :style="pageContainerStyle(i)">
-                <PageView
+                <BookPageView
                     :index="i.pageIndex"
-                    :active="true"/>
+                    :active="true"
+                    :active-load="true" />
             </div>
         </div>
         </Transition>
+        <transition name="center-horizontal-fade">
+            <Pagination
+                v-if="store.showBookPagination && spreadPageSum > 1"
+                class="bottom-pagination"
+                :cur-index="curSpreadIndex"
+                :page-sum="spreadPageSum"
+                @change="selectSpreadIndex" />
+        </transition>
         <div class="action-panel">
             <div class="next"></div>
             <div class="setting"></div>
@@ -27,11 +36,18 @@
 </template>
 
 <script lang="ts" setup>
-import PageView from './PageView.vue'
+import BookPageView from './BookPageView.vue'
+import Pagination from './widget/Pagination.vue'
 import type { StyleValue } from 'vue'
 import { computed } from 'vue'
 import { store, storeAction, computedAlbumViewportRatio, computedAlbumViewportHeight, computedAlbumViewportWidth } from '../store/app'
 import { handleWheelFlipEvent } from '../store/event'
+import {
+    buildBookSpreads,
+    findBookSpreadIndexByPage,
+    pickBookSpreadAnchorPage,
+    getBookCoverPlaceholderHeightOfWidth,
+} from '../model/bookSpread'
 
 interface BookPageDisplayParam {
     pageIndex: number,
@@ -51,21 +67,11 @@ function pageContainerStyle(page: BookPageDisplayParam): StyleValue {
     }
 }
 
-function spreadStyle(startIndex: number): StyleValue {
+function spreadStyle(spreadIndex: number): StyleValue {
     return {
-        zIndex: startIndex === store.curViewIndex ? 2 : 1,
-        pointerEvents: startIndex === store.curViewIndex ? 'auto' : 'none',
+        zIndex: spreadIndex === curSpreadIndex.value ? 2 : 1,
+        pointerEvents: spreadIndex === curSpreadIndex.value ? 'auto' : 'none',
     }
-}
-
-function getScreenIndexList(startIndex: number): number[] {
-    let indexList: number[] = []
-    for (let i = startIndex; i < startIndex + store.pagesPerScreen; i++) {
-        if (i >= -1 && i < store.pageCount) {
-            indexList.push(i)
-        }
-    }
-    return indexList
 }
 
 function getPagePositionRight(pageWidth: number, pageScreenIndex: number): number {
@@ -84,7 +90,9 @@ function calcScreenPageSize(screen: number[]): BookPageDisplayParam[] {
     }
     // calculate page size per screen
     let maxPageRatio = screen.reduce((max, index) => {
-        let val = storeAction.getImgPageHeightOfWidth(index)
+        let val = index >= 0 && index < store.pageCount
+            ? storeAction.getImgPageHeightOfWidth(index)
+            : getBookCoverPlaceholderHeightOfWidth()
         if (val > max) {
             return val
         }
@@ -99,7 +107,10 @@ function calcScreenPageSize(screen: number[]): BookPageDisplayParam[] {
     }
     for (let i = 0; i < screen.length; i++) {
         let pageIndex = <number>screen[i]
-        let height = width * storeAction.getImgPageHeightOfWidth(pageIndex)
+        let heightOfWidth = pageIndex >= 0 && pageIndex < store.pageCount
+            ? storeAction.getImgPageHeightOfWidth(pageIndex)
+            : getBookCoverPlaceholderHeightOfWidth()
+        let height = width * heightOfWidth
         let top = computedAlbumViewportHeight.value / 2 - height / 2
         if (store.showTopBar) {
             top += store.topBarHeight
@@ -116,32 +127,58 @@ function calcScreenPageSize(screen: number[]): BookPageDisplayParam[] {
 }
 
 const cachedBookSpreadList = computed(() => {
-    const step = Math.max(1, store.pagesPerScreen)
-    const preloadSpreadNum = Math.max(1, Math.ceil(store.loadNum / step))
-    const minStart = Math.max(0, store.curViewIndex - preloadSpreadNum * step)
-    const maxStart = Math.min(
-        Math.max(store.pageCount - 1, 0),
-        store.curViewIndex + preloadSpreadNum * step,
-    )
+    const spreads = buildBookSpreads({
+        pageCount: store.pageCount,
+        pagesPerScreen: store.pagesPerScreen,
+        isChangeOddEven: store.isChangeOddEven,
+    })
+    const currentSpreadIndex = findBookSpreadIndexByPage(spreads, store.curViewIndex)
+    const preloadSpreadNum = Math.max(1, Math.ceil(store.loadNum / Math.max(1, store.pagesPerScreen)))
+    const minSpreadIndex = Math.max(0, currentSpreadIndex - preloadSpreadNum)
+    const maxSpreadIndex = Math.min(spreads.length - 1, currentSpreadIndex + preloadSpreadNum)
 
     const result: Array<{
-        startIndex: number,
+        spreadIndex: number,
         pageList: BookPageDisplayParam[],
     }> = []
-    for (let startIndex = minStart; startIndex <= maxStart; startIndex += step) {
+    for (let spreadIndex = minSpreadIndex; spreadIndex <= maxSpreadIndex; spreadIndex++) {
+        const spread = spreads[spreadIndex]
         result.push({
-            startIndex,
-            pageList: calcScreenPageSize(getScreenIndexList(startIndex)),
+            spreadIndex,
+            pageList: calcScreenPageSize(spread),
         })
     }
-    if (!result.some(item => item.startIndex === store.curViewIndex)) {
-        result.push({
-            startIndex: store.curViewIndex,
-            pageList: calcScreenPageSize(getScreenIndexList(store.curViewIndex)),
+    if (!result.some(item => item.spreadIndex === currentSpreadIndex)) {
+        const activeSpread = spreads[currentSpreadIndex] || []
+        result.unshift({
+            spreadIndex: currentSpreadIndex,
+            pageList: calcScreenPageSize(activeSpread),
         })
     }
     return result
 })
+
+const bookSpreads = computed(() => {
+    return buildBookSpreads({
+        pageCount: store.pageCount,
+        pagesPerScreen: store.pagesPerScreen,
+        isChangeOddEven: store.isChangeOddEven,
+    })
+})
+
+const curSpreadIndex = computed(() => {
+    return findBookSpreadIndexByPage(bookSpreads.value, store.curViewIndex)
+})
+
+const spreadPageSum = computed(() => {
+    return bookSpreads.value.length
+})
+
+function selectSpreadIndex(spreadIndex: number) {
+    const targetSpread = bookSpreads.value[spreadIndex]
+    const targetPageIndex = pickBookSpreadAnchorPage(targetSpread, store.curViewIndex)
+    storeAction.setCurViewIndex(targetPageIndex, 'book-pagination')
+}
 
 const bookTransitionName = computed(() => {
     if (store.pageTurnAnimationMode === 'none') {
@@ -154,14 +191,12 @@ const bookTransitionName = computed(() => {
 })
 
 function onClickBg(e: any) {
-    console.log(e)
     let y = e.clientY
     switch(true) {
         case y >= 0 && y < store.viewportHeight * 0.3:
             storeAction.setCurViewIndex(store.curViewIndex - store.pagesPerScreen, 'click')
             break
         case y >= store.viewportHeight * 0.3 && y <= store.viewportHeight * 0.7:
-            console.log('setting')
             break
         case y >= store.viewportHeight * 0.7 && y <= store.viewportHeight:
             storeAction.setCurViewIndex(store.curViewIndex + store.pagesPerScreen, 'click')
@@ -284,6 +319,23 @@ function onClickBg(e: any) {
             will-change: transform, opacity;
             backface-visibility: hidden;
             box-shadow: 0 16px 26px -14px rgba(0, 0, 0, 0.38);
+        }
+    }
+
+    > .bottom-pagination {
+        position: absolute;
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: $book_view_pagination_bg;
+        border-radius: 3px;
+        opacity: 0.5;
+        box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        z-index: 12000;
+
+        &:hover {
+            opacity: 1;
         }
     }
 }

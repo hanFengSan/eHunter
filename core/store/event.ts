@@ -1,7 +1,7 @@
 import { store, storeAction } from './app'
 import { i18n, lang } from './i18n'
 import config from '../../src/config'
-import { getWelcomeInstructionText, getBookInstructionText } from '../assets/instructions'
+import { getWelcomeInstructionText } from '../assets/instructions'
 import { getVersionNotesText } from '../assets/versionNotes'
 import { TextReq } from '../../src/platform/base/request/TextReq'
 import pkgJson from '../../package.json'
@@ -148,14 +148,6 @@ export function checkInstructions() {
         storeAction.markWelcomeInstructionShown()
         openWelcomeInstructionDialog(true)
         return
-    }
-    if (store.readingMode == 1 && !store.hasShownBookInstruction) {
-        storeAction.markBookInstructionShown()
-        storeAction.openInstructionDialog({
-            title: i18n.value.instructions,
-            mdText: getBookInstructionText(lang.value),
-            isCompulsive: true,
-        })
     }
 }
 

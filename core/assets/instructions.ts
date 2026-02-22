@@ -14,7 +14,7 @@ const welcomeInstructionTemplate: Record<SupportedLang, string> = {
 
 3.\`滚动\`模式下, 支持\`A\`. \`D\`, \`Left(左)\`和\`Right(右)\`键翻页.
 
-4.\`书页\`模式下, 支持\`A\`. \`D\`, \`Left(左)\`, \`Right(右)\`和\`Space(空格)\`键翻页. 你也可以用鼠标滚轮翻页.
+4.\`书页\`模式下, 点击屏幕下方翻下一页，点击屏幕上方翻到上一页。支持\`A\`. \`D\`, \`Left(左)\`, \`Right(右)\`键翻页. 你也可以用鼠标滚轮翻页.
 
 5.\`分卷页数\`对性能要求较高,请不要设置过高,可能会导致卡顿.
 
@@ -51,7 +51,7 @@ eHunter-local是eHunter的本地版本, 支持Windows和MacOS. [项目主页](ht
 
 3.In \`Scroll\` mode, you can turn pages with \`A\`, \`D\`, \`Left\`, and \`Right\`.
 
-4.In \`Book\` mode, you can turn pages with \`A\`, \`D\`, \`Left\`, \`Right\`, and \`Space\`. You can also use the mouse wheel.
+4.In \`Book\` mode, click the lower part of the screen to go to the next page, and click the upper part to go to the previous page. You can also turn pages with \`A\`, \`D\`, \`Left\`, and \`Right\`, or use the mouse wheel.
 
 5.\`Volume size\` has relatively high performance requirements. Avoid setting it too high, or the reader may lag.
 
@@ -88,7 +88,7 @@ If you enjoy this extension, I would really appreciate a five-star rating in the
 
 3.\`スクロール\`モードでは、\`A\`、\`D\`、\`Left\`、\`Right\`キーでページをめくれます。
 
-4.\`ブック\`モードでは、\`A\`、\`D\`、\`Left\`、\`Right\`、\`Space\`キーでページをめくれます。マウスホイールでも操作できます。
+4.\`ブック\`モードでは、画面下部をクリックすると次のページ、画面上部をクリックすると前のページに移動します。\`A\`、\`D\`、\`Left\`、\`Right\`キー、またはマウスホイールでもページをめくれます。
 
 5.\`分巻ページ数\`はパフォーマンス負荷が高いため、上げすぎると動作が重くなる場合があります。
 
