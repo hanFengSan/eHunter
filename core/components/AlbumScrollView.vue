@@ -75,8 +75,13 @@ async function scrollToCurIndex() {
         scrollView.value!.scrollTo(0, animationTime)
         return
     }
+    const target = pageContainers.value[computedVolIndex.value]
+    if (!target) {
+        scrollView.value.scrollTo(0, animationTime)
+        return
+    }
     scrollView.value.scrollTo(
-        pageContainers.value[computedVolIndex.value].offsetTop - 100,
+        target.offsetTop - 100,
         animationTime
     )
 }

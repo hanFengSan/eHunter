@@ -772,7 +772,8 @@ export const computedVolumeSum = computed(() => {
 
 export const computedVolPageIndexList = computed(() => {
     let result: number[] = []
-    for (let i = computedVolFirstIndex.value; i < store.volumeSize && i < store.pageCount; i++) {
+    const volLastExclusive = computedVolFirstIndex.value + store.volumeSize
+    for (let i = computedVolFirstIndex.value; i < volLastExclusive && i < store.pageCount; i++) {
         result.push(i)
     }
     return result
