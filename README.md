@@ -1,85 +1,66 @@
 [中文版](https://github.com/hanFengSan/eHunter/blob/master/README_CN.md)
+
 # eHunter
-Provide a scroll mode and book mode, for a better reading experience.
+Provide scroll mode and book mode for a better reading experience.
 
 # Preview
-![avatar](https://github.com/hanFengSan/eHunter/blob/master/github_image/github_preview_4.png?raw=true)
+<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_4.jpg" style="width: 800px; display: block; padding: 10px;"/>
+<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_5.jpg" style="width: 800px; display: block; padding: 10px;"/>
+<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg" style="width: 800px; display: block; padding: 10px;"/>
 
-![avatar](https://github.com/hanFengSan/eHunter/blob/master/github_image/github_preview_5_1.png?raw=true)
+# Use on iPhone and iPad
+eHunter can run on iPhone and iPad. See the guides below:
 
-![avatar](https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg)
+CN: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_cn.md)
+EN: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_en.md)
+JP: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_jp.md)
 
-# Use in iPad
-You can follow the guide to use eHunter in iPad:
-CN: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_cn.md)
-EN: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_en.md)
-
-## Implementation
-It creates a new element in the Eh page, and inject Vue components to provide a scroll mode and book mode.
+## Implementation Overview
+eHunter creates a new node on the original page and mounts Vue to that node.
+Content crawling/parsing is handled by fetch-based logic.
+The architecture isolates platform-specific behavior from reader UI logic, making migration to other comic platforms easier.
 
 ## Install
-Tampermonkey: [openuserjs](https://openuserjs.org/scripts/alexchen/eHunter)
-Chrome: coming soon
-Firefox: Coming soon
-
-You also can get it from the 'release' of this project.
+Violentmonkey/Tampermonkey/userscript: [openuserjs](https://openuserjs.org/scripts/alexchen/eHunter)
 
 ## Run
-1. In a Node environment, run `npm install`, and `npm run dev`, then you will in dev mode.
-2. In the top of `chrome://extensions`, open the develop mode, and select the `/dist`.
-3. Run `npm run publish` to package a zip file in `/publish_output` for the web store of Chrome and Firefox.
-4. Tampermonkey: run `npm run build`, and the `/dist/inject.js` is target, just use it.
-5. Run `npm run test` to test.
+1. Run `npm install`, then `npm run dev` for development mode.
+2. Run `npm run build-prod` to generate the userscript build.
 
-## Structure
+## Project Architecture
+The current project is based on `Vite + Vue 3 + TypeScript`, with two main goals:
+1. Inject a reader UI into target site pages.
+2. Keep platform parsing logic and reader rendering logic layered for maintainability and extension.
+
+Main directory responsibilities:
+
 ```
 |-eHunter
-  |-build
-    |-gulpfile.js // gulp file for packaging
-    |-webpack.dev.conf.js // webpack file for dev
-    |-webpack.prod.conf.js // webpack file for prod
-  |-dist // the directory of release 
   |-src
-    |-assets // resources
-      |-img // images
-      |-value
-        |-String.js // for i18n
-        |-tags.js // tags
-        |-version.js // the informations of update in this version
-    |-bean // bean classes
-    |-components // Vue components
-      |-widget // button, pagination, switch etc..
-        |-AlbumBookView.vue // the component of book mode
-        |-AlbumScrollView.vue // the component of scorll mode
-        |-ModalManager.vue // manage dialogs
-        |-PageView.vue // the component of page， loading in AlbumBookView and AlbumScrollView
-        |-ReaderView.vue // the component of reader，including of AlbumBookView, AlbumScrollView,ThumbScrollview and TopBar
-        |-ThumbScrollview.vue // the component of thumbnail column
-        |-TopBar.vue // top bar
-    |-service
-      |-parser // the parseres of Eh pages
-      |-request // the request classes.
-      |-storage
-        |-Base
-          |-Stroage.js // extend from react-native-storage, supporting chrome.storage.
-        |-AlbumCacheService.js // cache the urls of images, the size of images.
-        |-LocalStorage.js // wrap Storage.js，basing on the window.localStorage
-        |-SyncStorage.js //  wrap Storage.js，basing on the chrome.storage.sync. It can sync the datas with Cloud of Google.
-      |-api.js // the api of Eh
-      |-InfoService.js // show the dialog of instructions, the dialog of update, etc..
-      |-SettingServie.js // save settings and get 
-      |-PlatformService.js // some apis, for cross platfroms
-      |-StringService.js // provide strings of i18n
-    |-store // Vuex
-    |-style // the variables of sass, and the style of Markdown
-    |-utils
-        |-bezier-easing.js // using Cubic Bezier in the scroll of scroll mode
-        |-MdRenderer.js // the renderer of Markdown
-        |-VueUtil.js // add some frequently-used functions in Vue
-    |-app.inject.vue // the main components of Vue
-    |-app.popup.vue // the main components of Vue in popup window
-    |-main.inject.js // the entry of webpeck and some earlier stage processing before injecting view of Vue.
-    |-main.popup.js // the entry of webpeck. in popup window.
-    |-config.js // version and update server
-    |-mainifest.json // the mainifest for chrome and firefox extension
+  |  |-main.ts               // Entry: initialize and mount app (currently test mounting by default)
+  |  |-config.ts             // Runtime config
+  |  |-platform/             // Platform layer (site detection, initialization, service factory)
+  |     |-detector.ts        // Host/environment detection
+  |     |-initializer.ts     // Platform initialization flow
+  |     |-factory.ts         // Platform service creation
+  |     |-eh/                // EH/EXH implementation
+  |     |-nh/                // NH implementation
+  |     |-base/              // Cross-platform base capabilities (request, queue, retry)
+  |
+  |-core
+  |  |-App.vue               // Reader root component
+  |  |-components/           // View layer: book mode, scroll mode, thumbnails, top bar, dialogs
+  |  |-service/              // Business services (album data, download, retry policy)
+  |  |-store/                // State management (app state, event bus, i18n, layout preference)
+  |  |-model/                // Domain models (layout, book spread, thumb expand)
+  |  |-utils/                // Utilities
+  |  |-style/                // Global styles and theme variables
+  |
+  |-public/                  // Static assets
+  |-dist/                    // Build output
+  |-specs/                   // Feature/design specs
+  |-misc/                    // Docs and supporting materials
 ```
+
+Simplified call flow:
+`main.ts -> platform initialization (detect site + create platform services) -> core reader mount -> component rendering/interaction -> service/store coordinate data loading and state updates`.

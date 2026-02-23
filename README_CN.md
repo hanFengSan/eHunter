@@ -6,80 +6,59 @@
 <img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_5.jpg" style="width: 800px; display: block; padding: 10px;"/>
 <img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg" style="width: 800px; display: block; padding: 10px;"/>
 
-# 在iPad上使用
-现在可以在iPad上使用eHunter了！可参考以下指南：
-CN: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_cn.md)
-EN: [Link](https://github.com/hanFengSan/eHunter/blob/master/ipad_en.md)
+# 在iPhone和iPad上使用
+现在可以在iPhone和iPad上使用eHunter了！可参考以下指南：
+CN: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_cn.md)
+EN: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_en.md)
+JP: [Link](https://github.com/hanFengSan/eHunter/blob/master/misc/iphone_ipad_jp.md)
 
 ## 实现方式概要
 在在原页面上新创建一个节点, 将vue注入到此节点上. 爬虫是利用fetch实现的.
 实现上基本隔离了具体环境, 可很容易得移植到其他漫画网站/平台等.
 
 ## 获取
-油猴版本: [openuserjs](https://openuserjs.org/scripts/alexchen/eHunter)
-Chrome版本: 新版本即将上架
-Firefox版本: 新版本即将上架
+暴力猴/油猴/userscript版本: [openuserjs](https://openuserjs.org/scripts/alexchen/eHunter)
 
 
 ## 运行
-1. `npm install`后, 再`npm run dev`就可以进入dev模式了(当然,我个人喜好用yarn).
-2. 在`chrome://extensions`页面顶部打开开发者模式, 选择项目的`/dist`文件夹就OK了.
-3. `npm run publish`可以直接生成chrome&firefox用的zip压缩文件到`publish_output`文件夹.
-4. 油猴的话, `npm run build`后, `/dist/inject.js`就是目标文件.
-5. 运行`npm run test`执行单元测试.
+1. `npm install`后, 再`npm run dev`就可以进入dev模式了
+2. `npm run build-prod`可以直接生成userscript版本
 
 
-## 项目结构
-由于v1.0升级到v2.0时，有些弃用的功能以及相关文件，比如订阅通知等，所以有些杂物并未投入使用，以下不会说明。
+## 项目架构
+当前项目基于 `Vite + Vue 3 + TypeScript`，核心目标是：
+1. 在目标站点页面内注入阅读器 UI；
+2. 将平台解析逻辑与阅读器渲染逻辑分层，便于扩展和维护。
+
+主要目录职责如下：
+
 ```
 |-eHunter
-  |-build
-    |-gulpfile.js // 部署用的gulp脚本
-    |-webpack.dev.conf.js // 开发中打包用的webpack脚本
-    |-webpack.prod.conf.js // 生产中打包用的webpack脚本
-  |-dist // release文件夹
   |-src
-    |-assets // 资源文件夹
-      |-img // image files
-      |-value
-        |-String.js // 多语言化
-        |-tags.js // 标志
-        |-version.js // 新版本更新信息
-    |-bean // bean类
-    |-components // vue组件
-      |-widget // 按钮、分页组件、开关等小组件
-        |-AlbumBookView.vue // 书本模式组件
-        |-AlbumScrollView.vue // 滚动模式组件
-        |-ModalManager.vue // 弹窗管理组件
-        |-PageView.vue // 图片页组件， 装载于AlbumBookView和AlbumScrollView之中
-        |-ReaderView.vue // 阅读器组件，载入AlbumBookView、AlbumScrollView、ThumbScrollview和TopBar
-        |-ThumbScrollview.vue // 滚动缩略图栏组件
-        |-TopBar.vue // 顶栏组件
-    |-service // 业务类
-      |-parser // 解析页面用的各种praser类
-      |-request // 异步请求队列序列化/请求失败自动重试等功能的请求服务类
-      |-storage
-        |-Base
-          |-Stroage.js // 继承于react-native-storage，使得支持chrome.storage. 目前弃用了chrome.storage作为底层，而是使用window.localStorage
-        |-AlbumCacheService.js // 实现画廊中图片地址、图片数量、图片高宽等的缓存，加速浏览。队列化存储，支持10个画廊的缓存。
-        |-LocalStorage.js // 封装Storage.js，使用window.localStorage为底层
-        |-SyncStorage.js // 封装Storage.js，使用chrome.storage.sync为底层, 可在chrome上实现云端同步数据
-      |-api.js // 请求url的封装
-      |-InfoService.js // 消息服务类，实现弹窗用户引导等
-      |-SettingServie.js // 设置服务类
-      |-PlatformService.js // 平台接口的隔离层, 用于屏蔽各平台api上的差异
-      |-StringService.js // 提供多语言化
-    |-store // vuex相关
-    |-style // sass的变量以及markdown样式
-    |-utils // 工具类
-        |-bezier-easing.js // 二次贝塞尔曲线生成，用于滚动模式的滚动
-        |-MdRenderer.js // md解析类
-        |-VueUtil.js // vue的一些常用操作封装
-    |-app.inject.vue // vue主组件
-    |-app.popup.vue // 弹出框的vue主组件
-    |-background.js // chrome的后台任务, 目前并未使用
-    |-main.inject.js // webpack入口; vue注入前的前期处理
-    |-main.popup.js // webpack入口
-    |-config.js // 定义版本和更新查询接口
-    |-mainifest.json // chrome&firefox extension的文件/权限/说明用的清单
+  |  |-main.ts               // 入口：初始化并挂载应用（当前以测试挂载为主）
+  |  |-config.ts             // 运行时配置
+  |  |-platform/             // 平台层（站点识别、初始化、平台服务工厂）
+  |     |-detector.ts        // 域名/环境识别
+  |     |-initializer.ts     // 平台初始化流程
+  |     |-factory.ts         // 平台服务实例创建
+  |     |-eh/                // EH/EXH 平台实现
+  |     |-nh/                // NH 平台实现
+  |     |-base/              // 跨平台基础能力（请求、队列、重试等）
+  |
+  |-core
+  |  |-App.vue               // 阅读器根组件
+  |  |-components/           // 视图层：书页模式、卷轴模式、缩略图、工具栏、弹窗等
+  |  |-service/              // 业务服务层（相册数据、下载、重试策略）
+  |  |-store/                // 状态管理（应用状态、事件、i18n、布局偏好）
+  |  |-model/                // 领域模型（布局、跨页、缩略图展开等）
+  |  |-utils/                // 工具函数
+  |  |-style/                // 全局样式与主题变量
+  |
+  |-public/                  // 静态资源
+  |-dist/                    // 构建产物
+  |-specs/                   // 功能设计与方案文档
+  |-misc/                    // 说明文档与辅助资料
 ```
+
+简化调用链路：
+`main.ts -> platform 初始化（识别站点 + 创建平台服务）-> core 阅读器挂载 -> 组件渲染与交互 -> service/store 协同完成数据加载与状态更新`。
