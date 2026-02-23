@@ -4,8 +4,8 @@
 Provide scroll mode and book mode for a better reading experience.
 
 # Preview
-<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_4.jpg" style="width: 800px; display: block; padding: 10px;"/>
-<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_5.jpg" style="width: 800px; display: block; padding: 10px;"/>
+<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_4.png" style="width: 800px; display: block; padding: 10px;"/>
+<img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_5_1.png" style="width: 800px; display: block; padding: 10px;"/>
 <img src="https://raw.githubusercontent.com/hanFengSan/eHunter/master/github_image/github_preview_3.jpg" style="width: 800px; display: block; padding: 10px;"/>
 
 # Use on iPhone and iPad
