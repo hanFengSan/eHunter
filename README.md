@@ -21,7 +21,7 @@ Content crawling/parsing is handled by fetch-based logic.
 The architecture isolates platform-specific behavior from reader UI logic, making migration to other comic platforms easier.
 
 ## Install
-Violentmonkey/Tampermonkey/userscript: [openuserjs](https://openuserjs.org/scripts/alexchen/eHunter)
+Tampermonkey/userscript: [openuserjs](https://openuserjs.org/scripts/alexchen/eHunter)
 
 ## Run
 1. Run `npm install`, then `npm run dev` for development mode.
