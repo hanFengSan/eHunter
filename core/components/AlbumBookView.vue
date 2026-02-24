@@ -231,6 +231,11 @@ function onClickBg(e: any) {
             position: absolute;
             box-sizing: border-box;
             box-shadow: 0px 19px 10px -8px rgba(0,0,0,0.35);
+            overflow: visible;
+
+            &:hover {
+                z-index: 13050 !important;
+            }
         }
     }
 
@@ -295,7 +300,7 @@ function onClickBg(e: any) {
             }
 
             > .book-page-container {
-                overflow: hidden;
+                overflow: visible;
 
                 &::after {
                     content: '';

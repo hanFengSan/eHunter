@@ -137,7 +137,7 @@ export interface SettingFieldDefinition {
     showInDialog: boolean
     dialogCategory?: SettingsPanelCategory
     dropKey?: 'readingModeList' | 'bookDirection' | 'pageTurnAnimation' | 'langList'
-    numKey?: 'widthScale' | 'loadNum' | 'downloadChunkSize' | 'volumeSize' | 'pagesPerScreen' | 'autoFlipFrequency' | 'wheelSensitivity' | 'scrollPageMargin'
+    numKey?: 'widthScale' | 'loadNum' | 'downloadChunkSize' | 'volumeSize' | 'pagesPerScreen' | 'autoFlipFrequency' | 'wheelSensitivity' | 'scrollPageMargin' | 'magnifierZoom' | 'magnifierAreaSize'
     min?: number
     max?: number
     useAbbrName?: boolean
@@ -251,6 +251,32 @@ export const settingFieldDefinitions: SettingFieldDefinition[] = [
         showInTopBar: true,
         showInDialog: true,
         dialogCategory: 'general',
+    },
+    {
+        id: 'magnifierZoom',
+        control: 'num',
+        labelI18nKey: 'magnifierZoom',
+        tipI18nKey: 'magnifierZoomTip',
+        modeScope: 'both',
+        showInTopBar: false,
+        showInDialog: true,
+        dialogCategory: 'general',
+        numKey: 'magnifierZoom',
+        min: 2,
+        max: 5,
+    },
+    {
+        id: 'magnifierAreaSize',
+        control: 'num',
+        labelI18nKey: 'magnifierAreaSize',
+        tipI18nKey: 'magnifierAreaSizeTip',
+        modeScope: 'both',
+        showInTopBar: false,
+        showInDialog: true,
+        dialogCategory: 'general',
+        numKey: 'magnifierAreaSize',
+        min: 20,
+        max: 300,
     },
     {
         id: 'widthScale',
@@ -659,6 +685,8 @@ function persistUnifiedSettingsState() {
             showBookThumbView: store.showBookThumbView,
             IsReverseBookWheeFliplDirection: store.IsReverseBookWheeFliplDirection,
             wheelSensitivity: store.wheelSensitivity,
+            magnifierZoom: store.magnifierZoom,
+            magnifierAreaSize: store.magnifierAreaSize,
             lang: lang.value,
             autoRetryByOtherSource: store.autoRetryByOtherSource,
             hasShownWelcomeInstruction: store.hasShownWelcomeInstruction,
@@ -692,6 +720,8 @@ function applyUnifiedSettingsPreference() {
         ['bookDirection', 'bookDirection'],
         ['autoFlipFrequency', 'autoFlipFrequency'],
         ['wheelSensitivity', 'wheelSensitivity'],
+        ['magnifierZoom', 'magnifierZoom'],
+        ['magnifierAreaSize', 'magnifierAreaSize'],
     ]
     for (const [sourceKey, targetKey] of numberFields) {
         if (typeof setting[sourceKey] === 'number' && Number.isFinite(setting[sourceKey])) {
@@ -854,6 +884,8 @@ export const store = reactive({
     wheelSensitivity: 100,
     scrollPageMargin: 70,
     autoRetryByOtherSource: true,
+    magnifierZoom: 3,
+    magnifierAreaSize: 80,
     hasShownWelcomeInstruction: false,
     hasShownBookInstruction: false,
     lastSeenVersionNotice: '',
@@ -1004,6 +1036,14 @@ export const settingConf = {
     },
     wheelSensitivity: {
         list: [10, 30, 50, 80, 100, 120, 150, 170, 200, 220, 250],
+    },
+    magnifierZoom: {
+        list: [2, 3, 4, 5],
+        suffix: 'x'
+    },
+    magnifierAreaSize: {
+        list: [50, 80, 120, 150],
+        suffix: 'px'
     },
     scrollPageMargin: {
         list: [0, 30, 70, 100, 150],
@@ -1179,6 +1219,10 @@ export const storeAction = {
         store.isChangeOddEven = !store.isChangeOddEven
         persistUnifiedSettingsState()
     },
+    toggleOddEvenFromPageMenu: () => {
+        store.isChangeOddEven = !store.isChangeOddEven
+        persistUnifiedSettingsState()
+    },
     toggleIsReverseFlip: () => {
         store.isReverseFlip = !store.isReverseFlip
         persistUnifiedSettingsState()
@@ -1206,6 +1250,14 @@ export const storeAction = {
     },
     setScrollPageMargin: (val: number) => {
         store.scrollPageMargin = val
+        persistUnifiedSettingsState()
+    },
+    setMagnifierZoom: (val: number) => {
+        store.magnifierZoom = Math.max(2, Math.min(5, Math.round(val)))
+        persistUnifiedSettingsState()
+    },
+    setMagnifierAreaSize: (val: number) => {
+        store.magnifierAreaSize = Math.max(20, Math.min(300, Math.round(val)))
         persistUnifiedSettingsState()
     },
     setLang: (val: string) => {

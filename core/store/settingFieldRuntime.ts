@@ -21,6 +21,8 @@ export function getFieldValue(id: string): any {
         case 'showBookThumbView': return store.showBookThumbView
         case 'IsReverseBookWheeFliplDirection': return store.IsReverseBookWheeFliplDirection
         case 'wheelSensitivity': return store.wheelSensitivity
+        case 'magnifierZoom': return store.magnifierZoom
+        case 'magnifierAreaSize': return store.magnifierAreaSize
         case 'lang': return i18n.value.lang
         case 'autoRetryByOtherSource': return store.autoRetryByOtherSource
         default: return null
@@ -47,6 +49,8 @@ export function setFieldValue(id: string, val: any): void {
         case 'showBookThumbView': if (store.showBookThumbView !== val) storeAction.toggleShowBookThumbView(); break
         case 'IsReverseBookWheeFliplDirection': if (store.IsReverseBookWheeFliplDirection !== val) storeAction.toggleIsReverseBookWheeFliplDirection(); break
         case 'wheelSensitivity': storeAction.setWheelSensitivity(val); break
+        case 'magnifierZoom': storeAction.setMagnifierZoom(val); break
+        case 'magnifierAreaSize': storeAction.setMagnifierAreaSize(val); break
         case 'lang': storeAction.setLang(val); break
         case 'autoRetryByOtherSource': storeAction.setAutoRetryByOtherSource(val); break
     }

@@ -1,6 +1,11 @@
 <template>
     <div class="book-page-view">
-        <PageView v-if="index >= 0 && index < store.pageCount" :index="index" :active="active" :active-load="activeLoad"/>
+        <PageView
+            v-if="index >= 0 && index < store.pageCount"
+            :index="index"
+            :active="active"
+            :active-load="activeLoad"
+            @toggle-odd-even="onToggleOddEven"/>
         <div class="page start-page" v-if="index == -1">
             <div :class="['ehunter-tag', { 'left': store.bookDirection === 1 }]">EHUNTER</div>
             <h1>{{ store.albumTitle }}</h1>
@@ -15,11 +20,16 @@
 <script lang="ts" setup>
 import PageView from './PageView.vue'
 import {store} from '../store/app'
+import { storeAction } from '../store/app'
 const props = defineProps<{
     index: number,
     active: boolean,
     activeLoad: boolean,
 }>()
+
+function onToggleOddEven() {
+    storeAction.toggleOddEvenFromPageMenu()
+}
 </script>
 
 <style lang="scss" scoped>
