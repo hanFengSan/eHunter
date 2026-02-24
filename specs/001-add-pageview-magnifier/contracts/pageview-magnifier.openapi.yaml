@@ -1,0 +1,249 @@
+openapi: 3.0.3
+info:
+  title: PageView Magnifier Menu Contract
+  version: 1.0.0
+  description: >-
+    Contract for PageView contextual menu interactions, desktop-only magnifier control,
+    book/scroll mode action visibility, and platform-gated load-original behavior.
+servers:
+  - url: https://ehunter.local
+paths:
+  /reader/pageview/{pageViewId}/menu/open:
+    post:
+      summary: Open contextual menu for a PageView
+      operationId: openPageViewMenu
+      parameters:
+        - name: pageViewId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuOpenRequest'
+      responses:
+        '200':
+          description: Menu state returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageMenuState'
+        '400':
+          description: Invalid trigger context
+
+  /reader/pageview/{pageViewId}/menu/actions/toggle-magnifier:
+    post:
+      summary: Toggle magnifier for current PageView
+      operationId: toggleMagnifier
+      parameters:
+        - name: pageViewId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated magnifier state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagnifierState'
+        '409':
+          description: Magnifier unavailable in current context
+
+  /reader/pageview/{pageViewId}/menu/actions/zoom:
+    post:
+      summary: Increase or decrease magnifier zoom level
+      operationId: changeMagnifierZoom
+      parameters:
+        - name: pageViewId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [direction]
+              properties:
+                direction:
+                  type: string
+                  enum: [in, out]
+      responses:
+        '200':
+          description: Zoom level updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagnifierState'
+        '409':
+          description: Zoom action not available
+
+  /reader/pageview/{pageViewId}/menu/actions/load-original:
+    post:
+      summary: Load original image source for current PageView
+      operationId: loadOriginalSource
+      parameters:
+        - name: pageViewId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Original source loading triggered
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [accepted, sourceMode]
+                properties:
+                  accepted:
+                    type: boolean
+                    enum: [true]
+                  sourceMode:
+                    type: string
+                    enum: [original]
+        '409':
+          description: Platform does not support source refresh
+
+  /reader/pageview/{pageViewId}/menu/actions/toggle-odd-even:
+    post:
+      summary: Toggle odd/even mode in book mode
+      operationId: toggleOddEven
+      parameters:
+        - name: pageViewId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Odd/even mode updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [readingMode, oddEvenState]
+                properties:
+                  readingMode:
+                    type: string
+                    enum: [book]
+                  oddEvenState:
+                    type: string
+                    enum: [odd, even]
+        '409':
+          description: Action unavailable outside book mode
+
+components:
+  schemas:
+    InputDeviceType:
+      type: string
+      enum: [desktop, mobile]
+
+    ReadingMode:
+      type: string
+      enum: [scroll, book]
+
+    MenuOpenTrigger:
+      type: string
+      enum: [scroll-click, scroll-longpress-500ms, book-center-click]
+
+    MenuOpenRequest:
+      type: object
+      required:
+        - readingMode
+        - deviceType
+        - trigger
+      properties:
+        readingMode:
+          $ref: '#/components/schemas/ReadingMode'
+        deviceType:
+          $ref: '#/components/schemas/InputDeviceType'
+        trigger:
+          $ref: '#/components/schemas/MenuOpenTrigger'
+        inBookCenterWhitespace:
+          type: boolean
+
+    MagnifierZoom:
+      type: string
+      enum: [2x, 3x, 4x, 5x]
+
+    MagnifierState:
+      type: object
+      required:
+        - enabled
+        - zoomLevel
+        - lensVisible
+        - focusIndicatorVisible
+      properties:
+        enabled:
+          type: boolean
+        zoomLevel:
+          $ref: '#/components/schemas/MagnifierZoom'
+        lensVisible:
+          type: boolean
+        focusIndicatorVisible:
+          type: boolean
+        lensSide:
+          type: string
+          enum: [left, right]
+
+    PageMenuAction:
+      type: object
+      required:
+        - actionKey
+        - visible
+        - enabled
+      properties:
+        actionKey:
+          type: string
+          enum: [toggleMagnifier, loadOriginal, toggleOddEven, zoomIn, zoomOut]
+        visible:
+          type: boolean
+        enabled:
+          type: boolean
+        disabledReason:
+          type: string
+
+    PageMenuActionBehaviorNote:
+      type: object
+      required: [loadOriginalVisibility, loadOriginalUnsupportedBehavior, oddEvenVisibility]
+      properties:
+        loadOriginalVisibility:
+          type: string
+          enum: [always-visible]
+        loadOriginalUnsupportedBehavior:
+          type: string
+          enum: [disabled-with-reason]
+        oddEvenVisibility:
+          type: string
+          enum: [book-mode-only]
+
+    PageMenuState:
+      type: object
+      required:
+        - pageViewId
+        - readingMode
+        - deviceType
+        - actions
+        - magnifierState
+      properties:
+        pageViewId:
+          type: string
+        readingMode:
+          $ref: '#/components/schemas/ReadingMode'
+        deviceType:
+          $ref: '#/components/schemas/InputDeviceType'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageMenuAction'
+        magnifierState:
+          $ref: '#/components/schemas/MagnifierState'
