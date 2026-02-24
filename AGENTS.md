@@ -145,6 +145,8 @@
 - TypeScript 5.9 + Vue 3.5.28, Vite 6.4.1, vite-svg-loader 5.1.0 (001-platform-injection)
 - TypeScript 5.9 + Vue 3.5 SFC + SCSS + Vue runtime (`vue`), existing `AlbumService`/store modules, zip generation library (`jszip`), YAML serialization library (`yaml`) (001-gallery-download-bundle)
 - Userscript storage preference via existing unified settings persistence (`GM_*` first, platform/local fallback) (001-gallery-download-bundle)
+- TypeScript 5.9 + Vue 3.5 SFC + SCSS + Vue runtime, existing core components (`PageView`, `BookPageView`, `MoreMenuPopover` pattern), existing store/actions and platform capability checks (001-add-pageview-magnifier)
+- In-memory session state only for magnifier toggle/zoom inheritance within one reading session (no persistent storage) (001-add-pageview-magnifier)
 
 ## Recent Changes
 - 001-add-pageflip-toggle: Added TypeScript 5.9 + Vue 3.5 (Vite 6) + Vue 3 runtime, existing core widget components, existing i18n/store modules
