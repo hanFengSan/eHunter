@@ -1,5 +1,14 @@
 <template>
-<section class="page-view" @click="onClickBg()">
+<section
+    ref="pageViewRef"
+    class="page-view"
+    @click="onClickBg"
+    @mousemove="onMouseMove"
+    @mouseleave="onMouseLeave"
+    @touchstart="onTouchStart"
+    @touchmove="onTouchMove"
+    @touchend="onTouchEnd"
+    @touchcancel="onTouchCancel">
     <div class="layer preview-layer">
         <ThumbView class="preview-thumb" :thumb-info="store.thumbInfos[index]" />
     </div>
@@ -10,26 +19,26 @@
                 <p class="loading-info" v-if="curLoadStatus!=ImgLoadStatus.Loaded" @click.stop="() => {}">
                     <span class="text">{{ loadingInfo }}</span>
                     <span class="operation">
-                        <FlatButton 
-                            class="tips tips-down no-margin" 
-                            :title-content="i18n.originImgTip" 
-                            :label="i18n.originImg" 
-                            mode="inline" 
+                        <FlatButton
+                            class="tips tips-down no-margin"
+                            :title-content="i18n.originImgTip"
+                            :label="i18n.originImg"
+                            mode="inline"
                             type="positive"
                             v-if="albumService.isSupportOriginImg()"
                             @click="getNewImgSrc(ImgSrcMode.Origin)" />
-                        <FlatButton 
-                            class="tips tips-down" 
-                            :title-content="i18n.refreshTip" 
-                            :label="i18n.refresh" 
-                            mode="inline" 
+                        <FlatButton
+                            class="tips tips-down"
+                            :title-content="i18n.refreshTip"
+                            :label="i18n.refresh"
+                            mode="inline"
                             type="positive"
                             @click="getNewImgSrc(ImgSrcMode.Default)" />
-                        <FlatButton 
-                            class="tips tips-down" 
-                            :title-content="i18n.refreshByOtherSourceTip" 
-                            :label="i18n.refreshByOtherSource" 
-                            mode="inline" 
+                        <FlatButton
+                            class="tips tips-down"
+                            :title-content="i18n.refreshByOtherSourceTip"
+                            :label="i18n.refreshByOtherSource"
+                            mode="inline"
                             type="positive"
                             v-if="albumService.isSupportImgChangeSource()"
                             @click="getNewImgSrc(ImgSrcMode.ChangeSource)" />
@@ -39,198 +48,326 @@
         </article>
     </div>
     <div class="layer img-layer">
-        <img class="album-item" 
-            v-if="active && imgPageInfo && imgPageInfo.src" 
-            :src="imgPageInfo.src" 
+        <img
+            ref="imgRef"
+            class="album-item"
+            v-if="active && imgPageInfo && imgPageInfo.src"
+            :src="imgPageInfo.src"
             @load="loaded()"
             @error="failLoad($event)">
+    </div>
+
+    <div class="layer menu-layer" v-if="menuOpen" @click.stop>
+        <div class="menu-anchor" :style="menuAnchorStyle">
+            <Popover :active="menuOpen" :custom-style="{ 'margin-left': '0px', 'margin-top': '0px' }" @close="closeMenu">
+                <div class="page-menu-options no-select">
+                    <button
+                        v-if="showMagnifierToggleAction"
+                        type="button"
+                        class="item"
+                        @click="toggleMagnifierFromMenu">
+                        <span>{{ magnifierEnabled ? i18n.closeMagnifier : i18n.openMagnifier }}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        :class="['item', { disabled: !loadOriginalEnabled }]"
+                        :title="loadOriginalDisabledReason"
+                        @click="loadOriginalFromMenu">
+                        <span>{{ i18n.originImg }}</span>
+                        <small v-if="!loadOriginalEnabled">{{ loadOriginalDisabledReason }}</small>
+                    </button>
+
+                    <button
+                        v-if="showOddEvenAction"
+                        type="button"
+                        class="item"
+                        @click="toggleOddEvenFromMenu">
+                        <span>{{ i18n.oddEven }}</span>
+                    </button>
+
+                    <button
+                        v-if="showMagnifierZoomActions"
+                        type="button"
+                        class="item"
+                        :disabled="magnifierZoom >= 5"
+                        @click="changeMagnifierZoom(1)">
+                        <span>{{ i18n.zoomInMagnifier }}</span>
+                    </button>
+
+                    <button
+                        v-if="showMagnifierZoomActions"
+                        type="button"
+                        class="item"
+                        :disabled="magnifierZoom <= 2"
+                        @click="changeMagnifierZoom(-1)">
+                        <span>{{ i18n.zoomOutMagnifier }}</span>
+                    </button>
+
+                    <button
+                        v-if="showMagnifierZoomActions"
+                        type="button"
+                        class="item"
+                        :disabled="magnifierAreaSize >= 150"
+                        @click="changeMagnifierAreaSize(1)">
+                        <span>{{ i18n.increaseMagnifierArea }}</span>
+                    </button>
+
+                    <button
+                        v-if="showMagnifierZoomActions"
+                        type="button"
+                        class="item"
+                        :disabled="magnifierAreaSize <= 50"
+                        @click="changeMagnifierAreaSize(-1)">
+                        <span>{{ i18n.decreaseMagnifierArea }}</span>
+                    </button>
+                </div>
+            </Popover>
+        </div>
+    </div>
+
+    <div v-if="showFocusIndicator" class="focus-indicator" :style="focusIndicatorStyle"></div>
+    <div v-if="showMagnifierLens" class="magnifier-lens" :style="magnifierLensStyle">
+        <canvas ref="magnifierCanvasRef" class="magnifier-canvas" v-show="lensWarmState === 'ready'"></canvas>
+        <div class="magnifier-pending" v-if="showMagnifierPending">
+            <span class="spinner"></span>
+            <span>{{ i18n.loadingImg }}</span>
+        </div>
     </div>
 </section>
 </template>
 
 <script setup lang="ts">
 import FlatButton from './widget/FlatButton.vue'
+import Popover from './widget/Popover.vue'
 import ThumbView from './ThumbView.vue'
-import { inject, ref, computed, watch, nextTick, onMounted } from 'vue'
+import { inject, ref, computed, watch, onMounted } from 'vue'
 import { store, storeAction } from '../store/app'
 import { NameAlbumService } from '../service/AlbumService'
 import type { AlbumService } from '../service/AlbumService'
 import { ImgSrcMode } from '../model/model'
 import { i18n } from '../store/i18n'
-import Utils from '../utils/Utils'
-import Logger from '../utils/Logger'
-import { buildRetryQueueAfterFailure as buildImageRetryQueueAfterFailure } from '../service/imageRetryPolicy'
+import { usePageMenu } from './composables/usePageMenu'
+import { useMagnifier } from './composables/useMagnifier'
+import { usePageImageLoader, ImgLoadStatus } from './composables/usePageImageLoader'
+import { useTouchLongPress } from './composables/useTouchLongPress'
+
+type MagnifierSessionPreference = {
+    enabled: boolean,
+}
+
+const MAGNIFIER_SESSION_KEY = '__ehunterMagnifierSessionState__'
+const sharedMagnifierSessionHost = globalThis as typeof globalThis & Record<typeof MAGNIFIER_SESSION_KEY, MagnifierSessionPreference | undefined>
+if (!sharedMagnifierSessionHost[MAGNIFIER_SESSION_KEY]) {
+    sharedMagnifierSessionHost[MAGNIFIER_SESSION_KEY] = {
+        enabled: false,
+    }
+}
+const magnifierSessionState = sharedMagnifierSessionHost[MAGNIFIER_SESSION_KEY] as MagnifierSessionPreference
 
 const props = defineProps<{
     index: number,
     active: boolean,
+    activeLoad?: boolean,
 }>()
 
-enum ImgLoadStatus {
-    Waiting = 0,
-    Loading = 1,
-    Error = 2,
-    Loaded = 3,
-}
-
-const emit = defineEmits(['clickBackground'])
-
+const emit = defineEmits(['clickBackground', 'toggleOddEven'])
 const albumService = <AlbumService>inject(NameAlbumService)
 
-const reloadTimes = ref(0)
-const message = ref('')
-const curLoadStatus = ref(ImgLoadStatus.Waiting) // 0:waiting, 1:loading, 2:error, 3:loaded
-const lastLoadMode = ref(ImgSrcMode.Default)
-const autoRetryQueue = ref<ImgSrcMode[]>([])
-const isAutoRetryRunning = ref(false)
-const isAutoRetryExhausted = ref(false)
+const pageViewRef = ref<HTMLElement | null>(null)
+const imgRef = ref<HTMLImageElement | null>(null)
+const magnifierCanvasRef = ref<HTMLCanvasElement | null>(null)
+const menuOwnerId = `pageview-menu-${props.index}`
 
-const imgPageInfo = computed(() => {
-    return storeAction.getImgPageInfo(props.index)
+const touchLongPressMs = 500
+const touchMoveTolerance = 10
+const menuAreaSizeOptions = [50, 80, 120, 150]
+const pendingRevealDelayMs = 120
+const lensGap = 6
+
+const imgPageInfo = computed(() => storeAction.getImgPageInfo(props.index))
+const isBookMode = computed(() => store.readingMode === 1)
+const isDesktopPointer = computed(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+        return true
+    }
+    return window.matchMedia('(hover: hover) and (pointer: fine)').matches
 })
 
-async function loadImgSrc(mode: ImgSrcMode) {
-    lastLoadMode.value = mode
-    isAutoRetryExhausted.value = false
-    let resp = await albumService.getImgSrc(props.index, mode)
-    if (resp instanceof Error) {
-        if (mode === ImgSrcMode.Default) {
-            autoRetryQueue.value = buildRetryQueueAfterFailure(mode)
-            await runAutoRetryQueue()
-        }
-        return;
-    }
-    if (imgPageInfo.value.src != resp.src) {
-        storeAction.setImgPageInfoSrc(props.index, resp.src)
-    }
-    if (resp.preciseHeightOfWidth && imgPageInfo.value.preciseHeightOfWidth != resp.preciseHeightOfWidth) {
-        storeAction.setImgPageInfoPreciseHeightOfWidth(props.index, resp.preciseHeightOfWidth)
-    }
-}
+const showMagnifierToggleAction = computed(() => isDesktopPointer.value)
+const showOddEvenAction = computed(() => isBookMode.value)
+const magnifierZoom = computed(() => Math.max(2, Math.min(5, Math.round(store.magnifierZoom || 3))))
+const magnifierAreaSize = computed(() => Math.max(20, Math.min(300, Math.round(store.magnifierAreaSize || 80))))
 
-function getRetryPolicyOptions() {
-    return {
-        autoRetryByOtherSource: store.autoRetryByOtherSource,
-        supportChangeSource: albumService.isSupportImgChangeSource(),
-    }
-}
+const loadOriginalEnabled = computed(() => albumService.isSupportImgChangeSource())
+const loadOriginalDisabledReason = computed(() => i18n.value.notSupportedInCurrentPlatform || i18n.value.disabled)
 
-function buildRetryQueueAfterFailure(failedMode: ImgSrcMode): ImgSrcMode[] {
-    return buildImageRetryQueueAfterFailure(failedMode, getRetryPolicyOptions())
-}
+const {
+    menuOpen,
+    menuAnchorStyle,
+    openMenuAt,
+    closeMenu,
+} = usePageMenu({
+    pageViewRef,
+    menuOwnerId,
+})
 
-async function runAutoRetryQueue() {
-    if (isAutoRetryRunning.value) {
-        return
-    }
-    isAutoRetryRunning.value = true
-    try {
-        while (autoRetryQueue.value.length > 0) {
-            const mode = autoRetryQueue.value.shift()
-            if (mode === undefined) {
-                break
-            }
-            const loaded = await getNewImgSrc(mode, true)
-            if (loaded) {
-                // Wait for img onload/onerror to continue.
-                return
-            }
-        }
-        isAutoRetryExhausted.value = true
-    } finally {
-        isAutoRetryRunning.value = false
-    }
-}
+const {
+    magnifierEnabled,
+    lensWarmState,
+    showFocusIndicator,
+    showMagnifierLens,
+    showMagnifierPending,
+    focusIndicatorStyle,
+    magnifierLensStyle,
+    warmMagnifierSource,
+    updateLensPosition,
+    hideMagnifierPointerArtifacts,
+    onMouseMove,
+    onMouseLeave,
+    toggleMagnifier,
+    setEnabledFromSession,
+} = useMagnifier({
+    pageViewRef,
+    imgRef,
+    magnifierCanvasRef,
+    imgSrc: computed(() => imgPageInfo.value?.src || ''),
+    isDesktopPointer,
+    magnifierZoom,
+    magnifierAreaSize,
+    pendingRevealDelayMs,
+    lensGap,
+    onSyncEnabled: (enabled) => {
+        magnifierSessionState.enabled = enabled
+    },
+})
 
-const loadingInfo = computed(() => {
-    let reloadInfo = reloadTimes.value ? `[${i18n.value.reload}-${reloadTimes.value}] ` : '';
-    if (message.value) {
-        return reloadInfo + message.value;
-    }
-    switch (curLoadStatus.value) {
-        case ImgLoadStatus.Error:
-            return reloadInfo + i18n.value.loadingImgFailed
-        case ImgLoadStatus.Loaded:
-            return reloadInfo + i18n.value.imgLoaded
-        case ImgLoadStatus.Waiting:
-            return reloadInfo + i18n.value.waiting
-        case ImgLoadStatus.Loading:
-        default:
-            return reloadInfo + i18n.value.loadingImg
-    }
+const showMagnifierZoomActions = computed(() => isDesktopPointer.value && magnifierEnabled.value)
+
+const {
+    curLoadStatus,
+    loadingInfo,
+    loadImgSrc,
+    getNewImgSrc,
+    failLoad,
+    loaded,
+} = usePageImageLoader({
+    index: props.index,
+    albumService,
+    imgPageInfo,
+    warmMagnifierSource,
+})
+
+const {
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+    onTouchCancel,
+} = useTouchLongPress({
+    touchLongPressMs,
+    touchMoveTolerance,
+    shouldHandle: () => !isBookMode.value && !isDesktopPointer.value,
+    onLongPress: (x, y) => openMenuAt(x, y),
 })
 
 onMounted(() => {
     if (props.active && !imgPageInfo.value.src) {
-        loadImgSrc(ImgSrcMode.Default)
+        void loadImgSrc(ImgSrcMode.Default)
+    } else if (imgPageInfo.value.src) {
+        void warmMagnifierSource(imgPageInfo.value.src)
     }
+    setEnabledFromSession(magnifierSessionState.enabled)
 })
 
 watch(() => props.active, (newVal) => {
     if (newVal && !imgPageInfo.value.src) {
-        loadImgSrc(ImgSrcMode.Default)
+        void loadImgSrc(ImgSrcMode.Default)
+        return
+    }
+    if (newVal && imgPageInfo.value.src) {
+        void warmMagnifierSource(imgPageInfo.value.src)
     }
 })
 
-async function getNewImgSrc(mode: ImgSrcMode, isAutoRetry = false): Promise<boolean> {
-    if (!isAutoRetry) {
-        autoRetryQueue.value = []
-    }
-    isAutoRetryExhausted.value = false
-    reloadTimes.value++
-    message.value = ''
-    storeAction.setImgPageInfoSrc(props.index, '')
-    curLoadStatus.value = ImgLoadStatus.Loading
-    lastLoadMode.value = mode
-    let resp = await albumService.getImgSrc(props.index, mode)
-    if (resp instanceof Error) {
-        switch (resp.message) {
-            case 'ERROR_NO_ORIGIN':
-                message.value = i18n.value.noOriginalImg
-                break
-            default:
-                message.value = i18n.value.loadingFailed
-        }
-        if (isAutoRetry) {
-            return false
-        }
-        autoRetryQueue.value = buildRetryQueueAfterFailure(mode)
-        await runAutoRetryQueue()
-        return false
-    }
-    await nextTick()
-    await Utils.timeout(300)
-    if (imgPageInfo.value.src != resp.src) {
-        storeAction.setImgPageInfoSrc(props.index, resp.src)
-    }
-    if (resp.preciseHeightOfWidth && imgPageInfo.value.preciseHeightOfWidth != resp.preciseHeightOfWidth) {
-        storeAction.setImgPageInfoPreciseHeightOfWidth(props.index, resp.preciseHeightOfWidth)
-    }
-    return true
+watch(() => props.index, () => {
+    setEnabledFromSession(magnifierSessionState.enabled)
+    hideMagnifierPointerArtifacts()
+})
+
+function clamp(val: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, val))
 }
 
-function failLoad(e) {
-    e.preventDefault()
-    if (imgPageInfo.value.src) {
-        curLoadStatus.value = ImgLoadStatus.Error;
-        Logger.logText('LOADING', 'loading image failed')
-        if (!isAutoRetryExhausted.value && autoRetryQueue.value.length === 0) {
-            autoRetryQueue.value = buildRetryQueueAfterFailure(lastLoadMode.value)
+function isInBookCenterRegion(clientY: number) {
+    return clientY >= store.viewportHeight * 0.3 && clientY <= store.viewportHeight * 0.7
+}
+
+function toggleMagnifierFromMenu() {
+    if (!isDesktopPointer.value) {
+        return
+    }
+    toggleMagnifier()
+    closeMenu()
+}
+
+function toggleOddEvenFromMenu() {
+    emit('toggleOddEven')
+    closeMenu()
+}
+
+function changeMagnifierZoom(step: number) {
+    const next = clamp(magnifierZoom.value + step, 2, 5)
+    storeAction.setMagnifierZoom(next)
+    updateLensPosition()
+    closeMenu()
+}
+
+function changeMagnifierAreaSize(step: number) {
+    const current = magnifierAreaSize.value
+    const sorted = menuAreaSizeOptions.slice().sort((a, b) => a - b)
+    if (step > 0) {
+        const next = sorted.find(item => item > current)
+        if (next !== undefined) {
+            storeAction.setMagnifierAreaSize(next)
         }
-        if (autoRetryQueue.value.length > 0) {
-            Logger.logText('LOADING', 'reloading image')
-            runAutoRetryQueue()
+    } else {
+        const prev = sorted.slice().reverse().find(item => item < current)
+        if (prev !== undefined) {
+            storeAction.setMagnifierAreaSize(prev)
         }
     }
+    updateLensPosition()
+    closeMenu()
 }
 
-function loaded() {
-    curLoadStatus.value = ImgLoadStatus.Loaded;
-    autoRetryQueue.value = []
-    isAutoRetryExhausted.value = false
+function loadOriginalFromMenu() {
+    if (!loadOriginalEnabled.value) {
+        return
+    }
+    void getNewImgSrc(ImgSrcMode.Origin)
+    closeMenu()
 }
 
-function onClickBg() {
+function onClickBg(e: MouseEvent) {
+    if (menuOpen.value) {
+        closeMenu()
+        return
+    }
+    if (isBookMode.value) {
+        if (isInBookCenterRegion(e.clientY)) {
+            e.stopPropagation()
+            openMenuAt(e.clientX, e.clientY)
+            return
+        }
+        emit('clickBackground')
+        return
+    }
+
+    if (isDesktopPointer.value) {
+        e.stopPropagation()
+        openMenuAt(e.clientX, e.clientY)
+        return
+    }
     emit('clickBackground')
 }
 </script>
@@ -251,7 +388,7 @@ span {
     left: 0;
     right: 0;
     transition: all 0.3s ease;
-    overflow: hidden;
+    overflow: visible;
     > .layer {
         position: absolute;
         top: 0;
@@ -326,6 +463,118 @@ span {
             min-width: inherit;
             height: inherit;
         }
+    }
+}
+
+.menu-layer {
+    z-index: 12010;
+    pointer-events: auto;
+
+    > .menu-anchor {
+        position: absolute;
+        width: 0;
+        height: 0;
+
+        :deep(.popover) {
+            min-width: 170px;
+            z-index: 12020;
+        }
+    }
+}
+
+.page-menu-options {
+    flex-direction: column;
+    min-width: 170px;
+
+    > .item {
+        border: 0;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px 12px;
+        color: rgba(0, 0, 0, 0.82);
+        transition: all 0.2s ease;
+        width: 100%;
+        font-size: 13px;
+
+        > small {
+            margin-top: 3px;
+            color: rgba(0, 0, 0, 0.45);
+            font-size: 11px;
+        }
+
+        &:hover {
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.08);
+            color: $accent_color;
+        }
+
+        &:disabled,
+        &.disabled {
+            cursor: not-allowed;
+            color: rgba(0, 0, 0, 0.45);
+            background: rgba(0, 0, 0, 0.03);
+        }
+    }
+}
+
+.focus-indicator {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.3);
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 12005;
+}
+
+.magnifier-lens {
+    position: absolute;
+    border: 2px solid $accent_color;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba($accent_color, 0.8);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+    z-index: 12009;
+
+    > .magnifier-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    > .magnifier-pending {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.92);
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.16));
+
+        > .spinner {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: rgba(255, 255, 255, 0.95);
+            animation: magnifier-spin 0.7s linear infinite;
+        }
+    }
+}
+
+@keyframes magnifier-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
     }
 }
 </style>
