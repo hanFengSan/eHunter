@@ -290,9 +290,9 @@ export default <any>{
         jp: 'eHunter閉じる'
     },
     toggleTopBar: {
-        cn: '显示/隐藏顶栏 [Esc]',
-        en: 'Show/hide top bar [Esc]',
-        jp: 'トップバーの表示/非表示 [Esc]'
+        cn: '显示/隐藏顶栏',
+        en: 'Show/hide top bar',
+        jp: 'トップバーの表示/非表示'
     },
     toggleMoreSettings: {
         cn: '显示/隐藏更多设置 [Shift]',
@@ -358,6 +358,146 @@ export default <any>{
         cn: '快捷设置',
         en: 'Quick settings',
         jp: 'クイック設定'
+    },
+    settingsShortcuts: {
+        cn: '快捷键',
+        en: 'Shortcuts',
+        jp: 'ショートカット'
+    },
+    shortcutEditHint: {
+        cn: '点击 + 从固定列表新增快捷键，点击快捷键上的 × 可删除。',
+        en: 'Click + to add from fixed options, click × on a shortcut to remove it.',
+        jp: '＋で固定リストから追加し、ショートカットの×で削除します。'
+    },
+    shortcutAddPlaceholder: {
+        cn: '选择快捷键',
+        en: 'Select key',
+        jp: 'キーを選択'
+    },
+    currentShortcut: {
+        cn: '当前',
+        en: 'Current',
+        jp: '現在'
+    },
+    shortcutResetLabel: {
+        cn: '恢复默认快捷键',
+        en: 'Restore default shortcuts',
+        jp: 'デフォルトのショートカットを復元'
+    },
+    shortcutResetAction: {
+        cn: '恢复默认',
+        en: 'Reset',
+        jp: 'リセット'
+    },
+    shortcutGoPrev: {
+        cn: '上一页',
+        en: 'Previous page',
+        jp: '前のページ'
+    },
+    shortcutGoPrevTip: {
+        cn: '滚动模式前进/后退中的后退动作',
+        en: 'Move to previous page/segment',
+        jp: '前のページ/セグメントへ移動'
+    },
+    shortcutGoNext: {
+        cn: '下一页',
+        en: 'Next page',
+        jp: '次のページ'
+    },
+    shortcutGoNextTip: {
+        cn: '滚动模式前进/后退中的前进动作',
+        en: 'Move to next page/segment',
+        jp: '次のページ/セグメントへ移動'
+    },
+    shortcutToggleMoreSettings: {
+        cn: '更多设置开关',
+        en: 'Toggle more settings',
+        jp: '詳細設定の表示切替'
+    },
+    shortcutToggleMoreSettingsTip: {
+        cn: '显示或关闭更多设置弹窗',
+        en: 'Open/close more settings modal',
+        jp: '詳細設定モーダルを開閉'
+    },
+    shortcutToggleTopBar: {
+        cn: '顶栏开关',
+        en: 'Toggle top bar',
+        jp: 'トップバー表示切替'
+    },
+    shortcutToggleTopBarTip: {
+        cn: '显示或隐藏顶部工具栏',
+        en: 'Show/hide top toolbar',
+        jp: '上部ツールバーを表示/非表示'
+    },
+    shortcutToggleThumbView: {
+        cn: '缩略图栏开关',
+        en: 'Toggle thumbnails',
+        jp: 'サムネイル表示切替'
+    },
+    shortcutToggleThumbViewTip: {
+        cn: '滚动/书页模式下切换缩略图栏显示',
+        en: 'Show/hide thumbnail panel in current mode',
+        jp: '現在モードのサムネイルパネル表示切替'
+    },
+    shortcutToggleQuickPreview: {
+        cn: '快速预览开关',
+        en: 'Toggle quick preview',
+        jp: 'クイックプレビュー切替'
+    },
+    shortcutToggleQuickPreviewTip: {
+        cn: '打开/关闭快速预览',
+        en: 'Open/close quick preview',
+        jp: 'クイックプレビューを開閉'
+    },
+    shortcutIncreaseWidthScale: {
+        cn: '调大页面比例',
+        en: 'Increase page scale',
+        jp: 'ページ倍率を上げる'
+    },
+    shortcutIncreaseWidthScaleTip: {
+        cn: '每次增加 5%',
+        en: 'Increase scale by 5%',
+        jp: '倍率を5%増加'
+    },
+    shortcutDecreaseWidthScale: {
+        cn: '调小页面比例',
+        en: 'Decrease page scale',
+        jp: 'ページ倍率を下げる'
+    },
+    shortcutDecreaseWidthScaleTip: {
+        cn: '每次减少 5%',
+        en: 'Decrease scale by 5%',
+        jp: '倍率を5%減少'
+    },
+    shortcutTogglePagination: {
+        cn: '页目录开关',
+        en: 'Toggle pagination',
+        jp: 'ページネーション切替'
+    },
+    shortcutTogglePaginationTip: {
+        cn: '书页模式下显示/隐藏页目录（默认未绑定）',
+        en: 'Show/hide pagination in book mode (unbound by default)',
+        jp: '見開きモードでページネーションを表示/非表示（初期値未割当）'
+    },
+    shortcutToggleAutoFlip: {
+        cn: '自动翻页开关',
+        en: 'Toggle auto flip',
+        jp: '自動ページめくり切替'
+    },
+    shortcutToggleAutoFlipTip: {
+        cn: '书页模式下开关自动翻页（默认未绑定）',
+        en: 'Toggle auto flip in book mode (unbound by default)',
+        jp: 'ページモードの自動めくり切替（初期未設定）'
+    },
+    shortcutToggleOddEven: {
+        cn: '奇偶切换开关',
+        en: 'Toggle odd/even',
+        jp: '奇偶切替'
+    },
+    shortcutToggleOddEvenTip: {
+        cn: '书页模式下切换奇偶页拼接（默认未绑定）',
+        en: 'Toggle odd/even stitching in book mode (unbound by default)',
+        jp: 'ページモードの奇偶ページ結合切替（初期未設定）'
     },
     languageSetting: {
         cn: '语言',

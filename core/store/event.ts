@@ -45,35 +45,106 @@ export function initViewportSizeUpdater() {
 
 function handleKeyboardEvent(e: any) {
     const keyboardUpdater = 'keyboard'
-    if (e.metaKey || e.ctrlKey) {
+    const rawKey = typeof e.key === 'string' ? e.key : ''
+    if (e.metaKey || (e.ctrlKey && rawKey !== 'Control')) {
         return
     }
-    switch (e.key) {
-        case 'ArrowLeft':
-        case 'ArrowUp':
-        case 'a':
+    const target = e.target as HTMLElement | null
+    if (target) {
+        const tagName = (target.tagName || '').toLowerCase()
+        if (tagName === 'input' || tagName === 'textarea' || tagName === 'select' || target.isContentEditable) {
+            return
+        }
+    }
+
+    const key = rawKey.length === 1 ? rawKey.toLowerCase() : rawKey
+    const shortcutMap = buildShortcutLookup()
+    const actionList = shortcutMap[key]
+    if (!actionList || actionList.length === 0) {
+        return
+    }
+
+    for (const action of actionList) {
+        switch (action) {
+        case 'goPrev':
             if (store.readingMode == 0) {
                 storeAction.setCurViewIndex(store.curViewIndex - 1, keyboardUpdater)
             } else if (store.readingMode == 1) {
                 storeAction.setCurViewIndex(store.curViewIndex - store.pagesPerScreen, keyboardUpdater)
             }
             break
-        case 'ArrowRight':
-        case 'ArrowDown':
-        case 'd':
+        case 'goNext':
             if (store.readingMode == 0) {
                 storeAction.setCurViewIndex(store.curViewIndex + 1, keyboardUpdater)
             } else if (store.readingMode == 1 && store.curViewIndex + store.pagesPerScreen < store.pageCount) {
                 storeAction.setCurViewIndex(store.curViewIndex + store.pagesPerScreen, keyboardUpdater)
             }
             break
-        case 'Shift':
+        case 'toggleMoreSettings':
             storeAction.toggleShowMoreSettingsDialog()
             break
-        case 'Escape':
+        case 'toggleTopBar':
             storeAction.toggleShowTopBar()
             break
+        case 'toggleThumbView':
+            if (store.readingMode == 0) {
+                storeAction.toggleShowThumbView()
+            } else {
+                storeAction.toggleShowBookThumbView()
+            }
+            break
+        case 'toggleQuickPreview':
+            if (store.showThumbExpandDialog) {
+                storeAction.closeThumbExpandDialog()
+            } else {
+                storeAction.openThumbExpandDialog()
+            }
+            break
+        case 'increaseWidthScale':
+            storeAction.setWidthScale(Math.min(100, store.widthScale + 5))
+            break
+        case 'decreaseWidthScale':
+            storeAction.setWidthScale(Math.max(30, store.widthScale - 5))
+            break
+        case 'togglePagination':
+            if (store.readingMode == 1) {
+                storeAction.toggleShowBookPagination()
+            }
+            break
+        case 'toggleAutoFlip':
+            storeAction.toggleIsAutoFlip()
+            break
+        case 'toggleOddEven':
+            storeAction.toggleIsChangeOddEven()
+            break
+        }
     }
+}
+
+function normalizeShortcutToken(token: string): string {
+    const trimmed = token.trim()
+    if (trimmed.length === 1) {
+        return trimmed.toLowerCase()
+    }
+    return trimmed
+}
+
+function buildShortcutLookup(): Record<string, string[]> {
+    const result: Record<string, string[]> = {}
+    const shortcutBindings = store.shortcutBindings
+    for (const actionName of Object.keys(shortcutBindings)) {
+        const keyList = (shortcutBindings as Record<string, string>)[actionName]
+            .split(',')
+            .map(item => normalizeShortcutToken(item))
+            .filter(item => item.length > 0)
+        for (const key of keyList) {
+            if (!result[key]) {
+                result[key] = []
+            }
+            result[key].push(actionName)
+        }
+    }
+    return result
 }
 
 export function initKeyboardListener() {

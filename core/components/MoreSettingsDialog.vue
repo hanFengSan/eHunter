@@ -2,7 +2,7 @@
     <teleport to=".ehunter-app">
         <transition name="slow-opacity-fade" appear>
             <div v-if="store.showMoreSettingsDialog" class="ehunter-more-settings-modal" @click.self="storeAction.closeMoreSettingsDialog">
-                <div class="ehunter-panel" @click.stop>
+                <div class="ehunter-panel" @click.stop="onPanelClick">
                     <header class="ehunter-panel-header">
                         <h3>{{ i18n.openMoreSettingsModal }}</h3>
                         <button class="ehunter-close-btn" type="button" :aria-label="i18n.cancel" @click="storeAction.closeMoreSettingsDialog">×</button>
@@ -115,7 +115,7 @@
                                     <div
                                         class="ehunter-quick-lane"
                                         @dragover.prevent
-                                        @drop="onDropToLane($event, true)">
+                                        @drop.stop="onDropToLane($event, true)">
                                         <header class="ehunter-lane-header">{{ i18n.enabled }}</header>
                                         <p class="ehunter-lane-desc">{{ i18n.quickEnabledHint }}</p>
                                         <div
@@ -129,7 +129,7 @@
                                             @dragstart="onDragStart($event, item.id)"
                                             @dragend="onDragEnd"
                                             @dragover.prevent
-                                            @drop="onDropToItem($event, item.id, true)">
+                                            @drop.stop="onDropToItem($event, item.id, true)">
                                             <span class="ehunter-drag-handle" aria-hidden="true"></span>
                                             <span class="ehunter-label">{{ quickItemLabel(item.id, item.i18nKey) }}</span>
                                             <span v-if="modeScopeText(item.modeScope)" class="ehunter-mode-tag">{{ modeScopeText(item.modeScope) }}</span>
@@ -139,7 +139,7 @@
                                     <div
                                         class="ehunter-quick-lane ehunter-hidden"
                                         @dragover.prevent
-                                        @drop="onDropToLane($event, false)">
+                                        @drop.stop="onDropToLane($event, false)">
                                         <header class="ehunter-lane-header">{{ i18n.hidden }}</header>
                                         <p class="ehunter-lane-desc">{{ i18n.quickHiddenHint }}</p>
                                         <div
@@ -153,12 +153,55 @@
                                             @dragstart="onDragStart($event, item.id)"
                                             @dragend="onDragEnd"
                                             @dragover.prevent
-                                            @drop="onDropToItem($event, item.id, false)">
+                                            @drop.stop="onDropToItem($event, item.id, false)">
                                             <span class="ehunter-drag-handle" aria-hidden="true"></span>
                                             <span class="ehunter-label">{{ quickItemLabel(item.id, item.i18nKey) }}</span>
                                             <span v-if="modeScopeText(item.modeScope)" class="ehunter-mode-tag">{{ modeScopeText(item.modeScope) }}</span>
                                         </div>
                                     </div>
+                                </div>
+                            </article>
+
+                            <article ref="shortcutsRef" class="ehunter-group" data-category="shortcuts">
+                                <h4>{{ i18n.settingsShortcuts }}</h4>
+                                <p class="ehunter-shortcut-intro">{{ i18n.shortcutEditHint }}</p>
+                                <div class="ehunter-row" v-for="action in shortcutActionDefinitions" :key="action.id">
+                                    <div class="ehunter-label-block">
+                                        <span class="ehunter-label">{{ i18n[action.labelI18nKey] }}</span>
+                                        <p v-if="shortcutTip(action.id, action.tipI18nKey)" class="ehunter-tip">{{ shortcutTip(action.id, action.tipI18nKey) }}</p>
+                                    </div>
+                                    <div class="ehunter-shortcut-editor">
+                                        <transition-group name="ehunter-shortcut-chip-list" tag="div" class="ehunter-shortcut-chips">
+                                            <button
+                                                v-for="key in shortcutBindingList(action.id)"
+                                                :key="`${action.id}-${key}`"
+                                                class="ehunter-shortcut-chip"
+                                                @click="removeShortcutBinding(action.id, key)">
+                                                <span class="ehunter-chip-key">{{ shortcutKeyLabel(key) }}</span>
+                                                <span class="ehunter-chip-remove">×</span>
+                                            </button>
+                                        </transition-group>
+                                        <div class="ehunter-shortcut-add">
+                                            <button class="ehunter-shortcut-add-btn" @click="toggleShortcutDropdown(action.id)">
+                                                <span class="ehunter-shortcut-add-icon">+</span>
+                                            </button>
+                                            <select
+                                                v-if="openedShortcutDropdown === action.id"
+                                                class="ehunter-shortcut-select"
+                                                :value="''"
+                                                @change="addShortcutBinding(action.id, ($event.target as HTMLSelectElement).value)">
+                                                <option value="" disabled selected>{{ i18n.shortcutAddPlaceholder }}</option>
+                                                <option
+                                                    v-for="candidate in availableShortcutCandidates(action.id)"
+                                                    :key="`${action.id}-candidate-${candidate}`"
+                                                    :value="candidate">{{ shortcutKeyLabel(candidate) }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ehunter-row">
+                                    <span class="ehunter-label">{{ i18n.shortcutResetLabel }}</span>
+                                    <button class="ehunter-action" @click="storeAction.resetShortcutBindings">{{ i18n.shortcutResetAction }}</button>
                                 </div>
                             </article>
 
@@ -196,14 +239,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import pkgJson from '../../package.json'
 import DropOption from './widget/DropOption.vue'
 import NumDropOption from './widget/NumDropOption.vue'
 import SimpleSwitch from './widget/SimpleSwitch.vue'
 import SimpleDialog from './widget/SimpleDialog.vue'
 import { i18n } from '../store/i18n'
-import { store, storeAction, settingsCategories, quickSettingOptions, settingFieldMap } from '../store/app'
+import { store, storeAction, settingsCategories, quickSettingOptions, settingFieldMap, shortcutActionDefinitions, shortcutKeyCandidates, type ShortcutActionId } from '../store/app'
 import { getFieldValue, setFieldValue, getDropList, getNumList, getNumSuffix, getDialogFieldIds } from '../store/settingFieldRuntime'
 
 const contentRef = ref<HTMLElement | null>(null)
@@ -211,10 +254,19 @@ const generalRef = ref<HTMLElement | null>(null)
 const scrollRef = ref<HTMLElement | null>(null)
 const bookRef = ref<HTMLElement | null>(null)
 const quickRef = ref<HTMLElement | null>(null)
+const shortcutsRef = ref<HTMLElement | null>(null)
 const otherRef = ref<HTMLElement | null>(null)
 const dragSourceId = ref('')
+const openedShortcutDropdown = ref<ShortcutActionId | ''>('')
+const pinnedQuickSettingId = 'readingMode'
 
 const versionText = computed(() => pkgJson.version)
+
+function handleContentDragOver(e: DragEvent) {
+    if (dragSourceId.value) {
+        e.preventDefault()
+    }
+}
 
 const quickSettingOrderList = computed(() => {
     return store.quickSettingOrder
@@ -307,6 +359,8 @@ function getCategoryRef(category: string): HTMLElement | null {
             return bookRef.value
         case 'quick':
             return quickRef.value
+        case 'shortcuts':
+            return shortcutsRef.value
         case 'other':
             return otherRef.value
         default:
@@ -339,6 +393,7 @@ function onContentScroll() {
         { id: 'scroll', elem: scrollRef.value },
         { id: 'book', elem: bookRef.value },
         { id: 'quick', elem: quickRef.value },
+        { id: 'shortcuts', elem: shortcutsRef.value },
         { id: 'other', elem: otherRef.value },
     ]
     let active: any = 'general'
@@ -372,15 +427,17 @@ function moveQuickToTarget(sourceId: string, targetId: string) {
         return
     }
     const ids = quickSettingManageList.value.map(item => item.id)
+    const sourceIndex = ids.indexOf(sourceId)
     const target = ids.includes(targetId) ? targetId : ''
-    if (!target) {
+    if (!target || sourceIndex < 0) {
         return
     }
-    const index = ids.indexOf(target)
-    if (index < 0) {
+    const targetIndex = ids.indexOf(target)
+    if (targetIndex < 0) {
         return
     }
-    storeAction.moveQuickSettingItem(sourceId, index)
+    const insertBeforeTargetIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex
+    storeAction.moveQuickSettingItem(sourceId, insertBeforeTargetIndex)
 }
 
 function ensureQuickSelection(id: string, selected: boolean) {
@@ -394,6 +451,12 @@ function onDropToItem(_: DragEvent, targetId: string, selected: boolean) {
     if (!dragSourceId.value) {
         return
     }
+    if (targetId === pinnedQuickSettingId && dragSourceId.value !== pinnedQuickSettingId) {
+        const firstMovable = quickSettingManageList.value.find(item => storeAction.isQuickSettingSelected(item.id))
+        if (firstMovable) {
+            targetId = firstMovable.id
+        }
+    }
     ensureQuickSelection(dragSourceId.value, selected)
     moveQuickToTarget(dragSourceId.value, targetId)
     dragSourceId.value = ''
@@ -404,18 +467,108 @@ function onDropToLane(_: DragEvent, selected: boolean) {
         return
     }
     ensureQuickSelection(dragSourceId.value, selected)
-    const laneList = selected ? enabledQuickSettingList.value : hiddenQuickSettingList.value
+    const laneList = (selected ? enabledQuickSettingList.value : hiddenQuickSettingList.value)
+        .filter(item => item.id !== pinnedQuickSettingId)
     if (laneList.length > 0) {
         const anchor = laneList[laneList.length - 1]
         if (anchor) {
             moveQuickToTarget(dragSourceId.value, anchor.id)
         }
+    } else if (selected) {
+        const firstMovable = quickSettingManageList.value.find(item => storeAction.isQuickSettingSelected(item.id))
+        if (firstMovable) {
+            moveQuickToTarget(dragSourceId.value, firstMovable.id)
+        }
     }
     dragSourceId.value = ''
 }
 
+function shortcutTip(actionId: string, tipI18nKey?: string): string {
+    const tip = tipI18nKey ? (i18n.value[tipI18nKey] || '') : ''
+    const list = shortcutBindingList(actionId as ShortcutActionId)
+    if (list.length > 0) {
+        return `${tip ? `${tip} · ` : ''}${i18n.value.currentShortcut}: ${list.map(shortcutKeyLabel).join(' / ')}`
+    }
+    return tip
+}
+
+function shortcutKeyLabel(key: string): string {
+    const found = shortcutKeyCandidates.find(item => item.key.toLowerCase() === key.toLowerCase())
+    return found ? found.label : key
+}
+
+function shortcutBindingList(actionId: ShortcutActionId): string[] {
+    const binding = store.shortcutBindings[actionId]
+    if (!binding) {
+        return []
+    }
+    return binding
+        .split(',')
+        .map(item => item.trim())
+        .filter(item => item.length > 0)
+}
+
+function availableShortcutCandidates(actionId: ShortcutActionId): string[] {
+    const selected = new Set(shortcutBindingList(actionId).map(item => item.toLowerCase()))
+    return shortcutKeyCandidates
+        .map(item => item.key)
+        .filter(item => !selected.has(item.toLowerCase()))
+}
+
+function updateShortcutBindingList(actionId: ShortcutActionId, list: string[]) {
+    storeAction.setShortcutBinding(actionId, list.join(','))
+}
+
+function removeShortcutBinding(actionId: ShortcutActionId, key: string) {
+    const next = shortcutBindingList(actionId).filter(item => item.toLowerCase() !== key.toLowerCase())
+    updateShortcutBindingList(actionId, next)
+}
+
+function toggleShortcutDropdown(actionId: ShortcutActionId) {
+    if (openedShortcutDropdown.value === actionId) {
+        openedShortcutDropdown.value = ''
+    } else {
+        openedShortcutDropdown.value = actionId
+    }
+}
+
+function onPanelClick(event: MouseEvent) {
+    if (!openedShortcutDropdown.value) {
+        return
+    }
+    const target = event.target as HTMLElement | null
+    if (target && target.closest('.ehunter-shortcut-add')) {
+        return
+    }
+    openedShortcutDropdown.value = ''
+}
+
+function addShortcutBinding(actionId: ShortcutActionId, key: string) {
+    const normalized = key.trim()
+    if (!normalized) {
+        return
+    }
+    const current = shortcutBindingList(actionId)
+    if (current.some(item => item.toLowerCase() === normalized.toLowerCase())) {
+        openedShortcutDropdown.value = ''
+        return
+    }
+    current.push(normalized)
+    updateShortcutBindingList(actionId, current)
+    openedShortcutDropdown.value = ''
+}
+
 onMounted(() => {
     onContentScroll()
+    if (contentRef.value) {
+        contentRef.value.addEventListener('dragover', handleContentDragOver)
+    }
+})
+
+onUnmounted(() => {
+    if (contentRef.value) {
+        contentRef.value.removeEventListener('dragover', handleContentDragOver)
+    }
 })
 </script>
 
@@ -534,10 +687,10 @@ onMounted(() => {
                     }
 
                     &.ehunter-active {
-                        background: linear-gradient(180deg, #dce9ff, #cfe2ff);
-                        color: #1f447d;
+                        background: #dff3e5;
+                        color: #2a6142;
                         font-weight: 700;
-                        box-shadow: inset 0 0 0 1px rgba(63, 106, 177, 0.24);
+                        box-shadow: inset 0 0 0 1px #8cc5a0;
                     }
                 }
             }
@@ -635,28 +788,33 @@ onMounted(() => {
                         }
 
                         > .ehunter-danger {
-                            border: none;
+                            border: 1px solid #d9a5a5;
                             border-radius: 8px;
-                            background: linear-gradient(180deg, #e65f5f, #cc3f3f);
-                            color: #fff;
+                            background: #fff4f4;
+                            color: #8a4646;
                             font-size: 13px;
                             padding: 8px 12px;
                             cursor: pointer;
-                            box-shadow: 0 8px 16px rgba(201, 67, 67, 0.26);
+
+                            &:hover {
+                                background: #ffe9e9;
+                                border-color: #cf8e8e;
+                            }
                         }
 
                         > .ehunter-action {
-                            border: 1px solid rgba(76, 111, 172, 0.36);
+                            border: 1px solid #8bc7a0;
                             border-radius: 8px;
-                            background: linear-gradient(180deg, #f6f9ff, #e7efff);
-                            color: #274b7e;
+                            background: #f2fff6;
+                            color: #2a5f41;
                             font-size: 13px;
                             padding: 8px 12px;
                             cursor: pointer;
                             font-weight: 600;
 
                             &:hover {
-                                background: linear-gradient(180deg, #edf4ff, #dceaff);
+                                background: #e6f7ec;
+                                border-color: #77b88f;
                             }
                         }
                     }
@@ -715,11 +873,10 @@ onMounted(() => {
                                 padding: 5px 8px;
                                 transition: all 0.18s ease;
                                 cursor: grab;
-                                user-select: none;
-                                -webkit-user-select: none;
-                                -webkit-touch-callout: none;
-                                -webkit-user-drag: none;
-                                touch-action: manipulation;
+                                 user-select: none;
+                                 -webkit-user-select: none;
+                                 -webkit-touch-callout: none;
+                                 touch-action: manipulation;
 
                                 * {
                                     user-select: none;
@@ -777,6 +934,13 @@ onMounted(() => {
                                 }
                             }
                         }
+                    }
+
+                    > .ehunter-shortcut-intro {
+                        margin: 0 0 8px;
+                        font-size: 12px;
+                        line-height: 1.35;
+                        color: #5c6e8d;
                     }
                 }
             }
@@ -837,16 +1001,16 @@ onMounted(() => {
 }
 
 :deep(.drop-option > .text) {
-    background: linear-gradient(180deg, #f2f7ff, #e5efff);
-    border: 1px solid rgba(93, 124, 176, 0.34);
+    background: #f2fff6;
+    border: 1px solid #86c59e;
     border-radius: 8px;
-    color: #2f4f7e;
+    color: #2a6042;
     font-weight: 600;
     padding: 4px 10px;
 }
 
 :deep(.drop-option > .icon-drop-down) {
-    fill: #2f4f7e;
+    fill: #2a6042;
 }
 
 :deep(.drop-option .options) {
@@ -854,5 +1018,148 @@ onMounted(() => {
     border: 1px solid rgba(95, 124, 169, 0.28);
     border-radius: 10px;
     box-shadow: 0 10px 22px rgba(24, 44, 80, 0.16);
+}
+
+.ehunter-shortcut-editor {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+    max-width: 56%;
+}
+
+.ehunter-shortcut-chips {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.ehunter-shortcut-chip {
+    border: 1px solid #8bc7a0;
+    border-radius: 999px;
+    background: #f4fff7;
+    color: #25543a;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    line-height: 1;
+    padding: 4px 8px;
+    max-width: 180px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        background: #ecfaef;
+        border-color: #6fb88b;
+    }
+
+    > .ehunter-chip-key {
+        display: block;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    > .ehunter-chip-remove {
+        font-weight: 700;
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 0;
+        margin-left: 0;
+        text-align: center;
+        overflow: hidden;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: width 0.15s ease, margin-left 0.15s ease, opacity 0.15s ease;
+    }
+
+    &:hover > .ehunter-chip-remove,
+    &:focus-visible > .ehunter-chip-remove {
+        width: 10px;
+        margin-left: 4px;
+        opacity: 0.8;
+    }
+}
+
+.ehunter-shortcut-chip-list-enter-active,
+.ehunter-shortcut-chip-list-leave-active {
+    transition: opacity 0.16s ease, transform 0.16s ease, max-width 0.16s ease, margin 0.16s ease, padding 0.16s ease;
+}
+
+.ehunter-shortcut-chip-list-move {
+    transition: transform 0.16s ease;
+}
+
+.ehunter-shortcut-chip-list-enter-from,
+.ehunter-shortcut-chip-list-leave-to {
+    opacity: 0;
+    transform: scale(0.88);
+}
+
+.ehunter-shortcut-chip-list-leave-to {
+    max-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    border-width: 0;
+}
+
+.ehunter-shortcut-add {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+}
+
+.ehunter-shortcut-add-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #7fbe98;
+    background: #effbf2;
+    color: #2b6a47;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover {
+        background: #e2f5e8;
+        border-color: #69ae85;
+    }
+}
+
+.ehunter-shortcut-add-icon {
+    display: block;
+    line-height: 1;
+    transform: translateY(-1px);
+    pointer-events: none;
+}
+
+.ehunter-shortcut-select {
+    min-width: 110px;
+    max-width: 150px;
+    border: 1px solid #8bc7a0;
+    border-radius: 7px;
+    background: #f6fff8;
+    color: #2b5d41;
+    font-size: 11px;
+    line-height: 1.2;
+    padding: 4px 7px;
 }
 </style>

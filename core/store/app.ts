@@ -27,6 +27,27 @@ type ModeScope = 'both' | 'scroll-only' | 'book-only'
 type SettingsPanelCategory = 'general' | 'scroll' | 'book'
 type SettingControlType = 'drop' | 'num' | 'switch'
 
+export type ShortcutActionId =
+    | 'goPrev'
+    | 'goNext'
+    | 'toggleMoreSettings'
+    | 'toggleTopBar'
+    | 'toggleThumbView'
+    | 'toggleQuickPreview'
+    | 'increaseWidthScale'
+    | 'decreaseWidthScale'
+    | 'togglePagination'
+    | 'toggleAutoFlip'
+    | 'toggleOddEven'
+
+export type ShortcutBindingMap = Record<ShortcutActionId, string>
+
+export interface ShortcutActionDefinition {
+    id: ShortcutActionId
+    labelI18nKey: string
+    tipI18nKey?: string
+}
+
 export interface DownloadStatusNotification {
     notificationId: string
     taskId: string
@@ -123,7 +144,7 @@ export interface QuickSettingOption {
 }
 
 export interface SettingsCategory {
-    id: 'general' | 'scroll' | 'book' | 'quick' | 'other'
+    id: 'general' | 'scroll' | 'book' | 'quick' | 'shortcuts' | 'other'
     i18nKey: string
 }
 
@@ -156,7 +177,7 @@ const pageTurnAnimationPreferenceKey = 'ehunter:reader:prefs:page-turn-animation
 const pageTurnAnimationPreferenceSchemaVersion = 1
 const defaultPageTurnAnimationMode: PageTurnAnimationMode = 'realistic'
 const unifiedSettingsPreferenceKey = 'ehunter:reader:prefs:unified-settings'
-const unifiedSettingsPreferenceSchemaVersion = 1
+const unifiedSettingsPreferenceSchemaVersion = 3
 let bookTurnSettleTimerID: number = 0
 let isBookTurning = false
 let pendingBookTurn: null | { val: number, updater: string } = null
@@ -190,7 +211,104 @@ export const settingsCategories: SettingsCategory[] = [
     { id: 'scroll', i18nKey: 'settingsScrollMode' },
     { id: 'book', i18nKey: 'settingsBookMode' },
     { id: 'quick', i18nKey: 'settingsQuick' },
+    { id: 'shortcuts', i18nKey: 'settingsShortcuts' },
     { id: 'other', i18nKey: 'settingsOther' },
+]
+
+export const shortcutActionDefinitions: ShortcutActionDefinition[] = [
+    { id: 'goPrev', labelI18nKey: 'shortcutGoPrev', tipI18nKey: 'shortcutGoPrevTip' },
+    { id: 'goNext', labelI18nKey: 'shortcutGoNext', tipI18nKey: 'shortcutGoNextTip' },
+    { id: 'toggleMoreSettings', labelI18nKey: 'shortcutToggleMoreSettings', tipI18nKey: 'shortcutToggleMoreSettingsTip' },
+    { id: 'toggleTopBar', labelI18nKey: 'shortcutToggleTopBar', tipI18nKey: 'shortcutToggleTopBarTip' },
+    { id: 'toggleThumbView', labelI18nKey: 'shortcutToggleThumbView', tipI18nKey: 'shortcutToggleThumbViewTip' },
+    { id: 'toggleQuickPreview', labelI18nKey: 'shortcutToggleQuickPreview', tipI18nKey: 'shortcutToggleQuickPreviewTip' },
+    { id: 'increaseWidthScale', labelI18nKey: 'shortcutIncreaseWidthScale', tipI18nKey: 'shortcutIncreaseWidthScaleTip' },
+    { id: 'decreaseWidthScale', labelI18nKey: 'shortcutDecreaseWidthScale', tipI18nKey: 'shortcutDecreaseWidthScaleTip' },
+    { id: 'togglePagination', labelI18nKey: 'shortcutTogglePagination', tipI18nKey: 'shortcutTogglePaginationTip' },
+    { id: 'toggleAutoFlip', labelI18nKey: 'shortcutToggleAutoFlip', tipI18nKey: 'shortcutToggleAutoFlipTip' },
+    { id: 'toggleOddEven', labelI18nKey: 'shortcutToggleOddEven', tipI18nKey: 'shortcutToggleOddEvenTip' },
+]
+
+export const defaultShortcutBindings: ShortcutBindingMap = {
+    goPrev: 'ArrowLeft,ArrowUp,a',
+    goNext: 'ArrowRight,ArrowDown,d',
+    toggleMoreSettings: 'Shift',
+    toggleTopBar: 'q',
+    toggleThumbView: 't',
+    toggleQuickPreview: 'f',
+    increaseWidthScale: ']',
+    decreaseWidthScale: '[',
+    togglePagination: '',
+    toggleAutoFlip: '',
+    toggleOddEven: '',
+}
+
+export interface ShortcutKeyCandidate {
+    key: string
+    label: string
+}
+
+export const shortcutKeyCandidates: ShortcutKeyCandidate[] = [
+    { key: 'ArrowUp', label: '↑' },
+    { key: 'ArrowDown', label: '↓' },
+    { key: 'ArrowLeft', label: '←' },
+    { key: 'ArrowRight', label: '→' },
+    { key: 'Escape', label: 'Esc' },
+    { key: 'Tab', label: 'Tab' },
+    { key: 'CapsLock', label: 'Caps' },
+    { key: 'Control', label: 'Ctrl' },
+    { key: 'Shift', label: 'Shift' },
+    { key: 'F1', label: 'F1' },
+    { key: 'F2', label: 'F2' },
+    { key: 'F3', label: 'F3' },
+    { key: 'F4', label: 'F4' },
+    { key: 'F5', label: 'F5' },
+    { key: 'F6', label: 'F6' },
+    { key: 'F7', label: 'F7' },
+    { key: 'F8', label: 'F8' },
+    { key: 'F9', label: 'F9' },
+    { key: 'F10', label: 'F10' },
+    { key: 'F11', label: 'F11' },
+    { key: 'F12', label: 'F12' },
+    { key: '1', label: '1' },
+    { key: '2', label: '2' },
+    { key: '3', label: '3' },
+    { key: '4', label: '4' },
+    { key: '5', label: '5' },
+    { key: '6', label: '6' },
+    { key: '7', label: '7' },
+    { key: '8', label: '8' },
+    { key: '9', label: '9' },
+    { key: '-', label: '-' },
+    { key: '=', label: '=' },
+    { key: '[', label: '[' },
+    { key: ']', label: ']' },
+    { key: 'a', label: 'A' },
+    { key: 'b', label: 'B' },
+    { key: 'c', label: 'C' },
+    { key: 'd', label: 'D' },
+    { key: 'e', label: 'E' },
+    { key: 'f', label: 'F' },
+    { key: 'g', label: 'G' },
+    { key: 'h', label: 'H' },
+    { key: 'i', label: 'I' },
+    { key: 'j', label: 'J' },
+    { key: 'k', label: 'K' },
+    { key: 'l', label: 'L' },
+    { key: 'm', label: 'M' },
+    { key: 'n', label: 'N' },
+    { key: 'o', label: 'O' },
+    { key: 'p', label: 'P' },
+    { key: 'q', label: 'Q' },
+    { key: 'r', label: 'R' },
+    { key: 's', label: 'S' },
+    { key: 't', label: 'T' },
+    { key: 'u', label: 'U' },
+    { key: 'v', label: 'V' },
+    { key: 'w', label: 'W' },
+    { key: 'x', label: 'X' },
+    { key: 'y', label: 'Y' },
+    { key: 'z', label: 'Z' },
 ]
 
 export const settingFieldDefinitions: SettingFieldDefinition[] = [
@@ -477,6 +595,34 @@ interface UnifiedSettingsPreference {
     settings: Record<string, any>
     quickSelection: string[]
     quickOrder: string[]
+    shortcuts?: Partial<ShortcutBindingMap>
+}
+
+function normalizeShortcutToken(raw: any): string {
+    if (typeof raw !== 'string') {
+        return ''
+    }
+    return raw.trim()
+}
+
+function normalizeShortcutBindings(raw: any): ShortcutBindingMap {
+    const result: ShortcutBindingMap = {
+        ...defaultShortcutBindings,
+    }
+    if (!raw || typeof raw !== 'object') {
+        return result
+    }
+    for (const definition of shortcutActionDefinitions) {
+        const key = definition.id
+        if (!Object.prototype.hasOwnProperty.call(raw, key)) {
+            continue
+        }
+        const val = normalizeShortcutToken((raw as Record<string, any>)[key])
+        if (typeof val === 'string') {
+            result[key] = val
+        }
+    }
+    return result
 }
 
 function normalizePageTurnAnimationMode(value: any): PageTurnAnimationMode {
@@ -653,12 +799,26 @@ function parseUnifiedSettingsPreference(rawData: any): UnifiedSettingsPreference
         return null
     }
     const quick = sanitizeQuickSettingSelection(rawData.quickSelection, rawData.quickOrder)
+    const schemaVersion = Number(rawData.schemaVersion) || unifiedSettingsPreferenceSchemaVersion
+    const shortcuts = normalizeShortcutBindings(rawData.shortcuts)
+    if (schemaVersion < 2 && (!shortcuts.toggleQuickPreview || !shortcuts.toggleQuickPreview.trim())) {
+        shortcuts.toggleQuickPreview = defaultShortcutBindings.toggleQuickPreview
+    }
+    if (schemaVersion < 3) {
+        if (!shortcuts.toggleTopBar || shortcuts.toggleTopBar.trim() === '' || shortcuts.toggleTopBar === 'Escape') {
+            shortcuts.toggleTopBar = defaultShortcutBindings.toggleTopBar
+        }
+        if (!shortcuts.toggleThumbView || shortcuts.toggleThumbView.trim() === '' || shortcuts.toggleThumbView === '~') {
+            shortcuts.toggleThumbView = defaultShortcutBindings.toggleThumbView
+        }
+    }
     return {
-        schemaVersion: Number(rawData.schemaVersion) || unifiedSettingsPreferenceSchemaVersion,
+        schemaVersion,
         updatedAt: typeof rawData.updatedAt === 'string' ? rawData.updatedAt : new Date().toISOString(),
         settings: typeof rawData.settings === 'object' && rawData.settings ? rawData.settings : {},
         quickSelection: quick.selected,
         quickOrder: quick.order,
+        shortcuts,
     }
 }
 
@@ -696,6 +856,9 @@ function persistUnifiedSettingsState() {
         },
         quickSelection: [...store.quickSettingSelected],
         quickOrder: [...store.quickSettingOrder],
+        shortcuts: {
+            ...store.shortcutBindings,
+        },
     }
     writeUnifiedSettingsRaw(payload)
 }
@@ -775,6 +938,7 @@ function applyUnifiedSettingsPreference() {
     const quick = sanitizeQuickSettingSelection(preference.quickSelection, preference.quickOrder)
     store.quickSettingSelected = quick.selected
     store.quickSettingOrder = quick.order
+    store.shortcutBindings = normalizeShortcutBindings(preference.shortcuts)
     persistUnifiedSettingsState()
 }
 
@@ -892,6 +1056,9 @@ export const store = reactive({
     lastRemoteUpdateNoticeAt: 0,
     quickSettingSelected: [...defaultQuickSettingSelected],
     quickSettingOrder: [...defaultQuickSettingOrder],
+    shortcutBindings: <ShortcutBindingMap>{
+        ...defaultShortcutBindings,
+    },
     isFactoryResetDialogVisible: false,
     factoryResetStatus: 'idle',
     factoryResetErrorMessage: '',
@@ -1266,6 +1433,16 @@ export const storeAction = {
     },
     setAutoRetryByOtherSource: (val: boolean) => {
         store.autoRetryByOtherSource = val
+        persistUnifiedSettingsState()
+    },
+    setShortcutBinding: (id: ShortcutActionId, val: string) => {
+        store.shortcutBindings[id] = normalizeShortcutToken(val)
+        persistUnifiedSettingsState()
+    },
+    resetShortcutBindings: () => {
+        store.shortcutBindings = {
+            ...defaultShortcutBindings,
+        }
         persistUnifiedSettingsState()
     },
     isQuickSettingSelected: (id: string) => {
