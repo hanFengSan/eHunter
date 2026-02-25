@@ -6,6 +6,7 @@
  */
 
 import { Platform, type PlatformDetectionResult } from './types'
+import { isTestEnvironmentHost } from '../../core/utils/runtimeEnv'
 
 /**
  * Detect platform based on current browser URL
@@ -48,7 +49,7 @@ export function detectPlatform(): PlatformDetectionResult {
   }
 
   // Test platform: localhost or IP addresses
-  if (hostname === 'localhost' || /^\d{1,3}(?:\.\d{1,3}){3}$/.test(hostname)) {
+  if (isTestEnvironmentHost(host)) {
     return {
       platform: Platform.TEST,
       host,

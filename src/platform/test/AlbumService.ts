@@ -1,6 +1,7 @@
 import type { ImgPageInfo, ThumbInfo, PreviewThumbnailStyle, ImgSrcMode } from "core/model/model";
 import type { AlbumService } from "core/service/AlbumService"
 import Util from '../../../core/utils/Utils'
+import { isTestEnvironment } from '../../../core/utils/runtimeEnv'
 
 let mockThumbInfos: Array<ThumbInfo> = []
 let srcMap: any = { 0: '/2195608-00.jpg', 1: '/2195608-01.jpg', 2: '/2195608-02.jpg', 3: '/2195608-03.jpg' }
@@ -26,7 +27,22 @@ for (let i = 0; i < 64; i++) {
 }
 
 export class TestAlbumService implements AlbumService {
+    private pageCount: number
+    private thumbInfos: Array<ThumbInfo>
+    private imgPageInfos: Array<ImgPageInfo>
+
     constructor(imgHtml: string) {
+        const params = new URLSearchParams(window.location.search)
+        const requestedPageTotal = Number.parseInt(params.get('pageTotal') || '', 10)
+        const hasValidPageTotal = Number.isFinite(requestedPageTotal) && requestedPageTotal > 0
+        const defaultPageCount = mockImgPageInfos.length
+
+        this.pageCount = isTestEnvironment() && hasValidPageTotal
+            ? requestedPageTotal
+            : defaultPageCount
+
+        this.thumbInfos = buildMockThumbInfos(this.pageCount)
+        this.imgPageInfos = buildMockImgPageInfos(this.pageCount)
     }
 
     isSupportOriginImg(): boolean {
@@ -49,7 +65,7 @@ export class TestAlbumService implements AlbumService {
         return '/g/id/test/'
     }
     getPageCount(): number {
-        return 64
+        return this.pageCount
     }
     getCurPageIndex(): number {
         return 0
@@ -60,17 +76,17 @@ export class TestAlbumService implements AlbumService {
     }
 
     getThumbInfos(isDisableCache: boolean): Array<ThumbInfo> {
-        return mockThumbInfos
+        return this.thumbInfos
     }
 
     getImgPageInfos(): Array<ImgPageInfo> {
-        return mockImgPageInfos
+        return this.imgPageInfos
     }
 
     async getImgSrc(index: number, mode: ImgSrcMode): Promise<ImgPageInfo | Error> {
         // await Util.timeout(30000)
-        mockImgPageInfos[index].src = mockImgPageInfos[index].pageUrl
-        return mockImgPageInfos[index]
+        this.imgPageInfos[index].src = this.imgPageInfos[index].pageUrl
+        return this.imgPageInfos[index]
     }
 
     getPreviewThumbnailStyle(index: number): PreviewThumbnailStyle {
@@ -92,4 +108,32 @@ export class TestAlbumService implements AlbumService {
             'background-size': imgPageInfo.heightOfWidth >= 1.43 ? 'cover' : `${sumOfThumbInSprite * 100}%`
         };
     }
+}
+
+function buildMockThumbInfos(pageCount: number): Array<ThumbInfo> {
+    const result: Array<ThumbInfo> = []
+    const baseCount = mockThumbInfos.length
+    for (let i = 0; i < pageCount; i++) {
+        const source = mockThumbInfos[i % baseCount]
+        result.push({
+            ...source,
+            id: String(i),
+        })
+    }
+    return result
+}
+
+function buildMockImgPageInfos(pageCount: number): Array<ImgPageInfo> {
+    const result: Array<ImgPageInfo> = []
+    const baseCount = mockImgPageInfos.length
+    for (let i = 0; i < pageCount; i++) {
+        const source = mockImgPageInfos[i % baseCount]
+        result.push({
+            ...source,
+            id: i,
+            index: i,
+            src: '',
+        })
+    }
+    return result
 }

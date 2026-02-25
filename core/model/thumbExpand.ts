@@ -1,6 +1,6 @@
 import type { ThumbInfo } from './model'
 
-export const thumbExpandSegmentSize = 100
+export const thumbExpandSegmentSize = 200
 
 export interface ThumbExpandSegmentRange {
     segmentIndex: number

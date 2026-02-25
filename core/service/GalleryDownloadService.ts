@@ -2,6 +2,7 @@ import * as fflate from 'fflate'
 import type { AlbumService } from './AlbumService'
 import { i18n } from '../store/i18n'
 import { getImageRetryStages } from './imageRetryPolicy'
+import { isTestEnvironment } from '../utils/runtimeEnv'
 
 declare const __EHUNTER_VERSION__: string | undefined
 
@@ -134,14 +135,7 @@ function inferExtension(src: string, blobType: string): string {
 }
 
 function isDevRuntimeForDownload(): boolean {
-    const host = window.location.hostname || ''
-    if (host === 'localhost') {
-        return true
-    }
-    if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) {
-        return true
-    }
-    return false
+    return isTestEnvironment()
 }
 
 async function fetchBlobByGMXhr(url: string, timeoutMs = 30000): Promise<Blob> {
