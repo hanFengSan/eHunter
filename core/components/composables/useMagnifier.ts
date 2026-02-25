@@ -205,13 +205,14 @@ export function useMagnifier(options: UseMagnifierOptions) {
         if (!rect) {
             return
         }
+        const viewportPadding = 8
         const localPointerX = clamp(pointerX.value - rect.left, 0, rect.width)
         const localPointerY = clamp(pointerY.value - rect.top, 0, rect.height)
         const focusHalf = focusBoxSize.value / 2
         const rightCandidate = localPointerX + focusHalf + lensGap
         const leftCandidate = localPointerX - focusHalf - lensGap - lensSize.value
-        const rightOverflowViewport = rect.left + rightCandidate + lensSize.value > window.innerWidth - 8
-        const leftOverflowViewport = rect.left + leftCandidate < 8
+        const rightOverflowViewport = rect.left + rightCandidate + lensSize.value > window.innerWidth - viewportPadding
+        const leftOverflowViewport = rect.left + leftCandidate < viewportPadding
 
         if (rightOverflowViewport && !leftOverflowViewport) {
             lensSide.value = 'left'
@@ -220,7 +221,10 @@ export function useMagnifier(options: UseMagnifierOptions) {
         }
 
         lensX.value = lensSide.value === 'right' ? rightCandidate : leftCandidate
-        lensY.value = localPointerY - lensSize.value / 2
+        const topCandidate = localPointerY - lensSize.value / 2
+        const minLensY = viewportPadding - rect.top
+        const maxLensY = window.innerHeight - viewportPadding - rect.top - lensSize.value
+        lensY.value = clamp(topCandidate, Math.min(minLensY, maxLensY), Math.max(minLensY, maxLensY))
         if (lensWarmState.value === 'ready') {
             renderMagnifierCanvas()
         }
