@@ -1004,6 +1004,7 @@ function getResponsiveDefaults() {
         showThumbView: !isMobile,
         showBookThumbView: !isMobile,
         pagesPerScreen: isMobile ? 1 : 2,
+        showBookPagination: !isMobile,
     }
 }
 
@@ -1038,7 +1039,7 @@ export const store = reactive({
     volumeSize: 100, // default 10, the page quantity per volume
     showThumbView: responsiveDefaults.showThumbView,
     bookDirection: 0, // 0: RTL, 1: LTR
-    showBookPagination: true, // show/hide bottom floating pagination bar
+    showBookPagination: responsiveDefaults.showBookPagination, // show/hide bottom floating pagination bar
     isChangeOddEven: false,
     isReverseFlip: false, // reverse the page flipping direction
     isAutoFlip: false,

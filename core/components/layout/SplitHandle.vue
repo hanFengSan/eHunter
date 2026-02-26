@@ -82,6 +82,7 @@ onUnmounted(() => {
 
 .split-handle {
   position: relative;
+  z-index: 13000;
   background: transparent;
   transition: background-color 0.2s ease;
   user-select: none;
