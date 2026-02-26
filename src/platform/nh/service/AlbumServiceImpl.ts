@@ -10,6 +10,13 @@ import type { ImgPageInfo, ThumbInfo, PreviewThumbnailStyle, ImgSrcMode } from '
 import { ImgHtmlParser } from '../parser/ImgHtmlParser'
 import { IntroHtmlParser } from '../parser/IntroHtmlParser'
 import { TextReq } from '../../base/request/TextReq'
+import type { InitializationStepUpdate } from '../../types'
+import {
+  NH_INITIALIZATION_STEPS,
+  createStepMap,
+  createStepUpdate,
+  markCurrentPendingStepFailed
+} from '../../init-steps'
 
 export class NHAlbumServiceImpl implements AlbumService {
   private imgHtmlParser: ImgHtmlParser
@@ -20,6 +27,10 @@ export class NHAlbumServiceImpl implements AlbumService {
   private albumId: string = ''
   private curPageIndex: number = 0
   private title: string = ''
+  private reportInitializationStep: (step: InitializationStepUpdate) => void = () => {}
+  private initializationStepStatus: Record<string, InitializationStepUpdate['status']> = {}
+  private readonly initializationStepOrder = NH_INITIALIZATION_STEPS.map(step => step.id)
+  private readonly initializationStepMap = createStepMap(NH_INITIALIZATION_STEPS)
 
   constructor() {
     const htmlText = document.documentElement.outerHTML
@@ -58,20 +69,78 @@ export class NHAlbumServiceImpl implements AlbumService {
     return this.curPageIndex
   }
 
+  setInitializationStepReporter(reporter: (step: InitializationStepUpdate) => void): void {
+    this.reportInitializationStep = reporter
+  }
+
+  private updateInitializationStep(step: InitializationStepUpdate): void {
+    this.initializationStepStatus[step.id] = step.status
+    this.reportInitializationStep(step)
+  }
+
+  private failCurrentInitializationStep(reason: string): void {
+    markCurrentPendingStepFailed(
+      this.initializationStepOrder,
+      this.initializationStepStatus,
+      this.initializationStepMap,
+      reason,
+      step => this.updateInitializationStep(step)
+    )
+  }
+
   async init(): Promise<Error | void> {
+    this.initializationStepStatus = {}
+    NH_INITIALIZATION_STEPS.forEach(step => {
+      this.updateInitializationStep(createStepUpdate(step, 'pending'))
+    })
+
     try {
       this.pageCount = this.imgHtmlParser.getPageCount()
       this.albumId = this.imgHtmlParser.getAlbumId()
       this.introUrl = this.imgHtmlParser.getIntroUrl()
       this.curPageIndex = this.imgHtmlParser.getCurPageNum() - 1
+      this.updateInitializationStep(
+        createStepUpdate(
+          this.initializationStepMap.parseImagePageMetadata,
+          'success',
+          `${this.pageCount} pages detected`
+        )
+      )
 
       const introHtml = await new TextReq(this.introUrl).request()
+      this.updateInitializationStep(
+        createStepUpdate(
+          this.initializationStepMap.fetchIntroPage,
+          'success',
+          'Intro page loaded'
+        )
+      )
       const introParser = new IntroHtmlParser(introHtml)
 
       this.title = introParser.getTitle()
+      if (!this.title || !this.title.trim()) {
+        throw new Error('Title is empty')
+      }
+      this.updateInitializationStep(
+        createStepUpdate(
+          this.initializationStepMap.extractTitle,
+          'success',
+          'Title extracted successfully'
+        )
+      )
+
       this.imgPageInfos = introParser.getImgPageInfos()
       this.thumbInfos = introParser.getThumbInfos()
+      this.updateInitializationStep(
+        createStepUpdate(
+          this.initializationStepMap.extractImagePagesAndThumbnails,
+          'success',
+          `${this.imgPageInfos.length} image pages and ${this.thumbInfos.length} thumbnails extracted`
+        )
+      )
     } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error)
+      this.failCurrentInitializationStep(reason)
       return error instanceof Error ? error : new Error(String(error))
     }
   }

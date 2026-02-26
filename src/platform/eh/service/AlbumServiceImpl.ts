@@ -12,6 +12,13 @@ import { ImgHtmlParser } from '../parser/ImgHtmlParser'
 import { IntroHtmlParser } from '../parser/IntroHtmlParser'
 import { ImgUrlListParser } from '../parser/ImgUrlListParser'
 import { TextReq } from '../../base/request/TextReq'
+import type { InitializationStepUpdate } from '../../types'
+import {
+  EH_INITIALIZATION_STEPS,
+  createStepMap,
+  createStepUpdate,
+  markCurrentPendingStepFailed
+} from '../../init-steps'
 
 const MOCK_THUMB_PARSE_ERROR_QUERY_KEY = 'ehunterMockThumbParseError'
 
@@ -34,6 +41,10 @@ export class EHAlbumServiceImpl implements AlbumService {
   private curPageIndex: number = 0
   private title: string = ''
   private isInitialized: boolean = false
+  private reportInitializationStep: (step: InitializationStepUpdate) => void = () => {}
+  private initializationStepStatus: Record<string, InitializationStepUpdate['status']> = {}
+  private readonly initializationStepOrder = EH_INITIALIZATION_STEPS.map(step => step.id)
+  private readonly initializationStepMap = createStepMap(EH_INITIALIZATION_STEPS)
 
   constructor() {
     // Parse current image page HTML
@@ -69,7 +80,31 @@ export class EHAlbumServiceImpl implements AlbumService {
     return this.curPageIndex
   }
 
+  setInitializationStepReporter(reporter: (step: InitializationStepUpdate) => void): void {
+    this.reportInitializationStep = reporter
+  }
+
+  private updateInitializationStep(step: InitializationStepUpdate): void {
+    this.initializationStepStatus[step.id] = step.status
+    this.reportInitializationStep(step)
+  }
+
+  private failCurrentInitializationStep(reason: string): void {
+    markCurrentPendingStepFailed(
+      this.initializationStepOrder,
+      this.initializationStepStatus,
+      this.initializationStepMap,
+      reason,
+      step => this.updateInitializationStep(step)
+    )
+  }
+
   async init(): Promise<Error | void> {
+    this.initializationStepStatus = {}
+    EH_INITIALIZATION_STEPS.forEach(step => {
+      this.updateInitializationStep(createStepUpdate(step, 'pending'))
+    })
+
     try {
       // Parse basic info from current image page
       this.title = this.imgHtmlParser.getTitle()
@@ -77,6 +112,13 @@ export class EHAlbumServiceImpl implements AlbumService {
       this.albumId = this.imgHtmlParser.getAlbumId()
       this.introUrl = this.imgHtmlParser.getIntroUrl()
       this.curPageIndex = this.imgHtmlParser.getCurPageNum() - 1 // Convert to 0-based index
+      this.updateInitializationStep(
+        createStepUpdate(
+          this.initializationStepMap.parseImagePageMetadata,
+          'success',
+          `Parsed title and ${this.pageCount} pages`
+        )
+      )
 
       // Parse thumbnail and image page info from intro pages
       const imgUrlListParser = new ImgUrlListParser(this.introUrl, this.pageCount)
@@ -86,6 +128,13 @@ export class EHAlbumServiceImpl implements AlbumService {
       }
 
       this.imgPageInfos = await imgUrlListParser.request()
+      this.updateInitializationStep(
+        createStepUpdate(
+          this.initializationStepMap.fetchIntroPages,
+          'success',
+          'Intro pages fetched successfully'
+        )
+      )
 
       // Generate thumbnail info from imgPageInfos
       this.thumbInfos = this.imgPageInfos.map((imgPageInfo, index) => {
@@ -119,6 +168,13 @@ export class EHAlbumServiceImpl implements AlbumService {
           }
         }
       })
+      this.updateInitializationStep(
+        createStepUpdate(
+          this.initializationStepMap.extractImagePagesAndThumbnails,
+          'success',
+          `${this.imgPageInfos.length} image pages and ${this.thumbInfos.length} thumbnails extracted`
+        )
+      )
 
       this.isInitialized = true
       console.log('EH Platform initialized successfully', {
@@ -130,6 +186,8 @@ export class EHAlbumServiceImpl implements AlbumService {
         imgPageCount: this.imgPageInfos.length
       })
     } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error)
+      this.failCurrentInitializationStep(reason)
       console.error('EH Platform initialization failed:', error)
       return error instanceof Error ? error : new Error(String(error))
     }

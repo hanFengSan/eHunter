@@ -16,7 +16,21 @@
       <h3>Initialization Error</h3>
       <button @click="onClose" class="close-button" aria-label="Close">x</button>
     </div>
+    <p class="feedback-link">
+      <strong>Feedback / Bug Report:</strong>
+      <a href="https://github.com/hanFengSan/eHunter/issues" target="_blank" rel="noopener noreferrer">Open GitHub Issues</a>
+    </p>
     <p class="error-message">{{ error.message }}</p>
+    <div v-if="initializationSteps.length" class="init-steps">
+      <h4>Initialization Steps</h4>
+      <ul>
+        <li v-for="step in initializationSteps" :key="step.id">
+          <span class="step-status" :class="`step-status--${step.status}`">{{ formatStepStatus(step.status) }}</span>
+          <span class="step-label">{{ step.label }}</span>
+          <span v-if="step.detail" class="step-detail">- {{ step.detail }}</span>
+        </li>
+      </ul>
+    </div>
     <details class="error-details" open>
       <summary>
         <span>Technical Details (for bug reports)</span>
@@ -33,9 +47,6 @@
         <pre v-if="error.stack" class="error-stack">{{ error.stack }}</pre>
       </div>
     </details>
-    <p class="feedback-link">
-      Feedback: <a href="https://github.com/hanFengSan/eHunter/issues" target="_blank" rel="noopener noreferrer">https://github.com/hanFengSan/eHunter/issues</a>
-    </p>
   </div>
   <slot v-else />
 </template>
@@ -43,7 +54,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import pkgJson from '../../package.json'
-import type { InitializationError } from '../../src/platform/types'
+import type { InitializationError, InitializationStepStatus, InitializationStepUpdate } from '../../src/platform/types'
 
 interface Props {
   isLoading?: boolean
@@ -119,7 +130,31 @@ const operatingSystem = getOperatingSystem()
 
 const copied = ref(false)
 
-const copyButtonText = computed(() => (copied.value ? 'Copied' : '复制'))
+const copyButtonText = computed(() => (copied.value ? 'Copied' : 'Copy'))
+
+const initializationSteps = computed<InitializationStepUpdate[]>(() => {
+  const currentError = props.error
+  if (!currentError?.steps || !Array.isArray(currentError.steps)) {
+    return []
+  }
+  return currentError.steps
+    .slice()
+    .sort((a, b) => {
+      const orderA = a.order ?? Number.MAX_SAFE_INTEGER
+      const orderB = b.order ?? Number.MAX_SAFE_INTEGER
+      return orderA - orderB
+    })
+})
+
+function formatStepStatus(status: InitializationStepStatus): string {
+  if (status === 'success') {
+    return 'Done'
+  }
+  if (status === 'failed') {
+    return 'Failed'
+  }
+  return 'Pending'
+}
 
 const errorDetailText = computed(() => {
   const currentError = props.error
@@ -128,6 +163,21 @@ const errorDetailText = computed(() => {
   }
 
   const lines = [
+    'Initialization Steps:'
+  ]
+
+  if (initializationSteps.value.length) {
+    initializationSteps.value.forEach(step => {
+      const detail = step.detail ? ` (${step.detail})` : ''
+      lines.push(`- [${formatStepStatus(step.status)}] ${step.label}${detail}`)
+    })
+  } else {
+    lines.push('- (No step data)')
+  }
+
+  lines.push('')
+  lines.push('Technical Details:')
+  lines.push(...[
     `Error: ${currentError.message}`,
     `Platform: ${currentError.platform}`,
     `eHunter Version: ${appVersion}`,
@@ -135,9 +185,10 @@ const errorDetailText = computed(() => {
     `OS: ${operatingSystem}`,
     `URL: ${currentError.url}`,
     `Timestamp: ${currentError.timestamp}`
-  ]
+  ])
 
   if (currentError.stack) {
+    lines.push('')
     lines.push(`Stack:\n${currentError.stack}`)
   }
 
@@ -311,11 +362,13 @@ $clouds: #ecf0f1;
 .ehunter-error {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     padding: 20px;
     background: #333;
     color: #fff;
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    text-align: left;
 }
 
 .error-header {
@@ -367,6 +420,74 @@ $clouds: #ecf0f1;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     padding: 15px;
+}
+
+.init-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.init-steps h4 {
+    margin: 0;
+    font-size: 15px;
+    color: #d9f2ff;
+}
+
+.init-steps ul {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.init-steps li {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.step-status {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    margin-right: 8px;
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.step-status--success {
+    background: rgba(56, 142, 60, 0.25);
+    color: #8ee59a;
+}
+
+.step-status--failed {
+    background: rgba(211, 47, 47, 0.25);
+    color: #ff9e9e;
+}
+
+.step-status--pending {
+    background: rgba(158, 158, 158, 0.25);
+    color: #d7d7d7;
+}
+
+.step-label {
+    color: #ffffff;
+}
+
+.step-detail {
+    color: rgba(255, 255, 255, 0.8);
+    margin-left: 4px;
 }
 
 .error-details summary {
@@ -429,12 +550,28 @@ $clouds: #ecf0f1;
 }
 
 .feedback-link {
-    margin-top: 14px;
-    margin-bottom: 0;
-    color: rgba(255, 255, 255, 0.85);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border-left: 4px solid #ffd166;
+    border-radius: 6px;
+    background: rgba(255, 209, 102, 0.18);
+    color: #fff4cf;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 .feedback-link a {
-    color: #4fc3f7;
+    color: #ffe29a;
+    text-decoration: underline;
+    font-weight: 700;
+}
+
+.feedback-link a:hover {
+    color: #fff6d7;
 }
 </style>
