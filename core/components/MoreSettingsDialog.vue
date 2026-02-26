@@ -1161,5 +1161,12 @@ onUnmounted(() => {
     font-size: 11px;
     line-height: 1.2;
     padding: 4px 7px;
+
+    &:hover,
+    &:focus {
+        border-color: #6ed08f;
+        background: #e9fff1 !important;
+        color: #1f7a3f;
+    }
 }
 </style>
