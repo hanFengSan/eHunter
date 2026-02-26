@@ -3,7 +3,7 @@
         "title":"新版本: v3.1.0",
         "version":"3.1.0",
         "text":"### v3.1.0\n- 新增放大镜功能（滚动模式：左键点击图片打开；书页模式：点击屏幕中间区域图片打开）\n- 支持快捷键自定义（入口：更多设置）\n- 修复「快捷设置」中的拖拽功能\n\n### v3.0.0 重点\n- 支持图片打包下载\n- 支持 iOS / iPad（移动端体验优化）\n- 图片加载失败时支持自动换源重试",
-        "time":1771819200000,
+        "time":1772323200000,
         "duration":432000000,
         "always":true,
         "operations":[
@@ -21,7 +21,7 @@
         "title":"New version: v3.1.0",
         "version":"3.1.0",
         "text":"### v3.1.0\n- Added a magnifier feature (Scroll Mode: left-click an image to open; Book Mode: click an image in the center area of the screen to open)\n- Added customizable keyboard shortcuts (entry: More Settings)\n- Fixed drag behavior in Quick Settings\n\n### v3.0.0 Highlights\n- Added image bundle download\n- Added iOS / iPad support (improved mobile experience)\n- Added automatic retry with alternative sources when image loading fails",
-        "time":1771819200000,
+        "time":1772323200000,
         "duration":432000000,
         "always":true,
         "operations":[
@@ -39,7 +39,7 @@
         "title":"新バージョン: v3.1.0",
         "version":"3.1.0",
         "text":"### v3.1.0\n- 拡大鏡機能を追加（スクロールモード: 画像を左クリックで起動、ブックモード: 画面中央エリアの画像をクリックで起動）\n- ショートカットキーのカスタマイズに対応（入口: 詳細設定）\n- クイック設定のドラッグ挙動を修正\n\n### v3.0.0 の主な更新\n- 画像の一括ダウンロードに対応\n- iOS / iPad 対応（モバイル体験を改善）\n- 画像読み込み失敗時に別ソースで自動再試行",
-        "time":1771819200000,
+        "time":1772323200000,
         "duration":432000000,
         "always":true,
         "operations":[
